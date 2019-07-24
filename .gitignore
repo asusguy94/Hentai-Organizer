@@ -1,0 +1,6 @@
+node_modules
+*.min.*
+package-lock.json
+.idea
+*test.php
+*.lock

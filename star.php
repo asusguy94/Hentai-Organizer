@@ -19,29 +19,29 @@ else
         <nav><?php $basic->navigation() ?></nav>
         <main class="container-fluid">
             <div class="row">
-                <section class="col-12">
+                <section class="col-7">
 					<?php
 					$stars->fetchStar($id);
 					?>
                 </section>
 
-                <!--<aside class="col-5">
+                <aside class="col-5">
                     <div id="relations">
                         <h1>Relations</h1>
                         <div class="row">
                             <div class="col-12">
                                 <button id="relation-add" class="btn btn-primary">Add</button>
                             </div>
-                        </div>-->
+                        </div>
 
 
-						<?php /*$stars->getRelations($id)*/ ?>
-                    <!--</div>-->
+						<?php $stars->getRelations($id) ?>
+                    </div>
 
-                    <!--<div id="relations">-->
-						<?php /*$stars->getRelations_other($id)*/ ?>
-                    <!--</div>-->
-               <!--</aside>-->
+                    <div id="relations">
+						<?php $stars->getRelations_other($id) ?>
+                    </div>
+               </aside>
         </main>
     </body>
 </html>

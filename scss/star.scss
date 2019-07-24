@@ -1,12 +1,10 @@
 @import "functions";
 
 aside {
-  border: 1px solid red;
-
-  #similar {
+  #relations {
     text-align: center;
 
-    a.similar-star {
+    a.relation {
       display: inline-block;
       width: 200px;
 

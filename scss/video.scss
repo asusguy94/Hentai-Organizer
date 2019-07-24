@@ -16,10 +16,19 @@ aside {
 
   #stars {
     margin-top: 10px;
-  }
 
-  .star img {
-    width: 100%;
+    .star {
+      width: 29%;
+      vertical-align: top;
+
+      img {
+        width: 100%
+      }
+
+      .info {
+        display: none;
+      }
+    }
   }
 
   #up-next {
@@ -33,20 +42,20 @@ aside {
     text-decoration: none;
 
     border-radius: 4px;
-  }
 
-  #up-next * {
-    color: white;
-  }
+    * {
+      color: white;
+    }
 
-  #up-next:hover {
-    background-color: darkgrey;
-  }
+    &:hover {
+      background-color: darkgrey;
+    }
 
-  #up-next > div {
-    position: relative;
-    top: 50%;
-    transform: translateY(-50%);
+    & > div {
+      position: relative;
+      top: 50%;
+      transform: translateY(-50%);
+    }
   }
 }
 
@@ -56,8 +65,6 @@ aside {
     display: block;
     width: 90%;
     float: left;
-
-    margin: 0;
   }
 
   & > h3 {
@@ -69,7 +76,7 @@ aside {
 
   & > #next {
     float: right;
-    margin-top: -1.5%;
+    margin-top: 1.5%;
   }
 }
 
@@ -103,7 +110,70 @@ aside {
     }
   }
 
+  .bookmark-info {
+    display: none;
+  }
+
   @include bookmarkPosition();
+}
+
+/* Franchise */
+aside #franchise {
+  margin-bottom: 3%;
+
+  .info {
+    height: inherit;
+
+    & > .title {
+      margin-left: 140px;
+    }
+
+    & > img.thumbnail {
+      height: inherit;
+      float: left;
+    }
+  }
+}
+
+/* Up Next */
+#up-next, .episode {
+  display: block;
+  height: 75px;
+
+  margin: 0 1%;
+  padding: 5px 10px;
+
+  background-color: grey;
+  text-decoration: none;
+
+  border-radius: 4px;
+
+  * {
+    color: white;
+  }
+
+  &:hover {
+    background-color: darkgrey;
+  }
+}
+
+.episode {
+  margin-top: 10px;
+}
+
+#up-next > div, .episode .title {
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+#video-attributes {
+  text-align: center;
+
+  .attribute {
+    display: inline-block;
+    margin-left: 5px
+  }
 }
 
 form[autocomplete] {

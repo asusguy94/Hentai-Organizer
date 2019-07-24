@@ -73,15 +73,6 @@
     display: block;
   }
 
-  .info {
-    .wsite {
-      color: green;
-    }
-    .site {
-      color: red;
-    }
-  }
-
   .divider {
     &::before, &::after {
       content: ' ';
@@ -160,9 +151,6 @@ small {
 
 input.xdsoft_input {
   text-transform: capitalize;
-  &[name="breast"] {
-    text-transform: uppercase;
-  }
 }
 
 .no-match {

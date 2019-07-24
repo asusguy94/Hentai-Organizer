@@ -876,7 +876,7 @@ class Star
 		$query->bindValue(1, $starID);
 		$query->execute();
 		if ($query->rowCount()) {
-			print '<div id="videos">';
+			print '<div id="videos" class="row">';
 
 			$cdnNumber = 2;
 			foreach ($query->fetchAll() as $data) {
@@ -1219,7 +1219,7 @@ class Video
 		$query->bindValue(1, $id);
 		$query->execute();
 		if ($query->rowCount()) {
-			print '<div id="video-stars">';
+			print '<div id="stars">';
 			foreach ($query->fetchAll() as $data) {
 				if ($data['image'] != '') {
 					print '<div class="star" data-star-id="' . $data['starID'] . '">';
@@ -1235,7 +1235,7 @@ class Video
 					print '<span class="ribbon">NEW<span>';
 				}
 
-				print '<div class="star-info" data-star-id="' . $data['starID'] . '">';
+				print '<div class="info" data-star-id="' . $data['starID'] . '">';
 				foreach ($star->getBookmarks($data['starID'], $id) as $result) {
 					print '<p class="btn btn-outline-primary btn-sm">' . $result['name'] . '</p>';
 				}
@@ -1254,7 +1254,7 @@ class Video
 		$query->bindValue(1, $id);
 		$query->execute();
 		if ($query->rowCount()) {
-			print '<div id="video-categories">';
+			print '<div id="categories">';
 			foreach ($query->fetchAll() as $data) {
 				print "<a class='category btn btn-outline-primary btn-sm px-3' href='category.php?id=$data[categoryID]' data-category-id='$data[categoryID]'>$data[name]</a>";
 			}
@@ -1265,7 +1265,7 @@ class Video
 	function getOffset($start)
 	{
 		$offset_decimal = $start / $this->videoDuration;
-		$offset_mx = 0.92;
+		$offset_mx = 1.01;
 
 		$offset = ($offset_decimal * 100);
 		$offset *= $offset_mx;

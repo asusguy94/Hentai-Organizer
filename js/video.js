@@ -511,12 +511,15 @@ $(function () {
                             let name = $(selectedAttribute_query).eq(i).attr("data-attribute-id")
                             selectedAttribute.push(name)
                         }
+
+                        searchField()
                         let attribute_query = $("#attributes > .attribute")
                         for (let i = 0; i < attribute_query.length; i++) {
                             let attributeID = $(attribute_query).eq(i).attr("data-attribute-id")
                             let attributeName = $(attribute_query).eq(i).text()
                             if (selectedAttribute.indexOf(attributeID) === -1) $("#dialog").append('<div class="btn" onclick="addBookmarkAttribute(' + bookmarkID + ", " + attributeID + ')">' + attributeName + "</div>")
                         }
+                        searchData()
                     })
                 }
             }, edit: {
@@ -530,12 +533,15 @@ $(function () {
                                 $("#dialog").remove()
                             }, width: 250, position: {my: "top", at: "top+150"}
                         })
+
+                        searchField()
                         for (let i = 0; i < $("#category_list > option").length; i++) {
                             let category = $("#category_list > option").eq(i)
                             let categoryID = category.attr("data-category-id")
                             let categoryName = category.attr("value")
                             if (categoryName !== bookmarkName) $("#dialog").append('<div class="btn" onclick="bookmark_editCategory(' + bookmarkID + "," + categoryID + ')">' + categoryName + "</div>")
                         }
+                        searchData()
                     })
                 }
             }, edit_time: {
@@ -605,12 +611,14 @@ $(function () {
                                 $(this).remove()
                             }, width: 250, maxHeight: $(window).height() - 55, position: {my: "top", at: "top+50"}
                         })
+                        searchField()
                         let attribute_query = $("#attributes > .attribute")
                         for (let i = 0; i < attribute_query.length; i++) {
                             let attributeID = $(attribute_query).eq(i).attr("data-attribute-id")
                             let attributeName = $(attribute_query).eq(i).text()
                             $("#dialog").append('<div class="btn" onclick="addGlobal_starAttribute(' + starID + ", " + attributeID + ')">' + attributeName + "</div>")
                         }
+                        searchData()
                     })
                 }
             }, remove: {
@@ -839,6 +847,46 @@ function is_ValidURL(url) {
     xhr.open("HEAD", url, false)
     xhr.send()
     return xhr.status !== 404
+}
+
+function searchField(dialogQuery = $('#dialog')) {
+    const searchWrapper = document.createElement('span')
+    searchWrapper.classList.add('search')
+    const searchInner = document.createElement('span')
+    searchInner.classList.add('inner')
+
+    searchWrapper.appendChild(searchInner)
+    dialogQuery.append(searchWrapper)
+}
+
+function searchData() {
+    const CHAR_BACKSPACE = 8
+    const CHAR_SPACE = 32
+    const CHAR_A = 65
+    const CHAR_Z = 90
+
+    let input = ''
+    document.addEventListener('keydown', function (e) {
+        if (((e.which === CHAR_BACKSPACE && input.length) || e.which === CHAR_SPACE) || (e.which >= CHAR_A && e.which <= CHAR_Z)) {
+            e.preventDefault() // spacebar scroll
+
+            if (e.which === 8) {
+                updateLabel(input = input.slice(0, -1))
+            } else {
+                updateLabel(input += String.fromCharCode(e.which).toLowerCase())
+            }
+
+            $('#dialog .btn').removeClass('no-match').not(function () {
+                return this.textContent.toLowerCase().indexOf(input) > -1
+            }).addClass('no-match')
+        }
+    })
+
+    function updateLabel(input) {
+        if (document.querySelector('.search > .inner')) {
+            document.querySelector('.search > .inner').textContent = input
+        }
+    }
 }
 
 // END Functions

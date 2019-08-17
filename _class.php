@@ -22,8 +22,6 @@ try {
 	die();
 }
 
-// TODO bootstrap navbar
-
 /* Initialize Header */
 ob_start();
 
@@ -149,7 +147,7 @@ class Basic
 				"link" => "random.php"
 			), array(
 				"name" => "DB",
-				"link" => "http://ds1517/phpMyAdmin?pma_username=" . DB_USER . "&pma_password=" . DB_PASS
+				"link" => "https://ds1517/phpMyAdmin?pma_username=" . DB_USER . "&pma_password=" . DB_PASS
 			), array(
 				"name" => "Generate Thumbnails",
 				"link" => 'video_generatethumbnails.php',
@@ -1549,7 +1547,10 @@ class Date
 	{
 		$minutes = floor($seconds / 60);
 		$seconds = $seconds % 60;
-		if ($seconds < 10) $seconds = '0' . $seconds;
+		if ($seconds < 10) $seconds = "0$seconds";
+
+		return "$minutes:$seconds";
+	}
 
 		return $minutes . ':' . $seconds;
 	}
@@ -1577,7 +1578,7 @@ class FFMPEG
 			$return = ($hours * 60 * 60) + ($minutes * 60) + $seconds;
 			return $return;
 		} else {
-			return false;
+			return 0;
 		}
 	}
 

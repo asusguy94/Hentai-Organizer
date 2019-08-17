@@ -29,6 +29,7 @@ $query = $pdo->prepare($sql);
 $query->execute();
 $result = $query->fetchAll(PDO::FETCH_OBJ);
 
+// Initialize Arrays
 $attribute_arr = [];
 $category_arr = [];
 $alias_arr = [];
@@ -45,14 +46,6 @@ for ($i = 0, $len = count($result); $i < $len; $i++) {
 	$fileName = $result[$i]->path;
 	$aliasName = $result[$i]->alias;
 	$cen = $result[$i]->cen;
-
-	if (is_null($videoID)) {
-		$query = $pdo->prepare("SELECT id FROM videos WHERE name = ? LIMIT 1");
-		$query->bindValue(1, $videoName);
-		$query->execute();
-
-		$videoID = $query->fetch()['id'];
-	}
 
 	$nextIsDuplicate = ($i < $len - 1 && ($result[$i + 1]->video == $videoName));
 	$prevIsDuplicate = ($i > 0 && ($result[$i - 1]->video == $videoName));
@@ -117,15 +110,13 @@ for ($i = 0, $len = count($result); $i < $len; $i++) {
 		}
 		print ']';
 
-		/* RESETS */
+		/* Reset Arrays */
 		$attribute_arr = [];
 		$category_arr = [];
 		$alias_arr = [];
 	}
 
 	if (!$nextIsDuplicate) {
-		print '';
-
 		if ($i < $len - 1) print '},';
 		else print '}';
 	}

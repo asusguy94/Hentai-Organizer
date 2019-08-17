@@ -67,8 +67,8 @@ global $pdo;
 				print '<div id="categories">';
 				foreach ($query->fetchAll() as $data) {
 					print '<div class="input-wrapper">';
-					print '<input type="checkbox" name="category_' . $data['name'] . '">';
-					print '<label for="category_' . $data['name'] . '">' . $data['name'] . '</label>';
+					print "<input type='checkbox' name='category_{$data['name']}'>";
+					print "<label for='category_{$data['name']}'>{$data['name']}</label>";
 					print '</div>';
 				}
 				print '</div>';

@@ -1,5 +1,6 @@
 <?php
 include('../_class.php');
+$basic = new Basic();
 
 if (isset($_GET['videoID']) && isset($_GET['videoPath'])) {
 	if (!empty($_GET['videoID']) && !empty($_GET['videoPath'])) {

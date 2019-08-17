@@ -426,7 +426,7 @@ $(function () {
                 name: "Rename File",
                 icon: "edit",
                 callback: function () {
-                    let videoPath_current = $(videoPlayer).find("source").first().attr("src").split("/")[1]
+                    let videoPath_current = `${$(videoPlayer).find("source").first().attr("src").split("/")[1]}.mp4`
                     $("body").append('<div id="dialog" title="Edit File"></div>')
                     $(function () {
                         $("#dialog").dialog({

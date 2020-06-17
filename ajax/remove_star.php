@@ -12,7 +12,7 @@ if (isset($_GET['starID'])) {
 		$query->execute();
 		if ($query->rowCount()) {
 			$image = $query->fetch()['image'];
-			unlink('images/stars/' . $image);
+			unlink("../images/stars/$image");
 		}
 
 		$query = $pdo->prepare("SELECT id FROM videostars WHERE starID = ? LIMIT 1");

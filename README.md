@@ -118,7 +118,3 @@ Currently the way the structure of the database and php-functions work, is that 
 5. BEFORE DOING ANYTHING: Check that nothing is using the unwanted data, this can be checked with the app (easy), or with the administration (intermediate).
 6. Remove the unwanted data from the administration website and go back to the app. it should now be working again
 ```
-## Copyright and License
-[Plyr](js/license.md)
-
-[The MIT License](LICENSE.md)

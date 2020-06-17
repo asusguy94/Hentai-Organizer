@@ -1,287 +1,305 @@
 <?php
-define('DB', 'hentai');
-define('DB_STR', 'mysql:host=127.0.0.1:3307;dbname=' . DB);
-define('DB_USER', 'hentai.web_user');
-define('DB_PASS', 'TUFDXy8qlqBUTz73');
-
-define('CDN_MAX', 0); // number of virtual subdomains
-define('THUMBNAIL_RES', 290);
-define('THUMBNAIL_START', 100);
-
-define('enableHLS', true);
-define('PARSER', false);
-
-define('BOOKMARK_FIX_OFFSET', 6);
-define('BOOTSTRAP', true);
-
-try {
-	$pdo = new PDO(DB_STR, DB_USER, DB_PASS);
-} catch (PDOException $e) {
-	print "Error: {$e->getMessage()}<br>";
-	print 'Please contact the system administrator if the problem persists';
-	die();
-}
-
-/* Initialize Header */
-ob_start();
-
-class Basic
-{
-	function head($title = '', $stylesheet = '', $script = '')
-	{
-		$this->title($title);
-		$this->stylesheet($stylesheet);
-		$this->script($script);
-		$this->meta();
-	}
-
-	function meta()
-	{
-		if (BOOTSTRAP) print '<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">';
-	}
-
-	function title($data)
-	{
-		if ($data !== '') print "<title>$data</title>";
-	}
-
-	function stylesheet($data)
-	{
-		print '<link rel="stylesheet" href="css/main.min.css?v=' . md5_file("css/main.min.css") . '">';
-
-		if (is_array($data)) {
-			for ($i = 0; $i < count($data); $i++) {
-				if ($data[$i] === 'jqueryui') {
-					print '<link rel="stylesheet" href="css/jquery.ui.min.css">';
-				} else if ($data[$i] === 'normalize') {
-					print '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css/normalize.css">';
-				} else if ($data[$i] === 'contextmenu') {
-					print "<link rel='stylesheet' href='css/jquery.contextMenu.min.css'>";
-				} else if ($data[$i] === 'autocomplete') {
-					print '<link rel="stylesheet" href="css/jquery.autocomplete.min.css">';
-				} else if ($data[$i] === 'plyr') {
-					print "<link rel='stylesheet' href='css/plyr.css?v=" . md5_file("css/plyr.css") . "'>";
-				} else if ($data[$i] === 'bootstrap' && BOOTSTRAP) {
-					print "<link rel='stylesheet' href='https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css'>";
-				} else if ($data[$i] === 'fa') {
-					print "<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.9.0/css/all.min.css'>";
-				} else if ($data[$i] === '') {
-
-				} else {
-					print "<link rel='stylesheet' href='css/$data[$i].min.css?v=" . md5_file("css/$data[$i].min.css") . "'>";
-				}
-			}
-		} else if ($data !== '') {
-			if (file_exists("css/$data.min.css"))
-				print "<link rel='stylesheet' href='css/$data.min.css" . md5_file("css/$data.min.css") . "'>";
-			else
-				print "<link rel='stylesheet' href='css/$data.css" . md5_file("css/$data.css") . "'>";
-		}
-	}
-
-	function script($data)
-	{
-		if (is_array($data)) {
-			for ($i = 0; $i < count($data); $i++) {
-				if ($data[$i] !== '') {
-					if ($data[$i] == 'jquery') {
-						print '<script src="js/jquery.min.js"></script>';
-					} else if ($data[$i] == 'contextmenu') {
-						print "<script src='js/jquery.contextMenu.min.js'></script>";
-					} else if ($data[$i] == 'autocomplete') {
-						print '<script src="js/jquery.autocomplete.min.js"></script>';
-					} else if ($data[$i] == 'jqueryui') {
-						print '<script src="js/jquery.ui.min.js"></script>';
-					} else if ($data[$i] == 'plyr') {
-						print "<script src='js/plyr.min.js?v=" . md5_file("js/plyr.min.js") . "'></script>";
-					} else if ($data[$i] == 'lazyload') {
-						print '<script src="js/lazyload.min.js?v=' . md5_file("js/lazyload.min.js") . '"></script>';
-					} else if ($data[$i] == 'hls') {
-						print '<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>';
-					} else {
-						if (file_exists("js/$data[$i].min.js"))
-							print "<script src='js/$data[$i].min.js?v=" . md5_file("js/$data[$i].min.js") . "'></script>";
-						else
-							print "<script src='js/$data[$i].js?v=" . md5_file("js/$data[$i].js") . "'></script>";
-					}
-				}
-			}
-		} else if ($data !== '') {
-			if (file_exists("js/$data.min.js"))
-				print "<script src='js/$data.min.js?v=" . md5_file("js/$data.min.js") . "'></script>";
-			else
-				print "<script src='js/$data.js?v=" . md5_file("js/$data.js") . "'></script>";
-		}
-	}
-
-	function navigation()
-	{
-		$currentPage = basename($_SERVER['PHP_SELF']);
-
-		$arr = array(
-			array(
-				"name" => "Home",
-				"link" => "index.php"
-			), array(
-				"name" => "Add Videos",
-				"link" => "add_videos.php"
-			), array(
-				"name" => "Video Search",
-				"link" => "video_search.php",
-				array(
-					"name" => "Videos",
-					"link" => "videos.php"
-				)
-			), array(
-				"name" => "Star Search",
-				"link" => "star_search.php",
-				array(
-					"name" => "Stars",
-					"link" => "stars.php"
-				)
-			), array(
-				"name" => "Franchises",
-				"link" => "franchises.php"
-			), array(
-				"name" => "Random",
-				"link" => "random.php"
-			), array(
-				"name" => "DB",
-				"link" => "https://ds1517/phpMyAdmin?pma_username=" . DB_USER . "&pma_password=" . DB_PASS
-			), array(
-				"name" => "Generate Thumbnails",
-				"link" => 'video_generatethumbnails.php',
-				array(
-					"name" => "Generate WebVTT",
-					'link' => 'vtt.php'
-				)
-			)
-		);
-
-		for ($i = 0; $i < count($arr); $i++) {
-			if ($i === 0) print '<ul class="main-menu">';
-
-			$name = $arr[$i]['name'];
-			$link = $arr[$i]['link'];
-
-			if ($link === $currentPage)
-				print '<li class="active">';
-			else
-				print '<li>';
-
-			print "<a href='$link'>$name</a>";
-
-			for ($j = 0; $j < count($arr[$i]); $j++) {
-				if (array_key_exists($j, $arr[$i]) && is_array($arr[$i][$j])) {
-					print '<ul class="sub-menu">';
-
-					$name = $arr[$i][$j]['name'];
-					$link = $arr[$i][$j]['link'];
-
-					if ($link === $currentPage)
-						print "<li class='active'><a href='$link'>$name</a></li>";
-					else
-						print "<li><a href='$link'>$name</a></li>";
-
-					print '</ul>';
-				}
-			}
-
-			print '</li>';
-			if ($i === count($arr) - 1) print '</ul>';
-		}
-	}
-
-	function pathToFname($path)
-	{
-		return pathinfo($path, PATHINFO_BASENAME);
-	}
-
-	function getExtension($path)
-	{
-		return pathinfo($path, PATHINFO_EXTENSION);
-	}
-
-	function removeExtension($filename)
-	{
-		return pathinfo($filename, PATHINFO_FILENAME);
-	}
-
-	function generateName($fname)
-	{
-		return explode('.' . $this->getExtension($fname), $fname)[0];
-	}
-
-	function generateFranchise($fname)
-	{
-		return explode(' Episode', $fname)[0];
-	}
-
-	function generateEpisode($fname)
-	{
-		return explode('Episode ', explode($this->generateFranchise($fname), explode($this->getExtension($fname), $this->generateName($fname))[0])[1])[1];
-	}
-
-	function endsWidth($haystack, $needle)
-	{
-		$length = strlen($needle);
-		if ($length == 0) {
-			return true;
-		}
-		return (substr($haystack, -$length) === $needle);
-	}
-
-	static function getClosest($search, $arr)
-	{
-		$closest = null;
-		foreach ($arr as $item) {
-			if ($closest === null || abs($search - $closest) > abs($item - $search)) {
-				$closest = $item;
-			}
-		}
-		return $closest;
-	}
-
-	static function getClosestQ($quality)
-	{
-		if ($quality == 396) return 480;
-		return self::getClosest($quality, [1080, 720, 480, 360]);
-	}
-
-	static function reload()
-	{
-		header("Location: $_SERVER[REQUEST_URI]");
-		die();
-	}
-
-	static function removeExtensionPath($path)
-	{
-		return substr($path, 0, strrpos($path, "."));
-	}
-
-	static function getFixedURL($url)
-	{
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, $url);
-		curl_setopt($ch, CURLOPT_HEADER, TRUE);
-		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, FALSE);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-		$a = curl_exec($ch);
-		if (preg_match('#Location: (.*)#', $a, $r))
-			return trim($r[1]);
-		else
-			return false;
-	}
-}
-
-class HomePage
-{
-	public $count;
-
-	function recent()
-	{
-		global $pdo;
-		$query = $pdo->prepare("
+    define('DB', 'hentai');
+    define('DB_STR', sprintf("mysql:host=127.0.0.1:3307;dbname=%s", DB));
+    define('DB_USER', 'hentai.web_user');
+    define('DB_PASS', 'TUFDXy8qlqBUTz73');
+    
+    try {
+        $pdo = new PDO(DB_STR, DB_USER, DB_PASS);
+    } catch (PDOException $e) {
+        print "Error: {$e->getMessage()}<br>";
+        print 'Please contact the system administrator if the problem persists';
+        die();
+    }
+    
+    $opt = Settings::getSettings();
+    
+    define('CDN', $opt['cdn']);
+    define('CDN_MAX', $opt['cdn_max']);
+    
+    define('THUMBNAIL_RES', $opt['thumbnail_res']); // resolution of smaller-thumbnail
+    define('THUMBNAIL_START', $opt['thumbnail_start']); // generate thumbnail at time-code
+    
+    define('enableWEBM', $opt['enable_webm']);
+    define('enableMKV', $opt['enable_mkv']);
+    define('enableFA', $opt['enable_fa']);
+    define('enableHLS', $opt['enable_hls']);
+    define('enableDASH', $opt['enable_dash']);
+    define('enableHTTPS', $opt['enable_https']);
+    
+    define('BOOKMARK_FIX_OFFSET', 6);
+    define('BOOTSTRAP', true);
+    
+    /* Initialize Header */
+    ob_start();
+    
+    class Basic
+    {
+        function head($title = '', $stylesheet = '', $script = '')
+        {
+            $this->title($title);
+            $this->stylesheet($stylesheet);
+            $this->script($script);
+            $this->meta();
+        }
+        
+        function meta()
+        {
+            if (BOOTSTRAP) print '<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">';
+        }
+        
+        function title($data)
+        {
+            if ($data !== '') print "<title>$data</title>";
+        }
+        
+        function stylesheet($data)
+        {
+            print sprintf("<link rel='stylesheet' href='css/main.min.css?v=%s'>", md5_file("css/main.min.css"));
+            
+            if (is_array($data)) {
+                for ($i = 0; $i < count($data); $i++) {
+                    if ($data[$i] === 'jqueryui') {
+                        print '<link rel="stylesheet" href="css/jquery.ui.min.css">';
+                    } else if ($data[$i] === 'normalize') {
+                        print '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css/normalize.css">';
+                    } else if ($data[$i] === 'contextmenu') {
+                        print "<link rel='stylesheet' href='css/jquery.contextMenu.min.css'>";
+                    } else if ($data[$i] === 'autocomplete') {
+                        print '<link rel="stylesheet" href="css/jquery.autocomplete.min.css">';
+                    } else if ($data[$i] === 'plyr') {
+                        print "<link rel='stylesheet' href='node_modules/plyr/dist/plyr.css'>";
+                    } else if ($data[$i] === 'bootstrap' && BOOTSTRAP) {
+                        print "<link rel='stylesheet' href='node_modules/bootstrap/dist/css/bootstrap.min.css'>";
+                        print '<link rel="stylesheet" href="node_modules/bootstrap-switch-button/css/bootstrap-switch-button.min.css">';
+                    } else if ($data[$i] === 'fa') {
+                        print "<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.9.0/css/all.min.css'>";
+                    } else if ($data[$i] === 'prettydropdown') {
+                        print '<link rel="stylesheet" href="/node_modules/pretty-dropdowns/dist/css/prettydropdowns.css">';
+                    } else if ($data[$i] === '') {
+                        continue;
+                    } else {
+                        print sprintf("<link rel='stylesheet' href='css/$data[$i].min.css?v=%s'>", md5_file("css/$data[$i].min.css"));
+                    }
+                }
+            } else if ($data !== '') {
+                if (file_exists("css/$data.min.css"))
+                    print sprintf("<link rel='stylesheet' href='css/$data.min.css%s'>", md5_file("css/$data.min.css"));
+                else
+                    print sprintf("<link rel='stylesheet' href='css/$data.css%s'>", md5_file("css/$data.css"));
+            }
+        }
+        
+        function script($data)
+        {
+            if (is_array($data)) {
+                for ($i = 0; $i < count($data); $i++) {
+                    if ($data[$i] !== '') {
+                        if ($data[$i] == 'jquery') {
+                            print '<script src="node_modules/jquery/dist/jquery.min.js"></script>';
+                        } else if ($data[$i] == 'bootstrap' && BOOTSTRAP) {
+                            print "<script src='node_modules/bootstrap/dist/js/bootstrap.bundle.min.js'></script>";
+                            print "<script src='node_modules/bootstrap-switch-button/dist/bootstrap-switch-button.min.js'></script>";
+                        } else if ($data[$i] == 'contextmenu') {
+                            print "<script src='node_modules/jquery-contextmenu/dist/jquery.contextMenu.min.js'></script>";
+                        } else if ($data[$i] == 'autocomplete') {
+                            print '<script src="node_modules/jquery-autocomplete/jquery.autocomplete.js"></script>';
+                        } else if ($data[$i] == 'jqueryui') {
+                            print '<script src="node_modules/jquery-ui-dist/jquery-ui.min.js"></script>';
+                        } else if ($data[$i] == 'plyr') {
+                            print "<script src='node_modules/plyr/dist/plyr.polyfilled.min.js'></script>";
+                        } else if ($data[$i] == 'lazyload') {
+                            print "<script src='node_modules/vanilla-lazyload/dist/lazyload.min.js'></script>";
+                        } else if ($data[$i] == 'prettydropdown') {
+                            print '<script src="node_modules/pretty-dropdowns/dist/js/jquery.prettydropdowns.js"></script>';
+                        } else if ($data[$i] == 'stretchy') {
+                            print '<script src="node_modules/stretchy/stretchy.min.js" async></script>';
+                        } else if ($data[$i] == 'hls') {
+                            print '<script src="node_modules/hls.js/dist/hls.min.js"></script>';
+                        } else if ($data[$i] == 'dash') {
+                            print '<script src="node_modules/dashjs/dist/dash.all.min.js"></script>';
+                        } else {
+                            if (file_exists("js/$data[$i].min.js"))
+                                print sprintf("<script src='js/$data[$i].min.js?v=%s' defer></script>", md5_file("js/$data[$i].min.js"));
+                            else
+                                print sprintf("<script src='js/$data[$i].js?v=%s' defer></script>", md5_file("js/$data[$i].js"));
+                        }
+                    }
+                }
+            } else if ($data !== '') {
+                if (file_exists("js/$data.min.js"))
+                    print sprintf("<script src='js/$data.min.js?v=%s' defer></script>", md5_file("js/$data.min.js"));
+                else
+                    print sprintf("<script src='js/$data.js?v=%s' defer></script>", md5_file("js/$data.js"));
+            }
+        }
+        
+        function navigation()
+        {
+            $currentPage = basename($_SERVER['PHP_SELF']);
+            
+            $arr = array(
+                array(
+                    "name" => "Home",
+                    "link" => "index.php"
+                ), array(
+                    "name" => "Add Videos",
+                    "link" => "add_videos.php"
+                ), array(
+                    "name" => "Video Search",
+                    "link" => "video_search.php",
+                    array(
+                        "name" => "Videos",
+                        "link" => "videos.php"
+                    )
+                ), array(
+                    "name" => "Star Search",
+                    "link" => "star_search.php",
+                    array(
+                        "name" => "Stars",
+                        "link" => "stars.php"
+                    )
+                ), array(
+                    "name" => "Franchises",
+                    "link" => "franchises.php"
+                ), array(
+                    "name" => "Random",
+                    "link" => "random.php"
+                ), array(
+                    "name" => "DB",
+                    "link" => "https://ds1517/phpMyAdmin",
+                ), array(
+                    "name" => "Generate Thumbnails",
+                    "link" => 'video_generatethumbnails.php',
+                    array(
+                        "name" => "Generate WebVTT",
+                        'link' => 'vtt.php'
+                    )
+                )
+            );
+            
+            for ($i = 0; $i < count($arr); $i++) {
+                if ($i === 0) print '<ul class="main-menu">';
+                
+                $name = $arr[$i]['name'];
+                $link = $arr[$i]['link'];
+                
+                if ($link === $currentPage)
+                    print '<li class="active">';
+                else
+                    print '<li>';
+                
+                print "<a href='$link'>$name</a>";
+                
+                for ($j = 0; $j < count($arr[$i]); $j++) {
+                    if (array_key_exists($j, $arr[$i]) && is_array($arr[$i][$j])) {
+                        print '<ul class="sub-menu">';
+                        
+                        $name = $arr[$i][$j]['name'];
+                        $link = $arr[$i][$j]['link'];
+                        
+                        if ($link === $currentPage)
+                            print "<li class='active'><a href='$link'>$name</a></li>";
+                        else
+                            print "<li><a href='$link'>$name</a></li>";
+                        
+                        print '</ul>';
+                    }
+                }
+                
+                print '</li>';
+                if ($i === count($arr) - 1) print '</ul>';
+            }
+        }
+        
+        function pathToFname($path)
+        {
+            return pathinfo($path, PATHINFO_BASENAME);
+        }
+        
+        function getExtension($path)
+        {
+            return pathinfo($path, PATHINFO_EXTENSION);
+        }
+        
+        function removeExtension($filename)
+        {
+            return pathinfo($filename, PATHINFO_FILENAME);
+        }
+        
+        function generateName($fname)
+        {
+            return explode('.' . $this->getExtension($fname), $fname)[0];
+        }
+        
+        function generateFranchise($fname)
+        {
+            return explode(' Episode', $fname)[0];
+        }
+        
+        function generateEpisode($fname)
+        {
+            return explode('Episode ', explode($this->generateFranchise($fname), explode($this->getExtension($fname), $this->generateName($fname))[0])[1])[1];
+        }
+        
+        static function getClosest($search, $arr)
+        {
+            $closest = null;
+            foreach ($arr as $item) {
+                if ($closest === null || abs($search - $closest) > abs($item - $search)) {
+                    $closest = $item;
+                }
+            }
+            return $closest;
+        }
+        
+        static function getClosestQ($quality)
+        {
+            if ($quality == 396) return 480;
+            return self::getClosest($quality, [1080, 720, 480, 360]);
+        }
+        
+        static function reload()
+        {
+            header("Location: $_SERVER[REQUEST_URI]");
+            die();
+        }
+        
+        static function removeExtensionPath($path)
+        {
+            return substr($path, 0, strrpos($path, "."));
+        }
+        
+        static function file_check($filename, $videoID, $isRoot = true)
+        {
+            $vttCheck = "vtt/$videoID.vtt";
+            
+            if (enableDASH)
+                $fileCheck = sprintf("videos/%s/playlist.mpd", self::removeExtensionPath($filename));
+            else if (enableHLS)
+                $fileCheck = sprintf("videos/%s/playlist.m3u8", self::removeExtensionPath($filename));
+            else
+                $fileCheck = "videos/$filename";
+            
+            if (!$isRoot) {
+                $fileCheck = "../$fileCheck";
+                $vttCheck = "../$vttCheck";
+            }
+            
+            return (
+                file_exists($fileCheck) && file_exists($vttCheck)
+            );
+        }
+    }
+    
+    class HomePage
+    {
+        public $count;
+        
+        function recent()
+        {
+            global $pdo;
+            $query = $pdo->prepare("
 											SELECT *
 											FROM videos
 											WHERE noStar = FALSE

@@ -993,6 +993,9 @@
             } else {
                 $result = $query->fetch();
                 
+                $date_class = new Date();
+                $date = $date_class->parse($result['date_published']);
+                
                 $query = $pdo->prepare("SELECT id AS aliasID, name AS aliasName FROM videoalias WHERE videoID = ? ORDER BY aliasName");
                 $query->bindValue(1, $id);
                 $query->execute();
@@ -1006,6 +1009,13 @@
                 
                 $fname = $result['path'];
                 $next = $this->nextVideo($id);
+                
+                if (!$date) {
+                    $date = 'NULL';
+                    $date = "<small class='date no-date btn far fa-calendar-check'>$date</small>";
+                } else {
+                    $date = "<small class='date btn far fa-calendar-check'>$date</small>";
+                }
                 
                 print '<div id="video">';
                 print "<h2><span id='video-name' data-franchise='$franchise'>$name</span>";
@@ -1022,6 +1032,7 @@
                 }
                 
                 if (isset($cen)) print " - <span style='color: red'>$cen</span>";
+                print "<small>$date</small>";
                 print '</h2>';
                 
                 print '<a id="next" class="btn btn-outline-primary btn-sm" href="?id=' . $next['id'] . '" title="' . $next['name'] . '">Next</a>';

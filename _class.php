@@ -912,6 +912,8 @@
                 return "SELECT videos.id, videos.name, videos.path FROM videos WHERE cen = TRUE";
             else if ($this->sqlMethod === '!q-1080')
                 return "SELECT videos.id, videos.name, videos.path FROM videos WHERE height <= 720";
+            else if ($this->sqlMethod === '!date')
+                return "SELECT videos.id, videos.name, videos.path FROM videos WHERE date_published IS NULL";
             else
                 return "";
         }

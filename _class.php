@@ -1406,20 +1406,42 @@
         function fetchAttributes($id)
         {
             $stars = $this->getStars($id);
+            $len = count($stars);
+            
             $starStr = '';
-            for ($i = 0; $i < count($stars); $i++) {
+            for ($i = 0; $i < $len; $i++) {
                 $starStr .= ' starattributes.starID = ' . $stars[$i]['starID'];
-                if ($i < count($stars) - 1) $starStr .= ' OR ';
+                if ($i < $len - 1) $starStr .= ' OR ';
             }
             
-            global $pdo;
-            $query = $pdo->prepare("
-											SELECT attributes.id, attributes.name FROM attributes JOIN bookmarkattributes ON attributes.id = bookmarkattributes.attributeID JOIN bookmarks ON bookmarkattributes.bookmarkID = bookmarks.id WHERE bookmarks.videoID = :videoID
+            $sql_star = "
+											SELECT attributes.id, attributes.name
+											FROM attributes
+											    JOIN bookmarkattributes ON attributes.id = bookmarkattributes.attributeID
+											    JOIN bookmarks ON bookmarkattributes.bookmarkID = bookmarks.id
+											WHERE bookmarks.videoID = :videoID
 											
 											UNION
 											
-											SELECT attributes.id, attributes.name FROM attributes JOIN starattributes ON attributes.id = starattributes.attributeID WHERE $starStr
-										");
+											SELECT attributes.id, attributes.name
+											FROM attributes
+											    JOIN starattributes ON attributes.id = starattributes.attributeID
+											WHERE $starStr
+										";
+            
+            $sql_noStar = "
+											SELECT attributes.id, attributes.name
+											FROM attributes
+											    JOIN bookmarkattributes ON attributes.id = bookmarkattributes.attributeID
+											    JOIN bookmarks ON bookmarkattributes.bookmarkID = bookmarks.id
+											WHERE bookmarks.videoID = :videoID
+											GROUP BY attributes.id
+										";
+            
+            global $pdo;
+            if (!$len) $query = $pdo->prepare($sql_noStar);
+            else $query = $pdo->prepare($sql_star);
+            
             
             $query->bindParam(':videoID', $id);
             $query->execute();
@@ -1505,7 +1527,7 @@
         protected $ffmpeg = '/volume1/@appstore/ffmpeg/bin/ffmpeg';
         public $rootFix = false;
         
-        function getDuration($fname) // TODO check if this function works with windows
+        function getDuration($fname)
         {
             $input = "videos/$fname"; // this makes ajax work...but "video_generatehumbnails" does not work!
             if ($this->rootFix) $input = "../$input";
@@ -1517,8 +1539,7 @@
                 $minutes = intval(explode(':', $duration)[1]);
                 $seconds = intval(explode('.', explode(':', $duration)[2])[0]);
                 
-                $return = ($hours * 60 * 60) + ($minutes * 60) + $seconds;
-                return $return;
+                return ($hours * 60 * 60) + ($minutes * 60) + $seconds;
             } else {
                 return 0;
             }
@@ -1625,8 +1646,8 @@
                     
                     $data .= "\n";
                     $data .= "\n" . ($counter + 1);
-                    $data .= "\n" . gmdate("H:i:s", $counter * $delay) . ".000 --> " . gmdate("H:i:s", ($counter + 1) * $delay) . '.000';
-                    $data .= "\n" . "../images/thumbnails/$videoID.jpg#xywh=" . ($row * $width) . "," . ($col * $height) . ",$width,$height";
+                    $data .= sprintf("\n%s.000 --> %s.000", gmdate("H:i:s", $counter * $delay), gmdate("H:i:s", ($counter + 1) * $delay));
+                    $data .= sprintf("\n../images/thumbnails/$videoID.jpg#xywh=%d,%d,$width,$height", $row * $width, $col * $height);
                     $counter++;
                 }
             }

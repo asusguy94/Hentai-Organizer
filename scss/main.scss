@@ -165,6 +165,7 @@ input.xdsoft_input {
   .inner {
     display: inherit;
     padding: 2px 4px;
+
     &:not(:empty) {
       background-color: orange;
     }
@@ -193,15 +194,15 @@ input.xdsoft_input {
 }
 
 [data-badge]:after {
-    content: attr(data-badge);
-    position: absolute;
-    top: 5px;
-    left: 5px;
-    background: green;
-    color: white;
-    text-align: center;
-    border-radius: 50%;
-    box-shadow: 0 0 1px #333;
+  content: attr(data-badge);
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  background: green;
+  color: white;
+  text-align: center;
+  border-radius: 50%;
+  box-shadow: 0 0 1px #333;
 }
 
 [data-badge] {
@@ -230,4 +231,11 @@ input.xdsoft_input {
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+}
+
+#addVideos {
+  input[type="text"] {
+    min-width: 100%;
+    padding-right: 6px;
+  }
 }

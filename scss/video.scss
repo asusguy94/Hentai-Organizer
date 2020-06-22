@@ -7,7 +7,7 @@ section {
 
 aside {
   width: 25%;
-  margin-top: 3.5%;
+  margin-top: 3.1%;
 
   margin-left: auto;
   margin-right: auto;
@@ -67,6 +67,10 @@ aside {
     float: left;
   }
 
+  #cen {
+    color: red;
+  }
+
   & > h3 {
     font-size: medium;
     color: green;
@@ -110,11 +114,23 @@ aside {
     }
   }
 
-  .bookmark-info {
-    display: none;
-  }
-
   @include bookmarkPosition();
+}
+
+/* Info */
+.bookmark-info, .star-info {
+  display: none;
+  position: fixed;
+
+  border: 1px solid black;
+  border-radius: 4px;
+  padding: 10px;
+  background-color: #eeeeee;
+
+  &.active {
+    display: block;
+    z-index: 3;
+  }
 }
 
 /* Franchise */
@@ -125,12 +141,18 @@ aside #franchise {
     height: inherit;
 
     & > .title {
-      margin-left: 140px;
+      margin-left: 210px;
     }
 
     & > img.thumbnail {
       height: inherit;
       float: left;
+    }
+
+    & > .plays {
+      float: left;
+      line-height: 3;
+      margin-right: 10px;
     }
   }
 }
@@ -138,7 +160,7 @@ aside #franchise {
 /* Up Next */
 #up-next, .episode {
   display: block;
-  height: 75px;
+  height: 50px;
 
   margin: 0 1%;
   padding: 5px 10px;
@@ -158,7 +180,7 @@ aside #franchise {
 }
 
 .episode {
-  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 #up-next > div, .episode .title {
@@ -170,7 +192,7 @@ aside #franchise {
 #video-attributes {
   text-align: center;
 
-  .attribute {
+  .video-attribute {
     display: inline-block;
     margin-left: 5px
   }

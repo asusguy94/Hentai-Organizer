@@ -31,6 +31,10 @@ h2 {
     margin-left: 5px;
   }
 
+  &.disabled {
+    pointer-events: none;
+    opacity: 0.4;
+  }
 }
 
 [class^="hidden-"], [class*="hidden-"] {
@@ -38,6 +42,11 @@ h2 {
 }
 
 .selected label {
+  font-weight: bold;
+}
+
+.not label {
+  color: red;
   font-weight: bold;
 }
 
@@ -80,4 +89,25 @@ h2 {
   &::after {
     content: ')';
   }
+}
+
+.prettydropdown {
+  li {
+    padding-left: 0.3rem !important;
+  }
+
+  .color {
+    display: inline-block;
+    margin-right: 5px;
+
+    $width: 12px;
+    width: $width;
+    height: $width;
+
+    border: 1px solid black;
+  }
+}
+
+#video-count {
+  color: blue;
 }

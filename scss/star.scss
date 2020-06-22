@@ -26,16 +26,3 @@ aside {
 .video {
   margin: 0 5px 10px;
 }
-
-.ignored {
-  color: red;
-  & + small .alias {
-    color: red;
-  }
-}
-
-.flag {
-  margin-left: 10px;
-}
-
-// TODO remove unused code

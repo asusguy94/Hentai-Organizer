@@ -918,15 +918,34 @@
                 return "";
         }
         
-        function fetchVideos()
+        function fetchVideos($limit, $config = [])
         {
+            if (!array_key_exists('selector', $config)) $config['selector'] = 'p';
+            if (!array_key_exists('className', $config)) $config['className'] = '';
+            
             global $pdo;
             $query = $pdo->prepare("{$this->sql()} ORDER BY franchise, episode");
             $query->bindParam(':videoID', $id);
             $query->execute();
             if ($query->rowCount()) {
+                $count = 0;
+                
                 foreach ($query->fetchAll() as $data) {
-                    print "<p><a href='video.php?id=$data[id]'>$data[name]</a></p>";
+                    if (!$limit) break;
+                    if (!Basic::file_check($data['path'], $data['id'])) continue;
+                    
+                    print "<$config[selector] class='$config[className]'>";
+                    print "<a href='video.php?id=$data[id]'>$data[name]</a>";
+                    print "</$config[selector]>";
+                    
+                    $count++;
+                    $limit--;
+                }
+                
+                if (!$count) {
+                    print "<$config[selector] class='$config[className]'>";
+                    print "<span>Missing Data</span>";
+                    print "</$config[selector]>";
                 }
             }
         }

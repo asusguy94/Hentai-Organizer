@@ -833,12 +833,12 @@
             if ($query->rowCount()) {
                 print '<div id="videos" class="row">';
                 
-                $cdnNumber = 2;
+                $cdnNumber = 1;
                 foreach ($query->fetchAll() as $data) {
                     $localPath = "videos/$data[path]";
                     $localPath_img = sprintf("images/videos/$data[videoID]-%d.jpg", THUMBNAIL_RES);
                     
-                    if ($cdnNumber) {
+                    if (CDN && CDN_MAX) {
                         $fullPath = "http://cdn$cdnNumber-$_SERVER[HTTP_HOST]/$localPath";
                         $fullPath_img = "http://cdn$cdnNumber-$_SERVER[HTTP_HOST]/$localPath_img";
                     } else {
@@ -851,8 +851,10 @@
                     print "<span class='title card-title'>$data[name]</span>";
                     print '</a>';
                     
-                    if ($cdnNumber < CDN_MAX) $cdnNumber++;
-                    else $cdnNumber = 1;
+                    if (CDN) {
+                        if ($cdnNumber < CDN_MAX) $cdnNumber++;
+                        else $cdnNumber = 1;
+                    }
                 }
                 print '</div>';
             }

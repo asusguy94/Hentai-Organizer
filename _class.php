@@ -1465,6 +1465,8 @@
                     print "<span class='attribute' data-attribute-id='$attribute[id]'>$attribute[name]</span>";
                 }
                 print '</div>';
+    
+                if (file_exists("vtt/$_GET[id].vtt")) echo '<div id="vtt"></div>';
             }
         }
     }

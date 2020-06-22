@@ -1,15 +1,15 @@
 <?php
-include('_class.php');
-$basic = new Basic();
-$video = new Video();
-global $pdo;
+    include('_class.php');
+    $basic = new Basic();
+    $video = new Video();
+    global $pdo;
 ?>
 
 <!doctype html>
 <html>
-<head>
-	<?php $basic->head('Video Search', array('', 'bootstrap', 'search'), array('jquery', 'lazyload', 'video.search')) ?>
-</head>
+    <head>
+        <?php $basic->head('Video Search', array('jqueryui', 'bootstrap', 'search'), array('jquery', 'jqueryui', 'bootstrap', 'lazyload', 'video.search')) ?>
+    </head>
 
     <body>
         <nav><?php $basic->navigation() ?></nav>

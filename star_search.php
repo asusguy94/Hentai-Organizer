@@ -8,7 +8,7 @@ global $pdo;
 <!doctype html>
 <html>
     <head>
-		<?php $basic->head('Star Search', array('', 'bootstrap', 'search'), array('jquery', 'lazyload', 'star.search')) ?>
+		<?php $basic->head('Star Search', array('', 'bootstrap', 'prettydropdown', 'search'), array('jquery', 'lazyload', 'prettydropdown', 'star.search')) ?>
     </head>
 
     <body>

@@ -12,9 +12,9 @@ else
 
 <!doctype html>
 <html>
-<head>
-	<?php $basic->head($videos->getVideo($id), array('', 'jqueryui', 'contextmenu', 'plyr', 'video'), array('jquery', 'jqueryui', 'contextmenu', 'hls', 'plyr', 'video')) ?>
-</head>
+    <head>
+        <?php $basic->head($videos->getVideo($id), array('', 'jqueryui', 'contextmenu', 'plyr', 'fa', 'video'), array('jquery', 'jqueryui', 'contextmenu', 'hls', 'dash', 'plyr', 'video')) ?>
+    </head>
 
 <body>
 <nav><?php $basic->navigation() ?></nav>

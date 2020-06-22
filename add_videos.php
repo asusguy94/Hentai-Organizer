@@ -82,33 +82,44 @@ if (isset($_POST['submit'])) {
 				$query->execute();
 			}
 
-		header('Location: video_generatethumbnails.php');
+			header('Location: video_generatethumbnails.php');
+		}
+	} else if (count($newFiles)) {
+		print '<form method="post" id="addVideos">';
+		$len = count($newFiles);
+		for ($i = 0; $i < $len; $i++) {
+			print '<div class="row">';
+
+			print '<div class="col-5"></div>';
+			print '<div class="col-2">';
+
+			print '<div class="form-group">';
+			print '<label for="fname[]">FileName</label><br>';
+			print sprintf("<input type='text' name='fname[]' value='%s'><br>", htmlspecialchars($newFiles[$i], ENT_QUOTES));
+			print '</div>';
+
+			print '<div class="form-group">';
+			print '<label for="title[]">Title</label><br>';
+			print sprintf("<input type='text' name='title[]' value='%s'><br>", htmlspecialchars($basic->generateName($newFiles[$i]), ENT_QUOTES));
+			print '</div>';
+
+			print '<div class="form-group">';
+			print '<label for="franchise[]">Franchise</label><br>';
+			print sprintf("<input type='text' name='franchise[]' value='%s'><br>", htmlspecialchars($basic->generateFranchise($newFiles[$i]), ENT_QUOTES));
+			print '</div>';
+
+			print '<div class="form-group">';
+			print '<label for="episode[]">Episode</label><br>';
+			print sprintf("<input type='number' name='episode[]' value='%s'><br>", $basic->generateEpisode($newFiles[$i]));
+			print '</div>';
+
+			if ($i < $len - 1) print '<br><hr>';
+			else print '<input type="submit" class="btn btn-primary" name="submit" value="Save Changes">';
+			print '</div>'; // .col-2
+
+			print '</div>'; // .row
+
+			if ($i < $len - 1) print '<br>';
+		}
+		print '</form>';
 	}
-} else if (count($newFiles)) {
-	print '<form method="post" id="addVideos">';
-	for ($i = 0; $i < count($newFiles); $i++) {
-		print '<div class="form-group">';
-		print '<label for="fname[]">FileName</label><br>';
-		print "<input type='text' name='fname[]' value='{$newFiles[$i]}'><br>";
-		print '</div>';
-
-		print '<div class="form-group">';
-		print '<label for="title[]">Title</label><br>';
-		print "<input type='text' name='title[]' value='{$basic->generateName($newFiles[$i])}'><br>";
-		print '</div>';
-
-		print '<div class="form-group">';
-		print '<label for="franchise[]">Franchise</label><br>';
-		print "<input type='text' name='franchise[]' value='{$basic->generateFranchise($newFiles[$i])}'><br>";
-		print '</div>';
-
-		print '<div class="form-group">';
-		print '<label for="episode[]">Episode</label><br>';
-		print "<input type='number' name='episode[]' value='{$basic->generateEpisode($newFiles[$i])}'><br>";
-		print '</div>';
-
-		print '<br>';
-	}
-	print '<input type="submit" class="btn btn-primary" name="submit" value="Save Changes">';
-	print '</form>';
-}

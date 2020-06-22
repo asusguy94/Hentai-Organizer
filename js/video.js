@@ -128,25 +128,34 @@ function videoVolume(level = 1) {
 
 // START Ajax
 function addPlay() {
-    let arguments = `videoID=${videoID}`
-    ajax("ajax/video_addplay.php", arguments, function () {
+    ajax_post("ajax/video_addplay.php", [
+        {'videoID': videoID}
+    ], function () {
         console.log('play added')
     })
 }
 
 function removePlays() {
-    let arguments = `videoID=${videoID}`
-    ajax("ajax/video_removeplays.php", arguments, function () {
+    ajax_post("ajax/video_removeplays.php", [
+        {'videoID': videoID}
+    ], function () {
         console.log('plays reset')
     })
 }
 
 function addAlias(aliasName) {
-    ajax("ajax/video_addalias.php", `videoID=${videoID}&aliasName=${encodeURIComponent(aliasName)}`)
+    ajax_post("ajax/video_addalias.php", [
+        {'videoID': videoID},
+        {'aliasName': aliasName}
+    ])
 }
 
 function renameAlias(aliasID, aliasName) {
-    ajax("ajax/video_renamealias.php", `videoID=${videoID}&aliasID=${aliasID}&aliasName=${encodeURIComponent(aliasName)}`)
+    ajax_post("ajax/video_renamealias.php", [
+        {'videoID': videoID},
+        {'aliasID': aliasID},
+        {'aliasName': aliasName}
+    ])
 }
 
 function removeAlias(aliasID) {
@@ -254,7 +263,30 @@ function ajax(page, params, callback = function () {
     }
 }
 
-// END Ajax
+function ajax_post(url, params, callback = () => {
+    location.href = `${location.href}`
+}) {
+    let xhr = new XMLHttpRequest()
+    xhr.open('POST', url)
+
+    if (params.length) {
+        let data = new FormData()
+        for (let i = 0; i < params.length; i++) {
+            let param = params[i]
+
+            let key = Object.keys(param)[0]
+            let val = param[key]
+            data.append(key, val)
+        }
+        xhr.send(data)
+    } else {
+        xhr.send()
+    }
+
+    xhr.onload = function () {
+        callback(this.responseText)
+    }
+}
 
 // START Context Menu
 $(function () {

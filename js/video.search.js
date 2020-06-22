@@ -1,5 +1,4 @@
-document.addEventListener('DOMContentLoaded', function () {
-    const label_input = document.getElementsByTagName('label')
+const sort_radio = document.querySelectorAll('input[name="sort"]')
 
     const noStar_checkbox = document.querySelector('input[name="no-star_0"]')
     const hasStar_checkbox = document.querySelector('input[name="no-star_1"]')
@@ -175,27 +174,116 @@ document.addEventListener('DOMContentLoaded', function () {
                     let category = this.name.split('category_').pop()
                     let category_class = category.replace(/ /g, '-')
 
-                    for (let i = 0; i < videoLength; i++) {
-                        let category_raw = video[i].getAttribute('data-category-name').slice(2, -2)
-                        let category_arr = category_raw.split(',')
+                for (let j = 0; j < videoLength; j++) {
+                    let category_arr = video[j].getAttribute('data-category-name').slice(2, -2).split(',')
 
-                        for (let j = 0, len = category_arr.length; j < len; j++) {
-                            if (this.checked && (category_arr[j] === category)) {
-                                video[i].classList.add('tmp')
-                            }
-                        }
-                    }
+                    indeterminateHandler(category_arr, category, this, j, true)
+                }
 
-                    if (this.checked) $('.video:not(.tmp)').addClass(`hidden-category-${category_class}`)
-                    else $(video).removeClass(`hidden-category-${category_class}`)
-                    $(video).removeClass('tmp') // remove leftover classes
-                })
-            }
-        }).then(function () {
-            new LazyLoad({
-                elements_selector: ".lazy",
-                threshold: 1500
+                $video.removeClass(`hidden-category-${category_class}`)
+                if (this.checked || this.indeterminate) $video.not('[data-tmp]').addClass(`hidden-category-${category_class}`)
+                $video.removeAttr('data-tmp')
             })
+        }
+
+        /* Attributes */
+        for (let i = 0, wrapperLen = attribute_checkbox.length; i < wrapperLen; i++) {
+            attribute_checkbox[i].addEventListener('change', function () {
+                indeterminateToggle(attribute_checkbox[i])
+
+                let attribute = this.name.split('attribute_').pop()
+                let attribute_class = attribute.replace(/ /g, '-')
+
+                for (let j = 0; j < videoLength; j++) {
+                    let attribute_arr = video[j].getAttribute('data-attribute-name').slice(2, -2).split(',')
+
+                    indeterminateHandler(attribute_arr, attribute, this, j)
+                }
+
+                $video.removeClass(`hidden-attribute-${attribute_class}`)
+                if (this.checked || this.indeterminate) $video.not('[data-tmp]').addClass(`hidden-attribute-${attribute_class}`)
+                $video.removeAttr('data-tmp')
+            })
+        }
+
+        /** Sort **/
+        for (let i = 0; i < sort_radio.length; i++) {
+            sort_radio[i].addEventListener('change', function () {
+                $(sort_radio).parent().removeClass('selected')
+                sort_radio[i].parentElement.classList.add('selected')
+
+                let label = this.id
+
+                let alphabetically = function (a, b) {
+                    return a.querySelector('span').innerHTML.toLowerCase().localeCompare(b.querySelector('span').innerHTML.toLowerCase(), 'en')
+                }
+
+                let alphabetically_reverse = (a, b) => alphabetically(b, a)
+
+                let added = function (a, b) {
+                    return a.getAttribute('data-id') - b.getAttribute('data-id')
+                }
+
+                let added_reverse = (a, b) => added(b, a)
+
+                let video_date = function (a, b) {
+                    let valA = new Date(a.getAttribute('data-date-published'))
+                    let valB = new Date(b.getAttribute('data-date-published'))
+
+                    if (!isValidDate(valA)) valA = new Date('2900-01-01')
+                    if (!isValidDate(valB)) valB = new Date('2900-01-01')
+
+                    return valA - valB
+                }
+
+                let video_date_reverse = function (a, b) {
+                    let valA = new Date(a.getAttribute('data-date-published'))
+                    let valB = new Date(b.getAttribute('data-date-published'))
+
+                    if (!isValidDate(valA)) valA = new Date('1900-01-01')
+                    if (!isValidDate(valB)) valB = new Date('1900-01-01')
+
+                    return valB - valA
+                }
+
+                switch (label) {
+                    case 'alphabetically':
+                        $video.sort(alphabetically)
+                        break
+                    case 'alphabetically_desc':
+                        $video.sort(alphabetically_reverse)
+                        break
+                    case 'added':
+                        $video.sort(added)
+                        break
+                    case 'added_desc':
+                        $video.sort(added_reverse)
+                        break
+                    case 'date':
+                        $video.sort(video_date)
+                        break
+                    case 'date_desc':
+                        $video.sort(video_date_reverse)
+                        break
+                    default:
+                        console.log(`No sort method for: ${label}`)
+                }
+
+                for (let i = 0; i < videoLength; i++) {
+                    $video[i].parentNode.appendChild($video[i])
+                }
+            })
+        }
+    }).then(function () {
+        new LazyLoad({
+            elements_selector: ".lazy"
         })
-    })()
+    })
+}
+
+loadData()
+
+updateBtn.addEventListener('click', function () {
+    resetData()
+    loadData()
 })

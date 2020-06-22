@@ -1,9 +1,8 @@
-document.addEventListener('DOMContentLoaded', () => {
-    window.videoWrapper = document.getElementById('video')
-    window.videoPlayer = document.getElementsByTagName('video')[0]
-    window.videoSource = document.querySelector('source[type="application/x-mpegURL"]')
-    window.videoID = new URL(location.href).searchParams.get('id')
-    window.seekTime = 1
+const videoWrapper = document.getElementById('video')
+const videoPlayer = document.getElementsByTagName('video')[0]
+const hlsSource = document.querySelector('source[data-type="hls"]')
+const dashSource = document.querySelector('source[data-type="dash"]')
+const videoID = new URL(location.href).searchParams.get('id')
 
     window.vtt_source = `vtt/${videoID}.vtt`
     window.bookmark = document.getElementsByClassName('bookmark')
@@ -91,32 +90,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     }
-
-    // END Listeners
-})
-
-// START Video
-function rewind(seconds = seekTime) {
-    let prevSeekTime = seekTime
-    if (seconds !== seekTime) {
-        prevSeekTime = seekTime
-        window.seekTime = seconds
-    }
-    videoPlayer.currentTime -= seconds
-    if (prevSeekTime !== seekTime)
-        window.seekTime = prevSeekTime
-}
-
-function skip(seconds = seekTime) {
-    let prevSeekTime = seekTime
-    if (seconds !== seekTime) {
-        prevSeekTime = seekTime
-        window.seekTime = seconds
-    }
-    videoPlayer.currentTime += seconds
-    if (prevSeekTime !== seekTime)
-        window.seekTime = prevSeekTime
-}
 
 function isPlaying() {
     return !videoPlayer.paused

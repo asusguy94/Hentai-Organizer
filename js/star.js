@@ -1,34 +1,64 @@
-document.addEventListener('DOMContentLoaded', function () {
-    window.starID = window.location.href.split('id=')[1]
-    window.video = document.getElementsByTagName('video')
-    window.addRel_btn = document.getElementById('relation-add')
+const starID = window.location.href.split('id=')[1]
+const video = document.getElementsByTagName('video')
+const addRel_btn = document.getElementById('relation-add')
 
-    window.startTime = 100
+const startTime = 100
 
-    dropbox()
-    autoComplete()
+dropbox()
+autoComplete()
 
-    let form = document.getElementsByTagName('form')
-    for (let i = 0; i < form.length; i++) {
-        form[i].addEventListener('keydown', function (e) {
-            switch (e.keyCode) {
-                case 13:
-                    form[i].submit()
-                    break
-                case 9:
-                    e.preventDefault()
+let form = document.getElementsByTagName('form')
+for (let i = 0; i < form.length; i++) {
+    form[i].addEventListener('keydown', function (e) {
+        switch (e.keyCode) {
+            case 13:
+                form[i].submit()
+                break
+            case 9:
+                e.preventDefault()
 
-                    if (i < form.length - 1) $('form').eq(i + 1).find('input')[0].focus()
-                    else $('#next')[0].click()
-                    break
-            }
+                if (i < form.length - 1) $('form').eq(i + 1).find('input')[0].focus()
+                else $('#next')[0].click()
+                break
+        }
+    })
+}
+
+setFocus()
+videoHover()
+
+addRel_btn.addEventListener('click', function () {
+    $('body').append('<div id="dialog" title="Add Relation"></div>')
+
+    $(function () {
+        $('#dialog').dialog({
+            close: function () {
+                $('#dialog').remove()
+            },
+            width: 250
         })
-    }
 
-    setFocus()
-    videoHover()
+        $('#dialog').append(
+            '<input type="text" name="relationName" autofocus placeholder="Title">' +
+            '<input type="number" name="relationID" placeholder="ID">' +
+            '<input type="button" id="relationAdd_confirm" class="btn btn-primary" value="Add">'
+        )
 
-    addRel_btn.addEventListener('click', function () {
+        document.querySelector('input#relationAdd_confirm').addEventListener('click', function () {
+            let title = $('[name="relationName"]').val().trim()
+            let id = $('[name="relationID"]').val().trim()
+
+            addRelation(id, title)
+        })
+    })
+})
+
+for (let i = 0; i < document.querySelectorAll('.relation-add').length; i++) {
+    document.querySelectorAll('.relation-add')[i].addEventListener('click', function () {
+        let el = $(this).parent().prev()
+        let otherID = el.attr('data-starID')
+        let title = el.find('.card-title').text()
+
         $('body').append('<div id="dialog" title="Add Relation"></div>')
 
         $(function () {
@@ -40,9 +70,9 @@ document.addEventListener('DOMContentLoaded', function () {
             })
 
             $('#dialog').append(
-                '<input type="text" name="relationName" autofocus placeholder="Title">' +
-                '<input type="number" name="relationID" placeholder="ID">' +
-                '<input type="button" id="relationAdd_confirm" class="btn btn-primary" value="Add">'
+                `<input type="text" name="relationName" autofocus value="${title}">` +
+                `<input type="number" name="relationID" value="${otherID}" placeholder="ID">` +
+                `<input type="button" id="relationAdd_confirm" class="btn btn-primary" value="Save">`
             )
 
             document.querySelector('input#relationAdd_confirm').addEventListener('click', function () {
@@ -53,39 +83,7 @@ document.addEventListener('DOMContentLoaded', function () {
             })
         })
     })
-
-    for (let i = 0; i < document.querySelectorAll('.relation-add').length; i++) {
-        document.querySelectorAll('.relation-add')[i].addEventListener('click', function () {
-            let el = $(this).parent().prev()
-            let otherID = el.attr('data-starID')
-            let title = el.find('.card-title').text()
-
-            $('body').append('<div id="dialog" title="Add Relation"></div>')
-
-            $(function () {
-                $('#dialog').dialog({
-                    close: function () {
-                        $('#dialog').remove()
-                    },
-                    width: 250
-                })
-
-                $('#dialog').append(
-                    `<input type="text" name="relationName" autofocus value="${title}">` +
-                    `<input type="number" name="relationID" value="${otherID}" placeholder="ID">` +
-                    `<input type="button" id="relationAdd_confirm" class="btn btn-primary" value="Save">`
-                )
-
-                document.querySelector('input#relationAdd_confirm').addEventListener('click', function () {
-                    let title = $('[name="relationName"]').val().trim()
-                    let id = $('[name="relationID"]').val().trim()
-
-                    addRelation(id, title)
-                })
-            })
-        })
-    }
-})
+}
 
 function addRelation(otherID, title) {
     ajax('ajax/star_add_relation.php', `starID=${starID}&otherID=${otherID}&title=${title}`)

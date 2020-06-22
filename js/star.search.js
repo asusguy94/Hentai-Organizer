@@ -1,9 +1,15 @@
-document.addEventListener('DOMContentLoaded', function () {
-    const breast_radio = document.querySelectorAll('input[name="breast"]');
-    const eye_radio = document.querySelectorAll('input[name="eye"]');
-    const hair_radio = document.querySelectorAll('input[name="hair"]');
-    const hairstyle_radio = document.querySelectorAll('input[name="hairstyle"]');
-    const attribute_checkbox = document.querySelectorAll('input[name^="attribute"]');
+const breast_radio = document.querySelectorAll('input[name="breast"]')
+const eye_radio = document.querySelectorAll('input[name="eye"]')
+const hair_radio = document.querySelectorAll('input[name="hair"]')
+const hairstyle_radio = document.querySelectorAll('input[name="hairstyle"]')
+const attribute_checkbox = document.querySelectorAll('input[name^="attribute"]')
+
+// Pretty DropDown
+$('select.pretty').prettyDropdown({
+    height: 30,
+    classic: true,
+    hoverIntent: -1
+});
 
     (function () {
         fetch('json/star.search.php').then(function (result) {
@@ -163,17 +169,15 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     }
 
-                    if (this.checked) $('.star:not(.tmp)').addClass(`hidden-attribute-${attribute_class}`);
-                    else $(stars).removeClass(`hidden-attribute-${attribute_class}`);
-                    $(stars).removeClass('tmp'); // remove leftover classes
-                });
-            }
-        }).then(function () {
-            new LazyLoad({
-                elements_selector: ".lazy",
-                threshold: 1500
-            });
-        });
-    })();
-});
-
+                if (this.checked) $('.star:not(.tmp)').addClass(`hidden-attribute-${attribute_class}`)
+                else $(stars).removeClass(`hidden-attribute-${attribute_class}`)
+                $(stars).removeClass('tmp') // remove leftover classes
+            })
+        }
+    }).then(function () {
+        new LazyLoad({
+            elements_selector: ".lazy",
+            threshold: 1500
+        })
+    })
+})()

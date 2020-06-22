@@ -1449,17 +1449,26 @@
     
     class Date
     {
-        function secondsToMinutesAndSeconds($seconds)
+        function stringToDate($str)
         {
-            $minutes = floor($seconds / 60);
-            $seconds = $seconds % 60;
-            if ($seconds < 10) $seconds = "0$seconds";
+            if (is_numeric(explode(' ', $str)[1])) {
+                $return = DateTime::createFromFormat('j n y', $str);
+            } else if (!is_numeric(explode(' ', $str)[0]) && count(explode(', ', $str)) > 1) {
+                $return = DateTime::createFromFormat('F j, Y+', $str); // allow trailing data ==> let SQL remove it!
+            } else if (count(explode('-', $str)) > 1) {
+                $return = DateTime::createFromFormat('Y-m-d', $str);
+            } else {
+                $return = DateTime::createFromFormat('j M y', $str);
+            }
             
-            return "$minutes:$seconds";
+            return $return->format('Y-m-d');
         }
-    
-    return $minutes . ':' . $seconds;
-    }
+        
+        function parse($dateStr)
+        {
+            if (!is_null($dateStr)) return date("j F Y", strtotime($dateStr));
+            else return false;
+        }
     }
     
     class FFMPEG

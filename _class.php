@@ -352,7 +352,7 @@
             $query->execute();
             $this->printData($query->fetchAll());
         }
-    
+        
         function printData($input, $ribbonCol = null)
         {
             $count = $this->count;
@@ -360,7 +360,7 @@
             foreach ($input AS $data) {
                 if ($count > 0) {
                     $count--;
-                
+                    
                     $col = ($this->count >= 10 ? 'col-1' : 'col');
                     print sprintf("
 						<a class='video $col px-0 mx-3 ribbon-container' href='video.php?id=$data[id]'>
@@ -389,64 +389,6 @@
             } else {
                 return false;
             }
-        }
-        
-        function video_isPartialMatch($path)
-        {
-            global $pdo;
-            $query = $pdo->prepare("SELECT id FROM videos WHERE path = ? AND franchise = ''");
-            $query->bindValue(1, $path);
-            $query->execute();
-            if ($query->rowCount()) return true;
-            else return false;
-        }
-        
-        function video_updateData($path, $franchise)
-        {
-            global $pdo;
-            $query = $pdo->prepare("UPDATE videos SET franchise = ? WHERE path = ?");
-            $query->bindValue(1, $franchise);
-            $query->bindValue(2, $path);
-            if ($query->execute()) return true;
-            else return false;
-        }
-        
-        function addVideo($path)
-        {
-            global $pdo;
-            $query = $pdo->prepare("INSERT INTO videos(path) VALUES(?)");
-            $query->bindValue(1, $path);
-            if ($query->execute()) return true;
-            else return false;
-        }
-        
-        function fnameToFranchise($fname)
-        {
-            $result = substr($fname, 0, strpos($fname, ' Episode '));
-            
-            if ($result === '') $result = substr($fname, 0, strpos($fname, 'st Scene') - 2);
-            if ($result === '') $result = substr($fname, 0, strpos($fname, 'nd Scene') - 2);
-            if ($result === '') $result = substr($fname, 0, strpos($fname, 'rd Scene') - 2);
-            if ($result === '') $result = substr($fname, 0, strpos($fname, 'th Scene') - 2);
-            
-            if ($result === '') $result = substr($fname, 0, strpos($fname, ' Bonus'));
-            if ($result === '') $result = substr($fname, 0, strpos($fname, ' Special'));
-            if ($result === '') $result = substr($fname, 0, strpos($fname, ' Extra'));
-            
-            return $result;
-        }
-        
-        function fnameToEpisode($fname)
-        {
-            
-            $result = substr($fname, strpos($fname, ' Episode ') + 1);
-            
-            $i = 1;
-            while (!is_numeric($result) && $result !== '') {
-                $result = substr($fname, strpos($fname, ' Episode ') + ++$i);
-            }
-            if ($result == '') $result = 99;
-            return $result;
         }
     }
     
@@ -721,7 +663,8 @@
             }
         }
         
-        function relationExists($starID, $otherID){
+        function relationExists($starID, $otherID)
+        {
             global $pdo;
             $query = $pdo->prepare("SELECT * from starrelations WHERE (starID = :starID AND otherstarID = :otherID) LIMIT 1");
             $query->bindParam(':starID', $starID);
@@ -920,40 +863,6 @@
             }
         }
         
-        function addImage_form()
-        {
-            print '<h3>Add Image</h3>';
-            print '<form method="post">';
-            print '<label for="image">ImageURL: </label>';
-            print '<input type="text" name="image">';
-            print '<input type="submit" name="addImage" value="Add">';
-            print '<form>';
-            
-            $this->addImage();
-        }
-        
-        function addImage()
-        {
-            global $pdo;
-            $basic = new Basic();
-            if (isset($_POST['addImage'])) {
-                if (isset($_POST['image']) && !empty($_POST['image'])) {
-                    $image = $_POST['image'];
-                    $id = $_GET['id'];
-                    $ext = $basic->getExtension($image);
-                    
-                    if ($this->downloadImage($image, $id)) {
-                        $query = $pdo->prepare("UPDATE stars SET image = ? WHERE id = ?");
-                        $query->bindValue(1, "$id.$ext");
-                        $query->bindValue(2, $id);
-                        if ($query->execute()) {
-                            Basic::reload();
-                        }
-                    }
-                }
-            }
-        }
-        
         function downloadImage($url, $name)
         {
             $basic = new Basic();
@@ -961,15 +870,6 @@
             $localPath = "../images/stars/$name.$ext";
             
             return copy($url, $localPath);
-        }
-        
-        function videoCount($id)
-        {
-            global $pdo;
-            $query = $pdo->prepare("SELECT COUNT(*) as total FROM videostars WHERE starID = ?");
-            $query->bindValue(1, $id);
-            $query->execute();
-            return $query->fetch()['total'];
         }
         
         function bookmarkStarCount($id, $videoID)
@@ -1053,30 +953,6 @@
                 }
             }
             return false;
-        }
-        
-        function upNext($id)
-        {
-            $nextVideo = $this->nextVideo($id);
-            $nextPlays = 0;
-            
-            if ($nextVideo) {
-                print "
-				<div id='up-next'>
-				<span>Up Next</span>
-				<a href='?id=$nextVideo[id]'>
-					<div class='info'>
-					<div class='title'>$nextVideo[name]</div>";
-                
-                if (intval($nextPlays) === 1) print "<div class='plays'>$nextPlays Play</div>";
-                else print "<div class='plays'>$nextPlays Plays</div>";
-                
-                print "
-						</div> // end .plays
-					</a>
-				</div>
-			";
-            }
         }
         
         function getVideo($id)
@@ -1212,7 +1088,6 @@
         
         function fetchInfo_sidebar($id)
         {
-            //$this->upNext($id);
             $this->fetchFranchise($id);
             $this->fetchStars($id);
             $this->fetchAttributes($id);

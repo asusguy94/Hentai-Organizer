@@ -554,14 +554,8 @@
                 } else {
                     print '<div id="dropbox"><span>Drop Image Here</span></div>';
                 }
+                
                 print "<h2>$name</h2>";
-                
-                if (PARSER) {
-                    print '<br><form method="post" style="display: inline"><div class="form-row">';
-                    print '<input class="btn btn-primary" type="submit" name="anisearch_img" value="AniSearch Image">';
-                    print '</div></form>';
-                }
-                
                 
                 $hair = $result['haircolor'];
                 $hairstyle = $result['hairstyle'];

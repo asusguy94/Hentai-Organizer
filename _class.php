@@ -552,9 +552,8 @@
                 if (!is_null($image) && !empty($image)) {
                     print sprintf("<img src='images/stars/$image?v=%s'>", md5_file("images/stars/$image"));
                 } else {
-                    print '<div id="dropbox"><span>Drop Image Here</span></div>';
+                    print '<div id="dropbox" class="unselectable"><span>Drop Image Here</span></div>';
                 }
-                
                 print "<h2>$name</h2>";
                 
                 $hair = $result['haircolor'];

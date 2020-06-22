@@ -1069,6 +1069,16 @@
             $query->execute();
             return $query->fetch()['franchise'];
         }
+    
+        function getPlays($videoID)
+        {
+            global $pdo;
+            $query = $pdo->prepare("SELECT COUNT(videoID) AS total FROM plays WHERE videoID = :videoID GROUP BY videoID LIMIT 1");
+            $query->bindParam(':videoID', $videoID);
+            $query->execute();
+        
+            return $query->fetch()['total'];
+        }
         
         function fetchFranchise($videoID)
         {
@@ -1084,9 +1094,10 @@
                     
                     print "<img src='images/videos/$data[id]-" . THUMBNAIL_RES . ".jpg' class='thumbnail'>";
                     print '<div class="title">' . $data['name'] . '</div>';
-                    
-                    //if (intval(0) === 1) print '<div class="plays">' . 0 . ' Play</div>';
-                    //else print '<div class="plays">' . 0 . ' Plays</div>';
+    
+                    $plays = $this->getPlays($data['id']);
+                    if (!$plays) $plays = 0;
+                    print "<span class='plays col-2'>$plays Plays</span>";
                     
                     print '</div>'; // end #info
                     print '</a>'; // end .episode

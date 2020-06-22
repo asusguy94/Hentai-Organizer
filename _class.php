@@ -1036,19 +1036,26 @@
                 print '</h2>';
                 
                 print '<a id="next" class="btn btn-outline-primary btn-sm" href="?id=' . $next['id'] . '" title="' . $next['name'] . '">Next</a>';
-                
-                $localPath = htmlspecialchars("videos/$fname", ENT_QUOTES);
+    
+                $streamDir = Basic::removeExtensionPath($fname);
+                $hlsFile = "videos/$streamDir/playlist.m3u8";
+                $dashFile = "videos/$streamDir/playlist.mpd";
                 
                 print "<video poster='images/videos/$id.jpg?v=" . md5_file("images/videos/$id.jpg") . "$' controls preload='auto' data-cen='$result[cen]'>";
-                
-                $hlsDir = Basic::removeExtensionPath($fname);
-                $hlsFile = "videos/$hlsDir/index.m3u8";
+    
+                // Source START
+                if (enableDASH && file_exists($dashFile)) {
+                    $dashFile = htmlspecialchars($dashFile, ENT_QUOTES);
+                    print "<source src='$dashFile' data-type='dash'>";
+                }
                 if (enableHLS && file_exists($hlsFile)) {
                     $hlsFile = htmlspecialchars($hlsFile, ENT_QUOTES);
-                    print "<source src='$hlsFile' type='application/x-mpegURL'>";
-                } else {
-                    print "<source src='$localPath' type='video/mp4'>";
+                    print "<source src='$hlsFile' type='application/x-mpegURL' data-type='hls'>";
                 }
+                $localFile = htmlspecialchars("videos/$fname", ENT_QUOTES);
+                print "<source src='$localFile' type='video/mp4'>";
+                // Source END
+                
                 print '</video>';
                 print '</div>';
             }

@@ -613,7 +613,7 @@
                 print '<label for="attribute">Attribute</label>';
                 print '<input type="text" name="attribute">';
                 print '<div id="attributes" class="hidden">';
-                $query = $pdo->prepare("SELECT * FROM attributes");
+                $query = $pdo->prepare("SELECT * FROM attributes WHERE videoOnly = FALSE ORDER BY name");
                 $query->execute();
                 foreach ($query->fetchAll() as $data) {
                     print "<span class='attribute'>$data[name]</span>";
@@ -1401,7 +1401,7 @@
         function hiddenData()
         {
             global $pdo;
-            $query = $pdo->prepare("SELECT * FROM attributes");
+            $query = $pdo->prepare("SELECT * FROM attributes WHERE starOnly = FALSE ORDER BY name");
             $query->execute();
             if ($query->rowCount()) {
                 print '<div id="attributes" class="hidden">';

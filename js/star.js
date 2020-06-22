@@ -124,7 +124,7 @@ function renameStar(starID, starName) {
 function ajax(page, params, callback = function () {
     location.href = `${location.href}`
 }) {
-    let url = page + '?' + params
+    let url = `${page}?${params}`
 
     let xhr = new XMLHttpRequest()
     xhr.open('GET', url)
@@ -313,9 +313,9 @@ function hasNoVideos() {
 }
 
 function autoComplete() {
-    function changeOrder(first, second, array) {
-        let index_one = array.indexOf(first)
-        let index_two = array.indexOf(second)
+    function changeOrder(items, array) {
+        let index_one = array.indexOf(items[0])
+        let index_two = array.indexOf(items[0])
         if (index_one >= 0 && index_two >= 0) {
             let tmp = array[index_one]
 
@@ -346,12 +346,7 @@ function autoComplete() {
     for (let i = 0, $this = $('.hairstyle'); i < $this.length; i++) hairStyles.push($this.eq(i).text())
     for (let i = 0, $this = $('#attributes > .attribute'); i < $this.length; i++) attributes.push($this.eq(i).text())
 
-    changeOrder('Schoolgirl', 'School Nurse', attributes)
-    changeOrder('Headmaster', 'Teacher', attributes)
-    changeOrder('Elf', 'Angel', attributes)
-    changeOrder('Tan Lines', 'Futanari', attributes)
-    changeOrder('Adolescent', 'Schoolgirl', attributes)
-    changeOrder('Android', 'Idol', attributes)
+    //changeOrder(['Elf', 'Angel'], attributes)
 
     $('input[name="breast"]').autocomplete({source: [breasts]})
     $('input[name="eyecolor"]').autocomplete({source: [eyeColors]})
@@ -399,13 +394,10 @@ function goToAndPlay(index, time = startTime) {
 function videoHover() {
     let thumbnail = undefined
     for (let i = 0; i < video.length; i++) {
-        video[i].addEventListener('mouseenter', function () {
-            startThumbnailPlayback(i)
-        })
+        let $this = $(video[i])
 
-        video[i].addEventListener('mouseleave', function () {
-            stopThumbnailPlayback(i)
-        })
+        $this.currentTime = startTime
+        $this.hover(() => startThumbnailPlayback(i), () => stopThumbnailPlayback(i))
     }
 
     function startThumbnailPlayback(index) {

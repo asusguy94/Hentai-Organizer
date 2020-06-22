@@ -1,80 +1,80 @@
 <?php
-include('../_class.php');
+    include('../_class.php');
 
-if (isset($_GET['videoID'])) {
-	if (!empty($_GET['videoID'])) {
-		$videoID = $_GET['videoID'];
+    if (isset($_GET['videoID'])) {
+        if (!empty($_GET['videoID'])) {
+            $videoID = $_GET['videoID'];
 
-		global $pdo;
-		$query = $pdo->prepare("SELECT * FROM videos WHERE id = :videoID LIMIT 1");
-		$query->bindParam(':videoID', $videoID);
-		$query->execute();
-		foreach ($query->fetchAll() as $data) {
-			$hlsDir = '../videos/' . Basic::removeExtensionPath($data['path']);
+            global $pdo;
+            $query = $pdo->prepare("SELECT * FROM videos WHERE id = :videoID LIMIT 1");
+            $query->bindParam(':videoID', $videoID);
+            $query->execute();
+            foreach ($query->fetchAll() as $data) {
+                $hlsDir = '../videos/' . Basic::removeExtensionPath($data['path']);
 
-			$query = $pdo->prepare("SELECT id FROM videostars WHERE videoID = :videoID LIMIT 1");
-			$query->bindParam(':videoID', $videoID);
-			$query->execute();
-			if (!$query->rowCount()) { // check if the video has some stars
-				if (file_exists('../videos/' . $data['path'])) {
-					if (unlink('../videos/' . $data['path'])) {
-						$webmPath = str_replace('.mp4', '.webm', str_replace('.m4v', '.webm', $data['path']));
-						if (file_exists('../videos/' . $webmPath)) {
-							unlink('../videos/' . $webmPath);
-						}
-						removeFromDB($videoID);
-						removeThumbnails($videoID);
-						removeHls($hlsDir);
-					}
-				} else {
-					removeFromDB($videoID);
-					removeThumbnails($videoID);
-					removeHls($hlsDir);
-				}
-			}
-		}
-	}
-}
+                $query = $pdo->prepare("SELECT id FROM videostars WHERE videoID = :videoID LIMIT 1");
+                $query->bindParam(':videoID', $videoID);
+                $query->execute();
+                if (!$query->rowCount()) { // check if the video has some stars
+                    if (file_exists('../videos/' . $data['path'])) {
+                        if (unlink('../videos/' . $data['path'])) {
+                            $webmPath = str_replace('.mp4', '.webm', str_replace('.m4v', '.webm', $data['path']));
+                            if (file_exists('../videos/' . $webmPath)) {
+                                unlink('../videos/' . $webmPath);
+                            }
+                            removeFromDB($videoID);
+                            removeThumbnails($videoID);
+                            removeHls($hlsDir);
+                        }
+                    } else {
+                        removeFromDB($videoID);
+                        removeThumbnails($videoID);
+                        removeHls($hlsDir);
+                    }
+                }
+            }
+        }
+    }
 
-function removeFromDB($videoID)
-{
-	global $pdo;
+    function removeFromDB($videoID)
+    {
+        global $pdo;
 
-	/* Remove Video */
-	$query = $pdo->prepare("DELETE FROM videos WHERE id = :videoID");
-	$query->bindParam(':videoID', $videoID);
-	$query->execute();
+        /* Remove Video */
+        $query = $pdo->prepare("DELETE FROM videos WHERE id = :videoID");
+        $query->bindParam(':videoID', $videoID);
+        $query->execute();
 
-	/* Remove Plays */
-	$query = $pdo->prepare("DELETE FROM plays WHERE videoID = :videoID");
-	$query->bindParam(':videoID', $videoID);
-	$query->execute();
-}
+        /* Remove Plays */
+        $query = $pdo->prepare("DELETE FROM plays WHERE videoID = :videoID");
+        $query->bindParam(':videoID', $videoID);
+        $query->execute();
+    }
 
-function removeThumbnails($videoID)
-{
-	unlink("../images/videos/$videoID.jpg");
-	unlink("../images/videos/$videoID-" . THUMBNAIL_RES . ".jpg");
+    function removeThumbnails($videoID)
+    {
+        unlink("../images/videos/$videoID.jpg");
+        unlink(sprintf("../images/videos/$videoID-%s.jpg", THUMBNAIL_RES));
 
         unlink("../images/thumbnails/$videoID.jpg");
         unlink("../vtt/$videoID.vtt");
     }
 
-function removeHls($dir)
-{
-	if(is_dir($dir)) {
-		$path = opendir($dir);
-		while (false !== ($file = readdir($path))) {
-			if (($file != '.') && ($file != '..')) {
-				$full = $dir . '/' . $file;
-				if (is_dir($full)) {
-					removeHls($full);
-				} else {
-					unlink($full);
-				}
-			}
-		}
-		closedir($path);
-		rmdir($dir);
-	}
-}
+    function removeHls($dir)
+    {
+        if (is_dir($dir)) {
+            $path = opendir($dir);
+            while (false !== ($file = readdir($path))) {
+                if (($file != '.') && ($file != '..')) {
+                    $full = $dir . '/' . $file;
+                    if (is_dir($full)) {
+                        removeHls($full);
+                    } else {
+                        unlink($full);
+                    }
+                }
+            }
+            closedir($path);
+            rmdir($dir);
+        }
+    }

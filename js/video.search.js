@@ -1,178 +1,195 @@
 const sort_radio = document.querySelectorAll('input[name="sort"]')
 
-    const noStar_checkbox = document.querySelector('input[name="no-star_0"]')
-    const hasStar_checkbox = document.querySelector('input[name="no-star_1"]')
+const cen_checkbox = document.querySelectorAll('input[name="cen"]')
+const noStar_checkbox = document.querySelectorAll('input[name="nostar"]')
+const quality_checkbox = document.querySelectorAll('input[name="quality"]')
 
-    const cen_checkbox = document.querySelector('input[name="cen"]')
-    const ucen_checkbox = document.querySelector('input[name="ucen"]')
+const title_input = document.querySelector('input[name="title"]')
+const attribute_checkbox = document.querySelectorAll('input[name^="attribute"]')
+const category_checkbox = document.querySelectorAll('input[name^="category"]')
 
-    const franchise_input = document.querySelector('input[name="franchise"]')
-    const title_input = document.querySelector('input[name="title"]')
-    const attribute_checkbox = document.querySelectorAll('input[name^="attribute"]')
-    const category_checkbox = document.querySelectorAll('input[name^="category"]')
+const existing_checkbox = document.querySelector('input[name="existing"]')
 
-    const loader = document.getElementById('loader')
+const loader = document.getElementById('loader')
+const updateBtn = document.getElementById('update')
 
+// Initialize PrevState for checkbox
+$(category_checkbox).attr('data-state', 0)
+$(attribute_checkbox).attr('data-state', 0)
+// TODO use jQuery.data() instead of JS.setAttribute()/JQuery.attr()
+// TODO checkbox style: https://stackoverflow.com/questions/10270987/change-checkbox-check-image-to-custom-image
 
-    const loadData = (function () {
-        fetch('json/video.search.php').then(function (jsonData) {
-            return jsonData.json()
-        }).then(function (data) { // CREATE DOM
-            const wrapper = document.getElementById('videos')
+const loadData = function () {
+    fetch('json/video.search.php').then(function (jsonData) {
+        return jsonData.json()
+    }).then(function (data) { // CREATE DOM
+        const wrapper = document.getElementById('videos')
 
-            const row = document.createElement('div')
-            row.classList.add('row', 'justify-content-center')
+        const row = document.createElement('div')
+        row.classList.add('row', 'justify-content-center')
 
-            for (let i = 0, elem = data['videos']; i < elem.length; i++) {
-                let thumbnail = elem[i]['thumbnail']
+        for (let i = 0, elem = data['videos']; i < elem.length; i++) {
+            let thumbnail = elem[i]['thumbnail']
 
-                let videoID = elem[i]['videoID']
-                let videoName = elem[i]['videoName']
-                let noStar = elem[i]['noStar']
-                let cen = elem[i]['cen']
-                let franchise = elem[i]['franchise']
+            let videoID = elem[i]['videoID']
+            let videoName = elem[i]['videoName']
+            let noStar = elem[i]['noStar']
+            let cen = elem[i]['cen']
+            let quality = elem[i]['quality']
+            let franchise = elem[i]['franchise']
 
-                let attribute = elem[i]['attribute']
-                let category = elem[i]['category']
-                let alias = elem[i]['alias']
+            let date_published = elem[i]['datePublished']
 
-                if (!category.length) category.push('0')
-                if (!attribute.length) attribute.push('0')
-                if (!alias.length) alias.push('0')
+            let attribute = elem[i]['attribute']
+            let category = elem[i]['category']
+            let alias = elem[i]['alias']
 
-                let a = document.createElement('a')
-                a.classList.add('video', 'card')
-                a.href = `video.php?id=${videoID}`
-                a.setAttribute('data-nostar', noStar)
-                a.setAttribute('data-cen', cen)
-                a.setAttribute('data-franchise', franchise)
-                a.setAttribute('data-title', videoName)
-                a.setAttribute('data-alias', alias)
-                a.setAttribute('data-attribute-name', `["${attribute}"]`)
-                a.setAttribute('data-category-name', `["${category}"]`)
+            if (!category.length) category.push('0')
+            if (!attribute.length) attribute.push('0')
+            if (!alias.length) alias.push('0')
 
-                let img = document.createElement('img')
-                img.classList.add('lazy', 'data-img-top')
-                img.setAttribute('data-src', thumbnail)
+            let existing = elem[i]['existing']
 
-                let span = document.createElement('span')
-                span.classList.add('title', 'card-title')
-                span.textContent = videoName
+            let a = document.createElement('a')
+            a.classList.add('video', 'card', 'ribbon-container')
+            a.href = `video.php?id=${videoID}`
+            a.setAttribute('data-id', videoID)
+            a.setAttribute('data-nostar', noStar)
+            a.setAttribute('data-cen', cen)
+            a.setAttribute('data-quality', quality)
+            a.setAttribute('data-franchise', franchise)
+            a.setAttribute('data-date-published', date_published)
+            a.setAttribute('data-title', videoName)
+            a.setAttribute('data-alias', alias)
+            a.setAttribute('data-attribute-name', `["${attribute}"]`)
+            a.setAttribute('data-category-name', `["${category}"]`)
+            a.setAttribute('data-existing', existing)
 
-                a.appendChild(img)
-                a.appendChild(span)
+            let img = document.createElement('img')
+            img.classList.add('lazy', 'data-img-top')
+            img.setAttribute('data-src', thumbnail)
 
-                row.appendChild(a)
-            }
-            wrapper.appendChild(row)
-        }).then(function () {
-            loader.remove()
+            let span = document.createElement('span')
+            span.classList.add('title', 'card-title')
+            span.textContent = videoName
 
-            window.video = document.getElementsByClassName('video')
-            window.videoLength = video.length
-        }).then(function () {
-            /** Label Click **/
-            for (let i = 0; i < label_input.length; i++) {
-                label_input[i].addEventListener('click', function () {
-                    $(label_input[i].previousSibling).click()
-                })
-            }
+            a.appendChild(img)
+            a.appendChild(span)
 
-            /** Filter **/
-            /* noStar */
-            noStar_checkbox.addEventListener('change', function () {
-                if (this.checked) {
-                    hasStar_checkbox.checked = false
-                    $('.video[data-nostar="0"]').addClass('hidden-starcount')
-                } else {
-                    $('.video[data-nostar="0"].hidden-starcount').removeClass('hidden-starcount')
+            // Quality
+            let ribbon = document.createElement('span')
+            ribbon.classList.add('ribbon')
+            ribbon.textContent = quality
+            a.appendChild(ribbon)
+
+            row.appendChild(a)
+        }
+        wrapper.appendChild(row)
+    }).then(function () {
+        loader.remove()
+
+        window.video = document.getElementsByClassName('video')
+        window.videoLength = video.length
+
+        window.$video = $(video)
+    }).then(function () {
+        setVideoCount(videoLength) // TODO StarCount-checkbox is incompatible with this -> change StarCount-checkbox
+
+        // Class Change
+        const observer = new MutationObserver(function (mutations) {
+            mutations.forEach(function (mutation) {
+                if (mutation.attributeName === 'class') {
+                    setVideoCount($('.video:visible').length)
                 }
             })
-            hasStar_checkbox.addEventListener('change', function () {
-                if (this.checked) {
-                    noStar_checkbox.checked = false
-                    $('.video[data-nostar="1"]').addClass('hidden-starcount')
-                } else {
-                    $('.video[data-nostar="1"].hidden-starcount').removeClass('hidden-starcount')
+        })
+        observer.observe($video[0], {attributes: true})
+    }).then(function () {
+        /** Filter **/
+        cen_checkbox.forEach(item => {
+            item.addEventListener('click', function () {
+                $(cen_checkbox).parent().removeClass('active')
+                this.parentNode.classList.add('active')
+
+                $('.video.hidden-cen').removeClass('hidden-cen')
+                switch (this.value) {
+                    case 'cen':
+                        $('.video[data-cen="0"]').addClass('hidden-cen')
+                        break
+                    case 'ucen':
+                        $('.video[data-cen="1"]').addClass('hidden-cen')
+                        break
                 }
             })
-            hasStar_checkbox.click()
+        })
 
-            /* Cen */
-            cen_checkbox.addEventListener('change', function () {
-                if (this.checked) {
-                    ucen_checkbox.checked = false
-                    $('.video[data-cen="0"]').addClass('hidden-cen')
-                } else {
-                    $('.video[data-cen="0"].hidden-cen').removeClass('hidden-cen')
+        quality_checkbox.forEach(item => {
+            item.addEventListener('click', function () {
+                $(quality_checkbox).parent().removeClass('active')
+                this.parentNode.classList.add('active')
+
+                $('.video.hidden-quality').removeClass('hidden-quality')
+                switch (this.value) {
+                    case '1080':
+                        $('.video[data-quality!="1080"]').addClass('hidden-quality')
+                        break
+                    case '!1080':
+                        $('.video[data-quality="1080"]').addClass('hidden-quality')
+                        break
                 }
             })
+        })
 
-            ucen_checkbox.addEventListener('change', function () {
-                if (this.checked) {
-                    cen_checkbox.checked = false
-                    $('.video[data-cen="1"]').addClass('hidden-cen')
-                } else {
-                    $('.video[data-cen="1"].hidden-cen').removeClass('hidden-cen')
+        noStar_checkbox.forEach(item => {
+            item.addEventListener('click', function () {
+                $(noStar_checkbox).parent().removeClass('active')
+                this.parentNode.classList.add('active')
+
+                $('.video.hidden-starcount').removeClass('hidden-starcount')
+                switch (this.value) {
+                    case 'has-star':
+                        $('.video[data-nostar="1"]').addClass('hidden-starcount')
+                        break
+                    case 'no-star':
+                        $('.video[data-nostar="0"]').addClass('hidden-starcount')
+                        break
                 }
             })
+        })
+        $(noStar_checkbox).filter('[value="has-star"]').click() // use hasStar as default filter method
 
-            /* Title */
-            if (title_input != null) {
-                title_input.addEventListener('keyup', function () {
-                    let input = title_input.value.toLowerCase()
-                    $(video).removeClass('hidden-title')
+        /* Title */
+        title_input.addEventListener('keyup', titleSearch)
 
-                    if (input !== '') {
-                        $(video).not(function () {
-                            return ((this.getAttribute('data-title').toLowerCase().indexOf(input) > -1) || (this.getAttribute('data-alias').toLowerCase().indexOf(input) > -1))
-                        }).addClass('hidden-title')
+        function titleSearch() {
+            let input = title_input.value.toLowerCase()
+            $video.removeClass('hidden-title')
+
+            $video.not(function () {
+                return ((this.getAttribute('data-title').toLowerCase().indexOf(input) > -1) || (this.getAttribute('data-alias').toLowerCase().indexOf(input) > -1))
+            }).addClass('hidden-title')
+        }
+
+        /* Existing */
+        existing_checkbox.addEventListener('change', function () {
+            $video.removeClass('hidden-existing')
+
+            if (this.checked) {
+                for (let i = 0; i < videoLength; i++) {
+                    if (video[i].getAttribute('data-existing') === '0') {
+                        video[i].classList.add('hidden-existing')
                     }
-                })
+                }
             }
+        })
 
-            /* Franchise */
-            if (franchise_input != null) {
-                franchise_input.addEventListener('keyup', function () {
-                    let input = franchise_input.value.toLowerCase()
-                    $(video).removeClass('hidden-franchise')
+        /* Category */
+        for (let i = 0, wrapperLen = category_checkbox.length; i < wrapperLen; i++) {
+            category_checkbox[i].addEventListener('change', function () {
+                indeterminateToggle(category_checkbox[i])
 
-                    if (input !== '') {
-                        $(video).not(function () {
-                            return (this.getAttribute('data-franchise').toLowerCase().indexOf(input) > -1)
-                        }).addClass('hidden-franchise')
-                    }
-                })
-            }
-
-            /* Attributes */
-            for (let i = 0, wrapperLen = attribute_checkbox.length; i < wrapperLen; i++) {
-                attribute_checkbox[i].addEventListener('change', function () {
-                    let attribute = this.name.split('attribute_').pop()
-                    let attribute_class = attribute.replace(/ /g, '-')
-
-                    for (let i = 0; i < videoLength; i++) {
-                        let attribute_raw = video[i].getAttribute('data-attribute-name').slice(2, -2)
-                        let attribute_arr = attribute_raw.split(',')
-
-                        for (let j = 0, len = attribute_arr.length; j < len; j++) {
-                            if (this.checked && (attribute_arr[j] === attribute)) {
-                                video[i].classList.add('tmp')
-                            }
-                        }
-                    }
-
-                    if (this.checked) $('.video:not(.tmp)').addClass(`hidden-attribute-${attribute_class}`)
-                    else $(video).removeClass(`hidden-attribute-${attribute_class}`)
-                    $(video).removeClass('tmp') // remove leftover classes
-                })
-            }
-
-            /* Category */
-            for (let i = 0, wrapperLen = category_checkbox.length; i < wrapperLen; i++) {
-                category_checkbox[i].addEventListener('change', function () {
-                    let category = this.name.split('category_').pop()
-                    let category_class = category.replace(/ /g, '-')
+                let category = this.name.split('category_').pop()
+                let category_class = category.replace(/ /g, '-')
 
                 for (let j = 0; j < videoLength; j++) {
                     let category_arr = video[j].getAttribute('data-category-name').slice(2, -2).split(',')
@@ -287,3 +304,81 @@ updateBtn.addEventListener('click', function () {
     resetData()
     loadData()
 })
+
+function resetData() {
+    $('.video').remove()
+}
+
+function isValidDate(date) {
+    return !!(Object.prototype.toString.call(date) === "[object Date]" && +date)
+}
+
+function setVideoCount(length) {
+    document.getElementById('video-count').textContent = length
+}
+
+function tmp(index) {
+    video[index].setAttribute('data-tmp', '')
+}
+
+function indeterminateToggle(el) {
+    switch (el.getAttribute('data-state')) {
+        case '0': // checked
+            el.setAttribute('data-state', '1')
+            el.indeterminate = false
+            el.checked = true
+
+            // Set Label Class
+            el.parentElement.classList.add('selected')
+            break
+        case '1': // indeterminate
+            el.setAttribute('data-state', '-1')
+            el.indeterminate = true
+            el.checked = false
+
+            // Set Label Class
+            el.parentElement.classList.add('not')
+
+            // Remove Label Class
+            el.parentElement.classList.remove('selected')
+            break
+        case '-1': // not-checked
+            el.setAttribute('data-state', '0')
+            el.indeterminate = false
+            el.checked = false
+
+            // Remove Label Classes
+            el.parentElement.classList.remove('not')
+            break
+    }
+}
+
+function indeterminateHandler(arr, item, parent, index, test = false) {
+    if (!test) {
+        for (let k = 0, len = arr.length; k < len; k++) {
+            if ((parent.checked && (arr[k] === item)) || (parent.indeterminate && arr[k].indexOf(item) === -1)) {
+                tmp(index)
+                break
+            }
+        }
+    } else {
+        for (let k = 0, len = arr.length; k < len; k++) {
+            if (parent.checked) {
+                if ((item === 'NULL' && len === 1 && arr[k] === '0') || (arr[k] === item)) {
+                    tmp(index)
+                    break
+                }
+            } else if (parent.indeterminate) {
+                if (item === 'NULL') {
+                    if (arr.indexOf("0") === -1) {
+                        tmp(index)
+                        break
+                    }
+                } else if (arr.indexOf(item) === -1) {
+                    tmp(index)
+                    break
+                }
+            }
+        }
+    }
+}

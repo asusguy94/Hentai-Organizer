@@ -9,7 +9,7 @@ $ffmpeg = new FFMPEG();
     <!doctype html>
     <html>
         <head>
-			<?php $basic->head('', array('bootstrap')) ?>
+			<?php $basic->head('', ['bootstrap'], ['stretchy']) ?>
         </head>
 
         <body>
@@ -32,14 +32,20 @@ foreach ($files as $path) {
 	}
 }
 
-$query = $pdo->prepare("SELECT id, path FROM videos WHERE duration = 0 OR height = 0");
-$query->execute();
-foreach ($query->fetchAll() AS $item) {
-	$query = $pdo->prepare("UPDATE videos SET duration = :duration, height = :height WHERE id = :id");
-	$query->bindParam(':id', $item['id']);
-	$query->bindParam(':duration', $ffmpeg->getDuration($item['path']));
-	$query->bindParam(':height', $ffmpeg->getVideoHeight($item['path']));
-}
+	$query = $pdo->prepare("SELECT id, path FROM videos WHERE duration = 0 OR height = 0");
+	$query->execute();
+	foreach ($query->fetchAll() AS $item) {
+		$query = $pdo->prepare("UPDATE videos SET duration = :duration, height = :height WHERE id = :id");
+		$query->bindParam(':id', $item['id']);
+
+        $duration = $ffmpeg->getDuration($item['path']);
+        $query->bindParam(':duration', $duration);
+
+        $videoHeight = $ffmpeg->getVideoHeight($item['path']);
+        $query->bindParam(':height', $videoHeight);
+        
+        $query->execute();
+	}
 
 if (isset($_POST['submit'])) {
 	if (count(array_filter($_POST)) === count($_POST)) { // check if all fields are filled out!
@@ -60,16 +66,21 @@ if (isset($_POST['submit'])) {
 			array_push($fnameArr, $data);
 		}
 
-		for ($i = 0; $i < count($fnameArr); $i++) {
-			$query = $pdo->prepare("INSERT INTO videos(name, episode, path, franchise, duration, height, date) VALUES(:name, :episode, :path, :franchise, :duration, :height, NOW())");
-			$query->bindParam(':name', $titleArr[$i]);
-			$query->bindParam(':episode', $episodeArr[$i]);
-			$query->bindParam(':path', $fnameArr[$i]);
-			$query->bindParam(':franchise', $franchiseArr[$i]);
-			$query->bindParam(':duration', $ffmpeg->getDuration($fnameArr[$i]));
-			$query->bindParam(':height', Basic::getClosestQ($ffmpeg->getVideoHeight($fnameArr[$i])));
-			$query->execute();
-		}
+			for ($i = 0; $i < count($fnameArr); $i++) {
+				$query = $pdo->prepare("INSERT INTO videos(name, episode, path, franchise, duration, height, date) VALUES(:name, :episode, :path, :franchise, :duration, :height, NOW())");
+				$query->bindParam(':name', $titleArr[$i]);
+				$query->bindParam(':episode', $episodeArr[$i]);
+				$query->bindParam(':path', $fnameArr[$i]);
+				$query->bindParam(':franchise', $franchiseArr[$i]);
+
+                $duration = $ffmpeg->getDuration($fnameArr[$i]);
+                $query->bindParam(':duration', $duration);
+
+                $videoHeight = Basic::getClosestQ($ffmpeg->getVideoHeight($fnameArr[$i]));
+                $query->bindParam(':height', $videoHeight);
+
+				$query->execute();
+			}
 
 		header('Location: video_generatethumbnails.php');
 	}

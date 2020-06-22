@@ -4,92 +4,100 @@ const hlsSource = document.querySelector('source[data-type="hls"]')
 const dashSource = document.querySelector('source[data-type="dash"]')
 const videoID = new URL(location.href).searchParams.get('id')
 
-    window.vtt_source = `vtt/${videoID}.vtt`
-    window.bookmark = document.getElementsByClassName('bookmark')
-    window.videoTitle = document.getElementById('video-name')
+const vtt_source = `vtt/${videoID}.vtt`
+const bookmark = document.getElementsByClassName('bookmark')
 
-    onFocus(() => {
-        videoStats()
-        bookmarkCollision()
+onFocus(videoStats)
+
+bookmarkCollision()
+bookmarkTooltip()
+starTooltip()
+attributeTooltip()
+
+const plyrPlayer = new Plyr(videoPlayer, {
+    'controls': ['play-large', 'play', 'current-time', 'progress', 'duration', 'fullscreen'],
+    'ratio': '21:9',
+    'invertTime': false,
+    'toggleInvert': false,
+    'seekTime': 1,
+    'previewThumbnails': {enabled: $('#vtt').length, src: vtt_source},
+    'hideControls': false // never hide controls
+})
+
+if (dashSource) {
+    const dash = dashjs.MediaPlayer().create()
+    const url = dashSource.getAttribute('src')
+    dash.initialize(videoPlayer, url, false)
+} else if (hlsSource && Hls.isSupported()) {
+    const hls = new Hls({autoStartLoad: false})
+    hls.loadSource(hlsSource.getAttribute('src'))
+    hls.attachMedia(videoPlayer)
+
+    hls.on(Hls.Events.MANIFEST_PARSED, (e, data) => {
+        const dataLevels = data['levels'].length - 1
+
+        let levels = {360: 0, 480: 1, 720: 2, 1080: 3}
+        let maxStartLevel = levels[720]
+        let maxLevel = levels[1080]
+
+        let desiredStartLevel = maxLevel - 1
+        if (desiredStartLevel > maxStartLevel) desiredStartLevel = maxStartLevel
+        if (desiredStartLevel > dataLevels) desiredStartLevel = dataLevels - 1
+        if (desiredStartLevel < 0) desiredStartLevel = 0
+
+        hls.startLevel = desiredStartLevel
+        hls.startLoad(getTime())
     })
+}
 
-    bookmarkTooltip()
-    starTooltip()
-    attributeTooltip()
-
-    videoVolume(0.25)
-
-    // Start Class
-    if (videoSource && Hls.isSupported()) {
-        const hls = new Hls({
-            maxBufferLength: 180 /* 3x duration of hls_time */
-        })
-        hls.loadSource(videoSource.getAttribute('src'))
-        hls.attachMedia(videoPlayer)
-    }
-
-    new Plyr(videoPlayer, {
-        'controls': ['play-large', 'play', 'current-time', 'progress', 'duration', 'fullscreen'],
-        'ratio': '21:9',
-        'invertTime': false,
-        'toggleInvert': false,
-        'seekTime': window.seekTime,
-        'volume': 1, // reset volume
-        'muted': false,
-        'previewThumbnails': {enabled: is_ValidURL(vtt_source), src: vtt_source},
-        'hideControls': false // never hide controls
-    })
-    // END Class
-
-    // START Listeners
-    document.addEventListener('keydown', (e) => {
-        if (e.keyCode === 9) {
-            e.preventDefault()
-            $('#next')[0].click()
-        }
-    })
-
-    videoWrapper.addEventListener('wheel', (e) => {
+document.addEventListener('keydown', e => {
+    if (e.keyCode === 9) {
         e.preventDefault()
+        $('#next')[0].click()
+    }
+})
 
-        let speed = 10
-        if (e.deltaY < 0) skip(speed)
-        else rewind(speed)
-    })
+videoWrapper.addEventListener('wheel', e => {
+    e.preventDefault()
 
-    videoPlayer.addEventListener('timeupdate', () => {
-        localStorage.bookmark = Math.round(videoPlayer.currentTime)
-    })
+    let speed = 10
+    if (e.deltaY < 0) plyrPlayer.forward(speed)
+    else plyrPlayer.rewind(speed)
+})
 
-    videoPlayer.addEventListener('playing', () => {
-        localStorage.playing = 1
-    })
+videoPlayer.addEventListener('timeupdate', () => {
+    localStorage.bookmark = Math.round(videoPlayer.currentTime)
+})
 
-    videoPlayer.addEventListener('pause', () => {
-        localStorage.playing = 0
-    })
+videoPlayer.addEventListener('playing', () => {
+    localStorage.playing = 1
+})
 
-    $(bookmark).on('click', function () {
-        playFrom(this.getAttribute('data-bookmark-time'))
-    })
+videoPlayer.addEventListener('pause', () => {
+    localStorage.playing = 0
+})
 
-    document.onkeydown = (e) => {
-        e = e || window.event
+$(bookmark).on('click', function () {
+    playFrom(this.getAttribute('data-bookmark-time'))
+})
 
-        if (!$('input').is(':focus')) {
-            switch (e.keyCode) {
-                case 37:
-                    rewind()
-                    break
-                case 39:
-                    skip()
-                    break
-                case 32:
-                    playPause()
-                    break
-            }
+document.onkeydown = (e) => {
+    e = e || window.event
+
+    if (!$('input').is(':focus')) {
+        switch (e.keyCode) {
+            case 37:
+                plyrPlayer.rewind()
+                break
+            case 39:
+                plyrPlayer.forward()
+                break
+            case 32:
+                playPause()
+                break
         }
     }
+}
 
 function isPlaying() {
     return !videoPlayer.paused
@@ -109,24 +117,6 @@ function isCen() {
     return videoPlayer.getAttribute("data-cen") === "1"
 }
 
-function videoVolume(level = 1) {
-    if (level > 1) {
-        let audioCtx = new AudioContext()
-        let source = audioCtx.createMediaElementSource(videoPlayer)
-
-        let gainNode = audioCtx.createGain()
-        gainNode.gain.value = level
-
-        source.connect(gainNode)
-        gainNode.connect(audioCtx.destination)
-    } else if (level >= 0) {
-        videoPlayer.volume = level
-    }
-}
-
-// END Video
-
-// START Ajax
 function addPlay() {
     ajax_post("ajax/video_addplay.php", [
         {'videoID': videoID}
@@ -180,7 +170,6 @@ function bookmark_editCategory(bookmarkID, categoryID) {
     ajax("ajax/bookmark_editCategory.php", `bookmarkID=${bookmarkID}&categoryID=${categoryID}`)
 }
 
-
 function bookmark_editTime(bookmarkID) {
     let seconds = Math.round(videoPlayer.currentTime)
     localStorage.bookmark = seconds
@@ -221,6 +210,12 @@ function addGlobal_starAttribute(starID, attributeID) {
     ajax("ajax/video_add_starattribute.php", `videoID=${videoID}&starID=${starID}&attributeID=${attributeID}`)
 }
 
+function removeBookmarkAttributes(bookmarkID) {
+    ajax_post('ajax/remove_bookmark_attributes.php', [
+        {'bookmarkID': bookmarkID}
+    ])
+}
+
 function addBookmarkAttribute(bookmarkID, attributeID) {
     ajax("ajax/add_bookmark_attribute.php", `bookmarkID=${bookmarkID}&attributeID=${attributeID}`)
 }
@@ -239,6 +234,13 @@ function removeVideo() {
 
 function fixBookmarks() {
     ajax("ajax/bookmarks_fix.php", `videoID=${videoID}`)
+}
+
+function editDate($date) {
+    ajax_post('ajax/video_setdate.php', [
+        {'videoID': videoID},
+        {'date': $date}
+    ])
 }
 
 function toggleCen() {
@@ -288,7 +290,7 @@ function ajax_post(url, params, callback = () => {
     }
 }
 
-// START Context Menu
+
 $(function () {
     $.contextMenu({
         selector: "#video > h2 #video-name",
@@ -323,15 +325,13 @@ $(function () {
                                 $("#dialog").remove()
                             }, width: 350
                         })
-                        $("#dialog").append('<input type="text" value="' + $("#video > h2 #video-name").attr("data-franchise") + '" name="videoFranchise_edit" autofocus>')
+                        $("#dialog").append(`<input type="text" value="${$("#video > h2 #video-name").attr("data-franchise")}" name="videoFranchise_edit" autofocus>`)
                         let input = $('input[name="videoFranchise_edit"]')
                         let len = input.val().length
                         input[0].focus()
                         input[0].setSelectionRange(len, len)
                         document.querySelector('input[name="videoFranchise_edit"]').addEventListener("keydown", function (e) {
-                            if (e.keyCode === 13) {
-                                renameFranchise(this.value)
-                            }
+                            if (e.keyCode === 13) renameFranchise(this.value)
                         })
                     })
                 }
@@ -347,9 +347,7 @@ $(function () {
                         $("#dialog").append('<input type="text" name="videoAlias_add" autofocus>')
                         $('input[name="videoAlias_add"]')[0].focus()
                         document.querySelector('input[name="videoAlias_add"]').addEventListener("keydown", function (e) {
-                            if (e.keyCode === 13) {
-                                addAlias(this.value)
-                            }
+                            if (e.keyCode === 13) addAlias(this.value)
                         })
                     })
                 }
@@ -377,7 +375,7 @@ $(function () {
                                 $("#dialog").remove()
                             }, width: 350
                         })
-                        $("#dialog").append('<input type="text" name="videoAlias_edit" value="' + aliasText_current + '" autofocus>')
+                        $("#dialog").append(`<input type="text" name="videoAlias_edit" value="${aliasText_current}" autofocus>`)
                         let input = $('input[name="videoAlias_edit"]')
                         let len = input.val().length
                         input[0].focus()
@@ -404,34 +402,24 @@ $(function () {
         selector: "video, .plyr",
         items: {
             cen: {
-                name: "Censor",
-                icon: "edit",
-                callback: function () {
+                name: "Censor", icon: "edit", callback: function () {
                     toggleCen()
                 }, visible: !isCen()
             }, un_cen: {
-                name: "Uncensor",
-                icon: "edit",
-                callback: function () {
+                name: "Uncensor", icon: "edit", callback: function () {
                     toggleCen()
                 }, visible: isCen()
             }, generate_thumbnail: {
-                name: "Create Thumbnail",
-                icon: "add",
-                callback: function () {
+                name: "Create Thumbnail", icon: "add", callback: function () {
                     generateThumbnail(videoPlayer.currentTime)
                 }
             }, remove_plays: {
-                name: "Remove Plays",
-                icon: 'delete',
-                callback: function () {
+                name: "Remove Plays", icon: 'delete', callback: function () {
                     removePlays()
                 }
             }, rename_file: {
-                name: "Rename File",
-                icon: "edit",
-                callback: function () {
-                    let videoPath_current = `${$(videoPlayer).find("source").first().attr("src").split("/")[1]}.mp4`
+                name: "Rename File", icon: "edit", callback: function () {
+                    let videoPath_current = `${$(videoPlayer).find("source").last().attr("src").split("/")[1]}`
                     $("body").append('<div id="dialog" title="Edit File"></div>')
                     $(function () {
                         $("#dialog").dialog({
@@ -445,9 +433,7 @@ $(function () {
                         input[0].focus()
                         input[0].setSelectionRange(len, len)
                         document.querySelector('input[name="videoFile_edit"]').addEventListener("keydown", function (e) {
-                            if (e.keyCode === 13) {
-                                renameFile(this.value)
-                            }
+                            if (e.keyCode === 13) renameFile(this.value)
                         })
                     })
                 }
@@ -474,6 +460,7 @@ $(function () {
 })
 $(function () {
     $.contextMenu({
+        zIndex: 3,
         selector: ".bookmark",
         items: {
             add_star: {
@@ -510,7 +497,7 @@ $(function () {
                                 $(this).remove()
                             }, width: 250, maxHeight: $(window).height() - 55, position: {my: "top", at: "top+50"}
                         })
-                        let selectedAttribute_query = $('.bookmark-info[data-bookmark-id="' + bookmarkID + '"] .btn[data-attribute-id]')
+                        let selectedAttribute_query = $(`.bookmark-info[data-bookmark-id="${bookmarkID}"] .btn[data-attribute-id]`)
                         let selectedAttribute = []
                         for (let i = 0; i < selectedAttribute_query.length; i++) {
                             let name = $(selectedAttribute_query).eq(i).attr("data-attribute-id")
@@ -522,10 +509,16 @@ $(function () {
                         for (let i = 0; i < attribute_query.length; i++) {
                             let attributeID = $(attribute_query).eq(i).attr("data-attribute-id")
                             let attributeName = $(attribute_query).eq(i).text()
-                            if (selectedAttribute.indexOf(attributeID) === -1) $("#dialog").append('<div class="btn" onclick="addBookmarkAttribute(' + bookmarkID + ", " + attributeID + ')">' + attributeName + "</div>")
+
+                            if (selectedAttribute.indexOf(attributeID) === -1) $("#dialog").append(`<div class="btn unselectable" onclick="addBookmarkAttribute(${bookmarkID}, ${attributeID})">${attributeName}</div>`)
                         }
                         searchData()
                     })
+                }
+            }, remove_attribute: {
+                name: 'Remove Attributes', icon: 'delete', callback: function (itemKey, options) {
+                    let id = options.$trigger.attr("data-bookmark-id")
+                    removeBookmarkAttributes(id)
                 }
             }, edit: {
                 name: "Change Category", icon: "edit", callback: function (itemKey, options) {
@@ -544,13 +537,13 @@ $(function () {
                             let category = $("#category_list > option").eq(i)
                             let categoryID = category.attr("data-category-id")
                             let categoryName = category.attr("value")
-                            if (categoryName !== bookmarkName) $("#dialog").append('<div class="btn" onclick="bookmark_editCategory(' + bookmarkID + "," + categoryID + ')">' + categoryName + "</div>")
+                            if (categoryName !== bookmarkName) $("#dialog").append(`<div class="btn unselectable" onclick="bookmark_editCategory(${bookmarkID},${categoryID})">${categoryName}</div>`)
                         }
                         searchData()
                     })
                 }
             }, edit_time: {
-                name: "Change Time", icon: "edit", callback: function (itemKey, options) {
+                name: "Change Time", icon: "far fa-clock", callback: function (itemKey, options) {
                     bookmark_editTime(options.$trigger.attr("data-bookmark-id"))
                 }
             }, delete: {
@@ -564,6 +557,7 @@ $(function () {
 })
 $(function () {
     $.contextMenu({
+        zIndex: 3,
         selector: ".category",
         items: {
             add_bookmark: {
@@ -572,12 +566,16 @@ $(function () {
                     addBookmark(id, videoID)
                 }
             }, remove: {
-                name: "Remove", icon: "delete", callback: function (itemKey, options) {
+                name: "Remove",
+                icon: "delete",
+                callback: function (itemKey, options) {
                     let id = options.$trigger.attr("data-category-id")
                     removeVideoCategory(videoID, id)
                 }
             }, delete: {
-                name: "Delete", icon: "delete", callback: function (itemKey, options) {
+                name: "Delete",
+                icon: "delete",
+                callback: function (itemKey, options) {
                     let id = options.$trigger.attr("data-category-id")
                     removeCategory(id)
                 }, visible: false
@@ -587,6 +585,7 @@ $(function () {
 })
 $(function () {
     $.contextMenu({
+        zIndex: 3,
         selector: ".star[data-star-id]",
         items: {
             add_bookmark: {
@@ -599,11 +598,14 @@ $(function () {
                                 $("#dialog").remove()
                             }, width: 250, position: {my: "right top", at: "right-110 top+250"}
                         })
+
+                        searchField()
                         for (let i = 0; i < $("#category_list > option").length; i++) {
                             let categoryID = $("#category_list > option").eq(i).attr("data-category-id")
                             let categoryName = $("#category_list > option").eq(i).attr("value")
-                            $("#dialog").append('<div class="btn" onclick="addBookmark_and_star(' + categoryID + ", " + starID + ')">' + categoryName + "</div>")
+                            $("#dialog").append(`<div class="btn unselectable" onclick="addBookmark_and_star(${categoryID}, ${starID})">${categoryName}</div>`)
                         }
+                        searchData()
                     })
                 }
             }, add_global_attribute: {
@@ -621,7 +623,7 @@ $(function () {
                         for (let i = 0; i < attribute_query.length; i++) {
                             let attributeID = $(attribute_query).eq(i).attr("data-attribute-id")
                             let attributeName = $(attribute_query).eq(i).text()
-                            $("#dialog").append('<div class="btn" onclick="addGlobal_starAttribute(' + starID + ", " + attributeID + ')">' + attributeName + "</div>")
+                            $("#dialog").append(`<div class="btn unselectable" onclick="addGlobal_starAttribute(${starID}, ${attributeID})">${attributeName}</div>`)
                         }
                         searchData()
                     })
@@ -635,13 +637,59 @@ $(function () {
         }
     })
 })
-// END Context Menu
 
-// START Functions
-function videoStats() {
+$(function () {
+    $.contextMenu({
+        selector: '#video .date',
+        items: {
+            'edit_date': {
+                name: 'Edit Date', icon: 'edit', callback: function () {
+                    let date_current = $('.date').not('.no-date').text().trim()
+                    if (date_current.length && date_current.split(' ').length > 2) {
+                        let date_arr = date_current.split(' ')
+                        let date_d = date_arr[0]
+                        let date_m = date_arr[1]
+                        let date_y = date_arr[2]
+
+                        if (date_m.length > 2) date_m = date_m.substring(0, 3)
+                        if (date_y.length > 2) date_y = date_y.substring(2, 4)
+
+                        date_current = `${date_d} ${date_m} ${date_y}`
+                    }
+
+                    $("body").append('<div id="dialog" title="Edit Date"></div>')
+                    $(function () {
+                        $("#dialog").dialog({
+                            close: function () {
+                                $("#dialog").remove()
+                            }, width: 350
+                        })
+                        $("#dialog").append(`<input type="text" name="date_edit" value="${date_current}" autofocus>`)
+                        let input = $('input[name="date_edit"]')
+                        let len = input.val().length
+                        input[0].focus()
+                        input[0].setSelectionRange(len, len)
+                        document.querySelector('input[name="date_edit"]').addEventListener("keydown", function (e) {
+                            if (e.keyCode === 13) editDate(this.value)
+                        })
+                    })
+                }
+            }
+        }
+    })
+})
+
+function getTime() {
     let seconds = videoPlayer.currentTime
-    if (typeof localStorage.bookmark !== "undefined" && localStorage.video === videoID)
-        seconds = parseInt(localStorage.bookmark)
+    if (typeof localStorage.bookmark !== "undefined" && localStorage.video === videoID) {
+        seconds = Number(localStorage.bookmark)
+    }
+
+    return seconds
+}
+
+function videoStats() {
+    let seconds = getTime()
 
     if (localStorage.video !== videoID) {
         localStorage.video = videoID
@@ -661,68 +709,45 @@ function videoStats() {
     }
 }
 
-function collisionCheck(firstElement, secondElement) {
+function collisionCheck(a, b) {
     const distance_min = {
         x: 7,
-        y: 35
     }
 
-    let first = {
-        dom: firstElement.getBoundingClientRect(),
-        x: $(firstElement).offset().left,
-        y: $(firstElement).offset().top
-    }
+    if (typeof a === "undefined" || typeof b === "undefined") return false
 
-    let second = {
-        dom: secondElement.getBoundingClientRect(),
-        x: $(secondElement).offset().left,
-        y: $(secondElement).offset().top
-    }
+    a = a.getBoundingClientRect()
+    b = b.getBoundingClientRect()
 
-    let distance = {
-        x: Math.abs((first.x + first.dom.width) - second.x),
-        y: Math.abs(first.y - second.y)
-    }
-
-    return !(
-        first.dom.right < second.dom.left ||
-        first.dom.left > second.dom.right ||
-        first.dom.bottom < second.dom.top ||
-        first.dom.top > second.dom.bottom
-    ) || (distance.x < distance_min.x && distance.y < distance_min.y)
+    return !((a.x + a.width) < b.x - distance_min.x) || (a.x - distance_min.x > (b.x + b.width))
 }
 
 function bookmarkCollision() {
     bookmarkSort()
 
     $(bookmark).attr('data-level', 1)
-    for (let i = 1; i < bookmark.length; i++) {
-        let level = $(bookmark).eq(i).attr('data-level')
+    for (let i = 1, items = bookmark, LEVEL_MIN = 1, LEVEL_MAX = 12, level = LEVEL_MIN; i < items.length; i++) {
+        let collision = false
 
-        let first = bookmark[i - 1]
-        let second = bookmark[i];
+        let first = items[i - 1]
+        let second = items[i]
 
-        (function addSpace() {
-            setTimeout(function () {
-                let collision = false
-                if (collisionCheck(first, second)) {
-                    collision = true
-                } else {
-                    for (let j = 1; j < i; j++) {
-                        first = bookmark[j - 1]
-                        if (collisionCheck(first, second)) collision = true
-                    }
-                }
+        if (collisionCheck(first, second)) {
+            collision = true
+        } else {
+            collision = false
 
-                if (collision) {
-                    if (level < 10) level++
-                    else level = 1
+            for (let j = 1; j < i; j++) {
+                if (collisionCheck(items[j], second)) collision = true
+            }
+        }
 
-                    $(bookmark).eq(i).attr('data-level', level)
-                    addSpace()
-                }
-            }, 250)
-        })()
+        if (collision && level < LEVEL_MAX) {
+            if (level < LEVEL_MAX) level++
+            second.setAttribute('data-level', level)
+        } else {
+            level = LEVEL_MIN
+        }
     }
 }
 
@@ -731,7 +756,6 @@ function bookmarkSort() {
         let valA = a.getAttribute('data-bookmark-time')
         let valB = b.getAttribute('data-bookmark-time')
 
-
         return valA - valB
     })
 
@@ -739,13 +763,11 @@ function bookmarkSort() {
 }
 
 function onFocus(callback) {
-    if (document.hasFocus()) {
+    if (document.hasFocus()) callback()
+
+    window.addEventListener('focus', function () {
         callback()
-    } else {
-        $(window).focus(function () {
-            callback()
-        })
-    }
+    })
 }
 
 function bookmarkTooltip() {
@@ -755,18 +777,34 @@ function bookmarkTooltip() {
         $(".bookmark-info[data-bookmark-id]").eq(index).removeClass("active")
     }
 
+    function setPos(categoryID, left, top) {
+        if ($(`.bookmark-info[data-bookmark-id="${categoryID}"] > *`).length) {
+            $(`.bookmark-info[data-bookmark-id="${categoryID}"]`)
+                .addClass("active")
+                .css({left: left, top: top})
+        }
+    }
+
     for (let i = 0; i < bookmarks.length; i++) {
         bookmarks[i].addEventListener("mouseenter", function (e) {
             clearHover(i)
+
             let leftPos = e.clientX - 100
             let topPos = e.clientY + 25
             if (leftPos > getWidth() - 280) leftPos = getWidth() - 280
-            let left = leftPos + "px"
-            let top = topPos + "px"
+            let left = `${leftPos}px`
+            let top = `${topPos}px`
+
             let categoryID = bookmarks[i].getAttribute("data-bookmark-id")
-            if ($(`.bookmark-info[data-bookmark-id="${categoryID}"] > *`).length) {
-                $(`.bookmark-info[data-bookmark-id="${categoryID}"]`).addClass("active")
-                $(`.bookmark-info[data-bookmark-id="${categoryID}"]`).css({left: left, top: top})
+            setPos(categoryID, left, top)
+
+
+            let bounding = $(`.bookmark-info[data-bookmark-id="${categoryID}"]`)[0].getBoundingClientRect()
+            if (bounding.bottom > (window.innerHeight || document.documentElement.clientHeight)) {
+                topPos = bounding.top - bounding.height - (25 * 2)
+                top = `${topPos}px`
+
+                setPos(categoryID, left, top)
             }
         })
         bookmarks[i].addEventListener("mouseleave", function () {
@@ -847,13 +885,6 @@ function setClipboard(data) {
     document.body.removeChild(el)
 }
 
-function is_ValidURL(url) {
-    let xhr = new XMLHttpRequest
-    xhr.open("HEAD", url, false)
-    xhr.send()
-    return xhr.status !== 404
-}
-
 function searchField(dialogQuery = $('#dialog')) {
     const searchWrapper = document.createElement('span')
     searchWrapper.classList.add('search')
@@ -865,17 +896,23 @@ function searchField(dialogQuery = $('#dialog')) {
 }
 
 function searchData() {
+    const CHAR_UP = 38
+    const CHAR_DOWN = 40
+
     const CHAR_BACKSPACE = 8
+    const CHAR_ENTER = 13
     const CHAR_SPACE = 32
+
     const CHAR_A = 65
     const CHAR_Z = 90
 
     let input = ''
-    document.addEventListener('keydown', function (e) {
+    $('#dialog .btn:visible').first().addClass('selected')
+    document.addEventListener('keydown', e => {
         if (((e.which === CHAR_BACKSPACE && input.length) || e.which === CHAR_SPACE) || (e.which >= CHAR_A && e.which <= CHAR_Z)) {
-            e.preventDefault() // spacebar scroll
+            e.preventDefault() // SPACEBAR
 
-            if (e.which === 8) {
+            if (e.which === CHAR_BACKSPACE) {
                 updateLabel(input = input.slice(0, -1))
             } else {
                 updateLabel(input += String.fromCharCode(e.which).toLowerCase())
@@ -884,6 +921,43 @@ function searchData() {
             $('#dialog .btn').removeClass('no-match').not(function () {
                 return this.textContent.toLowerCase().indexOf(input) > -1
             }).addClass('no-match')
+
+            $('#dialog .btn.selected').removeClass('selected')
+            $('#dialog .btn:visible').first().addClass('selected')
+        } else {
+            if (e.which === CHAR_ENTER || e.which === CHAR_UP || e.which === CHAR_DOWN) {
+                e.preventDefault() // UP & DOWN
+
+                if (e.which === CHAR_ENTER) {
+                    $('#dialog .btn.selected')[0].click()
+                } else {
+                    let $currentItem = $('#dialog .btn.selected')
+                    let $items = $('#dialog .btn:visible')
+                    if (e.which === CHAR_DOWN) {
+                        let $selectedItem
+                        for (let i = $items.length - 1; i >= 0; i--) {
+                            if (!$items.eq(i).hasClass('selected')) $selectedItem = $items.eq(i)
+                            else break
+                        }
+
+                        if ($selectedItem !== undefined) {
+                            $currentItem.removeClass('selected')
+                            $selectedItem.addClass('selected')
+                        }
+                    } else if (e.which === CHAR_UP) {
+                        let $selectedItem
+                        for (let i = 0; i < $items.length; i++) {
+                            if (!$items.eq(i).hasClass('selected')) $selectedItem = $items.eq(i)
+                            else break
+                        }
+
+                        if ($selectedItem !== undefined) {
+                            $currentItem.removeClass('selected')
+                            $selectedItem.addClass('selected')
+                        }
+                    }
+                }
+            }
         }
     })
 
@@ -893,5 +967,3 @@ function searchData() {
         }
     }
 }
-
-// END Functions

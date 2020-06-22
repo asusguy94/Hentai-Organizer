@@ -1,6 +1,7 @@
 <?php
     define('DB', 'hentai');
-    define('DB_STR', sprintf("mysql:host=127.0.0.1:3307;dbname=%s", DB));
+    define('DB_PORT', 3307);
+    define('DB_STR', sprintf("mysql:host=127.0.0.1:%d;dbname=%s", DB_PORT, DB));
     define('DB_USER', 'hentai.web_user');
     define('DB_PASS', 'TUFDXy8qlqBUTz73');
     
@@ -347,21 +348,21 @@
 											WHERE noStar = FALSE
 											ORDER BY RAND()
 										");
-
-		$query->execute();
-		$this->printData($query->fetchAll());
-	}
-
-	function printData($input, $ribbonCol = null)
-	{
-		$count = $this->count;
-		print "<div class='row'>";
-		foreach ($input AS $data) {
-			if ($count > 0) {
-				$count--;
-
-				$col = ($this->count >= 10 ? 'col-1' : 'col');
-				print "
+            
+            $query->execute();
+            $this->printData($query->fetchAll());
+        }
+        
+        function printData($input, $ribbonCol = null)
+        {
+            $count = $this->count;
+            print "<div class='row'>";
+            foreach ($input as $data) {
+                if ($count > 0) {
+                    $count--;
+                    
+                    $col = ($this->count >= 10 ? 'col-1' : 'col');
+                    print sprintf("
 						<a class='video $col px-0 mx-3 ribbon-container' href='video.php?id=$data[id]'>
 							<img class='mx-auto img-thumbnail' src='images/videos/$data[id]-" . THUMBNAIL_RES . ".jpg' alt='thumbnail'>
 							<span class='title mx-auto d-block'>$data[name]</span>";
@@ -705,13 +706,13 @@ class Star
 											    JOIN stars ON starrelations.otherstarID = stars.id
 											WHERE starID = :starID
 										");
-		$query->bindParam(':starID', $id);
-		$query->execute();
-
-		foreach ($query->fetchAll() AS $relation) {
-			$otherStarID = $relation['otherstarID'];
-
-			echo "
+            $query->bindParam(':starID', $id);
+            $query->execute();
+            
+            foreach ($query->fetchAll() as $relation) {
+                $otherStarID = $relation['otherstarID'];
+                
+                echo "
 					<a href='?id=$otherStarID' data-id='$relation[id]' data-starID='$otherStarID' class='relation card hover-parent'>
 						<img src='images/stars/$otherStarID' class='lazy card-img-top'>
 						<h3 class='card-title'>$relation[type]</h3>
@@ -739,15 +740,15 @@ class Star
 											    JOIN stars ON starrelations.otherstarID = stars.id
 											WHERE otherstarID = :starID
 										");
-		$query->bindParam(':starID', $id);
-		$query->execute();
-
-		foreach ($query->fetchAll() AS $relation) {
-			$otherStarID = $relation['starID'];
-
-			if($this->relationExists($id, $otherStarID)) continue;
-
-			echo "
+            $query->bindParam(':starID', $id);
+            $query->execute();
+            
+            foreach ($query->fetchAll() as $relation) {
+                $otherStarID = $relation['starID'];
+                
+                if ($this->relationExists($id, $otherStarID)) continue;
+                
+                echo "
 					<a href='?id=$otherStarID' data-id='$relation[id]' data-starID='$otherStarID' class='relation card hover-parent'>
 						<img src='images/stars/$otherStarID' class='lazy card-img-top'>
 						<h3 class='card-title'>$relation[type]</h3>

@@ -889,29 +889,29 @@
         function sql($override = 0)
         {
             if ($override == 1 || $this->sqlMethod == '')
-                return "SELECT videos.id, videos.name FROM videos WHERE noStar = FALSE";
+                return "SELECT videos.id, videos.name, videos.path FROM videos WHERE noStar = FALSE";
             else if ($this->sqlMethod === 'all')
-                return "SELECT videos.id, videos.name FROM videos";
+                return "SELECT videos.id, videos.name, videos.path FROM videos";
             else if ($this->sqlMethod === 'category')
-                return "SELECT videos.id, videos.name FROM videos LEFT JOIN videocategories ON videos.id = videocategories.videoID WHERE noStar = FALSE OR videos.id = :videoID GROUP BY name HAVING COUNT(videocategories.id)";
+                return "SELECT videos.id, videos.name, videos.path FROM videos LEFT JOIN videocategories ON videos.id = videocategories.videoID WHERE noStar = FALSE OR videos.id = :videoID GROUP BY name HAVING COUNT(videocategories.id)";
             else if ($this->sqlMethod === '!category')
-                return "SELECT videos.id, videos.name FROM videos LEFT JOIN videocategories ON videos.id = videocategories.videoID WHERE noStar = FALSE OR videos.id = :videoID GROUP BY name HAVING COUNT(videocategories.id) < 1";
+                return "SELECT videos.id, videos.name, videos.path FROM videos LEFT JOIN videocategories ON videos.id = videocategories.videoID WHERE noStar = FALSE OR videos.id = :videoID GROUP BY name HAVING COUNT(videocategories.id) < 1";
             else if ($this->sqlMethod === '!star')
-                return "SELECT videos.id, videos.name FROM videos LEFT JOIN videostars ON videos.id = videostars.videoID WHERE noStar = TRUE OR videos.id = :videoID GROUP BY name";
+                return "SELECT videos.id, videos.name, videos.path FROM videos LEFT JOIN videostars ON videos.id = videostars.videoID WHERE noStar = TRUE OR videos.id = :videoID GROUP BY name";
             else if ($this->sqlMethod === '!stars')
-                return "SELECT videos.id, videos.name FROM videos LEFT JOIN videostars ON videos.id = videostars.videoID WHERE noStar = FALSE OR videos.id = :videoID GROUP BY name HAVING COUNT(videostars.id) < 1";
+                return "SELECT videos.id, videos.name, videos.path FROM videos LEFT JOIN videostars ON videos.id = videostars.videoID WHERE noStar = FALSE OR videos.id = :videoID GROUP BY name HAVING COUNT(videostars.id) < 1";
             else if ($this->sqlMethod === '!star-image')
-                return "SELECT videos.id, videos.name FROM videos LEFT JOIN videostars ON videos.id = videostars.videoID LEFT JOIN stars ON videostars.starID = stars.id WHERE noStar = FALSE OR videos.id = :videoID GROUP BY name HAVING SUM(IF(stars.image IS NULL, 1, 0)) AND COUNT(videostars.id)";
+                return "SELECT videos.id, videos.name, videos.path FROM videos LEFT JOIN videostars ON videos.id = videostars.videoID LEFT JOIN stars ON videostars.starID = stars.id WHERE noStar = FALSE OR videos.id = :videoID GROUP BY name HAVING SUM(IF(stars.image IS NULL, 1, 0)) AND COUNT(videostars.id)";
             else if ($this->sqlMethod === 'bookmark')
-                return "SELECT videos.id, videos.name FROM videos LEFT JOIN bookmarks ON bookmarks.videoID = videos.id WHERE noStar = FALSE OR videos.id = :videoID GROUP BY name HAVING COUNT(bookmarks.id)";
+                return "SELECT videos.id, videos.name, videos.path FROM videos LEFT JOIN bookmarks ON bookmarks.videoID = videos.id WHERE noStar = FALSE OR videos.id = :videoID GROUP BY name HAVING COUNT(bookmarks.id)";
             else if ($this->sqlMethod == '!bookmark')
-                return "SELECT videos.id, videos.name FROM videos LEFT JOIN bookmarks ON bookmarks.videoID = videos.id WHERE noStar = FALSE OR videos.id = :videoID GROUP BY name HAVING COUNT(bookmarks.id) < 1";
+                return "SELECT videos.id, videos.name, videos.path FROM videos LEFT JOIN bookmarks ON bookmarks.videoID = videos.id WHERE noStar = FALSE OR videos.id = :videoID GROUP BY name HAVING COUNT(bookmarks.id) < 1";
             else if ($this->sqlMethod === 'bookmark !stars')
-                return "SELECT videos.id, videos.name FROM videos JOIN bookmarks ON bookmarks.videoID = videos.id LEFT JOIN bookmarkstars ON bookmarks.id = bookmarkstars.bookmarkID WHERE noStar = FALSE OR videos.id = :videoID GROUP BY name HAVING COUNT(bookmarkstars.id) < COUNT(bookmarks.id)";
+                return "SELECT videos.id, videos.name, videos.path FROM videos JOIN bookmarks ON bookmarks.videoID = videos.id LEFT JOIN bookmarkstars ON bookmarks.id = bookmarkstars.bookmarkID WHERE noStar = FALSE OR videos.id = :videoID GROUP BY name HAVING COUNT(bookmarkstars.id) < COUNT(bookmarks.id)";
             else if ($this->sqlMethod === 'cen')
-                return "SELECT videos.id, videos.name FROM videos WHERE cen = TRUE";
+                return "SELECT videos.id, videos.name, videos.path FROM videos WHERE cen = TRUE";
             else if ($this->sqlMethod === '!q-1080')
-                return "SELECT videos.id, videos.name FROM videos WHERE height <= 720";
+                return "SELECT videos.id, videos.name, videos.path FROM videos WHERE height <= 720";
             else
                 return "";
         }

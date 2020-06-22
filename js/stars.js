@@ -14,7 +14,7 @@ function ajax(page, params) {
 }
 
 function reloadPage() {
-    window.location.href = window.location.href;
+    window.location.href = `${window.location.href}`
 }
 
 /* Context Menu */

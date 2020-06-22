@@ -1063,15 +1063,6 @@
             return $query->fetch()['franchise'];
         }
         
-        function idToEpisode($id)
-        {
-            global $pdo;
-            $query = $pdo->prepare("SELECT episode FROM videos WHERE id = ? LIMIT 1");
-            $query->bindValue(1, $id);
-            $query->execute();
-            return $query->fetch()['episode'];
-        }
-        
         function fetchFranchise($videoID)
         {
             global $pdo;
@@ -1392,15 +1383,6 @@
             $query->bindValue(1, $id);
             $query->execute();
             return $query->fetch()['total'];
-        }
-        
-        function titleFromID($id)
-        {
-            global $pdo;
-            $query = $pdo->prepare("SELECT videos.name FROM videos WHERE videos.id = ? LIMIT 1");
-            $query->bindValue(1, $id);
-            $query->execute();
-            return $query->fetch()['name'];
         }
         
         function fetchAttributes($id)

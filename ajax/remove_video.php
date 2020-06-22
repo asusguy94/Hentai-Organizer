@@ -56,9 +56,9 @@ function removeThumbnails($videoID)
 	unlink("../images/videos/$videoID.jpg");
 	unlink("../images/videos/$videoID-" . THUMBNAIL_RES . ".jpg");
 
-	unlink("../images/thumbnails/$videoID.jpg");
-	unlink("../images/vtt/$videoID.vtt");
-}
+        unlink("../images/thumbnails/$videoID.jpg");
+        unlink("../vtt/$videoID.vtt");
+    }
 
 function removeHls($dir)
 {

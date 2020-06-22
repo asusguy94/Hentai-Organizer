@@ -1606,29 +1606,3 @@
             fwrite($vtt, $data);
         }
     }
-    
-    class System
-    {
-        function CPU()
-        {
-            $load = sys_getloadavg();
-            return $load[0];
-        }
-    }
-    
-    class Performance
-    {
-        public $start;
-        
-        function __construct()
-        {
-            $this->start = microtime(true);
-        }
-        
-        function result()
-        {
-            $end = microtime(true);
-            
-            return round(($end - $this->start), 2) . " seconds";
-        }
-    }

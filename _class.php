@@ -246,7 +246,7 @@
         static function getClosest($search, $arr)
         {
             $closest = null;
-            foreach ($arr as $item) {
+            foreach ($arr AS $item) {
                 if ($closest === null || abs($search - $closest) > abs($item - $search)) {
                     $closest = $item;
                 }
@@ -461,7 +461,7 @@
             $query->execute();
             if ($query->rowCount()) {
                 print '<div id="stars">';
-                foreach ($query->fetchAll() as $data) {
+                foreach ($query->fetchAll() AS $data) {
                     if (is_null($data['image']))
                         print '<div class="star no-image" data-star-id="' . $data['id'] . '">';
                     else
@@ -511,7 +511,7 @@
                 $i = 0;
                 $return = [];
                 $idFound = false;
-                foreach ($query->fetchAll() as $data) {
+                foreach ($query->fetchAll() AS $data) {
                     if (!$idFound) {
                         if ($data['id'] == $id) {
                             $idFound = true;
@@ -572,7 +572,7 @@
                 print '<div id="breasts" class="hidden">';
                 $query = $pdo->prepare("SELECT breast FROM stars WHERE breast IS NOT NULL GROUP BY breast");
                 $query->execute();
-                foreach ($query->fetchAll() as $data) {
+                foreach ($query->fetchAll() AS $data) {
                     print "<span class='breast'>$data[breast]</span>";
                 }
                 print '</div>';
@@ -584,7 +584,7 @@
                 print '<div id="eyecolorss" class="hidden">';
                 $query = $pdo->prepare("SELECT eyecolor FROM stars WHERE eyecolor IS NOT NULL GROUP BY eyecolor");
                 $query->execute();
-                foreach ($query->fetchAll() as $data) {
+                foreach ($query->fetchAll() AS $data) {
                     print "<span class='eyecolor'>$data[eyecolor]</span>";
                 }
                 print '</div>';
@@ -596,7 +596,7 @@
                 print '<div id="haircolors" class="hidden">';
                 $query = $pdo->prepare("SELECT haircolor FROM stars WHERE haircolor IS NOT NULL GROUP BY haircolor");
                 $query->execute();
-                foreach ($query->fetchAll() as $data) {
+                foreach ($query->fetchAll() AS $data) {
                     print "<span class='haircolor'>$data[haircolor]</span>";
                 }
                 print '</div>';
@@ -608,7 +608,7 @@
                 print '<div id="hairstyles" class="hidden">';
                 $query = $pdo->prepare("SELECT hairstyle FROM stars WHERE hairstyle IS NOT NULL GROUP BY hairstyle");
                 $query->execute();
-                foreach ($query->fetchAll() as $data) {
+                foreach ($query->fetchAll() AS $data) {
                     print "<span class='hairstyle'>$data[hairstyle]</span>";
                 }
                 print '</div>'; // #hairstyles
@@ -620,7 +620,7 @@
                 print '<div id="attributes" class="hidden">';
                 $query = $pdo->prepare("SELECT * FROM attributes");
                 $query->execute();
-                foreach ($query->fetchAll() as $data) {
+                foreach ($query->fetchAll() AS $data) {
                     print "<span class='attribute'>$data[name]</span>";
                 }
                 print '</div>'; // #attributes
@@ -651,7 +651,7 @@
             $query->bindParam(':starID', $id);
             $query->execute();
             
-            foreach ($query->fetchAll() as $relation) {
+            foreach ($query->fetchAll() AS $relation) {
                 $otherStarID = $relation['otherstarID'];
                 
                 echo "
@@ -686,7 +686,7 @@
             $query->bindParam(':starID', $id);
             $query->execute();
             
-            foreach ($query->fetchAll() as $relation) {
+            foreach ($query->fetchAll() AS $relation) {
                 $otherStarID = $relation['starID'];
                 
                 if ($this->relationExists($id, $otherStarID)) continue;
@@ -784,7 +784,7 @@
             $query->execute();
             if ($query->rowCount()) {
                 print '<h3>Attributes</h3>';
-                foreach ($query->fetchAll() as $data) {
+                foreach ($query->fetchAll() AS $data) {
                     print "<p class='attribute' data-attribute-id='$data[attributeID]'><span class='btn btn-outline-primary btn-sm'>$data[name]</span></p>";
                 }
             }
@@ -839,7 +839,7 @@
                 print '<div id="videos" class="row">';
                 
                 $cdnNumber = 2;
-                foreach ($query->fetchAll() as $data) {
+                foreach ($query->fetchAll() AS $data) {
                     $localPath = "videos/$data[path]";
                     $localPath_img = "images/videos/$data[videoID]-" . THUMBNAIL_RES . ".jpg";
                     
@@ -875,7 +875,7 @@
         function bookmarkStarCount($id, $videoID)
         {
             global $pdo;
-            $query = $pdo->prepare("SELECT COUNT(*) as total FROM bookmarkstars JOIN bookmarks ON bookmarks.id = bookmarkstars.bookmarkID WHERE starID = ? AND videoID = ?");
+            $query = $pdo->prepare("SELECT COUNT(*) AS total FROM bookmarkstars JOIN bookmarks ON bookmarks.id = bookmarkstars.bookmarkID WHERE starID = ? AND videoID = ?");
             $query->bindValue(1, $id);
             $query->bindValue(2, $videoID);
             $query->execute();
@@ -926,7 +926,7 @@
             $query->bindParam(':videoID', $id);
             $query->execute();
             if ($query->rowCount()) {
-                foreach ($query->fetchAll() as $data) {
+                foreach ($query->fetchAll() AS $data) {
                     print "<p><a href='video.php?id=$data[id]'>$data[name]</a></p>";
                 }
             }
@@ -942,7 +942,7 @@
             $query->execute();
             
             $idFound = false;
-            foreach ($query->fetchAll() as $data) {
+            foreach ($query->fetchAll() AS $data) {
                 if (!$idFound) {
                     if ($data['id'] == $id) {
                         $idFound = true;
@@ -996,7 +996,7 @@
                     $i = 0;
                     
                     print '<small>(';
-                    foreach ($aliasArr as $alias) {
+                    foreach ($aliasArr AS $alias) {
                         print "<span class='alias' data-alias-id='$alias[aliasID]'>$alias[aliasName]</span>";
                         if (++$i < count($aliasArr)) print ', ';
                     }
@@ -1051,7 +1051,7 @@
             $query->execute();
             if ($query->rowCount() > 1) {
                 print '<div id="franchise">';
-                foreach ($query->fetchAll() as $data) {
+                foreach ($query->fetchAll() AS $data) {
                     print '<a class="episode" href="?id=' . $data['id'] . '">';
                     print '<div class="info">';
                     
@@ -1112,7 +1112,7 @@
             $query->execute();
             if ($query->rowCount()) {
                 print '<div id="stars">';
-                foreach ($query->fetchAll() as $data) {
+                foreach ($query->fetchAll() AS $data) {
                     if ($data['image'] != '') {
                         print '<div class="star" data-star-id="' . $data['starID'] . '">';
                         print "<img class='image' src='images/stars/$data[image]?v=" . md5_file("images/stars/$data[image]") . "'>";
@@ -1128,7 +1128,7 @@
                     }
                     
                     print '<div class="info" data-star-id="' . $data['starID'] . '">';
-                    foreach ($star->getBookmarks($data['starID'], $id) as $result) {
+                    foreach ($star->getBookmarks($data['starID'], $id) AS $result) {
                         print '<p class="btn btn-outline-primary btn-sm">' . $result['name'] . '</p>';
                     }
                     print '</div>';
@@ -1147,7 +1147,7 @@
             $query->execute();
             if ($query->rowCount()) {
                 print '<div id="categories">';
-                foreach ($query->fetchAll() as $data) {
+                foreach ($query->fetchAll() AS $data) {
                     print "<a class='category btn btn-outline-primary btn-sm px-3' href='category.php?id=$data[categoryID]' data-category-id='$data[categoryID]'>$data[name]</a>";
                 }
                 print '</div>';
@@ -1173,7 +1173,7 @@
             $query->execute();
             if ($query->rowCount()) {
                 print '<div id="timeline">';
-                foreach ($query->fetchAll() as $data) {
+                foreach ($query->fetchAll() AS $data) {
                     $offset = $this->getOffset($data['start']);
                     print "<a class='bookmark btn btn-outline-primary btn-sm' data-bookmark-id='$data[id]' data-bookmark-time='$data[start]' data-level='1' style='margin-left: $offset%'>$data[name]</a>";
                     
@@ -1190,7 +1190,7 @@
                         $query = $pdo->prepare("SELECT attributes.name, attributes.id FROM starattributes JOIN attributes ON starattributes.attributeID = attributes.id WHERE starID = :starID");
                         $query->bindParam(':starID', $starID);
                         $query->execute();
-                        foreach ($query->fetchAll() as $attribute) {
+                        foreach ($query->fetchAll() AS $attribute) {
                             print "<div class='btn btn-outline-primary btn-sm no-hover' data-attribute-id='$attribute[id]'>$attribute[name]</div>";
                         }
                     }
@@ -1198,7 +1198,7 @@
                     $query = $pdo->prepare("SELECT attributes.name, attributes.id FROM bookmarkattributes JOIN attributes ON bookmarkattributes.attributeID = attributes.id WHERE bookmarkID = :bookmarkID");
                     $query->bindParam(':bookmarkID', $data['id']);
                     $query->execute();
-                    foreach ($query->fetchAll() as $attribute) {
+                    foreach ($query->fetchAll() AS $attribute) {
                         print "<div class='btn btn-outline-primary btn-sm no-hover' data-attribute-id='$attribute[id]'>$attribute[name]</div>";
                     }
                     print '</div>';
@@ -1218,7 +1218,7 @@
                 print '<label for="category">Category </label>';
                 print '<input name="category" list="category_list">';
                 print '<datalist id="category_list">';
-                foreach ($query->fetchAll() as $data) {
+                foreach ($query->fetchAll() AS $data) {
                     print "<option value='$data[name]' data-category-id='$data[id]'>";
                 }
                 print '</datalist>';
@@ -1349,7 +1349,7 @@
         function starCount($id)
         {
             global $pdo;
-            $query = $pdo->prepare("SELECT COUNT(*) as total FROM videostars WHERE videoID = ?");
+            $query = $pdo->prepare("SELECT COUNT(*) AS total FROM videostars WHERE videoID = ?");
             $query->bindValue(1, $id);
             $query->execute();
             return $query->fetch()['total'];
@@ -1428,7 +1428,7 @@
             $query->execute();
             
             if ($query->rowCount()) {
-                foreach ($query->fetchAll() as $data) {
+                foreach ($query->fetchAll() AS $data) {
                     print "<p class='franchise'>$data[franchise]</p>";
                 }
             }

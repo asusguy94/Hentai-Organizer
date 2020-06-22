@@ -24,8 +24,8 @@ global $pdo;
 						print '<div id="breasts">';
 						foreach ($query->fetchAll() as $data) {
 							print '<div class="input-wrapper">';
-							print '<input type="radio" name="breast">';
-							print "<label>$data[breast]</label>";
+							print "<input type='radio' name='breast' id='breast_$data[breast]'>";
+							print "<label for='breast_$data[breast]'>$data[breast]</label>";
 							print '</div>';
 						}
 						print '</div>';
@@ -40,8 +40,8 @@ global $pdo;
 						print '<div id="eye">';
 						foreach ($query->fetchAll() as $data) {
 							print '<div class="input-wrapper">';
-							print '<input type="radio" name="eye">';
-							print "<label>$data[eyecolor]</label>";
+							print "<input type='radio' name='eye' id='eye_$data[eyecolor]'>";
+							print "<label for='eye_$data[eyecolor]'>$data[eyecolor]</label>";
 							print '</div>';
 						}
 						print '</div>';
@@ -56,8 +56,8 @@ global $pdo;
 						print '<div id="hair">';
 						foreach ($query->fetchAll() as $data) {
 							print '<div class="input-wrapper">';
-							print '<input type="radio" name="hair">';
-							print "<label>$data[haircolor]</label>";
+							print "<input type='radio' name='hair' id='hair_$data[haircolor]'>";
+							print "<label for='hair_$data[haircolor]'>$data[haircolor]</label>";
 							print '</div>';
 						}
 						print '</div>';
@@ -72,8 +72,8 @@ global $pdo;
 						print '<div id="hairstyle">';
 						foreach ($query->fetchAll() as $data) {
 							print '<div class="input-wrapper">';
-							print "<input type='radio' name='hairstyle'>";
-							print "<label>$data[hairstyle]</label>";
+							print "<input type='radio' name='hairstyle' id='hairstyle_$data[hairstyle]'>";
+							print "<label for='hairstyle_$data[hairstyle]'>$data[hairstyle]</label>";
 							print '</div>';
 						}
 						print '</div>';
@@ -89,7 +89,7 @@ global $pdo;
 
 						foreach ($query->fetchAll() as $data) {
 							print '<div class="input-wrapper">';
-							print "<input type='checkbox' name='attribute_$data[name]'>";
+							print "<input type='checkbox' name='attribute_$data[name]' id='attribute_$data[name]'>";
 							print "<label for='attribute_$data[name]'>$data[name]</label>";
 							print '</div>';
 						}

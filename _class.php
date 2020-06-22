@@ -1031,18 +1031,18 @@
                     print ')</small>';
                 }
                 
-                if (isset($cen)) print " - <span style='color: red'>$cen</span>";
+                if (isset($cen)) print " - <span id='cen'>$cen</span>";
                 print "<small>$date</small>";
                 print '</h2>';
                 
-                print '<a id="next" class="btn btn-outline-primary btn-sm" href="?id=' . $next['id'] . '" title="' . $next['name'] . '">Next</a>';
-    
+                print "<a id='next' class='btn btn-outline-primary btn-sm' href='?id=$next[id]' title='$next[name]'>Next</a>";
+                
                 $streamDir = Basic::removeExtensionPath($fname);
                 $hlsFile = "videos/$streamDir/playlist.m3u8";
                 $dashFile = "videos/$streamDir/playlist.mpd";
                 
-                print "<video poster='images/videos/$id.jpg?v=" . md5_file("images/videos/$id.jpg") . "$' controls preload='auto' data-cen='$result[cen]'>";
-    
+                print sprintf("<video poster='images/videos/$id.jpg?v=%s' data-cen='$result[cen]'>", md5_file("images/videos/$id.jpg"));
+                
                 // Source START
                 if (enableDASH && file_exists($dashFile)) {
                     $dashFile = htmlspecialchars($dashFile, ENT_QUOTES);
@@ -1069,14 +1069,14 @@
             $query->execute();
             return $query->fetch()['franchise'];
         }
-    
+        
         function getPlays($videoID)
         {
             global $pdo;
             $query = $pdo->prepare("SELECT COUNT(videoID) AS total FROM plays WHERE videoID = :videoID GROUP BY videoID LIMIT 1");
             $query->bindParam(':videoID', $videoID);
             $query->execute();
-        
+            
             return $query->fetch()['total'];
         }
         
@@ -1089,15 +1089,15 @@
             if ($query->rowCount() > 1) {
                 print '<div id="franchise">';
                 foreach ($query->fetchAll() as $data) {
-                    print '<a class="episode" href="?id=' . $data['id'] . '">';
-                    print '<div class="info">';
+                    print "<a class='episode' href='?id=$data[id]'>";
+                    print '<div class="info row">';
                     
-                    print "<img src='images/videos/$data[id]-" . THUMBNAIL_RES . ".jpg' class='thumbnail'>";
-                    print '<div class="title">' . $data['name'] . '</div>';
-    
                     $plays = $this->getPlays($data['id']);
                     if (!$plays) $plays = 0;
                     print "<span class='plays col-2'>$plays Plays</span>";
+                    
+                    print sprintf("<img class='thumbnail col-3' src='images/videos/$data[id]-%d.jpg'>", THUMBNAIL_RES);
+                    print "<div class='title col-8'>$data[name]</div>";
                     
                     print '</div>'; // end #info
                     print '</a>'; // end .episode
@@ -1152,14 +1152,14 @@
                 print '<div id="stars">';
                 foreach ($query->fetchAll() as $data) {
                     if ($data['image'] != '') {
-                        print '<div class="star" data-star-id="' . $data['starID'] . '">';
-                        print "<img class='image' src='images/stars/$data[image]?v=" . md5_file("images/stars/$data[image]") . "'>";
+                        print "<div class='star' data-star-id='$data[starID]'>";
+                        print sprintf("<img class='image' src='images/stars/$data[image]?v=%s'>", md5_file("images/stars/$data[image]"));
                     } else {
-                        print '<div class="star no-image" data-star-id="' . $data['starID'] . '">';
+                        print "<div class='star no-image' data-star-id='$data[starID]'>";
                         print '<div class="image" style="height: 275px; width: 200px"></div>';
                     }
-                    
-                    print '<a class="name" href="star.php?id=' . $data['starID'] . '">' . $data['name'] . '</a>';
+    
+                    print "<a class='name' href='star.php?id=$data[starID]'>$data[name]</a>";
                     
                     if (!$total = $star->bookmarkStarCount($data['starID'], $id)) {
                         print '<span class="ribbon">NEW<span>';

@@ -422,6 +422,8 @@
                 $sql = "SELECT stars.id, stars.name, stars.image FROM stars JOIN videostars ON stars.id = videostars.starID JOIN videos ON videostars.videoID = videos.id WHERE (breast = 'Small' OR  breast = 'Large')";
             } else if ($this->sqlMethod === '!image') {
                 $sql = "SELECT stars.id, stars.name, stars.image FROM stars JOIN videostars ON stars.id = videostars.starID JOIN videos ON videostars.videoID = videos.id WHERE image IS NULL";
+            } else if ($this->sqlMethod === '0-9') {
+                $sql = "SELECT stars.id, stars.name, stars.image FROM stars JOIN videostars ON stars.id = videostars.starID JOIN videos ON videostars.videoID = videos.id WHERE stars.name REGEXP '^[A-Za-z].+[^ ][0-9]'";
             } else if ($this->sqlMethod === 'no-attribute') {
                 $sql = "SELECT stars.id, stars.name, stars.image FROM stars JOIN videostars ON stars.id = videostars.starID JOIN videos ON videostars.videoID = videos.id LEFT JOIN starattributes ON stars.id = starattributes.starID";
                 $this->havingStr = " HAVING COUNT(starattributes.starID) < 1";

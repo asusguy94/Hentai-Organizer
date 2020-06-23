@@ -1158,7 +1158,7 @@
                         print "<div class='star no-image' data-star-id='$data[starID]'>";
                         print '<div class="image" style="height: 275px; width: 200px"></div>';
                     }
-    
+                    
                     print "<a class='name' href='star.php?id=$data[starID]'>$data[name]</a>";
                     
                     if (!$total = $star->bookmarkStarCount($data['starID'], $id)) {
@@ -1465,7 +1465,7 @@
                     print "<span class='attribute' data-attribute-id='$attribute[id]'>$attribute[name]</span>";
                 }
                 print '</div>';
-    
+                
                 if (file_exists("vtt/$_GET[id].vtt")) echo '<div id="vtt"></div>';
             }
         }
@@ -1527,6 +1527,8 @@
         /* SYNOLOGY */
         protected $ffprobe = '/volume1/@appstore/ffmpeg/bin/ffprobe';
         protected $ffmpeg = '/volume1/@appstore/ffmpeg/bin/ffmpeg';
+        
+        protected $os = 'linux'; // linux | windows
         public $rootFix = false;
         
         function getDuration($fname)
@@ -1534,7 +1536,18 @@
             $input = "videos/$fname"; // this makes ajax work...but "video_generatehumbnails" does not work!
             if ($this->rootFix) $input = "../$input";
             
-            $duration = shell_exec("$this->ffmpeg -i \"$input\" 2>&1 | grep Duration | awk '{print $2}' | tr -d ,");
+            switch ($this->os) {
+                case 'linux':
+                    $duration = shell_exec("$this->ffmpeg -i \"$input\" 2>&1 | grep Duration | awk '{print $2}' | tr -d ,");
+                    break;
+                case 'windows':
+                    $duration = shell_exec("$this->ffmpeg -i \"$input\" 2>&1");
+                    $duration = explode(", ", explode("Duration: ", $duration)[1])[0];
+                    break;
+                default:
+                    return false;
+            }
+            
             
             if (!is_null($duration)) {
                 $hours = intval(explode(':', $duration)[0]);
@@ -1575,7 +1588,17 @@
             $input = "videos/$fname";
             if ($this->rootFix) $input = "../$input";
             
-            $height = shell_exec("$this->ffprobe -v quiet -show_streams \"$input\" | grep coded_height | cut -d '=' -f 2");
+            switch ($this->os) {
+                case 'linux':
+                    $height = shell_exec("$this->ffprobe -v quiet -show_streams \"$input\" | grep coded_height | cut -d '=' -f 2");
+                    break;
+                case 'windows':
+                    $height = shell_exec("$this->ffprobe -v quiet -show_streams \"$input\"");
+                    $height = explode("has_b_frames", explode("coded_height=", $height)[1])[0];
+                    break;
+                default:
+                    return false;
+            }
             
             if (!is_null($height)) {
                 return trim($height);

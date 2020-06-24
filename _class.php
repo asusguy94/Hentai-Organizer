@@ -61,20 +61,20 @@
             if (is_array($data)) {
                 for ($i = 0; $i < count($data); $i++) {
                     if ($data[$i] === 'jqueryui') {
-                        print '<link rel="stylesheet" href="css/jquery.ui.min.css">';
+                        print '<link rel="stylesheet" href="node_modules/jquery-ui-dist/jquery-ui.min.css">';
                     } else if ($data[$i] === 'normalize') {
                         print '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css/normalize.css">';
                     } else if ($data[$i] === 'contextmenu') {
-                        print "<link rel='stylesheet' href='css/jquery.contextMenu.min.css'>";
+                        print "<link rel='stylesheet' href='node_modules/jquery-contextmenu/dist/jquery.contextMenu.min.css'>";
                     } else if ($data[$i] === 'autocomplete') {
-                        print '<link rel="stylesheet" href="css/jquery.autocomplete.min.css">';
+                        print '<link rel="stylesheet" href="node_modules/jquery-autocomplete/jquery.autocomplete.css">';
                     } else if ($data[$i] === 'plyr') {
                         print "<link rel='stylesheet' href='node_modules/plyr/dist/plyr.css'>";
                     } else if ($data[$i] === 'bootstrap' && BOOTSTRAP) {
                         print "<link rel='stylesheet' href='node_modules/bootstrap/dist/css/bootstrap.min.css'>";
                         print '<link rel="stylesheet" href="node_modules/bootstrap-switch-button/css/bootstrap-switch-button.min.css">';
                     } else if ($data[$i] === 'fa') {
-                        print "<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.9.0/css/all.min.css'>";
+                        print "<link rel='stylesheet' href='/node_modules/@fortawesome/fontawesome-free/css/all.min.css'>";
                     } else if ($data[$i] === 'prettydropdown') {
                         print '<link rel="stylesheet" href="/node_modules/pretty-dropdowns/dist/css/prettydropdowns.css">';
                     } else if ($data[$i] === '') {

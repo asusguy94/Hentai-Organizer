@@ -4,6 +4,9 @@ const hair_radio = document.querySelectorAll('input[name="hair"]')
 const hairstyle_radio = document.querySelectorAll('input[name="hairstyle"]')
 const attribute_checkbox = document.querySelectorAll('input[name^="attribute"]')
 
+// Initialize PrevState for checkbox
+$(attribute_checkbox).attr('data-state', 0)
+
 // Pretty DropDown
 $('select.pretty').prettyDropdown({
     height: 30,
@@ -59,11 +62,13 @@ $('select.pretty').prettyDropdown({
     }).then(function () {
         window.stars = document.getElementsByClassName('star')
         window.starLength = stars.length
+
+        window.$stars = $(stars)
     }).then(function () {
         /* Breast Radio Buttons */
         for (let i = 0, wrapperLen = breast_radio.length; i < wrapperLen; i++) {
             breast_radio[i].addEventListener('change', function () {
-                $(stars).removeClass('hidden-breast')
+                $stars.removeClass('hidden-breast')
                 let selectedBreast = $('#breasts label').eq(i).text()
 
                 for (let j = 0; j < starLength; j++) {
@@ -75,7 +80,7 @@ $('select.pretty').prettyDropdown({
             })
 
             breast_radio[i].oncontextmenu = function () {
-                $(stars).removeClass('hidden-breast')
+                $stars.removeClass('hidden-breast')
                 for (let j = 0; j < wrapperLen; j++) {
                     breast_radio[j].checked = false
                 }
@@ -86,7 +91,7 @@ $('select.pretty').prettyDropdown({
         /* Eye Radio Buttons */
         for (let i = 0, wrapperLen = eye_radio.length; i < wrapperLen; i++) {
             eye_radio[i].addEventListener('change', function () {
-                $(stars).removeClass('hidden-eye')
+                $stars.removeClass('hidden-eye')
                 let selectedEye = $('#eye label').eq(i).text()
 
                 for (let j = 0; j < starLength; j++) {
@@ -98,7 +103,7 @@ $('select.pretty').prettyDropdown({
             })
 
             eye_radio[i].oncontextmenu = function () {
-                $(stars).removeClass('hidden-eye')
+                $stars.removeClass('hidden-eye')
                 for (let j = 0; j < wrapperLen; j++) {
                     eye_radio[j].checked = false
                 }
@@ -109,7 +114,7 @@ $('select.pretty').prettyDropdown({
         /* Hair Radio Buttons */
         for (let i = 0, wrapperLen = hair_radio.length; i < wrapperLen; i++) {
             hair_radio[i].addEventListener('change', function () {
-                $(stars).removeClass('hidden-hair')
+                $stars.removeClass('hidden-hair')
                 let selectedHair = $('#hair label').eq(i).text()
 
                 for (let j = 0; j < starLength; j++) {
@@ -121,7 +126,7 @@ $('select.pretty').prettyDropdown({
             })
 
             hair_radio[i].oncontextmenu = function () {
-                $(stars).removeClass('hidden-hair')
+                $stars.removeClass('hidden-hair')
                 for (let j = 0; j < wrapperLen; j++) {
                     hair_radio[j].checked = false
                 }
@@ -132,7 +137,7 @@ $('select.pretty').prettyDropdown({
         /* HairStyle Radio Buttons */
         for (let i = 0, wrapperLen = hairstyle_radio.length; i < wrapperLen; i++) {
             hairstyle_radio[i].addEventListener('change', function () {
-                $(stars).removeClass('hidden-hairstyle')
+                $stars.removeClass('hidden-hairstyle')
                 let selectedHair = $('#hairstyle label').eq(i).text()
 
                 for (let j = 0; j < starLength; j++) {
@@ -144,7 +149,7 @@ $('select.pretty').prettyDropdown({
             })
 
             hairstyle_radio[i].oncontextmenu = function () {
-                $(stars).removeClass('hidden-hairstyle')
+                $stars.removeClass('hidden-hairstyle')
                 for (let j = 0; j < wrapperLen; j++) {
                     hairstyle_radio[j].checked = false
                 }
@@ -155,23 +160,20 @@ $('select.pretty').prettyDropdown({
         /* Attribute Check Boxes */
         for (let i = 0, wrapperLen = attribute_checkbox.length; i < wrapperLen; i++) {
             attribute_checkbox[i].addEventListener('change', function () {
+                indeterminateToggle(attribute_checkbox[i])
+
                 let attribute = this.name.split('attribute_').pop()
                 let attribute_class = attribute.replace(/ /g, '-')
 
                 for (let j = 0; j < starLength; j++) {
-                    let attribute_raw = stars[j].getAttribute('data-attribute-name').slice(2, -2)
-                    let attribute_arr = attribute_raw.split(',')
+                    let attribute_arr = stars[j].getAttribute('data-attribute-name').slice(2, -2).split(',')
 
-                    for (let k = 0, len = attribute_arr.length; k < len; k++) {
-                        if (this.checked && (attribute_arr[k] === attribute)) {
-                            stars[j].classList.add('tmp')
-                        }
-                    }
+                    indeterminateHandler(attribute_arr, attribute, this, j)
                 }
 
-                if (this.checked) $('.star:not(.tmp)').addClass(`hidden-attribute-${attribute_class}`)
-                else $(stars).removeClass(`hidden-attribute-${attribute_class}`)
-                $(stars).removeClass('tmp') // remove leftover classes
+                $stars.removeClass(`hidden-attribute-${attribute_class}`)
+                if (this.checked || this.indeterminate) $stars.not('[data-tmp]').addClass(`hidden-attribute-${attribute_class}`)
+                $stars.removeAttr('data-tmp')
             })
         }
     }).then(function () {
@@ -181,3 +183,48 @@ $('select.pretty').prettyDropdown({
         })
     })
 })()
+
+function tmp(index) {
+    stars[index].setAttribute('data-tmp', '')
+}
+
+function indeterminateToggle(el) {
+    switch (el.getAttribute('data-state')) {
+        case '0': // checked
+            el.setAttribute('data-state', '1')
+            el.indeterminate = false
+            el.checked = true
+
+            // Set Label Class
+            el.parentElement.classList.add('selected')
+            break
+        case '1': // indeterminate
+            el.setAttribute('data-state', '-1')
+            el.indeterminate = true
+            el.checked = false
+
+            // Set Label Class
+            el.parentElement.classList.add('not')
+
+            // Remove Label Class
+            el.parentElement.classList.remove('selected')
+            break
+        case '-1': // not-checked
+            el.setAttribute('data-state', '0')
+            el.indeterminate = false
+            el.checked = false
+
+            // Remove Label Classes
+            el.parentElement.classList.remove('not')
+            break
+    }
+}
+
+function indeterminateHandler(arr, item, parent, index) {
+    for (let k = 0, len = arr.length; k < len; k++) {
+        if ((parent.checked && (arr[k] === item)) || (parent.indeterminate && arr[k].indexOf(item) === -1)) {
+            tmp(index)
+            break
+        }
+    }
+}

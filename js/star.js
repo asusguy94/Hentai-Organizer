@@ -44,7 +44,7 @@ addRel_btn.addEventListener('click', function () {
             '<input type="button" id="relationAdd_confirm" class="btn btn-primary" value="Add">'
         )
 
-        document.querySelector('input#relationAdd_confirm').addEventListener('click', function () {
+        document.querySelector('input#relationAdd_confirm').addEventListener('click', () => {
             let title = $('[name="relationName"]').val().trim()
             let id = $('[name="relationID"]').val().trim()
 

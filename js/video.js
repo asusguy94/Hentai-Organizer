@@ -696,9 +696,7 @@ function videoStats() {
         localStorage.bookmark = seconds
         localStorage.playing = 0
 
-        $(videoPlayer).one('play', function () {
-            addPlay()
-        })
+        $(videoPlayer).one('play', () => addPlay())
     }
 
     if (seconds) videoPlayer.currentTime = seconds

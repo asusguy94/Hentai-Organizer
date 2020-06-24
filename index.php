@@ -1,50 +1,50 @@
 <?php
-include('_class.php');
-$basic = new Basic();
-$home = new HomePage();
+    include('_class.php');
+    $basic = new Basic();
+    $home = new HomePage();
 ?>
 
 <!doctype html>
 <html>
     <head>
-		<?php $basic->head('Hentai', array('', 'bootstrap')) ?>
+        <?php $basic->head('Hentai', array('', 'bootstrap')) ?>
     </head>
 
     <body>
         <nav><?php $basic->navigation() ?></nav>
         <main class="container-fluid">
             <section class="row">
-				<?php $home->count = 10 ?>
-				<?php if ($home->count) { ?>
+                <?php $home->count = 10 ?>
+                <?php if ($home->count) { ?>
                     <div class="col-12">
                         <h2>Recent Added (<span class="count"><?= $home->count ?></span>)</h2>
-						<?php $home->recent() ?>
+                        <?php $home->recent() ?>
                     </div>
-				<?php } ?>
-
-				<?php $home->count = 5 ?>
-				<?php if ($home->count) { ?>
+                <?php } ?>
+                
+                <?php $home->count = 5 ?>
+                <?php if ($home->count) { ?>
                     <div class="col-12">
                         <h2>Recent Updated (<span class="count"><?= $home->count ?></span>)</h2>
-						<?php $home->newest() ?>
+                        <?php $home->newest() ?>
                     </div>
-				<?php } ?>
-
-				<?php $home->count = 20 ?>
-				<?php if ($home->count) { ?>
+                <?php } ?>
+                
+                <?php $home->count = 20 ?>
+                <?php if ($home->count) { ?>
                     <div class="col-12">
                         <h2>Random Videos (<span class="count"><?= $home->count ?></span>)</h2>
-						<?php $home->random() ?>
+                        <?php $home->random() ?>
                     </div>
-				<?php } ?>
-
-				<?php $home->count = 30 ?>
-				<?php if ($home->count) { ?>
+                <?php } ?>
+                
+                <?php $home->count = 30 ?>
+                <?php if ($home->count) { ?>
                     <div class="col-12">
                         <h2>Popular Videos (<span class="count"><?= $home->count ?></span>)</h2>
-						<?php $home->popular() ?>
+                        <?php $home->popular() ?>
                     </div>
-				<?php } ?>
+                <?php } ?>
             </section>
         </main>
     </body>

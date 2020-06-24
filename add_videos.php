@@ -1,9 +1,9 @@
 <?php
-include('_class.php');
+	include('_class.php');
 
-$basic = new Basic();
-$db = new DB();
-$ffmpeg = new FFMPEG();
+	$basic = new Basic();
+	$db = new DB();
+	$ffmpeg = new FFMPEG();
 ?>
 
     <!doctype html>
@@ -20,17 +20,17 @@ $ffmpeg = new FFMPEG();
     </html>
 
 <?php
-global $pdo;
-$files = glob('videos/*.mp4');
-$newFiles = [];
+	global $pdo;
+	$files = glob('videos/*.mp4');
+	$newFiles = [];
 
-foreach ($files as $path) {
-	$file = $basic->pathToFname($path);
+	foreach ($files as $path) {
+		$file = $basic->pathToFname($path);
 
-	if (!$db->videoExists($file)) {
-		array_push($newFiles, $file);
+		if (!$db->videoExists($file)) {
+			array_push($newFiles, $file);
+		}
 	}
-}
 
 	$query = $pdo->prepare("SELECT id, path FROM videos WHERE duration = 0 OR height = 0");
 	$query->execute();
@@ -47,24 +47,24 @@ foreach ($files as $path) {
         $query->execute();
 	}
 
-if (isset($_POST['submit'])) {
-	if (count(array_filter($_POST)) === count($_POST)) { // check if all fields are filled out!
-		$titleArr = [];
-		$episodeArr = [];
-		$franchiseArr = [];
-		$fnameArr = [];
-		foreach ($_POST['title'] as $data) {
-			array_push($titleArr, $data);
-		}
-		foreach ($_POST['episode'] as $data) {
-			array_push($episodeArr, $data);
-		}
-		foreach ($_POST['franchise'] as $data) {
-			array_push($franchiseArr, $data);
-		}
-		foreach ($_POST['fname'] as $data) {
-			array_push($fnameArr, $data);
-		}
+	if (isset($_POST['submit'])) {
+		if (count(array_filter($_POST)) === count($_POST)) { // check if all fields are filled out!
+			$titleArr = [];
+			$episodeArr = [];
+			$franchiseArr = [];
+			$fnameArr = [];
+			foreach ($_POST['title'] as $data) {
+				array_push($titleArr, $data);
+			}
+			foreach ($_POST['episode'] as $data) {
+				array_push($episodeArr, $data);
+			}
+			foreach ($_POST['franchise'] as $data) {
+				array_push($franchiseArr, $data);
+			}
+			foreach ($_POST['fname'] as $data) {
+				array_push($fnameArr, $data);
+			}
 
 			for ($i = 0; $i < count($fnameArr); $i++) {
 				$query = $pdo->prepare("INSERT INTO videos(name, episode, path, franchise, duration, height, date) VALUES(:name, :episode, :path, :franchise, :duration, :height, NOW())");

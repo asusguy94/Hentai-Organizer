@@ -13,8 +13,6 @@ if (isset($_GET['seconds']) && isset($_GET['categoryID']) && isset($_GET['videoI
 		$query->bindValue(3, $seconds);
 		$query->execute();
 
-
-
 		if (!$query->rowCount()) {
 			$query = $pdo->prepare("INSERT INTO bookmarks(videoID, categoryID, start) VALUES(?, ?, ?)");
 			$query->bindValue(1, $videoID);

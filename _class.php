@@ -1017,6 +1017,8 @@
                     $date = "<small class='date btn far fa-calendar-check'>$date</small>";
                 }
                 
+                $quality = "<small class='quality btn fas fa-film'>$result[height]</small>";
+                
                 print '<div id="video">';
                 print "<h2><span id='video-name' data-franchise='$franchise'>$name</span>";
                 
@@ -1033,6 +1035,7 @@
                 
                 if (isset($cen)) print " - <span id='cen'>$cen</span>";
                 print "<small>$date</small>";
+                print "<small>$quality</small>";
                 print '</h2>';
                 
                 print "<a id='next' class='btn btn-outline-primary btn-sm' href='?id=$next[id]' title='$next[name]'>Next</a>";

@@ -224,7 +224,10 @@ form[autocomplete] {
 
   background-color: white;
 
-  &.date::before {
+  &.quality {}
+
+  &.date::before,
+  &.quality::before {
     margin-right: 5px;
   }
 

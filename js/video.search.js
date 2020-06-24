@@ -39,6 +39,7 @@ const loadData = function () {
             let franchise = elem[i]['franchise']
 
             let date_published = elem[i]['datePublished']
+            let plays = elem[i]['plays']
 
             let attribute = elem[i]['attribute']
             let category = elem[i]['category']
@@ -59,6 +60,7 @@ const loadData = function () {
             a.setAttribute('data-quality', quality)
             a.setAttribute('data-franchise', franchise)
             a.setAttribute('data-date-published', date_published)
+            a.setAttribute('data-plays', plays)
             a.setAttribute('data-title', videoName)
             a.setAttribute('data-alias', alias)
             a.setAttribute('data-attribute-name', `["${attribute}"]`)
@@ -243,6 +245,12 @@ const loadData = function () {
 
                 let added_reverse = (a, b) => added(b, a)
 
+                let plays = function (a, b) {
+                    return a.getAttribute('data-plays') - b.getAttribute('data-plays')
+                }
+
+                let plays_reverse = (a, b) => plays(b, a)
+
                 let video_date = function (a, b) {
                     let valA = new Date(a.getAttribute('data-date-published'))
                     let valB = new Date(b.getAttribute('data-date-published'))
@@ -281,6 +289,12 @@ const loadData = function () {
                         break
                     case 'date_desc':
                         $video.sort(video_date_reverse)
+                        break
+                    case 'plays':
+                        $video.sort(plays)
+                        break
+                    case 'plays_desc':
+                        $video.sort(plays_reverse)
                         break
                     default:
                         console.log(`No sort method for: ${label}`)

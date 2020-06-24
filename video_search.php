@@ -101,6 +101,16 @@
                         <label for="date_desc">Newest</label>
                     </div>
 
+                    <div class="input-wrapper">
+                        <input id="plays_desc" type="radio" name="sort">
+                        <label for="plays_desc">Most Popular</label>
+                    </div>
+
+                    <div class="input-wrapper">
+                        <input id="plays" type="radio" name="sort">
+                        <label for="plays">Least Popular</label>
+                    </div>
+
                     <h2>Categories</h2>
                     <?php
                         $query = $pdo->prepare("SELECT * FROM categories ORDER BY name");

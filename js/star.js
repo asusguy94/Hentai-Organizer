@@ -315,7 +315,7 @@ function hasNoVideos() {
 function autoComplete() {
     function changeOrder(items, array) {
         let index_one = array.indexOf(items[0])
-        let index_two = array.indexOf(items[0])
+        let index_two = array.indexOf(items[1])
         if (index_one >= 0 && index_two >= 0) {
             let tmp = array[index_one]
 

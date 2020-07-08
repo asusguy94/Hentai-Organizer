@@ -86,6 +86,7 @@ class VideoPage extends Component {
             visible: false,
             data: null,
         },
+        newVideo: false,
     }
 
     handleWheel(e) {
@@ -106,7 +107,7 @@ class VideoPage extends Component {
     handleCensor_toggle() {
         Axios.get(`${config.api}/cen.php?id=${this.state.video.id}`).then(() => {
             this.setState((prevState) => {
-                let video = { ...prevState.video }
+                let video = prevState.video
                 video.censored = !video.censored
 
                 return { video }
@@ -176,8 +177,6 @@ class VideoPage extends Component {
     }
 
     handleBookmark_category(category, bookmark) {
-        // TODO Optimize Code
-
         Axios.get(
             `${config.api}/changebookmarkcategory.php?id=${bookmark.id}&categoryID=${category.id}`
         ).then(() => {
@@ -217,6 +216,12 @@ class VideoPage extends Component {
     }
 
     /* Plays - own class? */
+    handlePlays_add() {
+        Axios.get(`${config.api}/addplay.php?videoID=${this.state.video.id}`).then(() => {
+            console.log('Play Added')
+        })
+    }
+
     handlePlays_reset() {
         Axios.get(`${config.api}/removeplays.php?videoID=${this.state.video.id}`).then(() => {
             this.setState((prevState) => {
@@ -397,9 +402,7 @@ class VideoPage extends Component {
                                                 src={`${config.source}/images/stars/${this.state.bookmarks[i].starID}`}
                                             />
 
-                                            {/* TODO this.state.bookmarks[i] is undefined */}
-
-                                            {Object.keys(this.state.bookmarks[i].attributes).map(
+                                            {/*Object.keys(this.state.bookmarks[i].attributes).map(
                                                 (b_i) => (
                                                     <div
                                                         key={b_i}
@@ -408,7 +411,7 @@ class VideoPage extends Component {
                                                         {console.log(this.state.bookmarks[i])}
                                                     </div>
                                                 )
-                                            )}
+                                                )*/}
                                         </ReactTooltip>
                                     </div>
 
@@ -580,6 +583,11 @@ class VideoPage extends Component {
 
                 this.player.player.on('play', () => {
                     localStorage.playing = 1
+
+                    if (this.state.newVideo) {
+                        this.handlePlays_add()
+                        this.setState({ newVideo: false })
+                    }
                 })
 
                 this.player.player.on('pause', () => {
@@ -625,15 +633,18 @@ class VideoPage extends Component {
 
                         if (Boolean(Number(localStorage.playing)))
                             this.handleVideo_play(localStorage.bookmark)
+
+                        this.setState({ newVideo: false })
                     } else {
                         localStorage.video = this.state.video.id
                         localStorage.bookmark = 0
+
+                        this.setState({ newVideo: false })
 
                         hls.startLoad()
                     }
                 })
 
-                /* Prevent Stream RESET */
                 this.setState((prevState) => {
                     let loaded = prevState.loaded
                     loaded.hls = true
@@ -651,7 +662,7 @@ class VideoPage extends Component {
             a = a.getBoundingClientRect()
             b = b.getBoundingClientRect()
 
-            return !(a.x + a.width < b.x) || a.x > b.x + b.width
+            return !(a.x + a.width < b.x || a.x > b.x + b.width)
         }
 
         for (
@@ -664,6 +675,9 @@ class VideoPage extends Component {
             let first = items[i - 1]
             let second = items[i]
 
+            if (first === null || second === null) continue // skip if error
+            // TODO find out why this is causing an error
+
             if (collisionCheck(first, second)) {
                 collision = true
             } else {
@@ -675,11 +689,12 @@ class VideoPage extends Component {
             }
 
             if (collision && level < LEVEL_MAX) {
-                if (level < LEVEL_MAX) level++
-                second.setAttribute('data-level', level)
+                level++
             } else {
                 level = LEVEL_MIN
             }
+
+            second.setAttribute('data-level', level)
         }
     }
 
@@ -725,6 +740,17 @@ class VideoPage extends Component {
                 this.setState((prevState) => {
                     let loaded = prevState.loaded
                     loaded.categories = true
+
+                    return { loaded }
+                })
+            })
+
+        Axios.get(`${config.api}/attributes.php`)
+            .then(({ data: attributes }) => this.setState({ attributes }))
+            .then(() => {
+                this.setState((prevState) => {
+                    let loaded = prevState.loaded
+                    loaded.attributes = true
 
                     return { loaded }
                 })

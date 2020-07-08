@@ -170,17 +170,18 @@ class VideoPage extends Component {
     handleBookmark_time(id) {
         let time = Math.round(this.player.player.currentTime)
 
-        Axios.get(`${config.api}/changebookmarktime.php?id=${id}&time=${time}`).then(() => {
-            let bookmarks = this.state.bookmarks
+        Axios.get(`${config.api}/changebookmarktime.php?id=${id}&time=${time}`).then(({ data }) => {
+            if (data.success) {
+                let bookmarks = this.state.bookmarks
 
-            // TODO - check if bookmark-time overlaps with another bookmark
-            let arr = Object.keys(bookmarks).map((i) => {
-                if (bookmarks[i].id === id) bookmarks[i].start = time
+                let arr = Object.keys(bookmarks).map((i) => {
+                    if (bookmarks[i].id === id) bookmarks[i].start = time
 
-                return bookmarks[i]
-            })
+                    return bookmarks[i]
+                })
 
-            this.setState({ bookmarks: arr })
+                this.setState({ bookmarks: arr })
+            }
         })
     }
 
@@ -636,7 +637,6 @@ class VideoPage extends Component {
             let second = items[i]
 
             if (first === null || second === null) continue // skip if error
-            // TODO find out why this is causing an error
 
             if (collisionCheck(first, second)) {
                 collision = true

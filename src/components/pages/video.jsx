@@ -29,13 +29,22 @@ class VideoPage extends Component {
                 added: '',
                 published: '',
             },
+            quality: 0,
             censored: false,
             plays: 0,
+            attributes: [
+                // TODO get from bookmark-attributes_table and stars_table
+                {
+                    id: 0,
+                    name: '',
+                },
+            ],
         },
         stars: [
             {
                 id: 0,
                 name: '',
+                // TODO Should contain star-attributes
             },
         ],
 
@@ -135,14 +144,23 @@ class VideoPage extends Component {
             } else {
                 Axios.get(
                     `${config.api}/addbookmark.php?videoID=${this.state.video.id}&categoryID=${category.id}&time=${time}&starID=${star.id}`
-                ).then(({ data }) => success(data))
+                ).then(({ data }) => success(data, star.id))
             }
         }
 
-        const success = (data) => {
+        const success = (data, starID = 0) => {
+            let attributes = data.attributes
+            if (typeof data.attributes === 'undefined') attributes = []
+
             this.setState((prevState) => {
                 let bookmarks = prevState.bookmarks
-                bookmarks.push({ id: data.id, name: category.name, start: time })
+                bookmarks.push({
+                    id: data.id,
+                    name: category.name,
+                    start: time,
+                    starID,
+                    attributes,
+                })
 
                 return { bookmarks }
             })
@@ -274,6 +292,11 @@ class VideoPage extends Component {
                                     </MenuItem>
                                 </ContextMenu>
                             </div>
+
+                            <div className='header__quality btn btn-sm btn-outline-primary'>
+                                <i className='far fa-film' />
+                                {this.state.video.quality}
+                            </div>
                         </div>
                     </header>
 
@@ -402,16 +425,19 @@ class VideoPage extends Component {
                                                 src={`${config.source}/images/stars/${this.state.bookmarks[i].starID}`}
                                             />
 
-                                            {/*Object.keys(this.state.bookmarks[i].attributes).map(
+                                            {Object.keys(this.state.bookmarks[i].attributes).map(
                                                 (b_i) => (
                                                     <div
                                                         key={b_i}
                                                         className='attribute btn btn-sm btn-light'
                                                     >
-                                                        {console.log(this.state.bookmarks[i])}
+                                                        {
+                                                            this.state.bookmarks[i].attributes[b_i]
+                                                                .name
+                                                        }
                                                     </div>
                                                 )
-                                                )*/}
+                                            )}
                                         </ReactTooltip>
                                     </div>
 
@@ -484,6 +510,7 @@ class VideoPage extends Component {
                 <aside className='col-3'>
                     <div id='stars' className='row justify-content-center'>
                         {this.state.loaded.stars &&
+                            this.state.stars[0].id !== 0 &&
                             Object.keys(this.state.stars).map((key, i) => (
                                 <React.Fragment key={i}>
                                     <div className='star col-4'>

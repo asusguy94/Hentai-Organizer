@@ -37,9 +37,7 @@
 
 ## Video Page
 
-### :x: Heading
-
--   Missing quallity
+### :heavy_check_mark: Heading
 
 | Name             | Status             |
 | ---------------- | ------------------ |

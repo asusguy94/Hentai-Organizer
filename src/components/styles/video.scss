@@ -1,0 +1,74 @@
+@import 'functions';
+
+.video-page {
+    .header {
+        margin-bottom: 15px;
+
+        &__title {
+            display: inline-block;
+        }
+
+        &__censored {
+            .label {
+                color: red;
+
+                &:before {
+                    content: ' - ';
+                    color: black;
+                }
+            }
+        }
+
+        .btn {
+            margin-left: 15px;
+            color: black;
+
+            &:hover {
+                color: white;
+            }
+
+            i {
+                margin-right: 5px;
+            }
+        }
+    }
+
+    #timeline {
+        position: relative;
+        left: 95px;
+        margin-top: 5px;
+
+        .bookmark {
+            position: absolute;
+            white-space: nowrap;
+
+            @include bookmarkPosition();
+
+            [id^='bookmark-info-'] {
+                .btn {
+                    display: block;
+                    margin-top: 3px;
+
+                    &:first-of-type {
+                        margin-top: 6px;
+                    }
+                }
+            }
+        }
+    }
+
+    aside {
+        margin-top: 5.25em;
+
+        #stars {
+            text-align: center;
+        }
+    }
+
+    .separator {
+        &:before,
+        &:after {
+            content: ' ';
+        }
+    }
+}

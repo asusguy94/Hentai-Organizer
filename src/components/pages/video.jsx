@@ -138,9 +138,9 @@ class VideoPage extends Component {
         let time = Math.round(this.player.player.currentTime)
         if (time) {
             if (star === null) {
-                Axios.get(`${config.api}/addbookmark.php?videoID=${this.state.video.id}&categoryID=${category.id}&time=${time}`).then(({ data }) =>
-                    success(data)
-                )
+                Axios.get(
+                    `${config.api}/addbookmark.php?videoID=${this.state.video.id}&categoryID=${category.id}&time=${time}`
+                ).then(({ data }) => success(data))
             } else {
                 Axios.get(
                     `${config.api}/addbookmark.php?videoID=${this.state.video.id}&categoryID=${category.id}&time=${time}&starID=${star.id}`
@@ -266,7 +266,9 @@ class VideoPage extends Component {
                                     </MenuItem>
                                 </ContextMenu>
 
-                                <small className='header__censored text-muted'>{this.state.video.censored && <span className='label'>Censored</span>}</small>
+                                <small className='header__censored text-muted'>
+                                    {this.state.video.censored && <span className='label'>Censored</span>}
+                                </small>
                             </h1>
 
                             <div className='header__date btn btn-sm btn-outline-primary'>
@@ -276,7 +278,7 @@ class VideoPage extends Component {
                                 </ContextMenuTrigger>
 
                                 <ContextMenu id='menu__date'>
-                                    <MenuItem>
+                                    <MenuItem disabled>
                                         <i className='far fa-edit' />
                                         Edit Date
                                     </MenuItem>
@@ -429,7 +431,10 @@ class VideoPage extends Component {
                                                                     className='btn btn-sm btn-outline-primary d-block w-auto'
                                                                     onClick={() => {
                                                                         this.handleModal()
-                                                                        this.handleBookmark_category(this.state.categories[category_i], this.state.bookmarks[i])
+                                                                        this.handleBookmark_category(
+                                                                            this.state.categories[category_i],
+                                                                            this.state.bookmarks[i]
+                                                                        )
                                                                     }}
                                                                 >
                                                                     {this.state.categories[category_i].name}
@@ -463,8 +468,15 @@ class VideoPage extends Component {
                                 <React.Fragment key={i}>
                                     <div className='star col-4'>
                                         <ContextMenuTrigger id={`star-${i}`}>
-                                            <img className='star__image w-100' alt='star' src={`${config.source}/images/stars/${this.state.stars[i].id}`} />
-                                            <a href={`${config.source}/star.php?id=${this.state.stars[i].id}`} className='star__name d-block'>
+                                            <img
+                                                className='star__image w-100'
+                                                alt='star'
+                                                src={`${config.source}/images/stars/${this.state.stars[i].id}`}
+                                            />
+                                            <a
+                                                href={`${config.source}/star.php?id=${this.state.stars[i].id}`}
+                                                className='star__name d-block'
+                                            >
                                                 {this.state.stars[i].name}
                                             </a>
                                         </ContextMenuTrigger>
@@ -482,7 +494,10 @@ class VideoPage extends Component {
                                                                 className='btn btn-sm btn-outline-primary d-block w-auto'
                                                                 onClick={() => {
                                                                     this.handleModal()
-                                                                    this.handleBookmark_add(this.state.categories[category_i], this.state.stars[i])
+                                                                    this.handleBookmark_add(
+                                                                        this.state.categories[category_i],
+                                                                        this.state.stars[i]
+                                                                    )
                                                                 }}
                                                             >
                                                                 {this.state.categories[category_i].name}
@@ -495,7 +510,7 @@ class VideoPage extends Component {
                                             <i className='far fa-plus' /> Add Bookmark
                                         </MenuItem>
 
-                                        <MenuItem>
+                                        <MenuItem disabled>
                                             <i className='far fa-plus' /> Add Global Attribute
                                         </MenuItem>
 

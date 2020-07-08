@@ -2,24 +2,11 @@
 
 ## :heavy_check_mark: Home Page
 
-| Name           | Status             |
-| -------------- | ------------------ |
-| Recent Videos  | :heavy_check_mark: |
-| Newest Videos  | :heavy_check_mark: |
-| Random Videos  | :heavy_check_mark: |
-| Popular Videos | :heavy_check_mark: |
-| Styling        | :heavy_check_mark: |
-
 ## :x: Add Videos
 
 ## :x: Video Search
 
 ## :heavy_check_mark: Videos
-
-| Name        | Status             |
-| ----------- | ------------------ |
-| Video Title | :heavy_check_mark: |
-| Styling     | :heavy_check_mark: |
 
 ## :x: Star Search
 
@@ -29,7 +16,7 @@
 
 ## :x: Random Video
 
--   Temporarily disabled
+_Temporarily disabled_
 
 ## :x:Generate Thumbnails
 
@@ -41,25 +28,25 @@
 
 | Name             | Status             |
 | ---------------- | ------------------ |
-| Rename Title     | :x:                |
-| Rename Franchise | :x:                |
-| Add Alias        | :x:                |
+| Rename Title     | :x: High Priority  |
+| Rename Franchise | :x: High Priority  |
+| Add Alias        | :x: High Priority  |
 | Copy Franchise   | :heavy_check_mark: |
-| Edit Date        | :heavy_check_mark: |
+| Edit Date        | :x: High Priority  |
 
 ### :heavy_check_mark: Video
 
-| Name             | Status             |
-| ---------------- | ------------------ |
-| Add Bookmark     | :heavy_check_mark: |
-| Uncensor/Censor  | :heavy_check_mark: |
-| Create Thumbnail | :x:                |
-| Remove Plays     | :x:                |
-| Rename File      | :x:                |
-| Copy Filename    | :heavy_check_mark: |
-| Update Video     | :x:                |
-| Update Bookmarks | :x:                |
-| Delete Video     | :x:                |
+| Name             | Status                                  |
+| ---------------- | --------------------------------------- |
+| Add Bookmark     | :heavy_check_mark:                      |
+| Uncensor/Censor  | :heavy_check_mark:                      |
+| Create Thumbnail | :x:                                     |
+| Remove Plays     | :heavy_check_mark:                      |
+| Rename File      | :x:                                     |
+| Copy Filename    | :heavy_check_mark:                      |
+| Update Video     | :x: _replace existing data in database_ |
+| Update Bookmarks | :x: _offset bookmarks by 6 seconds_     |
+| Delete Video     | :x:                                     |
 
 ### :x: Bookmark
 
@@ -67,10 +54,10 @@
 
 | Name             | Status             |
 | ---------------- | ------------------ |
-| Add Star         | :x:                |
-| Remove Star      | :x:                |
-| Add Attribute    | :x:                |
-| Remove Attribute | :x:                |
+| Add Star         | :x: High Priority  |
+| Remove Star      | :x: High Priority  |
+| Add Attribute    | :x: High Priority  |
+| Remove Attribute | :x: High Priority  |
 | Change Category  | :heavy_check_mark: |
 | Change Time      | :heavy_check_mark: |
 | Delete           | :heavy_check_mark: |
@@ -80,7 +67,15 @@
 | Name                 | Status             |
 | -------------------- | ------------------ |
 | Add Bookmark         | :heavy_check_mark: |
-| Add Global Attribute | :heavy_check_mark: |
+| Add Global Attribute | :x: High Prioriry  |
 | Remove               | :heavy_check_mark: |
+
+## Form
+
+| Name             | Status                      |
+| ---------------- | --------------------------- |
+| Add Category     | :x: _create new category_   |
+| Add Star         | :x: _create new star_       |
+| Add NoStar-label | :x: _label as without star_ |
 
 ### :x: Used Attributes

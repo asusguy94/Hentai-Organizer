@@ -11,14 +11,16 @@ class VideosPage extends Component {
 
     render() {
         return (
-            <div className='col-12'>
-                {Object.keys(this.state.data).map((key, i) => (
-                    <li key={i} className='list-group-item list-group-item'>
-                        <a href={`${config.api}/video/${this.state.data[key].id}`}>
-                            {this.state.data[key].name}
-                        </a>
-                    </li>
-                ))}
+            <div className='col'>
+                <div className='list-group'>
+                    {Object.keys(this.state.data).map((key, i) => (
+                        <li key={i} className='list-group-item list-group-item-action'>
+                            <a href={`video/${this.state.data[key].id}`}>
+                                {this.state.data[key].name}
+                            </a>
+                        </li>
+                    ))}
+                </div>
             </div>
         )
     }

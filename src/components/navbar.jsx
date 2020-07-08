@@ -35,7 +35,7 @@ class NavBar extends Component {
                     </li>
 
                     <li>
-                        <Link to='/franchise'>Franchise</Link>
+                        <Link to='/franchise'>Franchises</Link>
                     </li>
 
                     <li>

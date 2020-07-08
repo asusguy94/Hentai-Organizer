@@ -1,60 +1,71 @@
-import React, {Component} from 'react'
-import Axios from "axios"
+import React, { Component } from 'react'
+import Axios from 'axios'
 
-import {PlyrComponent} from "plyr-react"
-import Hls from "hls.js"
-import {ContextMenu, ContextMenuTrigger, MenuItem} from "react-contextmenu"
-import ReactTooltip from "react-tooltip"
+import { PlyrComponent } from 'plyr-react'
+import Hls from 'hls.js'
+import { ContextMenu, ContextMenuTrigger, MenuItem } from 'react-contextmenu'
+import ReactTooltip from 'react-tooltip'
 
-import Modal from "../modal"
+import Modal from '../modal'
 
-import "../styles/video.scss"
+import '../styles/video.scss'
 
-import config from "../config"
+import config from '../config'
 
 class VideoPage extends Component {
     state = {
         video: {
             id: 0,
+            nextID: 0,
             episode: 0,
-            franchise: "",
-            name: "",
+            franchise: '',
+            name: '',
             path: {
-                file: "",
-                stream: ""
+                file: '',
+                stream: '',
             },
+            duration: 0,
             date: {
-                added: "",
-                published: ""
+                added: '',
+                published: '',
             },
             censored: false,
             plays: 0,
         },
+        stars: [
+            {
+                id: 0,
+                name: '',
+            },
+        ],
+
         bookmarks: [
             {
                 id: 0,
-                name: "",
+                name: '',
                 start: 0,
                 starID: 0,
                 attributes: [
                     {
                         id: 0,
-                        name: "",
-                    }
+                        name: '',
+                    },
                 ],
-            }
+            },
         ],
-        stars: [
-            {
-                id: 0,
-                name: ""
-            }
-        ],
+
         categories: [
             {
                 id: 0,
-                name: ""
-            }
+                name: '',
+            },
+        ],
+
+        attributes: [
+            {
+                id: 0,
+                name: '',
+            },
         ],
 
         loaded: {
@@ -63,6 +74,7 @@ class VideoPage extends Component {
             bookmarks: false,
             stars: false,
             categories: false,
+            attributes: false,
 
             videoEvents: false,
         },
@@ -77,30 +89,29 @@ class VideoPage extends Component {
     }
 
     handleWheel(e) {
-        this.player.player.currentTime += (this.state.seekSpeed.wheel * Math.sign(e.deltaY) * -1)
+        this.player.player.currentTime += this.state.seekSpeed.wheel * Math.sign(e.deltaY) * -1
     }
 
     handleModal(title = null, data = null) {
-        this.setState(prevState => {
+        this.setState((prevState) => {
             let modal = prevState.modal
             modal.title = title
             modal.data = data
             modal.visible = !modal.visible
 
-            return {modal}
+            return { modal }
         })
     }
 
     handleCensor_toggle() {
-        Axios.get(`${config.api}/cen.php?id=${this.state.video.id}`)
-            .then(() => {
-                this.setState(prevState => {
-                    let video = {...prevState.video}
-                    video.censored = !video.censored
+        Axios.get(`${config.api}/cen.php?id=${this.state.video.id}`).then(() => {
+            this.setState((prevState) => {
+                let video = { ...prevState.video }
+                video.censored = !video.censored
 
-                    return {video}
-                })
+                return { video }
             })
+        })
     }
 
     async handleFname_copy() {
@@ -117,20 +128,22 @@ class VideoPage extends Component {
         let time = Math.round(this.player.player.currentTime)
         if (time) {
             if (star === null) {
-                Axios.get(`${config.api}/addbookmark.php?videoID=${this.state.video.id}&categoryID=${category.id}&time=${time}`)
-                    .then(({data}) => success(data))
+                Axios.get(
+                    `${config.api}/addbookmark.php?videoID=${this.state.video.id}&categoryID=${category.id}&time=${time}`
+                ).then(({ data }) => success(data))
             } else {
-                Axios.get(`${config.api}/addbookmark.php?videoID=${this.state.video.id}&categoryID=${category.id}&time=${time}&starID=${star.id}`)
-                    .then(({data}) => success(data))
+                Axios.get(
+                    `${config.api}/addbookmark.php?videoID=${this.state.video.id}&categoryID=${category.id}&time=${time}&starID=${star.id}`
+                ).then(({ data }) => success(data))
             }
         }
 
         const success = (data) => {
-            this.setState(prevState => {
+            this.setState((prevState) => {
                 let bookmarks = prevState.bookmarks
-                bookmarks.push({id: data.id, name: category.name, start: time})
+                bookmarks.push({ id: data.id, name: category.name, start: time })
 
-                return {bookmarks}
+                return { bookmarks }
             })
         }
     }
@@ -138,51 +151,50 @@ class VideoPage extends Component {
     handleBookmark_time(id) {
         let time = Math.round(this.player.player.currentTime)
 
-        Axios.get(`${config.api}/changebookmarktime.php?id=${id}&time=${time}`)
-            .then(() => {
-                let bookmarks = this.state.bookmarks
+        Axios.get(`${config.api}/changebookmarktime.php?id=${id}&time=${time}`).then(() => {
+            let bookmarks = this.state.bookmarks
 
-                // TODO - check if bookmark-time overlaps with another bookmark
-                let arr = Object.keys(bookmarks).map((i) => {
-                    if (bookmarks[i].id === id) bookmarks[i].start = time
+            // TODO - check if bookmark-time overlaps with another bookmark
+            let arr = Object.keys(bookmarks).map((i) => {
+                if (bookmarks[i].id === id) bookmarks[i].start = time
 
-                    return bookmarks[i]
-                })
-
-                this.setState({bookmarks: arr})
+                return bookmarks[i]
             })
+
+            this.setState({ bookmarks: arr })
+        })
     }
 
     handleBookmark_remove(id) {
-        Axios.get(`${config.api}/removebookmark.php?id=${id}`)
-            .then(() => {
-                let bookmarks = this.state.bookmarks.filter((item) => {
-                    return item.id !== id
-                })
-
-                this.setState({bookmarks})
+        Axios.get(`${config.api}/removebookmark.php?id=${id}`).then(() => {
+            let bookmarks = this.state.bookmarks.filter((item) => {
+                return item.id !== id
             })
+
+            this.setState({ bookmarks })
+        })
     }
 
     handleBookmark_category(category, bookmark) {
         // TODO Optimize Code
 
-        Axios.get(`${config.api}/changebookmarkcategory.php?id=${bookmark.id}&categoryID=${category.id}`)
-            .then(() => {
-                let bookmarks = this.state.bookmarks
-                let obj = Object.keys(bookmarks).map((i) => {
-                    if (bookmarks[i].id === bookmark.id) {
-                        let item = bookmarks[i]
-                        item.name = category.name
+        Axios.get(
+            `${config.api}/changebookmarkcategory.php?id=${bookmark.id}&categoryID=${category.id}`
+        ).then(() => {
+            let bookmarks = this.state.bookmarks
+            let obj = Object.keys(bookmarks).map((i) => {
+                if (bookmarks[i].id === bookmark.id) {
+                    let item = bookmarks[i]
+                    item.name = category.name
 
-                        return item
-                    }
+                    return item
+                }
 
-                    return bookmarks[i]
-                })
-
-                this.setState({bookmarks: obj})
+                return bookmarks[i]
             })
+
+            this.setState({ bookmarks: obj })
+        })
     }
 
     /* Franchise - own class? */
@@ -192,64 +204,67 @@ class VideoPage extends Component {
 
     /* Star - own class? */
     handleStar_remove(id) {
-        Axios.get(`${config.api}/removevideostar.php?videoID=${this.state.video.id}&starID=${id}`)
-            .then(() => {
-                let stars = this.state.stars.filter((item) => {
-                    return item.id !== id
-                })
-
-                // TODO check if star has bookmarks
-                this.setState({stars})
+        Axios.get(
+            `${config.api}/removevideostar.php?videoID=${this.state.video.id}&starID=${id}`
+        ).then(() => {
+            let stars = this.state.stars.filter((item) => {
+                return item.id !== id
             })
+
+            // TODO check if star has bookmarks
+            this.setState({ stars })
+        })
     }
 
     /* Plays - own class? */
     handlePlays_reset() {
-        Axios.get(`${config.api}/removeplays.php?videoID=${this.state.video.id}`)
-            .then(() => {
-                this.setState(prevState => {
-                    let video = prevState.video
-                    video.plays = 0
+        Axios.get(`${config.api}/removeplays.php?videoID=${this.state.video.id}`).then(() => {
+            this.setState((prevState) => {
+                let video = prevState.video
+                video.plays = 0
 
-                    return {video}
-                })
+                return { video }
             })
+        })
     }
 
     render() {
         return (
-            <div className="video-page col-12 row">
-                <section className="col-9">
-                    <header className="header row">
-                        <div className="col-12">
-                            <h1 className="header__title h2 align-middle">
-                                <div className="d-inline-block align-middle">
-                                    <ContextMenuTrigger id="title">{this.state.video.name}</ContextMenuTrigger>
+            <div className='video-page col-12 row'>
+                <section className='col-9'>
+                    <header className='header row'>
+                        <div className='col-12'>
+                            <h1 className='header__title h2 align-middle'>
+                                <div className='d-inline-block align-middle'>
+                                    <ContextMenuTrigger id='title'>
+                                        {this.state.video.name}
+                                    </ContextMenuTrigger>
                                 </div>
 
-                                <ContextMenu id="title">
-                                    <hr/>
+                                <ContextMenu id='title'>
+                                    <hr />
 
-                                    <MenuItem onClick={() => this.handleFranchise_copy()}
-                                    ><i className="far fa-copy"/> Copy Franchise</MenuItem>
+                                    <MenuItem onClick={() => this.handleFranchise_copy()}>
+                                        <i className='far fa-copy' /> Copy Franchise
+                                    </MenuItem>
                                 </ContextMenu>
 
-                                <small className="header__censored text-muted">
+                                <small className='header__censored text-muted'>
                                     {this.state.video.censored && (
-                                        <span className="label">Censored</span>
+                                        <span className='label'>Censored</span>
                                     )}
                                 </small>
                             </h1>
 
-                            <div className="header__date btn btn-sm btn-outline-primary">
-                                <ContextMenuTrigger id="menu__date">
-                                    <i className="far fa-calendar-check"/>
+                            <div className='header__date btn btn-sm btn-outline-primary'>
+                                <ContextMenuTrigger id='menu__date'>
+                                    <i className='far fa-calendar-check' />
                                     {this.state.video.date.published}
                                 </ContextMenuTrigger>
 
-                                <ContextMenu id="menu__date">
+                                <ContextMenu id='menu__date'>
                                     <MenuItem>
-                                        <i className="far fa-edit"/>
+                                        <i className='far fa-edit' />
                                         Edit Date
                                     </MenuItem>
                                 </ContextMenu>
@@ -257,181 +272,282 @@ class VideoPage extends Component {
                         </div>
                     </header>
 
-                    <div className="video-container" onWheel={this.handleWheel.bind(this)}>
-                        <ContextMenuTrigger id="video">
+                    <div className='video-container' onWheel={this.handleWheel.bind(this)}>
+                        <ContextMenuTrigger id='video'>
                             {this.state.loaded.video && (
-                                <PlyrComponent ref={(player) => this.player = player}
-                                               options={{
-                                                   'controls': [
-                                                       "play-large", "play", "current-time",
-                                                       "progress", "duration", "fullscreen"
-                                                   ],
-                                                   "hideControls": false,
-                                                   "ratio": "21:9",
-                                                   "keyboard": {global: true},
-                                                   "seekTime": this.state.seekSpeed.regular,
-                                                   "previewThumbnails": {
-                                                       enabled: true,
-                                                       src: `${config.source}/vtt/${this.state.video.id}.vtt`
-                                                   },
-                                               }}
-                                               sources={{
-                                                   type: 'video',
-                                                   sources: [
-                                                       {
-                                                           src: `${config.source}/videos/${this.state.video.path.stream}`,
-                                                           type: "application/x-mpegURL",
-                                                       },
-                                                       {
-                                                           src: `${config.source}/videos/${this.state.video.path.file}`,
-                                                           type: "video/mp4",
-                                                       },
-                                                   ]
-                                               }}
+                                <PlyrComponent
+                                    ref={(player) => (this.player = player)}
+                                    options={{
+                                        controls: [
+                                            'play-large',
+                                            'play',
+                                            'current-time',
+                                            'progress',
+                                            'duration',
+                                            'fullscreen',
+                                        ],
+                                        hideControls: false,
+                                        ratio: '21:9',
+                                        keyboard: { global: true },
+                                        seekTime: this.state.seekSpeed.regular,
+                                        previewThumbnails: {
+                                            enabled: true,
+                                            src: `${config.source}/vtt/${this.state.video.id}.vtt`,
+                                        },
+                                    }}
+                                    sources={{
+                                        type: 'video',
+                                        sources: [
+                                            {
+                                                src: `${config.source}/videos/${this.state.video.path.stream}`,
+                                                type: 'application/x-mpegURL',
+                                            },
+                                            {
+                                                src: `${config.source}/videos/${this.state.video.path.file}`,
+                                                type: 'video/mp4',
+                                            },
+                                        ],
+                                    }}
                                 />
                             )}
                         </ContextMenuTrigger>
 
-                        <ContextMenu id="video">
-                            <MenuItem onClick={() => {
-                                this.handleModal("Add Bookmark",
-                                    Object.keys(this.state.categories).map((i) => {
-                                        return (
-                                            <div key={i} className="btn btn-sm btn-outline-primary d-block"
-                                                 onClick={() => {
-                                                     this.handleModal()
-                                                     this.handleBookmark_add(this.state.categories[i])
-                                                 }}
-                                            >{this.state.categories[i].name}</div>
-                                        )
-                                    })
-                                )
-                            }}
-                            ><i className="far fa-plus"/> Add Bookmark</MenuItem>
+                        <ContextMenu id='video'>
+                            <MenuItem
+                                onClick={() => {
+                                    this.handleModal(
+                                        'Add Bookmark',
+                                        Object.keys(this.state.categories).map((i) => {
+                                            return (
+                                                <div
+                                                    key={i}
+                                                    className='btn btn-sm btn-outline-primary d-block'
+                                                    onClick={() => {
+                                                        this.handleModal()
+                                                        this.handleBookmark_add(
+                                                            this.state.categories[i]
+                                                        )
+                                                    }}
+                                                >
+                                                    {this.state.categories[i].name}
+                                                </div>
+                                            )
+                                        })
+                                    )
+                                }}
+                            >
+                                <i className='far fa-plus' /> Add Bookmark
+                            </MenuItem>
 
-                            <MenuItem onClick={() => this.handleCensor_toggle()}
-                            >{this.state.video.censored
-                                ? <React.Fragment><i className="far fa-check-circle"/> Uncensor</React.Fragment>
-                                : <React.Fragment><i className="far fa-exclamation-circle"/> Censor</React.Fragment>
-                            }</MenuItem>
+                            <MenuItem onClick={() => this.handleCensor_toggle()}>
+                                {this.state.video.censored ? (
+                                    <React.Fragment>
+                                        <i className='far fa-check-circle' /> Uncensor
+                                    </React.Fragment>
+                                ) : (
+                                    <React.Fragment>
+                                        <i className='far fa-exclamation-circle' /> Censor
+                                    </React.Fragment>
+                                )}
+                            </MenuItem>
 
-                            <MenuItem onClick={() => this.handlePlays_reset()}
-                            ><i className="far fa-trash-alt"/> Remove Plays</MenuItem>
+                            <MenuItem onClick={() => this.handlePlays_reset()}>
+                                <i className='far fa-trash-alt' /> Remove Plays
+                            </MenuItem>
 
-                            <hr/>
+                            <hr />
 
-                            <MenuItem onClick={() => this.handleFname_copy()}
-                            ><i className="far fa-copy"/> Copy Filename</MenuItem>
+                            <MenuItem onClick={() => this.handleFname_copy()}>
+                                <i className='far fa-copy' /> Copy Filename
+                            </MenuItem>
                         </ContextMenu>
                     </div>
 
-                    <div className="col-12" id="timeline">
-                        {this.state.loaded.bookmarks && this.state.loaded.video && Object.keys(this.state.bookmarks).map((i) => (
-                            <React.Fragment key={i}>
-                                <div className="btn btn-sm btn-outline-primary bookmark"
-                                     style={{left: `${(this.state.bookmarks[i].start * 100 / this.state.video.duration) * 0.88}%`}}
-                                     onClick={() => this.handleVideo_play(this.state.bookmarks[i].start)}
-                                     ref={(bookmark => this.bookmarks[i] = bookmark)} data-level={1}
-                                >
-                                    <ContextMenuTrigger id={`bookmark-${i}`}>
-                                        <div data-tip={true} data-for={`bookmark-info-${i}`}>
-                                            {this.state.bookmarks[i].name}
-                                        </div>
-                                    </ContextMenuTrigger>
-
-                                    <ReactTooltip id={`bookmark-info-${i}`} effect="solid">
-                                        <img alt="star" className="star__image"
-                                             data-star-id={this.state.bookmarks[i].starID}
-                                             src={`${config.source}/images/stars/${this.state.bookmarks[i].starID}`}/>
-
-                                        {/* TODO this.state.bookmarks[i] is undefined */}
-
-                                        {Object.keys(this.state.bookmarks[i].attributes).map((b_i) => (
-                                            <div key={b_i} className="attribute btn btn-sm btn-light">
-                                                {console.log(this.state.bookmarks[i])}
-                                            </div>
-                                        ))}
-                                    </ReactTooltip>
-                                </div>
-
-                                <ContextMenu id={`bookmark-${i}`}>
-                                    <hr/>
-
-                                    <MenuItem
-                                        onClick={() => {
-                                            this.handleModal("Change Category",
-
-                                                Object.keys(this.state.categories).filter((c_i) => {
-                                                    return this.state.categories[c_i].name !== this.state.bookmarks[i].name
-                                                }).map((c_i) => {
-                                                    return (
-                                                        <div key={c_i}
-                                                             className="btn btn-sm btn-outline-primary d-block w-auto"
-                                                             onClick={() => {
-                                                                 this.handleModal()
-                                                                 this.handleBookmark_category(this.state.categories[c_i], this.state.bookmarks[i])
-                                                             }}
-                                                        >{this.state.categories[c_i].name}</div>
-                                                    )
-                                                })
-                                            )
+                    <div className='col-12' id='timeline'>
+                        {this.state.loaded.bookmarks &&
+                            this.state.loaded.video &&
+                            Object.keys(this.state.bookmarks).map((i) => (
+                                <React.Fragment key={i}>
+                                    <div
+                                        className='btn btn-sm btn-outline-primary bookmark'
+                                        style={{
+                                            left: `${
+                                                ((this.state.bookmarks[i].start * 100) /
+                                                    this.state.video.duration) *
+                                                0.88
+                                            }%`,
                                         }}
-                                    ><i className="far fa-edit"/> Change Category</MenuItem>
+                                        onClick={() =>
+                                            this.handleVideo_play(this.state.bookmarks[i].start)
+                                        }
+                                        ref={(bookmark) => (this.bookmarks[i] = bookmark)}
+                                        data-level={1}
+                                    >
+                                        <ContextMenuTrigger id={`bookmark-${i}`}>
+                                            <div data-tip={true} data-for={`bookmark-info-${i}`}>
+                                                {this.state.bookmarks[i].name}
+                                            </div>
+                                        </ContextMenuTrigger>
 
-                                    <MenuItem
-                                        onClick={() => this.handleBookmark_time(this.state.bookmarks[i].id)}
-                                    ><i className="far fa-clock"/> Change Time</MenuItem>
+                                        <ReactTooltip id={`bookmark-info-${i}`} effect='solid'>
+                                            <img
+                                                alt='star'
+                                                className='star__image'
+                                                data-star-id={this.state.bookmarks[i].starID}
+                                                src={`${config.source}/images/stars/${this.state.bookmarks[i].starID}`}
+                                            />
 
-                                    <MenuItem
-                                        onClick={() => this.handleBookmark_remove(this.state.bookmarks[i].id)}
-                                    ><i className="far fa-trash-alt"/> Delete</MenuItem>
-                                </ContextMenu>
-                            </React.Fragment>
-                        ))}
+                                            {/* TODO this.state.bookmarks[i] is undefined */}
+
+                                            {Object.keys(this.state.bookmarks[i].attributes).map(
+                                                (b_i) => (
+                                                    <div
+                                                        key={b_i}
+                                                        className='attribute btn btn-sm btn-light'
+                                                    >
+                                                        {console.log(this.state.bookmarks[i])}
+                                                    </div>
+                                                )
+                                            )}
+                                        </ReactTooltip>
+                                    </div>
+
+                                    <ContextMenu id={`bookmark-${i}`}>
+                                        <hr />
+
+                                        <MenuItem
+                                            onClick={() => {
+                                                this.handleModal(
+                                                    'Change Category',
+
+                                                    Object.keys(this.state.categories)
+                                                        .filter((c_i) => {
+                                                            return (
+                                                                this.state.categories[c_i].name !==
+                                                                this.state.bookmarks[i].name
+                                                            )
+                                                        })
+                                                        .map((c_i) => {
+                                                            return (
+                                                                <div
+                                                                    key={c_i}
+                                                                    className='btn btn-sm btn-outline-primary d-block w-auto'
+                                                                    onClick={() => {
+                                                                        this.handleModal()
+                                                                        this.handleBookmark_category(
+                                                                            this.state.categories[
+                                                                                c_i
+                                                                            ],
+                                                                            this.state.bookmarks[i]
+                                                                        )
+                                                                    }}
+                                                                >
+                                                                    {
+                                                                        this.state.categories[c_i]
+                                                                            .name
+                                                                    }
+                                                                </div>
+                                                            )
+                                                        })
+                                                )
+                                            }}
+                                        >
+                                            <i className='far fa-edit' /> Change Category
+                                        </MenuItem>
+
+                                        <MenuItem
+                                            onClick={() =>
+                                                this.handleBookmark_time(this.state.bookmarks[i].id)
+                                            }
+                                        >
+                                            <i className='far fa-clock' /> Change Time
+                                        </MenuItem>
+
+                                        <MenuItem
+                                            onClick={() =>
+                                                this.handleBookmark_remove(
+                                                    this.state.bookmarks[i].id
+                                                )
+                                            }
+                                        >
+                                            <i className='far fa-trash-alt' /> Delete
+                                        </MenuItem>
+                                    </ContextMenu>
+                                </React.Fragment>
+                            ))}
                     </div>
                 </section>
 
-                <aside className="col-3">
-                    <div id="stars" className="row justify-content-center">
-                        {this.state.loaded.stars && Object.keys(this.state.stars).map((key, i) => (
-                            <React.Fragment key={i}>
-                                <div className="star col-4">
-                                    <ContextMenuTrigger id={`star-${i}`}>
-                                        <img className="star__image w-100" alt="star"
-                                             src={`${config.source}/images/stars/${this.state.stars[i].id}`}/>
-                                        <a href={`${config.source}/star.php?id=${this.state.stars[i].id}`}
-                                           className="star__name d-block">{this.state.stars[i].name}</a>
-                                    </ContextMenuTrigger>
-                                </div>
+                <aside className='col-3'>
+                    <div id='stars' className='row justify-content-center'>
+                        {this.state.loaded.stars &&
+                            Object.keys(this.state.stars).map((key, i) => (
+                                <React.Fragment key={i}>
+                                    <div className='star col-4'>
+                                        <ContextMenuTrigger id={`star-${i}`}>
+                                            <img
+                                                className='star__image w-100'
+                                                alt='star'
+                                                src={`${config.source}/images/stars/${this.state.stars[i].id}`}
+                                            />
+                                            <a
+                                                href={`${config.source}/star.php?id=${this.state.stars[i].id}`}
+                                                className='star__name d-block'
+                                            >
+                                                {this.state.stars[i].name}
+                                            </a>
+                                        </ContextMenuTrigger>
+                                    </div>
 
-                                <ContextMenu id={`star-${i}`}>
-                                    <MenuItem
-                                        onClick={() => {
-                                            this.handleModal("Add Bookmark",
-                                                Object.keys(this.state.categories).map((c_i) => {
-                                                    return (
-                                                        <div key={c_i}
-                                                             className="btn btn-sm btn-outline-primary d-block w-auto"
-                                                             onClick={() => {
-                                                                 this.handleModal()
-                                                                 this.handleBookmark_add(this.state.categories[c_i], this.state.stars[i])
-                                                             }}
-                                                        >{this.state.categories[c_i].name}</div>
+                                    <ContextMenu id={`star-${i}`}>
+                                        <MenuItem
+                                            onClick={() => {
+                                                this.handleModal(
+                                                    'Add Bookmark',
+                                                    Object.keys(this.state.categories).map(
+                                                        (c_i) => {
+                                                            return (
+                                                                <div
+                                                                    key={c_i}
+                                                                    className='btn btn-sm btn-outline-primary d-block w-auto'
+                                                                    onClick={() => {
+                                                                        this.handleModal()
+                                                                        this.handleBookmark_add(
+                                                                            this.state.categories[
+                                                                                c_i
+                                                                            ],
+                                                                            this.state.stars[i]
+                                                                        )
+                                                                    }}
+                                                                >
+                                                                    {
+                                                                        this.state.categories[c_i]
+                                                                            .name
+                                                                    }
+                                                                </div>
+                                                            )
+                                                        }
                                                     )
-                                                })
-                                            )
-                                        }}
-                                    ><i className="far fa-plus"/> Add Bookmark</MenuItem>
+                                                )
+                                            }}
+                                        >
+                                            <i className='far fa-plus' /> Add Bookmark
+                                        </MenuItem>
 
-                                    <MenuItem
-                                    ><i className="far fa-plus"/> Add Global Attribute</MenuItem>
+                                        <MenuItem>
+                                            <i className='far fa-plus' /> Add Global Attribute
+                                        </MenuItem>
 
-                                    <MenuItem
-                                        onClick={() => this.handleStar_remove(this.state.stars[i].id)}
-                                    ><i className="far fa-trash-alt"/> Remove</MenuItem>
-                                </ContextMenu>
-                            </React.Fragment>
-                        ))}
+                                        <MenuItem
+                                            onClick={() =>
+                                                this.handleStar_remove(this.state.stars[i].id)
+                                            }
+                                        >
+                                            <i className='far fa-trash-alt' /> Remove
+                                        </MenuItem>
+                                    </ContextMenu>
+                                </React.Fragment>
+                            ))}
                     </div>
                 </aside>
 
@@ -439,7 +555,9 @@ class VideoPage extends Component {
                     visible={this.state.modal.visible}
                     onClose={() => this.handleModal()}
                     title={this.state.modal.title}
-                >{this.state.modal.data}</Modal>
+                >
+                    {this.state.modal.data}
+                </Modal>
             </div>
         )
     }
@@ -452,7 +570,6 @@ class VideoPage extends Component {
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (this.state.loaded.video) {
-
             /* Events Handler */
             if (!this.state.loaded.videoEvents) {
                 this.player.player.on('timeupdate', () => {
@@ -469,24 +586,24 @@ class VideoPage extends Component {
                     localStorage.playing = 0
                 })
 
-                this.setState(prevState => {
+                this.setState((prevState) => {
                     let loaded = prevState.loaded
                     loaded.videoEvents = true
 
-                    return {loaded}
+                    return { loaded }
                 })
             }
 
             /* HLS handler */
             if (!this.state.loaded.hls && Hls.isSupported()) {
-                const hls = new Hls({autoStartLoad: false})
+                const hls = new Hls({ autoStartLoad: false })
                 hls.loadSource(this.player.player.media.firstElementChild.getAttribute('src'))
                 hls.attachMedia(this.player.player.media)
 
                 hls.on(Hls.Events.MANIFEST_PARSED, (e, data) => {
                     const dataLevels = data['levels'].length - 1
 
-                    let levels = {1080: 3, 720: 2, 480: 1, 360: 0}
+                    let levels = { 1080: 3, 720: 2, 480: 1, 360: 0 }
                     let maxLevel = levels[1080]
                     let maxStartLevel = levels[720]
 
@@ -506,7 +623,8 @@ class VideoPage extends Component {
                     if (Number(localStorage.video) === this.state.video.id) {
                         hls.startLoad(Number(localStorage.bookmark))
 
-                        if (Boolean(Number(localStorage.playing))) this.handleVideo_play(localStorage.bookmark)
+                        if (Boolean(Number(localStorage.playing)))
+                            this.handleVideo_play(localStorage.bookmark)
                     } else {
                         localStorage.video = this.state.video.id
                         localStorage.bookmark = 0
@@ -516,27 +634,31 @@ class VideoPage extends Component {
                 })
 
                 /* Prevent Stream RESET */
-                this.setState(prevState => {
+                this.setState((prevState) => {
                     let loaded = prevState.loaded
                     loaded.hls = true
 
-                    return {loaded}
+                    return { loaded }
                 })
             }
         }
 
         /* Collision Check */
         const collisionCheck = (a, b) => {
-            if (typeof a === "undefined" || typeof b === "undefined") return false
+            if (typeof a === 'undefined' || typeof b === 'undefined') return false
             if (a === null || b === null) return false
 
             a = a.getBoundingClientRect()
             b = b.getBoundingClientRect()
 
-            return !((a.x + a.width) < b.x) || (a.x > (b.x + b.width))
+            return !(a.x + a.width < b.x) || a.x > b.x + b.width
         }
 
-        for (let i = 1, items = this.bookmarks, LEVEL_MIN = 1, LEVEL_MAX = 10, level = LEVEL_MIN; i < items.length; i++) {
+        for (
+            let i = 1, items = this.bookmarks, LEVEL_MIN = 1, LEVEL_MAX = 10, level = LEVEL_MIN;
+            i < items.length;
+            i++
+        ) {
             let collision = false
 
             let first = items[i - 1]
@@ -562,49 +684,49 @@ class VideoPage extends Component {
     }
 
     getData() {
-        let {id} = this.props.match.params
+        let { id } = this.props.match.params
 
         Axios.get(`${config.api}/video.php?id=${id}`)
-            .then(({data: video}) => this.setState({video}))
+            .then(({ data: video }) => this.setState({ video }))
             .then(() => {
-                this.setState(prevState => {
+                this.setState((prevState) => {
                     let loaded = prevState.loaded
                     loaded.video = true
 
-                    return {loaded}
+                    return { loaded }
                 })
             })
 
         Axios.get(`${config.api}/bookmarks.php?id=${id}`)
-            .then(({data: bookmarks}) => this.setState({bookmarks}))
+            .then(({ data: bookmarks }) => this.setState({ bookmarks }))
             .then(() => {
-                this.setState(prevState => {
+                this.setState((prevState) => {
                     let loaded = prevState.loaded
                     loaded.bookmarks = true
 
-                    return {loaded}
+                    return { loaded }
                 })
             })
 
         Axios.get(`${config.api}/stars.php?id=${id}`)
-            .then(({data: stars}) => this.setState({stars}))
+            .then(({ data: stars }) => this.setState({ stars }))
             .then(() => {
-                this.setState(prevState => {
+                this.setState((prevState) => {
                     let loaded = prevState.loaded
                     loaded.stars = true
 
-                    return {loaded}
+                    return { loaded }
                 })
             })
 
         Axios.get(`${config.api}/categories.php`)
-            .then(({data: categories}) => this.setState({categories}))
+            .then(({ data: categories }) => this.setState({ categories }))
             .then(() => {
-                this.setState(prevState => {
+                this.setState((prevState) => {
                     let loaded = prevState.loaded
                     loaded.categories = true
 
-                    return {loaded}
+                    return { loaded }
                 })
             })
     }

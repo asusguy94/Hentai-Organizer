@@ -1,27 +1,27 @@
 .ui-dialog {
-  width: 100%;
+    width: 100%;
 
-  .ui-dialog-title {
-    text-align: center;
-  }
+    .ui-dialog-title {
+        text-align: center;
+    }
 }
 
 #dialog {
-  cursor: default;
+    cursor: default;
 
-  #dropbox {
-    width: 100%;
-    height: 275px;
-  }
+    #dropbox {
+        width: 100%;
+        height: 275px;
+    }
 
-  input {
-    text-align: center;
-    width: 95%;
-  }
+    input {
+        text-align: center;
+        width: 95%;
+    }
 
-  .selected {
-    box-shadow: 0 0 4px blue;
-    background-color: dodgerblue;
-    color: white;
-  }
+    .selected {
+        box-shadow: 0 0 4px blue;
+        background-color: dodgerblue;
+        color: white;
+    }
 }

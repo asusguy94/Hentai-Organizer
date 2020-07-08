@@ -1,5 +1,5 @@
 <?php
-include('_class.php');
+include '_class.php';
 $video = new Video();
 
 $query = $pdo->prepare("{$video->sql()} ORDER BY RAND() LIMIT 1");

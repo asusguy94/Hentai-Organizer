@@ -1,18 +1,18 @@
 <?php
-    include('_class.php');
-    $basic = new Basic();
-    $video = new Video();
-    global $pdo;
+include '_class.php';
+$basic = new Basic();
+$video = new Video();
+global $pdo;
 ?>
 
 <!doctype html>
 <html>
     <head>
-        <?php $basic->head('Video Search', array('jqueryui', 'bootstrap', 'search'), array('jquery', 'jqueryui', 'bootstrap', 'lazyload', 'video.search')) ?>
+        <?php $basic->head('Video Search', array('jqueryui', 'bootstrap', 'search'), array('jquery', 'jqueryui', 'bootstrap', 'lazyload', 'video.search'))?>
     </head>
 
     <body>
-        <nav><?php $basic->navigation() ?></nav>
+        <nav><?php $basic->navigation()?></nav>
         <main class="container-fluid">
             <div class="row">
                 <aside class="col-2">
@@ -111,38 +111,38 @@
                         <label for="plays">Least Popular</label>
                     </div>
 
-                    <h2>Categories</h2>
-                    <?php
-                        $query = $pdo->prepare("SELECT * FROM categories ORDER BY name");
-                        $query->execute();
-                        if ($query->rowCount()) {
-                            print '<div id="categories">';
-                            print "<div class='input-wrapper'><input type='checkbox' name='category_NULL' id='category_NULL'><label for='category_NULL'>NULL</label></div>";
-                            foreach ($query->fetchAll() as $data) {
-                                print '<div class="input-wrapper">';
-                                print "<input type='checkbox' name='category_$data[name]' id='category_$data[name]'>";
-                                print "<label for='category_$data[name]'>$data[name]</label>";
-                                print '</div>';
-                            }
-                            print '</div>';
-                        }
-                    ?>
+<h2>Categories</h2>
+<?php
+$query = $pdo->prepare("SELECT * FROM categories ORDER BY name");
+$query->execute();
+if ($query->rowCount()) {
+    print '<div id="categories">';
+    print "<div class='input-wrapper'><input type='checkbox' name='category_NULL' id='category_NULL'><label for='category_NULL'>NULL</label></div>";
+    foreach ($query->fetchAll() as $data) {
+        print '<div class="input-wrapper">';
+        print "<input type='checkbox' name='category_$data[name]' id='category_$data[name]'>";
+        print "<label for='category_$data[name]'>$data[name]</label>";
+        print '</div>';
+    }
+    print '</div>';
+}
+?>
 
-                    <h2>Attributes</h2>
-                    <?php
-                        $query = $pdo->prepare("SELECT * FROM attributes ORDER BY name");
-                        $query->execute();
-                        if ($query->rowCount()) {
-                            print '<div id="attributes">';
-                            foreach ($query->fetchAll() as $data) {
-                                print '<div class="input-wrapper">';
-                                print "<input type='checkbox' name='attribute_$data[name]' id='attribute_$data[name]'>";
-                                print "<label for='attribute_$data[name]'>$data[name]</label>";
-                                print '</div>';
-                            }
-                            print '</div>';
-                        }
-                    ?>
+<h2>Attributes</h2>
+<?php
+$query = $pdo->prepare("SELECT * FROM attributes ORDER BY name");
+$query->execute();
+if ($query->rowCount()) {
+    print '<div id="attributes">';
+    foreach ($query->fetchAll() as $data) {
+        print '<div class="input-wrapper">';
+        print "<input type='checkbox' name='attribute_$data[name]' id='attribute_$data[name]'>";
+        print "<label for='attribute_$data[name]'>$data[name]</label>";
+        print '</div>';
+    }
+    print '</div>';
+}
+?>
                 </aside>
 
                 <section id="videos" class="col-10">

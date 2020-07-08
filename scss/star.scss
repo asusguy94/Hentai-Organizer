@@ -1,28 +1,28 @@
-@import "functions";
+@import 'functions';
 
 aside {
-  #relations {
-    text-align: center;
+    #relations {
+        text-align: center;
 
-    a.relation {
-      display: inline-block;
-      width: 200px;
+        a.relation {
+            display: inline-block;
+            width: 200px;
 
-      margin: 10px;
-      text-decoration: none;
-      color: inherit;
+            margin: 10px;
+            text-decoration: none;
+            color: inherit;
 
-      &:hover {
-        text-decoration: underline;
-      }
+            &:hover {
+                text-decoration: underline;
+            }
 
-      img {
-        width: inherit;
-      }
+            img {
+                width: inherit;
+            }
+        }
     }
-  }
 }
 
 .video {
-  margin: 0 5px 10px;
+    margin: 0 5px 10px;
 }

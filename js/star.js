@@ -17,7 +17,11 @@ for (let i = 0; i < form.length; i++) {
             case 9:
                 e.preventDefault()
 
-                if (i < form.length - 1) $('form').eq(i + 1).find('input')[0].focus()
+                if (i < form.length - 1)
+                    $('form')
+                        .eq(i + 1)
+                        .find('input')[0]
+                        .focus()
                 else $('#next')[0].click()
                 break
         }
@@ -35,62 +39,74 @@ addRel_btn.addEventListener('click', function () {
             close: function () {
                 $('#dialog').remove()
             },
-            width: 250
+            width: 250,
         })
 
         $('#dialog').append(
             '<input type="text" name="relationName" autofocus placeholder="Title">' +
-            '<input type="number" name="relationID" placeholder="ID">' +
-            '<input type="button" id="relationAdd_confirm" class="btn btn-primary" value="Add">'
+                '<input type="number" name="relationID" placeholder="ID">' +
+                '<input type="button" id="relationAdd_confirm" class="btn btn-primary" value="Add">'
         )
 
-        document.querySelector('input#relationAdd_confirm').addEventListener('click', () => {
-            let title = $('[name="relationName"]').val().trim()
-            let id = $('[name="relationID"]').val().trim()
-
-            addRelation(id, title)
-        })
-    })
-})
-
-for (let i = 0; i < document.querySelectorAll('.relation-add').length; i++) {
-    document.querySelectorAll('.relation-add')[i].addEventListener('click', function () {
-        let el = $(this).parent().prev()
-        let otherID = el.attr('data-starID')
-        let title = el.find('.card-title').text()
-
-        $('body').append('<div id="dialog" title="Add Relation"></div>')
-
-        $(function () {
-            $('#dialog').dialog({
-                close: function () {
-                    $('#dialog').remove()
-                },
-                width: 250
-            })
-
-            $('#dialog').append(
-                `<input type="text" name="relationName" autofocus value="${title}">` +
-                `<input type="number" name="relationID" value="${otherID}" placeholder="ID">` +
-                `<input type="button" id="relationAdd_confirm" class="btn btn-primary" value="Save">`
-            )
-
-            document.querySelector('input#relationAdd_confirm').addEventListener('click', function () {
+        document
+            .querySelector('input#relationAdd_confirm')
+            .addEventListener('click', () => {
                 let title = $('[name="relationName"]').val().trim()
                 let id = $('[name="relationID"]').val().trim()
 
                 addRelation(id, title)
             })
-        })
     })
+})
+
+for (let i = 0; i < document.querySelectorAll('.relation-add').length; i++) {
+    document
+        .querySelectorAll('.relation-add')
+        [i].addEventListener('click', function () {
+            let el = $(this).parent().prev()
+            let otherID = el.attr('data-starID')
+            let title = el.find('.card-title').text()
+
+            $('body').append('<div id="dialog" title="Add Relation"></div>')
+
+            $(function () {
+                $('#dialog').dialog({
+                    close: function () {
+                        $('#dialog').remove()
+                    },
+                    width: 250,
+                })
+
+                $('#dialog').append(
+                    `<input type="text" name="relationName" autofocus value="${title}">` +
+                        `<input type="number" name="relationID" value="${otherID}" placeholder="ID">` +
+                        `<input type="button" id="relationAdd_confirm" class="btn btn-primary" value="Save">`
+                )
+
+                document
+                    .querySelector('input#relationAdd_confirm')
+                    .addEventListener('click', function () {
+                        let title = $('[name="relationName"]').val().trim()
+                        let id = $('[name="relationID"]').val().trim()
+
+                        addRelation(id, title)
+                    })
+            })
+        })
 }
 
 function addRelation(otherID, title) {
-    ajax('ajax/star_add_relation.php', `starID=${starID}&otherID=${otherID}&title=${title}`)
+    ajax(
+        'ajax/star_add_relation.php',
+        `starID=${starID}&otherID=${otherID}&title=${title}`
+    )
 }
 
 function editRelation(otherID, title, ref_id) {
-    ajax('ajax/star_edit_relation.php', `starID=${starID}&otherID=${otherID}&title=${title}&refID=${ref_id}`)
+    ajax(
+        'ajax/star_edit_relation.php',
+        `starID=${starID}&otherID=${otherID}&title=${title}&refID=${ref_id}`
+    )
 }
 
 function removeRelation(ref_id) {
@@ -110,7 +126,10 @@ function removeStarImage(id) {
 }
 
 function removeStarAttribute(starID, attributeID) {
-    ajax('ajax/remove_star_attribute.php', `starID=${starID}&attributeID=${attributeID}`)
+    ajax(
+        'ajax/remove_star_attribute.php',
+        `starID=${starID}&attributeID=${attributeID}`
+    )
 }
 
 function deleteStar(starID) {
@@ -121,17 +140,20 @@ function renameStar(starID, starName) {
     ajax('ajax/rename_star.php', `starID=${starID}&starName=${starName}`)
 }
 
-function ajax(page, params, callback = function () {
-    location.href = `${location.href}`
-}) {
+function ajax(
+    page,
+    params,
+    callback = function () {
+        location.href = `${location.href}`
+    }
+) {
     let url = `${page}?${params}`
 
     let xhr = new XMLHttpRequest()
     xhr.open('GET', url)
     xhr.send()
     xhr.onreadystatechange = function () {
-        if (this.readyState === 4 && this.status === 200)
-            callback()
+        if (this.readyState === 4 && this.status === 200) callback()
     }
 }
 
@@ -141,22 +163,22 @@ $(function () {
     $.contextMenu({
         selector: '#star > img',
         items: {
-            "delete_image": {
-                name: "Delete Image",
-                icon: "delete",
+            delete_image: {
+                name: 'Delete Image',
+                icon: 'delete',
                 callback: function () {
                     removeStarImage(starID)
-                }
+                },
             },
-            "delete_star": {
-                name: "Delete Star",
-                icon: "delete",
+            delete_star: {
+                name: 'Delete Star',
+                icon: 'delete',
                 callback: function () {
                     deleteStar(starID)
                 },
-                disabled: !hasNoVideos()
-            }
-        }
+                disabled: !hasNoVideos(),
+            },
+        },
     })
 })
 /* Dropbox */
@@ -164,21 +186,22 @@ $(function () {
     $.contextMenu({
         selector: '#dropbox',
         items: {
-            "delete_star": {
-                name: "Delete Star",
-                icon: "delete",
+            delete_star: {
+                name: 'Delete Star',
+                icon: 'delete',
                 callback: function () {
                     deleteStar(starID)
                 },
-                disabled: !hasNoVideos()
-            }, "add_image": {
-                name: "Manual Add JPG",
+                disabled: !hasNoVideos(),
+            },
+            add_image: {
+                name: 'Manual Add JPG',
                 icon: 'add',
                 callback: function () {
                     addStarImage_db()
-                }
-            }
-        }
+                },
+            },
+        },
     })
 })
 /* Attribute */
@@ -186,15 +209,15 @@ $(function () {
     $.contextMenu({
         selector: '#star .attribute',
         items: {
-            "remove": {
-                name: "Remove",
-                icon: "delete",
+            remove: {
+                name: 'Remove',
+                icon: 'delete',
                 callback: function (itemKey, options) {
                     let id = options.$trigger.attr('data-attribute-id')
                     removeStarAttribute(starID, id)
-                }
-            }
-        }
+                },
+            },
+        },
     })
 })
 /* Title */
@@ -203,36 +226,43 @@ $(function () {
         selector: '#star > h2',
         zIndex: 2,
         items: {
-            "rename": {
-                name: "Rename",
-                icon: "edit",
+            rename: {
+                name: 'Rename',
+                icon: 'edit',
                 callback: function () {
-
-                    $('body').append('<div id="dialog" title="Edit Star"></div>')
+                    $('body').append(
+                        '<div id="dialog" title="Edit Star"></div>'
+                    )
 
                     $(function () {
                         $('#dialog').dialog({
                             close: function () {
                                 $('#dialog').remove()
                             },
-                            width: 250
+                            width: 250,
                         })
 
-                        $('#dialog').append('<input type="text" name="starName_edit" value="' + $('#star > h2').text() + '" autofocus>')
+                        $('#dialog').append(
+                            '<input type="text" name="starName_edit" value="' +
+                                $('#star > h2').text() +
+                                '" autofocus>'
+                        )
                         let input = $('input[name="starName_edit"]')
                         let len = input.val().length
                         input[0].focus()
                         input[0].setSelectionRange(len, len)
 
-                        document.querySelector('input[name="starName_edit"]').addEventListener('keydown', function (e) {
-                            if (e.keyCode === 13) {
-                                renameStar(starID, this.value)
-                            }
-                        })
+                        document
+                            .querySelector('input[name="starName_edit"]')
+                            .addEventListener('keydown', function (e) {
+                                if (e.keyCode === 13) {
+                                    renameStar(starID, this.value)
+                                }
+                            })
                     })
-                }
-            }
-        }
+                },
+            },
+        },
     })
 })
 /* Relation */
@@ -241,48 +271,55 @@ $(function () {
         selector: '#relations > .relation',
         zIndex: 2,
         items: {
-            "rename": {
-                name: "Edit",
-                icon: "edit",
+            rename: {
+                name: 'Edit',
+                icon: 'edit',
                 callback: function (itemKey, options) {
                     let name = options.$trigger.find('h3.card-title').text()
                     let otherstarID = options.$trigger.attr('data-starID')
                     let ref_id = options.$trigger.attr('data-id')
 
-                    $('body').append('<div id="dialog" title="Edit Star"></div>')
+                    $('body').append(
+                        '<div id="dialog" title="Edit Star"></div>'
+                    )
 
                     $(function () {
                         $('#dialog').dialog({
                             close: function () {
                                 $('#dialog').remove()
                             },
-                            width: 250
+                            width: 250,
                         })
 
                         $('#dialog').append(
                             `<input type="text" name="relationName" value="${name}" autofocus placeholder="Title">` +
-                            `<input type="number" name="relationID" value="${otherstarID}" placeholder="ID">` +
-                            `<input type="button" id="relationEdit_confirm" class="btn btn-primary" value="Save">`
+                                `<input type="number" name="relationID" value="${otherstarID}" placeholder="ID">` +
+                                `<input type="button" id="relationEdit_confirm" class="btn btn-primary" value="Save">`
                         )
 
-                        document.querySelector('input#relationEdit_confirm').addEventListener('click', function () {
-                            let title = $('[name="relationName"]').val().trim()
-                            let id = $('[name="relationID"]').val().trim()
+                        document
+                            .querySelector('input#relationEdit_confirm')
+                            .addEventListener('click', function () {
+                                let title = $('[name="relationName"]')
+                                    .val()
+                                    .trim()
+                                let id = $('[name="relationID"]').val().trim()
 
-                            editRelation(id, title, ref_id)
-                        })
+                                editRelation(id, title, ref_id)
+                            })
                     })
-                }
-            }, "remove": {
-                name: "Remove",
-                icon: "delete",
+                },
+            },
+            remove: {
+                name: 'Remove',
+                icon: 'delete',
                 callback: function (itemKey, options) {
                     let ref_id = options.$trigger.attr('data-id')
 
                     removeRelation(ref_id)
-                }
-            }
-        }
+                },
+            },
+        },
     })
 })
 
@@ -326,9 +363,13 @@ function autoComplete() {
 
     function removeDuplicate() {
         for (let i = 0; i < $('.attribute > .btn').length; i++) {
-            $('#attributes > .attribute').filter(function () {
-                return ($(this).text() === $('.attribute > .btn').eq(i).text())
-            }).remove()
+            $('#attributes > .attribute')
+                .filter(function () {
+                    return (
+                        $(this).text() === $('.attribute > .btn').eq(i).text()
+                    )
+                })
+                .remove()
         }
     }
 
@@ -340,20 +381,29 @@ function autoComplete() {
         hairLengths = [],
         hairStyles = [],
         attributes = []
-    for (let i = 0, $this = $('.breast'); i < $this.length; i++) breasts.push($this.eq(i).text())
-    for (let i = 0, $this = $('.eyecolor'); i < $this.length; i++) eyeColors.push($this.eq(i).text())
-    for (let i = 0, $this = $('.haircolor'); i < $this.length; i++) hairColors.push($this.eq(i).text())
-    for (let i = 0, $this = $('.hairstyle'); i < $this.length; i++) hairStyles.push($this.eq(i).text())
-    for (let i = 0, $this = $('#attributes > .attribute'); i < $this.length; i++) attributes.push($this.eq(i).text())
+    for (let i = 0, $this = $('.breast'); i < $this.length; i++)
+        breasts.push($this.eq(i).text())
+    for (let i = 0, $this = $('.eyecolor'); i < $this.length; i++)
+        eyeColors.push($this.eq(i).text())
+    for (let i = 0, $this = $('.haircolor'); i < $this.length; i++)
+        hairColors.push($this.eq(i).text())
+    for (let i = 0, $this = $('.hairstyle'); i < $this.length; i++)
+        hairStyles.push($this.eq(i).text())
+    for (
+        let i = 0, $this = $('#attributes > .attribute');
+        i < $this.length;
+        i++
+    )
+        attributes.push($this.eq(i).text())
 
     //changeOrder(['Elf', 'Angel'], attributes)
 
-    $('input[name="breast"]').autocomplete({source: [breasts]})
-    $('input[name="eyecolor"]').autocomplete({source: [eyeColors]})
-    $('input[name="haircolor"]').autocomplete({source: [hairColors]})
-    $('input[name="hairlength"]').autocomplete({source: [hairLengths]})
-    $('input[name="hairstyle"]').autocomplete({source: [hairStyles]})
-    $('input[name="attribute"]').autocomplete({source: [attributes]})
+    $('input[name="breast"]').autocomplete({ source: [breasts] })
+    $('input[name="eyecolor"]').autocomplete({ source: [eyeColors] })
+    $('input[name="haircolor"]').autocomplete({ source: [hairColors] })
+    $('input[name="hairlength"]').autocomplete({ source: [hairLengths] })
+    $('input[name="hairstyle"]').autocomplete({ source: [hairStyles] })
+    $('input[name="attribute"]').autocomplete({ source: [attributes] })
 }
 
 function setFocus() {
@@ -366,7 +416,10 @@ function setFocus() {
                 break
             }
         } else if (value !== '') {
-            $this.eq(i + 1).find('input')[0].focus()
+            $this
+                .eq(i + 1)
+                .find('input')[0]
+                .focus()
             break
         } else if (i === 0) {
             $this.eq(i).find('input')[0].focus()
@@ -390,14 +443,16 @@ function goToAndPlay(index, time = startTime) {
     if (!isPlaying(index)) video[index].play()
 }
 
-
 function videoHover() {
     let thumbnail = undefined
     for (let i = 0; i < video.length; i++) {
         let $this = $(video[i])
 
         $this.currentTime = startTime
-        $this.hover(() => startThumbnailPlayback(i), () => stopThumbnailPlayback(i))
+        $this.hover(
+            () => startThumbnailPlayback(i),
+            () => stopThumbnailPlayback(i)
+        )
     }
 
     function startThumbnailPlayback(index) {
@@ -405,7 +460,7 @@ function videoHover() {
         let offset = 60 // next thumbnail images
         let duration = 1.5
 
-        goToAndPlay(index, time += startTime)
+        goToAndPlay(index, (time += startTime))
         thumbnail = setInterval(function () {
             time += offset
             if (time > video[index].duration) {
@@ -421,4 +476,3 @@ function videoHover() {
         clearInterval(thumbnail)
     }
 }
-

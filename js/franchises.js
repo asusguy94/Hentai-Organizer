@@ -1,9 +1,21 @@
 function renameFranchise(oldName, newName) {
-    ajax('ajax/franchise_renameall.php', 'franchiseOld=' + encodeURIComponent(oldName) + '&franchiseNew=' + encodeURIComponent(newName))
+    ajax(
+        'ajax/franchise_renameall.php',
+        'franchiseOld=' +
+            encodeURIComponent(oldName) +
+            '&franchiseNew=' +
+            encodeURIComponent(newName)
+    )
 }
 
 function renameVideo(oldName, newName) {
-    ajax('ajax/franchise_renamevideoall.php', 'franchiseOld=' + encodeURIComponent(oldName) + '&franchiseNew=' + encodeURIComponent(newName))
+    ajax(
+        'ajax/franchise_renamevideoall.php',
+        'franchiseOld=' +
+            encodeURIComponent(oldName) +
+            '&franchiseNew=' +
+            encodeURIComponent(newName)
+    )
 }
 
 function ajax(page, params) {
@@ -25,37 +37,51 @@ $(function () {
     $.contextMenu({
         selector: '.franchise',
         items: {
-            "rename": {
-                name: "Rename",
-                icon: "edit",
+            rename: {
+                name: 'Rename',
+                icon: 'edit',
                 callback: function (itemKey, options) {
                     let franchiseName_current = options.$trigger.text()
 
-                    $('body').append('<div id="dialog" title="Edit Star"></div>')
+                    $('body').append(
+                        '<div id="dialog" title="Edit Star"></div>'
+                    )
 
                     $(function () {
                         $('#dialog').dialog({
                             close: function () {
                                 $('#dialog').remove()
                             },
-                            width: 250
+                            width: 250,
                         })
 
-                        $('#dialog').append('<input type="text" name="franchise_edit" value="' + franchiseName_current + '" autofocus>')
+                        $('#dialog').append(
+                            '<input type="text" name="franchise_edit" value="' +
+                                franchiseName_current +
+                                '" autofocus>'
+                        )
                         let input = $('input[name="franchise_edit"]')
                         let len = input.val().length
                         input[0].focus()
                         input[0].setSelectionRange(len, len)
 
-                        document.querySelector('input[name="franchise_edit"]').addEventListener('keydown', function (e) {
-                            if (e.keyCode === 13) {
-                                renameFranchise(franchiseName_current, this.value)
-                                renameVideo(franchiseName_current, this.value)
-                            }
-                        })
+                        document
+                            .querySelector('input[name="franchise_edit"]')
+                            .addEventListener('keydown', function (e) {
+                                if (e.keyCode === 13) {
+                                    renameFranchise(
+                                        franchiseName_current,
+                                        this.value
+                                    )
+                                    renameVideo(
+                                        franchiseName_current,
+                                        this.value
+                                    )
+                                }
+                            })
                     })
-                }
-            }
-        }
+                },
+            },
+        },
     })
 })

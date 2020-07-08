@@ -1,35 +1,35 @@
 <?php
-    include('_class.php');
-    
-    $basic = new Basic();
-    $ffmpeg = new FFMPEG();
+include '_class.php';
+
+$basic = new Basic();
+$ffmpeg = new FFMPEG();
 ?>
 
     <!doctype html>
     <html>
         <head>
-            <?php $basic->head() ?>
+            <?php $basic->head()?>
         </head>
 
         <body>
             <nav>
-                <?php $basic->navigation() ?>
+                <?php $basic->navigation()?>
             </nav>
         </body>
     </html>
 
 <?php
-    global $pdo;
-    $query = $pdo->prepare("SELECT * FROM videos");
-    $query->execute();
-    foreach ($query->fetchAll() as $result) {
-        if (!file_exists("images/videos/$result[id].jpg")) { // FULL RES
-            $ffmpeg->generateThumbnail($result['path'], $result['id'], THUMBNAIL_START);
-        }
-        if (!file_exists("images/videos/$result[id]-" . THUMBNAIL_RES . ".jpg")) { // THUMBNAIL RES
-            $ffmpeg->generateThumbnail($result['path'], $result['id'], THUMBNAIL_START, THUMBNAIL_RES);
-        }
+global $pdo;
+$query = $pdo->prepare("SELECT * FROM videos");
+$query->execute();
+foreach ($query->fetchAll() as $result) {
+    if (!file_exists("images/videos/$result[id].jpg")) { // FULL RES
+        $ffmpeg->generateThumbnail($result['path'], $result['id'], THUMBNAIL_START);
     }
-    
-    header('Location: add_videos.php');
+    if (!file_exists("images/videos/$result[id]-" . THUMBNAIL_RES . ".jpg")) { // THUMBNAIL RES
+        $ffmpeg->generateThumbnail($result['path'], $result['id'], THUMBNAIL_START, THUMBNAIL_RES);
+    }
+}
+
+header('Location: add_videos.php');
 ?>

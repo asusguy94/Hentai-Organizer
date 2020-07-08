@@ -1,241 +1,249 @@
-@import "functions";
+@import 'functions';
 
 /* Navigation */
-@import "navigation";
+@import 'navigation';
 
 /* Stars */
 #stars {
-  text-align: center
+    text-align: center;
 }
 
 .star {
-  display: inline-block;
-  margin: 0 5px 10px;
+    display: inline-block;
+    margin: 0 5px 10px;
 
-  border: 3px solid transparent;
+    border: 3px solid transparent;
 
-  .name {
-    display: block;
-    text-align: center;
-  }
+    .name {
+        display: block;
+        text-align: center;
+    }
 }
 
-.star.no-image .image, div.image {
-  background-color: #C4C4C4;
+.star.no-image .image,
+div.image {
+    background-color: #c4c4c4;
 }
 
-.star .image, .star-image {
-  max-height: 275px;
-  max-width: 200px;
+.star .image,
+.star-image {
+    max-height: 275px;
+    max-width: 200px;
 }
 
 .card.star {
-  max-width: 200px;
+    max-width: 200px;
 
-  .card-img-top {
-    max-height: 275px;
-  }
+    .card-img-top {
+        max-height: 275px;
+    }
 }
 
 /* Star */
 #star {
-  & > img,
-  & > #dropbox {
-    width: 200px;
-  }
+    & > img,
+    & > #dropbox {
+        width: 200px;
+    }
 
-  #next {
-    position: absolute;
-    left: 25%;
-    margin-top: 100px;
-  }
+    #next {
+        position: absolute;
+        left: 25%;
+        margin-top: 100px;
+    }
 }
 
 /* Category */
 #categories {
-  margin-bottom: 20px;
+    margin-bottom: 20px;
 
-  .category {
-    display: block;
-    width: 90px;
-  }
+    .category {
+        display: block;
+        width: 90px;
+    }
 }
 
 .video {
-  text-decoration: none !important;
-  color: black;
+    text-decoration: none !important;
+    color: black;
 
-  span {
-    text-align: center;
-  }
-
-  .info, .title {
-    display: block;
-  }
-
-  .divider {
-    &::before, &::after {
-      content: ' ';
+    span {
+        text-align: center;
     }
-  }
 
-  img, video {
-    display: block;
-    width: $thumbnailWidth + px;
-  }
+    .info,
+    .title {
+        display: block;
+    }
+
+    .divider {
+        &::before,
+        &::after {
+            content: ' ';
+        }
+    }
+
+    img,
+    video {
+        display: block;
+        width: $thumbnailWidth + px;
+    }
 }
 
 /* Form */
 form {
-  margin-bottom: 7px
+    margin-bottom: 7px;
 }
 
 label {
-  margin-right: 5px;
+    margin-right: 5px;
 
-  &[for="eyecolor"], &[for="haircolor"] {
-    font-weight: bold
-  }
+    &[for='eyecolor'],
+    &[for='haircolor'] {
+        font-weight: bold;
+    }
 }
 
 /* Dialog */
-@import "dialog";
+@import 'dialog';
 
 /* Dropbox */
-@import "dropbox";
+@import 'dropbox';
 
 /* Ribbon */
-@import "ribbon";
+@import 'ribbon';
 
 /* Other */
-.location, .attribute {
-  display: inline-block;
+.location,
+.attribute {
+    display: inline-block;
 
-  &::before {
-    margin-right: 5px;
-  }
+    &::before {
+        margin-right: 5px;
+    }
 }
 
 h3 {
-  margin-bottom: 0
+    margin-bottom: 0;
 }
 
 .btn {
-  margin: 5px;
-  cursor: default !important;
+    margin: 5px;
+    cursor: default !important;
 }
 
 .active {
-  border-color: black
+    border-color: black;
 }
 
 .selected {
-  border-color: green
+    border-color: green;
 }
 
 .hidden {
-  display: none;
+    display: none;
 }
 
 .inline {
-  display: inline-block;
+    display: inline-block;
 
-  &:nth-of-type(2n) {
-    margin-left: 1%;
-  }
+    &:nth-of-type(2n) {
+        margin-left: 1%;
+    }
 }
 
 small {
-  margin-left: 10px;
+    margin-left: 10px;
 }
 
 input.xdsoft_input {
-  text-transform: capitalize;
+    text-transform: capitalize;
 }
 
 .no-match {
-  display: none;
+    display: none;
 }
 
 .search {
-  display: inline-block;
-  width: 100%;
-  text-align: center;
+    display: inline-block;
+    width: 100%;
+    text-align: center;
 
-  .inner {
-    display: inherit;
-    padding: 2px 4px;
+    .inner {
+        display: inherit;
+        padding: 2px 4px;
 
-    &:not(:empty) {
-      background-color: orange;
+        &:not(:empty) {
+            background-color: orange;
+        }
     }
-  }
 }
 
 .invisible-submit {
-  position: absolute;
-  left: -99999px;
+    position: absolute;
+    left: -99999px;
 }
 
 .symbol {
-  display: none;
-  position: absolute;
-  z-index: 10;
+    display: none;
+    position: absolute;
+    z-index: 10;
 
-  @include center(54%, 50%);
+    @include center(54%, 50%);
 
-  background-color: #858585;
-  border-radius: 30px;
-  padding: 0 10px;
+    background-color: #858585;
+    border-radius: 30px;
+    padding: 0 10px;
 }
 
 .flag {
-  margin-bottom: -7px;
+    margin-bottom: -7px;
 }
 
 [data-badge]:after {
-  content: attr(data-badge);
-  position: absolute;
-  top: 5px;
-  left: 5px;
-  background: green;
-  color: white;
-  text-align: center;
-  border-radius: 50%;
-  box-shadow: 0 0 1px #333;
+    content: attr(data-badge);
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    background: green;
+    color: white;
+    text-align: center;
+    border-radius: 50%;
+    box-shadow: 0 0 1px #333;
 }
 
 [data-badge] {
-  &.badge-x:after {
-    @include circle(23px)
-  }
+    &.badge-x:after {
+        @include circle(23px);
+    }
 
-  &.badge-xx:after {
-    @include circle(23px, 30px)
-  }
+    &.badge-xx:after {
+        @include circle(23px, 30px);
+    }
 
-  &.badge-xxx:after {
-    @include circle(23px, 37px)
-  }
+    &.badge-xxx:after {
+        @include circle(23px, 37px);
+    }
 }
 
 /* Video Count */
 @for $i from 1 through 6 {
-  h#{$i} .count {
-    color: green;
-  }
+    h#{$i} .count {
+        color: green;
+    }
 }
 
-.unselectable, .input-wrapper > label {
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
+.unselectable,
+.input-wrapper > label {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 #addVideos {
-  input[type="text"] {
-    min-width: 100%;
-    padding-right: 6px;
-  }
+    input[type='text'] {
+        min-width: 100%;
+        padding-right: 6px;
+    }
 }

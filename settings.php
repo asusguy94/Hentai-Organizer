@@ -1,17 +1,17 @@
 <?php
-    include('_class.php');
-    $basic = new Basic();
+include '_class.php';
+$basic = new Basic();
 ?>
 
 <!doctype html>
 <html>
     <head>
-        <?php $basic->head('Settings', ['bootstrap'], ['jquery', 'bootstrap']) ?>
+        <?php $basic->head('Settings', ['bootstrap'], ['jquery', 'bootstrap'])?>
     </head>
 
     <body>
         <nav>
-            <?php $basic->navigation() ?>
+            <?php $basic->navigation()?>
         </nav>
 
         <main class="container">
@@ -132,7 +132,7 @@
                             <label for="thumbnail-res" class="col-form-label col-2">Height</label>
                             <div><input type="number" class="form-control col-4" id="thumbnail-res" name="thumbnail_res"
                                         min="0"
-                                        value="<?= THUMBNAIL_RES ?>"></div>
+                                        value="<?=THUMBNAIL_RES?>"></div>
                         </div>
 
                         <!-- Thumbnail START -->
@@ -141,7 +141,7 @@
                             <label for="thumbnail-start" class="col-form-label col-2">Start</label>
                             <div><input type="number" class="form-control col-4" id="thumbnail-start"
                                         name="thumbnail_start" min="0"
-                                        value="<?= THUMBNAIL_START ?>"></div>
+                                        value="<?=THUMBNAIL_START?>"></div>
                         </div>
 
                         <h4>CDN</h4>
@@ -151,35 +151,10 @@
                             <label for="cdn-max" class="col-form-label col-2">CDN Limit</label>
                             <div><input type="number" class="form-control col-8" id="cdn-max" name="cdn_max" min="0"
                                         max="5"
-                                        value="<?= CDN_MAX ?>"></div>
+                                        value="<?=CDN_MAX?>"></div>
                         </div>
 
                         <button type="submit" class="btn btn-primary" name="submit">Save</button>
-                        
-                        <?php
-                            
-                            if (isset($_POST['submit'])) {
-                                $names = [
-                                    'enable_https', 'cdn', 'enable_fa', 'enable_webm', 'enable_mkv',
-                                    'enable_dash', 'enable_hls', 'thumbnail_res', 'thumbnail_start', 'cdn_max',
-                                ];
-                                $values = array_map(function ($item) {
-                                    $val = $_POST[$item];
-                                    
-                                    if (empty($val) || $val == 'off') {
-                                        return 0;
-                                    } else if ($val == 'on') {
-                                        return 1;
-                                    } else {
-                                        return $val;
-                                    }
-                                }, $names);
-                                
-                                Settings::setSettings($names, $values);
-                                Basic::reload();
-                            }
-                        
-                        ?>
                     </form>
                 </section>
             </div>
@@ -188,3 +163,26 @@
 </html>
 
 <script>$('[data-toggle="tooltip"]').tooltip()</script>
+
+<?php
+if (isset($_POST['submit'])) {
+    $names = [
+        'enable_https', 'cdn', 'enable_fa', 'enable_webm', 'enable_mkv',
+        'enable_dash', 'enable_hls', 'thumbnail_res', 'thumbnail_start', 'cdn_max',
+    ];
+    $values = array_map(function ($item) {
+        $val = $_POST[$item];
+
+        if (empty($val) || $val == 'off') {
+            return 0;
+        } else if ($val == 'on') {
+            return 1;
+        } else {
+            return $val;
+        }
+    }, $names);
+
+    Settings::setSettings($names, $values);
+    Basic::reload();
+}
+?>

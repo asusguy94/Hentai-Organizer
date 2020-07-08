@@ -19,19 +19,18 @@ $('select.pretty').prettyDropdown({
         return result.json()
     }).then(function (data) {
         let wrapper = document.getElementById('stars')
-        let elem = data['stars']
 
-        for (let i = 0; i < elem.length; i++) {
-            let starID = elem[i]['starID']
-            let starName = elem[i]['starName']
-            let starImg = elem[i]['starImg']
-            let breastSize = elem[i]['breast']
-            let eyeColor = elem[i]['eye']
-            let hairColor = elem[i]['hair']
-            let hairStyle = elem[i]['hairstyle']
-            let franchise = elem[i]['franchise']
+        data['stars'].forEach(elem => {
+            let starID = elem['starID']
+            let starName = elem['starName']
+            let starImg = elem['starImg']
+            let breastSize = elem['breast']
+            let eyeColor = elem['eye']
+            let hairColor = elem['hair']
+            let hairStyle = elem['hairstyle']
+            let franchise = elem['franchise']
 
-            let attribute = elem[i]['attribute']
+            let attribute = elem['attribute']
             if (!attribute.length) attribute = ["0"]
 
             let a = document.createElement('a')
@@ -58,124 +57,119 @@ $('select.pretty').prettyDropdown({
             a.appendChild(img)
             a.appendChild(span)
             wrapper.appendChild(a)
-        }
+        })
     }).then(function () {
         window.stars = document.getElementsByClassName('star')
-        window.starLength = stars.length
-
         window.$stars = $(stars)
     }).then(function () {
         /* Breast Radio Buttons */
-        for (let i = 0, wrapperLen = breast_radio.length; i < wrapperLen; i++) {
-            breast_radio[i].addEventListener('change', function () {
-                $stars.removeClass('hidden-breast')
-                let selectedBreast = $('#breasts label').eq(i).text()
+        breast_radio.forEach(radio => {
+            radio.addEventListener('change', e => {
+                let target = e.target
 
-                for (let j = 0; j < starLength; j++) {
-                    let breast = stars[j].getAttribute('data-breast')
-                    if (breast !== selectedBreast) {
-                        stars[j].classList.add('hidden-breast')
-                    }
+                $stars.removeClass('hidden-breast')
+                let selectedHair = target.id.split('breast_')[1]
+
+                for (const star of stars) {
+                    let hairStyle = star.getAttribute('data-breast')
+                    if (hairStyle !== selectedHair) star.classList.add('hidden-breast')
                 }
             })
 
-            breast_radio[i].oncontextmenu = function () {
+            radio.oncontextmenu = () => {
                 $stars.removeClass('hidden-breast')
-                for (let j = 0; j < wrapperLen; j++) {
-                    breast_radio[j].checked = false
-                }
+                radio.checked = false
+
                 return false
             }
-        }
+        })
 
         /* Eye Radio Buttons */
-        for (let i = 0, wrapperLen = eye_radio.length; i < wrapperLen; i++) {
-            eye_radio[i].addEventListener('change', function () {
-                $stars.removeClass('hidden-eye')
-                let selectedEye = $('#eye label').eq(i).text()
+        eye_radio.forEach(radio => {
+            radio.addEventListener('change', e => {
+                let target = e.target
 
-                for (let j = 0; j < starLength; j++) {
-                    let hair = stars[j].getAttribute('data-eye')
-                    if (hair !== selectedEye) {
-                        stars[j].classList.add('hidden-eye')
-                    }
+                $stars.removeClass('hidden-eye')
+                let selectedHair = target.id.split('eye_')[1]
+
+                for (const star of stars) {
+                    let hairStyle = star.getAttribute('data-eye')
+                    if (hairStyle !== selectedHair) star.classList.add('hidden-eye')
                 }
             })
 
-            eye_radio[i].oncontextmenu = function () {
+            radio.oncontextmenu = () => {
                 $stars.removeClass('hidden-eye')
-                for (let j = 0; j < wrapperLen; j++) {
-                    eye_radio[j].checked = false
-                }
+                radio.checked = false
+
                 return false
             }
-        }
+        })
 
         /* Hair Radio Buttons */
-        for (let i = 0, wrapperLen = hair_radio.length; i < wrapperLen; i++) {
-            hair_radio[i].addEventListener('change', function () {
-                $stars.removeClass('hidden-hair')
-                let selectedHair = $('#hair label').eq(i).text()
+        hair_radio.forEach(radio => {
+            radio.addEventListener('change', e => {
+                let target = e.target
 
-                for (let j = 0; j < starLength; j++) {
-                    let hair = stars[j].getAttribute('data-hair')
-                    if (hair !== selectedHair) {
-                        stars[j].classList.add('hidden-hair')
-                    }
+                $stars.removeClass('hidden-hair')
+                let selectedHair = target.id.split('hair_')[1]
+
+                for (const star of stars) {
+                    let hairStyle = star.getAttribute('data-hair')
+                    if (hairStyle !== selectedHair) star.classList.add('hidden-hair')
                 }
             })
 
-            hair_radio[i].oncontextmenu = function () {
+            radio.oncontextmenu = () => {
                 $stars.removeClass('hidden-hair')
-                for (let j = 0; j < wrapperLen; j++) {
-                    hair_radio[j].checked = false
-                }
+                radio.checked = false
+
                 return false
             }
-        }
+        })
 
         /* HairStyle Radio Buttons */
-        for (let i = 0, wrapperLen = hairstyle_radio.length; i < wrapperLen; i++) {
-            hairstyle_radio[i].addEventListener('change', function () {
-                $stars.removeClass('hidden-hairstyle')
-                let selectedHair = $('#hairstyle label').eq(i).text()
+        hairstyle_radio.forEach(radio => {
+            radio.addEventListener('change', e => {
+                let target = e.target
 
-                for (let j = 0; j < starLength; j++) {
-                    let hairStyle = stars[j].getAttribute('data-hairstyle')
-                    if (hairStyle !== selectedHair) {
-                        stars[j].classList.add('hidden-hairstyle')
-                    }
+                $stars.removeClass('hidden-hairstyle')
+                let selectedHair = target.id.split('hairstyle_')[1]
+
+                for (const star of stars) {
+                    let hairStyle = star.getAttribute('data-hairstyle')
+                    if (hairStyle !== selectedHair) star.classList.add('hidden-hairstyle')
                 }
             })
 
-            hairstyle_radio[i].oncontextmenu = function () {
+            radio.oncontextmenu = () => {
                 $stars.removeClass('hidden-hairstyle')
-                for (let j = 0; j < wrapperLen; j++) {
-                    hairstyle_radio[j].checked = false
-                }
+                radio.checked = false
+
                 return false
             }
-        }
+        })
 
         /* Attribute Check Boxes */
-        for (let i = 0, wrapperLen = attribute_checkbox.length; i < wrapperLen; i++) {
-            attribute_checkbox[i].addEventListener('change', function () {
-                indeterminateToggle(attribute_checkbox[i])
+        attribute_checkbox.forEach(checkbox => {
+            checkbox.addEventListener('change', e => {
+                let target = e.target
 
-                let attribute = this.name.split('attribute_').pop()
+                indeterminateToggle(target)
+
+                let attribute = target.name.split('attribute_').pop()
                 let attribute_class = attribute.replace(/ /g, '-')
 
-                for (let j = 0; j < starLength; j++) {
-                    let attribute_arr = stars[j].getAttribute('data-attribute-name').slice(2, -2).split(',')
-
-                    indeterminateHandler(attribute_arr, attribute, this, j)
-                }
+                Array.from(stars).forEach((star, index) => {
+                    let attribute_arr = star.getAttribute('data-attribute-name').slice(2, -2).split(',')
+                    indeterminateHandler(attribute_arr, attribute, target, index)
+                })
 
                 $stars.removeClass(`hidden-attribute-${attribute_class}`)
-                if (this.checked || this.indeterminate) $stars.not('[data-tmp]').addClass(`hidden-attribute-${attribute_class}`)
+                if (target.checked || target.indeterminate) $stars.not('[data-tmp]').addClass(`hidden-attribute-${attribute_class}`)
                 $stars.removeAttr('data-tmp')
             })
-        }
+        })
     }).then(function () {
         new LazyLoad({
             elements_selector: ".lazy",
@@ -221,10 +215,11 @@ function indeterminateToggle(el) {
 }
 
 function indeterminateHandler(arr, item, parent, index) {
-    for (let k = 0, len = arr.length; k < len; k++) {
-        if ((parent.checked && (arr[k] === item)) || (parent.indeterminate && arr[k].indexOf(item) === -1)) {
-            tmp(index)
-            break
-        }
+    if (parent.checked) {
+        arr.forEach(element => {
+            if (element === item) tmp(index)
+        })
+    } else if (parent.indeterminate && !arr.includes(item)) {
+        tmp(index)
     }
 }

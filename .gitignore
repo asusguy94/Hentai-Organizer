@@ -1,7 +1,11 @@
+# Node Modules
 node_modules
+
+# Compiled Files 
 *.min.*
-package-lock.json
-test.*
-*.lock
+
+# Log Files
 *.log
-.idea
+
+# Development Testing
+*.test

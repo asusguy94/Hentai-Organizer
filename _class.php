@@ -29,7 +29,6 @@
     define('enableHTTPS', $opt['enable_https']);
     
     define('BOOKMARK_FIX_OFFSET', 6);
-    define('BOOTSTRAP', true);
     
     /* Initialize Header */
     ob_start();
@@ -46,7 +45,7 @@
         
         function meta()
         {
-            if (BOOTSTRAP) print '<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">';
+            print '<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">';
         }
         
         function title($data)
@@ -70,24 +69,17 @@
                         print '<link rel="stylesheet" href="node_modules/jquery-autocomplete/jquery.autocomplete.css">';
                     } else if ($data[$i] === 'plyr') {
                         print "<link rel='stylesheet' href='node_modules/plyr/dist/plyr.css'>";
-                    } else if ($data[$i] === 'bootstrap' && BOOTSTRAP) {
+                    } else if ($data[$i] === 'bootstrap') {
                         print "<link rel='stylesheet' href='node_modules/bootstrap/dist/css/bootstrap.min.css'>";
                         print '<link rel="stylesheet" href="node_modules/bootstrap-switch-button/css/bootstrap-switch-button.min.css">';
                     } else if ($data[$i] === 'fa') {
-                        print "<link rel='stylesheet' href='/node_modules/@fortawesome/fontawesome-free/css/all.min.css'>";
+                        print "<link rel='stylesheet' href='node_modules/@fortawesome/fontawesome-free/css/all.min.css'>";
                     } else if ($data[$i] === 'prettydropdown') {
-                        print '<link rel="stylesheet" href="/node_modules/pretty-dropdowns/dist/css/prettydropdowns.css">';
-                    } else if ($data[$i] === '') {
-                        continue;
+                        print '<link rel="stylesheet" href="node_modules/pretty-dropdowns/dist/css/prettydropdowns.css">';
                     } else {
                         print sprintf("<link rel='stylesheet' href='css/$data[$i].min.css?v=%s'>", md5_file("css/$data[$i].min.css"));
                     }
                 }
-            } else if ($data !== '') {
-                if (file_exists("css/$data.min.css"))
-                    print sprintf("<link rel='stylesheet' href='css/$data.min.css%s'>", md5_file("css/$data.min.css"));
-                else
-                    print sprintf("<link rel='stylesheet' href='css/$data.css%s'>", md5_file("css/$data.css"));
             }
         }
         
@@ -98,7 +90,7 @@
                     if ($data[$i] !== '') {
                         if ($data[$i] == 'jquery') {
                             print '<script src="node_modules/jquery/dist/jquery.min.js"></script>';
-                        } else if ($data[$i] == 'bootstrap' && BOOTSTRAP) {
+                        } else if ($data[$i] == 'bootstrap') {
                             print "<script src='node_modules/bootstrap/dist/js/bootstrap.bundle.min.js'></script>";
                             print "<script src='node_modules/bootstrap-switch-button/dist/bootstrap-switch-button.min.js'></script>";
                         } else if ($data[$i] == 'contextmenu') {
@@ -120,18 +112,10 @@
                         } else if ($data[$i] == 'dash') {
                             print '<script src="node_modules/dashjs/dist/dash.all.min.js"></script>';
                         } else {
-                            if (file_exists("js/$data[$i].min.js"))
-                                print sprintf("<script src='js/$data[$i].min.js?v=%s' defer></script>", md5_file("js/$data[$i].min.js"));
-                            else
-                                print sprintf("<script src='js/$data[$i].js?v=%s' defer></script>", md5_file("js/$data[$i].js"));
+                            print sprintf("<script src='js/$data[$i].min.js?v=%s' defer></script>", md5_file("js/$data[$i].min.js"));
                         }
                     }
                 }
-            } else if ($data !== '') {
-                if (file_exists("js/$data.min.js"))
-                    print sprintf("<script src='js/$data.min.js?v=%s' defer></script>", md5_file("js/$data.min.js"));
-                else
-                    print sprintf("<script src='js/$data.js?v=%s' defer></script>", md5_file("js/$data.js"));
             }
         }
         
@@ -489,7 +473,7 @@
         {
             global $pdo;
             $query = $pdo->prepare("SELECT name FROM stars WHERE id = :starID LIMIT 1");
-            $query->bindParam(':starID', $id);
+            $query->bindParam('starID', $id);
             $query->execute();
             return $query->fetch()['name'];
         }
@@ -507,7 +491,7 @@
                 } else {
                     $query = $pdo->prepare($this->sql());
                 }
-                $query->bindParam(':starID', $id);
+                $query->bindParam('starID', $id);
                 $query->execute();
                 
                 $i = 0;
@@ -609,7 +593,7 @@
                 print '</div>'; // #hairstyles
                 print '</form>';
                 
-                print '<form method="post">';
+                print '<form method="post" style="display: inline-block" class="mr-1">';
                 print '<label for="attribute">Attribute</label>';
                 print '<input type="text" name="attribute">';
                 print '<div id="attributes" class="hidden">';
@@ -643,7 +627,7 @@
 											    JOIN stars ON starrelations.otherstarID = stars.id
 											WHERE starID = :starID
 										");
-            $query->bindParam(':starID', $id);
+            $query->bindParam('starID', $id);
             $query->execute();
             
             foreach ($query->fetchAll() as $relation) {
@@ -662,8 +646,8 @@
         {
             global $pdo;
             $query = $pdo->prepare("SELECT * from starrelations WHERE (starID = :starID AND otherstarID = :otherID) LIMIT 1");
-            $query->bindParam(':starID', $starID);
-            $query->bindParam(':otherID', $otherID);
+            $query->bindParam('starID', $starID);
+            $query->bindParam('otherID', $otherID);
             $query->execute();
             
             return $query->rowCount();
@@ -678,7 +662,7 @@
 											    JOIN stars ON starrelations.otherstarID = stars.id
 											WHERE otherstarID = :starID
 										");
-            $query->bindParam(':starID', $id);
+            $query->bindParam('starID', $id);
             $query->execute();
             
             foreach ($query->fetchAll() as $relation) {
@@ -778,9 +762,8 @@
             $query->bindValue(1, $starID);
             $query->execute();
             if ($query->rowCount()) {
-                print '<h3>Attributes</h3>';
                 foreach ($query->fetchAll() as $data) {
-                    print "<p class='attribute' data-attribute-id='$data[attributeID]'><span class='btn btn-outline-primary btn-sm'>$data[name]</span></p>";
+                    print "<span class='attribute' data-attribute-id='$data[attributeID]'><span class='btn btn-outline-primary btn-sm'>$data[name]</span></span>";
                 }
             }
         }
@@ -883,7 +866,7 @@
     class Video
     {
         public $noStar;
-        public $sqlMethod = '';
+        public $sqlMethod = '!bookmark';
         public $videoDuration;
         
         function sql($override = 0)
@@ -925,7 +908,7 @@
             
             global $pdo;
             $query = $pdo->prepare("{$this->sql()} ORDER BY franchise, episode");
-            $query->bindParam(':videoID', $id);
+            $query->bindParam('videoID', $id);
             $query->execute();
             if ($query->rowCount()) {
                 $count = 0;
@@ -956,7 +939,7 @@
             
             if ($this->sqlMethod === 'all') $query = $pdo->prepare("{$this->sql()} ORDER BY franchise, episode");
             else $query = $pdo->prepare("{$this->sql()} OR videos.id = :videoID ORDER BY franchise, episode");
-            $query->bindParam(':videoID', $id);
+            $query->bindParam('videoID', $id);
             $query->execute();
             
             $idFound = false;
@@ -977,7 +960,7 @@
         {
             global $pdo;
             $query = $pdo->prepare("SELECT name FROM videos WHERE id = :videoID");
-            $query->bindParam(':videoID', $id);
+            $query->bindParam('videoID', $id);
             $query->execute();
             return $query->fetch()['name'];
         }
@@ -1077,7 +1060,7 @@
         {
             global $pdo;
             $query = $pdo->prepare("SELECT COUNT(videoID) AS total FROM plays WHERE videoID = :videoID GROUP BY videoID LIMIT 1");
-            $query->bindParam(':videoID', $videoID);
+            $query->bindParam('videoID', $videoID);
             $query->execute();
             
             return $query->fetch()['total'];
@@ -1234,7 +1217,7 @@
                                                                 JOIN attributes ON starattributes.attributeID = attributes.id
                                                             WHERE starID = :starID ORDER BY name
                                                         ");
-                        $query->bindParam(':starID', $starID);
+                        $query->bindParam('starID', $starID);
                         $query->execute();
                         foreach ($query->fetchAll() as $attribute) {
                             print "<div class='btn btn-outline-primary btn-sm no-hover' data-attribute-id='$attribute[id]'>$attribute[name]</div>";
@@ -1248,7 +1231,7 @@
                                                         WHERE bookmarkID = :bookmarkID
                                                         ORDER BY name
                                                     ");
-                    $query->bindParam(':bookmarkID', $data['id']);
+                    $query->bindParam('bookmarkID', $data['id']);
                     $query->execute();
                     foreach ($query->fetchAll() as $attribute) {
                         print "<div class='btn btn-outline-primary btn-sm no-hover' data-attribute-id='$attribute[id]'>$attribute[name]</div>";
@@ -1446,7 +1429,7 @@
             else $query = $pdo->prepare($sql_star);
             
             
-            $query->bindParam(':videoID', $id);
+            $query->bindParam('videoID', $id);
             $query->execute();
             if ($query->rowCount()) {
                 print '<div id="video-attributes">';

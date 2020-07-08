@@ -7,14 +7,14 @@
 <!doctype html>
 <html>
     <head>
-        <?php $basic->head('Hentai', array('', 'bootstrap')) ?>
+        <?php $basic->head('Hentai', ['bootstrap']) ?>
     </head>
 
     <body>
         <nav><?php $basic->navigation() ?></nav>
         <main class="container-fluid">
             <section class="row">
-                <?php $home->count = 10 ?>
+                <?php $home->count = 0 ?>
                 <?php if ($home->count) { ?>
                     <div class="col-12">
                         <h2>Recent Added (<span class="count"><?= $home->count ?></span>)</h2>
@@ -22,7 +22,7 @@
                     </div>
                 <?php } ?>
                 
-                <?php $home->count = 5 ?>
+                <?php $home->count = 0 ?>
                 <?php if ($home->count) { ?>
                     <div class="col-12">
                         <h2>Recent Updated (<span class="count"><?= $home->count ?></span>)</h2>

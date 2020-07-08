@@ -7,7 +7,7 @@ $videos = new Video();
 <!doctype html>
 <html>
     <head>
-		<?php $basic->head('', array('', 'bootstrap')) ?>
+		<?php $basic->head('', ['bootstrap']) ?>
     </head>
 
     <body>

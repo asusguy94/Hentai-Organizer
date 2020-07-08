@@ -7,7 +7,7 @@ $stars = new Star();
 <!doctype html>
 <html>
 <head>
-	<?php $basic->head('', array('', 'jqueryui', 'contextmenu'), array('jquery', 'jqueryui', 'contextmenu', 'stars')) ?>
+	<?php $basic->head('', ['jqueryui', 'contextmenu'], ['jquery', 'jqueryui', 'contextmenu', 'stars']) ?>
 </head>
 
 <body>
@@ -29,7 +29,7 @@ $stars = new Star();
 					if (!$stars->addStar($star)) {
 						echo 'Could not add star!';
 					}else{
-					    print '<script>window.location.href = window.location.href</script>';
+					    print '<script>window.location.href = `${window.location.href}`</script>';
                     }
 				}
 			}

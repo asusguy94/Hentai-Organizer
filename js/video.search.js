@@ -16,8 +16,6 @@ const updateBtn = document.getElementById('update')
 // Initialize PrevState for checkbox
 $(category_checkbox).attr('data-state', 0)
 $(attribute_checkbox).attr('data-state', 0)
-// TODO use jQuery.data() instead of JS.setAttribute()/JQuery.attr()
-// TODO checkbox style: https://stackoverflow.com/questions/10270987/change-checkbox-check-image-to-custom-image
 
 const loadData = function () {
     fetch('json/video.search.php').then(function (jsonData) {
@@ -28,28 +26,28 @@ const loadData = function () {
         const row = document.createElement('div')
         row.classList.add('row', 'justify-content-center')
 
-        for (let i = 0, elem = data['videos']; i < elem.length; i++) {
-            let thumbnail = elem[i]['thumbnail']
+        data['videos'].forEach(elem => {
+            let thumbnail = elem['thumbnail']
 
-            let videoID = elem[i]['videoID']
-            let videoName = elem[i]['videoName']
-            let noStar = elem[i]['noStar']
-            let cen = elem[i]['cen']
-            let quality = elem[i]['quality']
-            let franchise = elem[i]['franchise']
+            let videoID = elem['videoID']
+            let videoName = elem['videoName']
+            let noStar = elem['noStar']
+            let cen = elem['cen']
+            let quality = elem['quality']
+            let franchise = elem['franchise']
 
-            let date_published = elem[i]['datePublished']
-            let plays = elem[i]['plays']
+            let date_published = elem['datePublished']
+            let plays = elem['plays']
 
-            let attribute = elem[i]['attribute']
-            let category = elem[i]['category']
-            let alias = elem[i]['alias']
+            let attribute = elem['attribute']
+            let category = elem['category']
+            let alias = elem['alias']
 
             if (!category.length) category.push('0')
             if (!attribute.length) attribute.push('0')
             if (!alias.length) alias.push('0')
 
-            let existing = elem[i]['existing']
+            let existing = elem['existing']
 
             let a = document.createElement('a')
             a.classList.add('video', 'card', 'ribbon-container')
@@ -85,17 +83,17 @@ const loadData = function () {
             a.appendChild(ribbon)
 
             row.appendChild(a)
-        }
+        })
         wrapper.appendChild(row)
     }).then(function () {
         loader.remove()
 
-        window.video = document.getElementsByClassName('video')
-        window.videoLength = video.length
+        window.videos = document.getElementsByClassName('video')
+        window.$videos = $(videos)
 
-        window.$video = $(video)
+        window.elementFocus = document.activeElement
     }).then(function () {
-        setVideoCount(videoLength) // TODO StarCount-checkbox is incompatible with this -> change StarCount-checkbox
+        setVideoCount(videos.length)
 
         // Class Change
         const observer = new MutationObserver(function (mutations) {
@@ -105,11 +103,11 @@ const loadData = function () {
                 }
             })
         })
-        observer.observe($video[0], {attributes: true})
+        observer.observe($videos[0], {attributes: true})
     }).then(function () {
         /** Filter **/
-        cen_checkbox.forEach(item => {
-            item.addEventListener('click', function () {
+        cen_checkbox.forEach(checkbox => {
+            checkbox.addEventListener('click', function () {
                 $(cen_checkbox).parent().removeClass('active')
                 this.parentNode.classList.add('active')
 
@@ -125,8 +123,8 @@ const loadData = function () {
             })
         })
 
-        quality_checkbox.forEach(item => {
-            item.addEventListener('click', function () {
+        quality_checkbox.forEach(checkbox => {
+            checkbox.addEventListener('click', function () {
                 $(quality_checkbox).parent().removeClass('active')
                 this.parentNode.classList.add('active')
 
@@ -165,73 +163,79 @@ const loadData = function () {
 
         function titleSearch() {
             let input = title_input.value.toLowerCase()
-            $video.removeClass('hidden-title')
+            $videos.removeClass('hidden-title')
 
-            $video.not(function () {
-                return ((this.getAttribute('data-title').toLowerCase().indexOf(input) > -1) || (this.getAttribute('data-alias').toLowerCase().indexOf(input) > -1))
+            $videos.not(function () {
+                return ((this.getAttribute('data-title').toLowerCase().includes(input)) || (this.getAttribute('data-alias').toLowerCase().includes(input)))
             }).addClass('hidden-title')
         }
 
         /* Existing */
         existing_checkbox.addEventListener('change', function () {
-            $video.removeClass('hidden-existing')
+            $videos.removeClass('hidden-existing')
 
             if (this.checked) {
-                for (let i = 0; i < videoLength; i++) {
-                    if (video[i].getAttribute('data-existing') === '0') {
-                        video[i].classList.add('hidden-existing')
+                for (const video of videos) {
+                    if (video.getAttribute('data-existing') === '0') {
+                        video.classList.add('hidden-existing')
                     }
                 }
             }
         })
 
         /* Category */
-        for (let i = 0, wrapperLen = category_checkbox.length; i < wrapperLen; i++) {
-            category_checkbox[i].addEventListener('change', function () {
-                indeterminateToggle(category_checkbox[i])
+        category_checkbox.forEach(checkbox => {
+            checkbox.addEventListener('change', e => {
+                let target = e.target
 
-                let category = this.name.split('category_').pop()
+                indeterminateToggle(checkbox)
+
+                let category = target.name.split('category_').pop()
                 let category_class = category.replace(/ /g, '-')
 
-                for (let j = 0; j < videoLength; j++) {
-                    let category_arr = video[j].getAttribute('data-category-name').slice(2, -2).split(',')
+                Array.from(videos).forEach((video, index) => {
+                    let category_arr = video.getAttribute('data-category-name').slice(2, -2).split(',')
 
-                    indeterminateHandler(category_arr, category, this, j, true)
-                }
+                    indeterminateHandler(category_arr, category, target, index, true)
+                })
 
-                $video.removeClass(`hidden-category-${category_class}`)
-                if (this.checked || this.indeterminate) $video.not('[data-tmp]').addClass(`hidden-category-${category_class}`)
-                $video.removeAttr('data-tmp')
+                $videos.removeClass(`hidden-category-${category_class}`)
+                if (target.checked || target.indeterminate) $videos.not('[data-tmp]').addClass(`hidden-category-${category_class}`)
+                $videos.removeAttr('data-tmp')
             })
-        }
+        })
 
         /* Attributes */
-        for (let i = 0, wrapperLen = attribute_checkbox.length; i < wrapperLen; i++) {
-            attribute_checkbox[i].addEventListener('change', function () {
-                indeterminateToggle(attribute_checkbox[i])
+        attribute_checkbox.forEach(checkbox => {
+            checkbox.addEventListener('change', e => {
+                let target = e.target
 
-                let attribute = this.name.split('attribute_').pop()
+                indeterminateToggle(checkbox)
+
+                let attribute = target.name.split('attribute_').pop()
                 let attribute_class = attribute.replace(/ /g, '-')
 
-                for (let j = 0; j < videoLength; j++) {
-                    let attribute_arr = video[j].getAttribute('data-attribute-name').slice(2, -2).split(',')
+                Array.from(videos).forEach((video, index) => {
+                    let attribute_arr = video.getAttribute('data-attribute-name').slice(2, -2).split(',')
 
-                    indeterminateHandler(attribute_arr, attribute, this, j)
-                }
+                    indeterminateHandler(attribute_arr, attribute, target, index)
+                })
 
-                $video.removeClass(`hidden-attribute-${attribute_class}`)
-                if (this.checked || this.indeterminate) $video.not('[data-tmp]').addClass(`hidden-attribute-${attribute_class}`)
-                $video.removeAttr('data-tmp')
+                $videos.removeClass(`hidden-attribute-${attribute_class}`)
+                if (target.checked || target.indeterminate) $videos.not('[data-tmp]').addClass(`hidden-attribute-${attribute_class}`)
+                $videos.removeAttr('data-tmp')
             })
-        }
+        })
 
         /** Sort **/
-        for (let i = 0; i < sort_radio.length; i++) {
-            sort_radio[i].addEventListener('change', function () {
-                $(sort_radio).parent().removeClass('selected')
-                sort_radio[i].parentElement.classList.add('selected')
+        sort_radio.forEach(radio => {
+            radio.addEventListener('change', function (e) {
+                let target = e.target
 
-                let label = this.id
+                $(sort_radio).parent().removeClass('selected')
+                radio.parentElement.classList.add('selected')
+
+                let label = target.id
 
                 let alphabetically = function (a, b) {
                     return a.querySelector('span').innerHTML.toLowerCase().localeCompare(b.querySelector('span').innerHTML.toLowerCase(), 'en')
@@ -273,38 +277,40 @@ const loadData = function () {
 
                 switch (label) {
                     case 'alphabetically':
-                        $video.sort(alphabetically)
+                        $videos.sort(alphabetically)
                         break
                     case 'alphabetically_desc':
-                        $video.sort(alphabetically_reverse)
+                        $videos.sort(alphabetically_reverse)
                         break
                     case 'added':
-                        $video.sort(added)
+                        $videos.sort(added)
                         break
                     case 'added_desc':
-                        $video.sort(added_reverse)
+                        $videos.sort(added_reverse)
                         break
                     case 'date':
-                        $video.sort(video_date)
+                        $videos.sort(video_date)
                         break
                     case 'date_desc':
-                        $video.sort(video_date_reverse)
+                        $videos.sort(video_date_reverse)
                         break
                     case 'plays':
-                        $video.sort(plays)
+                        $videos.sort(plays)
                         break
                     case 'plays_desc':
-                        $video.sort(plays_reverse)
+                        $videos.sort(plays_reverse)
                         break
                     default:
                         console.log(`No sort method for: ${label}`)
                 }
 
-                for (let i = 0; i < videoLength; i++) {
-                    $video[i].parentNode.appendChild($video[i])
+                for (let i = 0; i < videos.length; i++) {
+                    $videos[i].parentNode.appendChild($videos[i])
                 }
             })
-        }
+        })
+    }).then(function () {
+        elementFocus.focus() // Force focus, initialization
     }).then(function () {
         new LazyLoad({
             elements_selector: ".lazy"
@@ -332,7 +338,7 @@ function setVideoCount(length) {
 }
 
 function tmp(index) {
-    video[index].setAttribute('data-tmp', '')
+    videos[index].setAttribute('data-tmp', '')
 }
 
 function indeterminateToggle(el) {
@@ -370,9 +376,8 @@ function indeterminateToggle(el) {
 function indeterminateHandler(arr, item, parent, index, test = false) {
     if (!test) {
         for (let k = 0, len = arr.length; k < len; k++) {
-            if ((parent.checked && (arr[k] === item)) || (parent.indeterminate && arr[k].indexOf(item) === -1)) {
+            if ((parent.checked && (arr[k] === item)) || (parent.indeterminate && arr.indexOf(item) === -1)) {
                 tmp(index)
-                break
             }
         }
     } else {
@@ -380,17 +385,14 @@ function indeterminateHandler(arr, item, parent, index, test = false) {
             if (parent.checked) {
                 if ((item === 'NULL' && len === 1 && arr[k] === '0') || (arr[k] === item)) {
                     tmp(index)
-                    break
                 }
             } else if (parent.indeterminate) {
                 if (item === 'NULL') {
                     if (arr.indexOf("0") === -1) {
                         tmp(index)
-                        break
                     }
                 } else if (arr.indexOf(item) === -1) {
                     tmp(index)
-                    break
                 }
             }
         }

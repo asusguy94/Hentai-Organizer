@@ -7,8 +7,6 @@ const videoID = new URL(location.href).searchParams.get('id')
 const vtt_source = `vtt/${videoID}.vtt`
 const bookmark = document.getElementsByClassName('bookmark')
 
-onFocus(videoStats)
-
 bookmarkCollision()
 bookmarkTooltip()
 starTooltip()
@@ -46,9 +44,12 @@ if (dashSource) {
         if (desiredStartLevel < 0) desiredStartLevel = 0
 
         hls.startLevel = desiredStartLevel
+        hls.autoLevelCapping = maxLevel
         hls.startLoad(getTime())
     })
 }
+
+onFocus(videoStats)
 
 document.addEventListener('keydown', e => {
     if (e.keyCode === 9) {
@@ -66,7 +67,10 @@ videoWrapper.addEventListener('wheel', e => {
 })
 
 videoPlayer.addEventListener('timeupdate', () => {
-    localStorage.bookmark = Math.round(videoPlayer.currentTime)
+    let seconds = Math.round(videoPlayer.currentTime)
+    if (seconds) {
+        localStorage.bookmark = seconds
+    }
 })
 
 videoPlayer.addEventListener('playing', () => {
@@ -696,10 +700,10 @@ function videoStats() {
         localStorage.bookmark = seconds
         localStorage.playing = 0
 
-        $(videoPlayer).one('play', () => addPlay())
+        $(videoPlayer).one('play', addPlay)
     }
 
-    if (seconds) videoPlayer.currentTime = seconds
+    plyrPlayer.currentTime = seconds
     if (localStorage.playing === "1") {
         setTimeout(function () {
             videoPlayer.play()

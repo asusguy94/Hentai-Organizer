@@ -7,7 +7,7 @@ $franchise = new Franchise();
 <!doctype html>
 <html>
 <head>
-	<?php $basic->head('', array('', 'jqueryui', 'contextmenu'), array('jquery', 'jqueryui', 'contextmenu', 'franchises')) ?>
+	<?php $basic->head('', ['jqueryui', 'contextmenu'], ['jquery', 'jqueryui', 'contextmenu', 'franchises']) ?>
 </head>
 
 <body>

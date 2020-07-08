@@ -36,13 +36,13 @@
 	$query->execute();
 	foreach ($query->fetchAll() AS $item) {
 		$query = $pdo->prepare("UPDATE videos SET duration = :duration, height = :height WHERE id = :id");
-		$query->bindParam(':id', $item['id']);
+		$query->bindParam('id', $item['id']);
 
         $duration = $ffmpeg->getDuration($item['path']);
-        $query->bindParam(':duration', $duration);
+        $query->bindParam('duration', $duration);
 
         $videoHeight = $ffmpeg->getVideoHeight($item['path']);
-        $query->bindParam(':height', $videoHeight);
+        $query->bindParam('height', $videoHeight);
         
         $query->execute();
 	}
@@ -68,16 +68,16 @@
 
 			for ($i = 0; $i < count($fnameArr); $i++) {
 				$query = $pdo->prepare("INSERT INTO videos(name, episode, path, franchise, duration, height, date) VALUES(:name, :episode, :path, :franchise, :duration, :height, NOW())");
-				$query->bindParam(':name', $titleArr[$i]);
-				$query->bindParam(':episode', $episodeArr[$i]);
-				$query->bindParam(':path', $fnameArr[$i]);
-				$query->bindParam(':franchise', $franchiseArr[$i]);
+				$query->bindParam('name', $titleArr[$i]);
+				$query->bindParam('episode', $episodeArr[$i]);
+				$query->bindParam('path', $fnameArr[$i]);
+				$query->bindParam('franchise', $franchiseArr[$i]);
 
                 $duration = $ffmpeg->getDuration($fnameArr[$i]);
-                $query->bindParam(':duration', $duration);
+                $query->bindParam('duration', $duration);
 
                 $videoHeight = Basic::getClosestQ($ffmpeg->getVideoHeight($fnameArr[$i]));
-                $query->bindParam(':height', $videoHeight);
+                $query->bindParam('height', $videoHeight);
 
 				$query->execute();
 			}

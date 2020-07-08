@@ -13,7 +13,7 @@
 <!doctype html>
 <html>
     <head>
-        <?php $basic->head($videos->getVideo($id), array('', 'jqueryui', 'contextmenu', 'plyr', 'fa', 'video'), array('jquery', 'jqueryui', 'contextmenu', 'hls', 'dash', 'plyr', 'video')) ?>
+        <?php $basic->head($videos->getVideo($id), ['jqueryui', 'contextmenu', 'plyr', 'fa', 'video'], ['jquery', 'jqueryui', 'contextmenu', 'hls', 'dash', 'plyr', 'video']) ?>
     </head>
 
     <body>

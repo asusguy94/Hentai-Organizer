@@ -221,7 +221,7 @@ class VideoPage extends Component {
                 if (bookmarks[i].id === bookmark.id) {
                     let item = bookmarks[i]
                     let attributes = item.attributes
-                    attributes = attributes.push({ id: attribute.id, name: attribute.name })
+                    attributes.push({ id: attribute.id, name: attribute.name })
 
                     return item
                 }

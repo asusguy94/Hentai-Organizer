@@ -519,7 +519,6 @@ class VideoPage extends Component {
                 <aside className='col-3'>
                     <div id='stars' className='row justify-content-center'>
                         {this.state.loaded.stars &&
-                            this.state.stars[0].id !== 0 &&
                             Object.keys(this.state.stars).map((key, i) => (
                                 <React.Fragment key={i}>
                                     <div className='star col-4'>

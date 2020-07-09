@@ -52,15 +52,15 @@ _Temporarily disabled_
 
 -   Hover elements are broken
 
-| Name             | Status             |
-| ---------------- | ------------------ |
-| Add Star         | :x: High Priority  |
-| Remove Star      | :x: High Priority  |
-| Add Attribute    | :x: High Priority  |
-| Remove Attribute | :x: High Priority  |
-| Change Category  | :heavy_check_mark: |
-| Change Time      | :heavy_check_mark: |
-| Delete           | :heavy_check_mark: |
+| Name              | Status             |
+| ----------------- | ------------------ |
+| Add Star          | :x: High Priority  |
+| Remove Star       | :x: High Priority  |
+| Add Attribute     | :heavy_check_mark: |
+| Remove Attributes | :x: High Priority  |
+| Change Category   | :heavy_check_mark: |
+| Change Time       | :heavy_check_mark: |
+| Delete            | :heavy_check_mark: |
 
 ### :heavy_check_mark: Stars
 

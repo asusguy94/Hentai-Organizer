@@ -213,6 +213,25 @@ class VideoPage extends Component {
         })
     }
 
+    handleBookmark_addAttribute(attribute, bookmark) {
+        Axios.get(`${config.api}/addbookmarkattribute.php?bookmarkID=${bookmark.id}&attributeID=${attribute.id}`).then(() => {
+            let bookmarks = this.state.bookmarks
+            let obj = Object.keys(bookmarks).map((i) => {
+                if (bookmarks[i].id === bookmark.id) {
+                    let item = bookmarks[i]
+                    let attributes = item.attributes
+                    attributes = attributes.push({ id: attribute.id, name: attribute.name })
+
+                    return item
+                }
+
+                return bookmarks[i]
+            })
+
+            this.setState({ bookmarks: obj })
+        })
+    }
+
     /* Franchise - own class? */
     async handleFranchise_copy() {
         await navigator.clipboard.writeText(this.state.video.franchise)
@@ -415,6 +434,34 @@ class VideoPage extends Component {
 
                                     <ContextMenu id={`bookmark-${i}`}>
                                         <hr />
+
+                                        <MenuItem
+                                            onClick={() => {
+                                                this.handleModal(
+                                                    'Add Attribute',
+
+                                                    Object.keys(this.state.attributes).map((attribute_i) => {
+                                                        return (
+                                                            <div
+                                                                key={attribute_i}
+                                                                className='btn btn-sm btn-outline-primary d-block w-auto'
+                                                                onClick={() => {
+                                                                    this.handleModal()
+                                                                    this.handleBookmark_addAttribute(
+                                                                        this.state.attributes[attribute_i],
+                                                                        this.state.bookmarks[i]
+                                                                    )
+                                                                }}
+                                                            >
+                                                                {this.state.attributes[attribute_i].name}
+                                                            </div>
+                                                        )
+                                                    })
+                                                )
+                                            }}
+                                        >
+                                            <i className='far fa-plus' /> Add Attribute
+                                        </MenuItem>
 
                                         <MenuItem
                                             onClick={() => {

@@ -32,7 +32,7 @@ _Temporarily disabled_
 | Rename Franchise | :x: High Priority  |
 | Add Alias        | :x: High Priority  |
 | Copy Franchise   | :heavy_check_mark: |
-| Edit Date        | :x: High Priority  |
+| Edit Date        | :heavy_check_mark: |
 
 ### :heavy_check_mark: Video
 

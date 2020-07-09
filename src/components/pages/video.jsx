@@ -96,6 +96,7 @@ class VideoPage extends Component {
             data: null,
         },
         newVideo: false,
+        inputValue: '',
     }
 
     handleWheel(e) {
@@ -237,6 +238,27 @@ class VideoPage extends Component {
         await navigator.clipboard.writeText(this.state.video.franchise)
     }
 
+    /* Date - own class */
+    handleDate() {
+        Axios.get(`${config.api}/setdate.php?videoID=${this.state.video.id}&date=${this.state.inputValue}`).then(({ data }) => {
+            if (data.success) {
+                this.setState((prevState) => {
+                    let date = prevState.video.date
+                    date.published = data.date
+
+                    return { date }
+                })
+            }
+
+            this.setState({ inputValue: '' })
+        })
+    }
+
+    handleInput(e) {
+        let inputValue = e.target.value
+        this.setState({ inputValue })
+    }
+
     /* Star - own class? */
     handleStar_remove(id) {
         Axios.get(`${config.api}/removevideostar.php?videoID=${this.state.video.id}&starID=${id}`).then(() => {
@@ -298,7 +320,31 @@ class VideoPage extends Component {
                                 </ContextMenuTrigger>
 
                                 <ContextMenu id='menu__date'>
-                                    <MenuItem disabled>
+                                    <MenuItem
+                                        onClick={() => {
+                                            this.handleModal(
+                                                'Change Time',
+                                                <React.Fragment>
+                                                    <input
+                                                        type='text'
+                                                        className='text-center'
+                                                        onChange={this.handleInput.bind(this)}
+                                                        ref={(input) => input && input.focus()}
+                                                    />
+
+                                                    <div
+                                                        className='btn btn-sm btn-primary'
+                                                        onClick={() => {
+                                                            this.handleModal()
+                                                            this.handleDate()
+                                                        }}
+                                                    >
+                                                        Save Date
+                                                    </div>
+                                                </React.Fragment>
+                                            )
+                                        }}
+                                    >
                                         <i className='far fa-edit' />
                                         Edit Date
                                     </MenuItem>

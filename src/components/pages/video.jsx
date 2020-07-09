@@ -260,6 +260,19 @@ class VideoPage extends Component {
     }
 
     /* Star - own class? */
+    handleStar_add(name) {
+        Axios.get(`${config.api}/addstar.php?name=${name}&videoID=${this.state.video.id}`).then(({ data }) => {
+            if (data.success) {
+                this.setState((prevState) => {
+                    let stars = prevState.stars
+                    stars.push({ id: data.starID, name })
+
+                    return { stars }
+                })
+            }
+        })
+    }
+
     handleStar_remove(id) {
         Axios.get(`${config.api}/removevideostar.php?videoID=${this.state.video.id}&starID=${id}`).then(() => {
             let stars = this.state.stars.filter((item) => {
@@ -621,6 +634,21 @@ class VideoPage extends Component {
                                     </ContextMenu>
                                 </React.Fragment>
                             ))}
+                        <div className='col-12 mt-2'>
+                            <hr />
+
+                            <label htmlFor='add-star'>Star</label>
+                            <input
+                                type='text'
+                                id='add-star'
+                                onChange={this.handleInput.bind(this)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                        this.handleStar_add(e.target.value)
+                                    }
+                                }}
+                            />
+                        </div>
                     </div>
                 </aside>
 

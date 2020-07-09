@@ -75,7 +75,7 @@ _Temporarily disabled_
 | Name             | Status                      |
 | ---------------- | --------------------------- |
 | Add Category     | :x: _create new category_   |
-| Add Star         | :x: _create new star_       |
+| Add Star         | :heavy_check_mark:          |
 | Add NoStar-label | :x: _label as without star_ |
 
 ### :x: Used Attributes

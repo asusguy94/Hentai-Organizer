@@ -337,24 +337,20 @@ class VideoPage extends Component {
                                         onClick={() => {
                                             this.handleModal(
                                                 'Change Time',
-                                                <React.Fragment>
-                                                    <input
-                                                        type='text'
-                                                        className='text-center'
-                                                        onChange={this.handleInput.bind(this)}
-                                                        ref={(input) => input && input.focus()}
-                                                    />
+                                                <input
+                                                    type='text'
+                                                    className='text-center'
+                                                    onChange={this.handleInput.bind(this)}
+                                                    ref={(input) => input && input.focus()}
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === 'Enter') {
+                                                            e.preventDefault()
 
-                                                    <div
-                                                        className='btn btn-sm btn-primary'
-                                                        onClick={() => {
                                                             this.handleModal()
                                                             this.handleDate()
-                                                        }}
-                                                    >
-                                                        Save Date
-                                                    </div>
-                                                </React.Fragment>
+                                                        }
+                                                    }}
+                                                />
                                             )
                                         }}
                                     >
@@ -644,6 +640,8 @@ class VideoPage extends Component {
                                 onChange={this.handleInput.bind(this)}
                                 onKeyDown={(e) => {
                                     if (e.key === 'Enter') {
+                                        e.preventDefault()
+
                                         this.handleStar_add(e.target.value)
                                     }
                                 }}

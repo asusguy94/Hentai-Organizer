@@ -309,6 +309,14 @@ class VideoPage extends Component {
                                 <i className='far fa-film' />
                                 {this.state.video.quality}
                             </div>
+
+                            <a
+                                className='header__next btn btn-sm btn-outline-primary float-right'
+                                id='next'
+                                href={`/video/${this.state.video.nextID}`}
+                            >
+                                Next
+                            </a>
                         </div>
                     </header>
 

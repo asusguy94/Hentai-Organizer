@@ -759,7 +759,7 @@ class VideoPage extends Component {
                 })
             })
 
-        Axios.get(`${config.api}/attributes.php`)
+        Axios.get(`${config.api}/attributes.php?method=video`)
             .then(({ data: attributes }) => this.setState({ attributes }))
             .then(() => {
                 this.setState((prevState) => {

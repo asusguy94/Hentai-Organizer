@@ -575,11 +575,11 @@ class VideoPage extends Component {
                     <div id='stars' className='row justify-content-center'>
                         {this.state.loaded.stars &&
                             Object.keys(this.state.stars).map((key, i) => (
-                                <React.Fragment key={i}>
-                                    <div className='star col-4'>
+                                <div key={i} className='star col-4'>
+                                    <div className='card'>
                                         <ContextMenuTrigger id={`star-${i}`}>
                                             <img
-                                                className='star__image w-100'
+                                                className='star__image card-img-top'
                                                 alt='star'
                                                 src={`${config.source}/images/stars/${this.state.stars[i].id}`}
                                             />
@@ -628,7 +628,7 @@ class VideoPage extends Component {
                                             <i className='far fa-trash-alt' /> Remove
                                         </MenuItem>
                                     </ContextMenu>
-                                </React.Fragment>
+                                </div>
                             ))}
                         <div className='col-12 mt-2'>
                             <hr />

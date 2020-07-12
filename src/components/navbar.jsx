@@ -39,10 +39,6 @@ class NavBar extends Component {
                     </li>
 
                     <li>
-                        <Link to='/videos/random'>Random</Link>
-                    </li>
-
-                    <li>
                         <Link to='/generate/thumbnails'>Generate Thumbnails</Link>
                         <ul className='sub-menu'>
                             <li>

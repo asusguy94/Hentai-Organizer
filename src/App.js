@@ -7,7 +7,6 @@ import NavBar from './components/navbar'
 /* Page Components */
 import HomePage from './components/pages/home'
 import VideosPage from './components/pages/videos'
-import RandomVideoPage from './components/pages/randomvideo'
 import VideoPage from './components/pages/video'
 
 /* Style */
@@ -32,8 +31,6 @@ class App extends Component {
                             <Route path='/videos/add'>
                                 <p>Add Videos Page</p>
                             </Route>
-
-                            <Route path='/videos/random' component={RandomVideoPage} />
 
                             <Route path='/videos' component={VideosPage} />
 

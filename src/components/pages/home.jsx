@@ -54,7 +54,7 @@ class HomePage extends Component {
     getData(type, limit = this.state[type].limit) {
         Axios.get(`${config.api}/home.php?type=${type}&limit=${limit}`).then(({ data }) => {
             this.setState((prevState) => {
-                let object = { ...prevState[type] }
+                let object = prevState[type]
                 object.data = data
 
                 return { [type]: object }
@@ -70,18 +70,15 @@ class HomePage extends Component {
                         {obj.label} Videos (<span className='count'>{obj.limit}</span>)
                     </h2>
                     <div className='row'>
-                        {Object.keys(obj.data).map((key, i) => (
-                            <Link
-                                className='video col-1 px-0 mx-3 ribbon-container'
-                                to={`/video/${obj.data[key].id}`}
-                                key={i}
-                            >
+                        {Object.keys(obj.data).map((i) => (
+                            <Link className='video col-1 px-0 mx-3 ribbon-container' to={`/video/${obj.data[i].id}`} key={i}>
                                 <img
                                     className='mx-auto img-thumbnail'
                                     alt='video'
-                                    src={`${config.source}/images/videos/${obj.data[key].id}-290`}
+                                    src={`${config.source}/images/videos/${obj.data[i].id}-290`}
                                 />
-                                <span className='title mx-auto d-block'>{obj.data[key].name}</span>
+
+                                <span className='title mx-auto d-block'>{obj.data[i].name}</span>
                             </Link>
                         ))}
                     </div>

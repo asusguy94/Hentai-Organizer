@@ -161,7 +161,7 @@ class VideoPage extends Component {
 
         const success = (data, starID = 0) => {
             let attributes = data.attributes
-            if (typeof data.attributes === 'undefined') attributes = [{ id: 0, name: '' }]
+            if (typeof data.attributes === 'undefined') attributes = []
 
             this.setState((prevState) => {
                 let bookmarks = prevState.bookmarks
@@ -487,22 +487,26 @@ class VideoPage extends Component {
                                             </div>
                                         </ContextMenuTrigger>
 
-                                        <ReactTooltip id={`bookmark-info-${i}`} effect='solid'>
-                                            {this.state.bookmarks[i].starID !== 0 && (
-                                                <img
-                                                    alt='star'
-                                                    className='star__image'
-                                                    data-star-id={this.state.bookmarks[i].starID}
-                                                    src={`${config.source}/images/stars/${this.state.bookmarks[i].starID}`}
-                                                />
-                                            )}
+                                        {(this.state.bookmarks[i].starID !== 0 || this.state.bookmarks[i].attributes.length > 0) && (
+                                            <ReactTooltip id={`bookmark-info-${i}`} effect='solid'>
+                                                {this.state.bookmarks[i].starID !== 0 && (
+                                                    <img
+                                                        alt='star'
+                                                        className='star__image'
+                                                        data-star-id={this.state.bookmarks[i].starID}
+                                                        src={`${config.source}/images/stars/${this.state.bookmarks[i].starID}`}
+                                                    />
+                                                )}
 
-                                            {Object.keys(this.state.bookmarks[i].attributes).map((bookmark_i) => (
-                                                <div key={bookmark_i} className='attribute btn btn-sm btn-light'>
-                                                    {this.state.bookmarks[i].attributes[bookmark_i].name}
-                                                </div>
-                                            ))}
-                                        </ReactTooltip>
+                                                {Object.keys(this.state.bookmarks[i].attributes).map((bookmark_i) => [
+                                                    this.state.bookmarks[i].attributes[bookmark_i].id !== 0 && (
+                                                        <div key={bookmark_i} className='attribute btn btn-sm btn-light'>
+                                                            {this.state.bookmarks[i].attributes[bookmark_i].name}
+                                                        </div>
+                                                    ),
+                                                ])}
+                                            </ReactTooltip>
+                                        )}
                                     </div>
 
                                     <ContextMenu id={`bookmark-${i}`}>

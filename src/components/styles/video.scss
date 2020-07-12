@@ -64,13 +64,44 @@
     }
 
     aside {
-        margin-top: 5.25em;
+        margin-top: 4.25em;
 
         #stars {
             text-align: center;
 
             hr {
                 width: 60%;
+            }
+        }
+
+        #franchise {
+            margin-bottom: 3%;
+
+            .episode {
+                display: block;
+                background-color: grey;
+                color: white;
+                text-decoration: none;
+
+                border-radius: 4px;
+                margin-bottom: 10px;
+
+                height: 60px;
+
+                &:hover {
+                    background-color: darkgrey;
+                }
+
+                &__plays {
+                }
+
+                &__thumbnail {
+                    padding: 3px 0;
+                    height: inherit;
+                }
+
+                &__title {
+                }
             }
         }
     }

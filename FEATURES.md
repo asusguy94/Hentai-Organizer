@@ -52,15 +52,9 @@ _Temporarily disabled_
 
 -   Hover elements are broken
 
-| Name              | Status             |
-| ----------------- | ------------------ |
-| Add Star          | :x: High Priority  |
-| Remove Star       | :x: High Priority  |
-| Add Attribute     | :heavy_check_mark: |
-| Remove Attributes | :x: High Priority  |
-| Change Category   | :heavy_check_mark: |
-| Change Time       | :heavy_check_mark: |
-| Delete            | :heavy_check_mark: |
+### :heavy_check_mark: Other videos from same franchise
+
+### :x: Other videos from same franchise
 
 ### :heavy_check_mark: Stars
 

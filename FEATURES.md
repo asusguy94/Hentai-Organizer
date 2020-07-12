@@ -14,10 +14,6 @@
 
 ## :x: Franchises
 
-## :x: Random Video
-
-_Temporarily disabled_
-
 ## :x:Generate Thumbnails
 
 ## :x:Generate WebVTT
@@ -26,50 +22,50 @@ _Temporarily disabled_
 
 ### :heavy_check_mark: Heading
 
-| Name             | Status             | Priority |
-| ---------------- | ------------------ | :------: |
-| Rename Title     | :x:                |   High   |
-| Rename Franchise | :x:                |   High   |
-| Add Alias        | :x:                |   Low    |
-| Copy Franchise   | :heavy_check_mark: |          |
-| Edit Date        | :heavy_check_mark: |          |
+| Name             | Status             |             Priority              |
+| ---------------- | ------------------ | :-------------------------------: |
+| Rename Title     | :x:                |               HIGH                |
+| Rename Franchise | :x:                |               HIGH                |
+| Add Alias        | :x:                | LOW...might remove alias from app |
+| Copy Franchise   | :heavy_check_mark: |                                   |
+| Edit Date        | :heavy_check_mark: |                                   |
 
 ### :heavy_check_mark: Video
 
-| Name             | Status                                  | Priority |
-| ---------------- | --------------------------------------- | :------: |
-| Add Bookmark     | :heavy_check_mark:                      |          |
-| Uncensor/Censor  | :heavy_check_mark:                      |          |
-| Create Thumbnail | :x:                                     |   Low    |
-| Remove Plays     | :heavy_check_mark:                      |          |
-| Rename File      | :x:                                     |   High   |
-| Copy Filename    | :heavy_check_mark:                      |          |
-| Update Video     | :x: _replace existing data in database_ |   High   |
-| Update Bookmarks | :x: _offset bookmarks by 6 seconds_     |   High   |
-| Delete Video     | :x:                                     |   High   |
+| Name             | Status                                  |         Priority          |
+| ---------------- | --------------------------------------- | :-----------------------: |
+| Add Bookmark     | :heavy_check_mark:                      |                           |
+| Uncensor/Censor  | :heavy_check_mark:                      |                           |
+| Create Thumbnail | :x:                                     | LOW...did not work before |
+| Remove Plays     | :heavy_check_mark:                      |                           |
+| Rename File      | :x:                                     |           HIGH            |
+| Copy Filename    | :heavy_check_mark:                      |                           |
+| Update Video     | :x: _replace existing data in database_ |           HIGH            |
+| Update Bookmarks | :x: _offset bookmarks by 6 seconds_     |           HIGH            |
+| Delete Video     | :x:                                     |           HIGH            |
 
 ### :x: Bookmark
 
 -   Hover elements are broken
 
-| Name              | Status             | Priority |
-| ----------------- | ------------------ | :------: |
-| Add Star          | :x:                |   High   |
-| Remove Star       | :x:                |   High   |
+| Name              | Status             | Priority | Reason |
+| ----------------- | ------------------ | :------: | ------ |
+| Add Star          | :x:                |   HIGH   |
+| Remove Star       | :x:                |   HIGH   |
 | Add Attribute     | :heavy_check_mark: |          |
-| Remove Attributes | :x:                |   High   |
+| Remove Attributes | :x:                |   HIGH   |
 | Change Category   | :heavy_check_mark: |          |
 | Change Time       | :heavy_check_mark: |          |
 | Delete            | :heavy_check_mark: |          |
 
 ### :heavy_check_mark: Other videos from same franchise
 
-| Name      | Status                                                   | Priority |
-| --------- | -------------------------------------------------------- | :------: |
-| Plays     | :x:                                                      |   High   |
-| Thumbnail | :heavy_check_mark:                                       |          |
-| Title     | :heavy_check_mark:                                       |          |
-| Link      | :x: _currently links by `<a>` should link with `<Link>`_ |   Low    |
+| Name      | Status                                                   |         Priority         |
+| --------- | -------------------------------------------------------- | :----------------------: |
+| Plays     | :x:                                                      |           HIGH           |
+| Thumbnail | :heavy_check_mark:                                       |                          |
+| Title     | :heavy_check_mark:                                       |                          |
+| Link      | :x: _currently links by `<a>` should link with `<Link>`_ | LOW...working fine as is |
 
 ### :heavy_check_mark: Stars
 
@@ -79,12 +75,12 @@ _Temporarily disabled_
 | Add Global Attribute | :x:                |   HIGH   |
 | Remove               | :heavy_check_mark: |          |
 
-## Form
+## :heavy_check_mark: Form
 
-| Name             | Status                    | Priority |
-| ---------------- | ------------------------- | :------: |
-| Add Category     | :x: _create new category_ |   Low    |
-| Add Star         | :heavy_check_mark:        |          |
-| Add NoStar-label | :x:                       |   High   |
+| Name             | Status                    |                   Priority                   |
+| ---------------- | ------------------------- | :------------------------------------------: |
+| Add Category     | :x: _create new category_ | LOW...might remove related database from app |
+| Add Star         | :heavy_check_mark:        |                                              |
+| Add NoStar-label | :heavy_check_mark:        |                                              |
 
 ### :x: Used Attributes

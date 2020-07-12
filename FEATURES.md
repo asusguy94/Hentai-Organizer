@@ -30,7 +30,7 @@ _Temporarily disabled_
 | ---------------- | ------------------ | :------: |
 | Rename Title     | :x:                |   High   |
 | Rename Franchise | :x:                |   High   |
-| Add Alias        | :x:                |   High   |
+| Add Alias        | :x:                |   Low    |
 | Copy Franchise   | :heavy_check_mark: |          |
 | Edit Date        | :heavy_check_mark: |          |
 
@@ -38,7 +38,7 @@ _Temporarily disabled_
 
 | Name             | Status                                  | Priority |
 | ---------------- | --------------------------------------- | :------: |
-| Add Bookmark     | :heavy_check_mark:                      |    -     |
+| Add Bookmark     | :heavy_check_mark:                      |          |
 | Uncensor/Censor  | :heavy_check_mark:                      |          |
 | Create Thumbnail | :x:                                     |   Low    |
 | Remove Plays     | :heavy_check_mark:                      |          |

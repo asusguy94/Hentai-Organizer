@@ -440,6 +440,7 @@ class VideoPage extends Component {
 
                         <ContextMenu id='video'>
                             <MenuItem
+                                disabled={this.state.video.noStar}
                                 onClick={() => {
                                     this.handleModal(
                                         'Add Bookmark',
@@ -706,6 +707,7 @@ class VideoPage extends Component {
                                         id='no-star'
                                         onChange={this.handleNoStar.bind(this)}
                                         defaultChecked={this.state.video.noStar}
+                                        disabled={this.state.bookmarks.length || this.state.stars.length}
                                     />
                                     <label htmlFor='no-star'>No Star</label>
                                 </React.Fragment>

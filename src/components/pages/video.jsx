@@ -134,6 +134,16 @@ class VideoPage extends Component {
         this.player.player.play()
     }
 
+    handleRibbon(star) {
+        let hasBookmark = false
+
+        this.state.bookmarks.forEach((bookmark) => {
+            if (!hasBookmark && bookmark.starID === star.id) hasBookmark = true
+        })
+
+        if (!hasBookmark) return <span className='ribbon'>NEW</span>
+    }
+
     /* Bookmarks - own class? */
     handleBookmark_add(category, star = null) {
         let time = Math.round(this.player.player.currentTime)
@@ -574,9 +584,9 @@ class VideoPage extends Component {
                 <aside className='col-3'>
                     <div id='stars' className='row justify-content-center'>
                         {this.state.loaded.stars &&
-                            Object.keys(this.state.stars).map((key, i) => (
+                            Object.keys(this.state.stars).map((i) => (
                                 <div key={i} className='star col-4'>
-                                    <div className='card'>
+                                    <div className='card mb-2 ribbon-container'>
                                         <ContextMenuTrigger id={`star-${i}`}>
                                             <img
                                                 className='star__image card-img-top'
@@ -589,6 +599,8 @@ class VideoPage extends Component {
                                             >
                                                 {this.state.stars[i].name}
                                             </a>
+
+                                            {this.handleRibbon(this.state.stars[i])}
                                         </ContextMenuTrigger>
                                     </div>
 

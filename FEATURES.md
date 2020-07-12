@@ -76,7 +76,7 @@ _Temporarily disabled_
 | Name                 | Status             | Priority |
 | -------------------- | ------------------ | :------: |
 | Add Bookmark         | :heavy_check_mark: |          |
-| Add Global Attribute | :x:                |   High   |
+| Add Global Attribute | :x:                |   HIGH   |
 | Remove               | :heavy_check_mark: |          |
 
 ## Form

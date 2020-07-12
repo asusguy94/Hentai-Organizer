@@ -45,6 +45,7 @@ class VideoPage extends Component {
                     name: 0,
                 },
             ],
+            noStar: 0,
         },
         stars: [
             {
@@ -273,6 +274,19 @@ class VideoPage extends Component {
     handleInput(e) {
         let inputValue = e.target.value
         this.setState({ inputValue })
+    }
+
+    handleNoStar(e) {
+        let status = Number(e.target.checked)
+
+        Axios.get(`${config.api}/nostar.php?videoID=${this.state.video.id}&status=${status}`).then(() => {
+            this.setState((prevState) => {
+                let video = prevState.video
+                video.noStar = status
+
+                return { video }
+            })
+        })
     }
 
     /* Star - own class? */
@@ -669,19 +683,33 @@ class VideoPage extends Component {
                         <div className='col-12 mt-2'>
                             <hr />
 
-                            <label htmlFor='add-star'>Star</label>
-                            <input
-                                type='text'
-                                id='add-star'
-                                onChange={this.handleInput.bind(this)}
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Enter') {
-                                        e.preventDefault()
+                            {this.state.loaded.video && (
+                                <React.Fragment>
+                                    <label htmlFor='add-star'>Star</label>
+                                    <input
+                                        type='text'
+                                        id='add-star'
+                                        onChange={this.handleInput.bind(this)}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                e.preventDefault()
 
-                                        this.handleStar_add(e.target.value)
-                                    }
-                                }}
-                            />
+                                                this.handleStar_add(e.target.value)
+                                            }
+                                        }}
+                                        disabled={this.state.video.noStar}
+                                    />
+
+                                    <input
+                                        type='checkbox'
+                                        name='no-star'
+                                        id='no-star'
+                                        onChange={this.handleNoStar.bind(this)}
+                                        defaultChecked={this.state.video.noStar}
+                                    />
+                                    <label htmlFor='no-star'>No Star</label>
+                                </React.Fragment>
+                            )}
                         </div>
                     </div>
                 </aside>

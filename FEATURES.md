@@ -26,50 +26,65 @@ _Temporarily disabled_
 
 ### :heavy_check_mark: Heading
 
-| Name             | Status             |
-| ---------------- | ------------------ |
-| Rename Title     | :x: High Priority  |
-| Rename Franchise | :x: High Priority  |
-| Add Alias        | :x: High Priority  |
-| Copy Franchise   | :heavy_check_mark: |
-| Edit Date        | :heavy_check_mark: |
+| Name             | Status             | Priority |
+| ---------------- | ------------------ | :------: |
+| Rename Title     | :x:                |   High   |
+| Rename Franchise | :x:                |   High   |
+| Add Alias        | :x:                |   High   |
+| Copy Franchise   | :heavy_check_mark: |          |
+| Edit Date        | :heavy_check_mark: |          |
 
 ### :heavy_check_mark: Video
 
-| Name             | Status                                  |
-| ---------------- | --------------------------------------- |
-| Add Bookmark     | :heavy_check_mark:                      |
-| Uncensor/Censor  | :heavy_check_mark:                      |
-| Create Thumbnail | :x:                                     |
-| Remove Plays     | :heavy_check_mark:                      |
-| Rename File      | :x:                                     |
-| Copy Filename    | :heavy_check_mark:                      |
-| Update Video     | :x: _replace existing data in database_ |
-| Update Bookmarks | :x: _offset bookmarks by 6 seconds_     |
-| Delete Video     | :x:                                     |
+| Name             | Status                                  | Priority |
+| ---------------- | --------------------------------------- | :------: |
+| Add Bookmark     | :heavy_check_mark:                      |    -     |
+| Uncensor/Censor  | :heavy_check_mark:                      |          |
+| Create Thumbnail | :x:                                     |   Low    |
+| Remove Plays     | :heavy_check_mark:                      |          |
+| Rename File      | :x:                                     |   High   |
+| Copy Filename    | :heavy_check_mark:                      |          |
+| Update Video     | :x: _replace existing data in database_ |   High   |
+| Update Bookmarks | :x: _offset bookmarks by 6 seconds_     |   High   |
+| Delete Video     | :x:                                     |   High   |
 
 ### :x: Bookmark
 
 -   Hover elements are broken
 
+| Name              | Status             | Priority |
+| ----------------- | ------------------ | :------: |
+| Add Star          | :x:                |   High   |
+| Remove Star       | :x:                |   High   |
+| Add Attribute     | :heavy_check_mark: |          |
+| Remove Attributes | :x:                |   High   |
+| Change Category   | :heavy_check_mark: |          |
+| Change Time       | :heavy_check_mark: |          |
+| Delete            | :heavy_check_mark: |          |
+
 ### :heavy_check_mark: Other videos from same franchise
 
-### :x: Other videos from same franchise
+| Name      | Status                                                   | Priority |
+| --------- | -------------------------------------------------------- | :------: |
+| Plays     | :x:                                                      |   High   |
+| Thumbnail | :heavy_check_mark:                                       |          |
+| Title     | :heavy_check_mark:                                       |          |
+| Link      | :x: _currently links by `<a>` should link with `<Link>`_ |   Low    |
 
 ### :heavy_check_mark: Stars
 
-| Name                 | Status             |
-| -------------------- | ------------------ |
-| Add Bookmark         | :heavy_check_mark: |
-| Add Global Attribute | :x: High Prioriry  |
-| Remove               | :heavy_check_mark: |
+| Name                 | Status             | Priority |
+| -------------------- | ------------------ | :------: |
+| Add Bookmark         | :heavy_check_mark: |          |
+| Add Global Attribute | :x:                |   High   |
+| Remove               | :heavy_check_mark: |          |
 
 ## Form
 
-| Name             | Status                      |
-| ---------------- | --------------------------- |
-| Add Category     | :x: _create new category_   |
-| Add Star         | :heavy_check_mark:          |
-| Add NoStar-label | :x: _label as without star_ |
+| Name             | Status                    | Priority |
+| ---------------- | ------------------------- | :------: |
+| Add Category     | :x: _create new category_ |   Low    |
+| Add Star         | :heavy_check_mark:        |          |
+| Add NoStar-label | :x:                       |   High   |
 
 ### :x: Used Attributes

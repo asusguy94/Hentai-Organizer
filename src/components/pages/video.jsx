@@ -475,7 +475,10 @@ class VideoPage extends Component {
                                     <div
                                         className='btn btn-sm btn-outline-primary bookmark'
                                         style={{
-                                            left: `${((this.state.bookmarks[i].start * 100) / this.state.video.duration) * 0.88}%`,
+                                            left: `${
+                                                ((this.state.bookmarks[i].start * 100) / this.state.video.duration) *
+                                                config.timeline.offset
+                                            }%`,
                                         }}
                                         onClick={() => this.handleVideo_play(this.state.bookmarks[i].start)}
                                         ref={(bookmark) => (this.bookmarks[i] = bookmark)}

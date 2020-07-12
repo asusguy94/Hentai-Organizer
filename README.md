@@ -17,3 +17,11 @@ and should work flawlessly.
 ## Features
 
 Status of features can be found here [features.md](FEATURES.md)
+
+## Special Requirements
+
+This version has some special requirements (look above to see if there are any changes)
+
+1.  video-thumbnails(WebVTT) to be generated, which can be done with the previous version.
+2.  a folder must exist within the videos folder with the same name as the original file
+    -   then the hls.files needs to be included in this folder with the exact name `playlist.m3u8`

@@ -475,7 +475,7 @@ class VideoPage extends Component {
                             <MenuItem onClick={() => this.handleCensor_toggle()}>
                                 {this.state.video.censored ? (
                                     <React.Fragment>
-                                        <i className='far fa-check-circle' /> Uncensor
+                                        <i className='far fa-check-circle' /> UnCensor
                                     </React.Fragment>
                                 ) : (
                                     <React.Fragment>
@@ -492,6 +492,22 @@ class VideoPage extends Component {
 
                             <MenuItem onClick={() => this.handleFname_copy()}>
                                 <i className='far fa-copy' /> Copy Filename
+                            </MenuItem>
+
+                            <MenuItem divider />
+
+                            <MenuItem disabled>
+                                <i className='far fa-edit' /> Update Video
+                            </MenuItem>
+
+                            <MenuItem disabled>
+                                <i className='far fa-edit' /> Update Bookmarks
+                            </MenuItem>
+
+                            <MenuItem divider />
+
+                            <MenuItem disabled>
+                                <i className='far fa-trash-alt' /> Delete Video
                             </MenuItem>
                         </ContextMenu>
                     </div>
@@ -542,6 +558,16 @@ class VideoPage extends Component {
                                     </div>
 
                                     <ContextMenu id={`bookmark-${i}`}>
+                                        <MenuItem disabled>
+                                            <i className='far fa-plus' /> Add Star
+                                        </MenuItem>
+
+                                        <MenuItem disabled>
+                                            <i className='far fa-trash-alt' /> Remove Star
+                                        </MenuItem>
+
+                                        <MenuItem divider />
+
                                         <MenuItem
                                             onClick={() => {
                                                 this.handleModal(
@@ -568,6 +594,10 @@ class VideoPage extends Component {
                                             }}
                                         >
                                             <i className='far fa-plus' /> Add Attribute
+                                        </MenuItem>
+
+                                        <MenuItem disabled>
+                                            <i className='far fa-trash-alt' /> Remove Attributes
                                         </MenuItem>
 
                                         <MenuItem

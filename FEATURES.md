@@ -23,8 +23,6 @@
 
 ## :x: Stars
 
-## :x: Franchises
-
 ## :x:Generate Thumbnails
 
 ## :x:Generate WebVTT

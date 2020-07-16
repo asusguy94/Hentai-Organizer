@@ -35,10 +35,6 @@ class NavBar extends Component {
                     </li>
 
                     <li>
-                        <Link to='/franchise'>Franchises</Link>
-                    </li>
-
-                    <li>
                         <Link to='/generate/thumbnails'>Generate Thumbnails</Link>
                         <ul className='sub-menu'>
                             <li>

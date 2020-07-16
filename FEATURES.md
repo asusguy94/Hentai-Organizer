@@ -27,9 +27,9 @@
 
 ## :x:Generate WebVTT
 
-## Video Page
+## :x: Video Page
 
-### :heavy_check_mark: Heading
+### :x: Heading
 
 | Name             | Status             | Priority |
 | ---------------- | ------------------ | :------: |
@@ -39,7 +39,7 @@
 | Edit Date        | :heavy_check_mark: |          |
 | Next ID          | :heavy_check_mark: |          |
 
-### :heavy_check_mark: Video
+### :x: Video
 
 | Name             | Status                                  | Priority |
 | ---------------- | --------------------------------------- | :------: |
@@ -54,57 +54,63 @@
 
 ### :x: Bookmark
 
--   Hover elements are broken
-
-| Name              | Status             | Priority | Reason |
-| ----------------- | ------------------ | :------: | ------ |
+| Name              | Status             | Priority |
+| ----------------- | ------------------ | :------: |
 | Add Star          | :x:                |   HIGH   |
 | Remove Star       | :x:                |   HIGH   |
 | Add Attribute     | :heavy_check_mark: |          |
 | Remove Attributes | :x:                |   HIGH   |
 | Change Category   | :heavy_check_mark: |          |
 | Change Time       | :heavy_check_mark: |          |
-| Delete            | :heavy_check_mark: |          |
+| Delete Bookmark   | :heavy_check_mark: |          |
 
-### :heavy_check_mark: Other videos from same franchise
+### :x: Other videos from same franchise
 
-| Name      | Status                                                   |         Priority         |
-| --------- | -------------------------------------------------------- | :----------------------: |
-| Plays     | :x:                                                      |           HIGH           |
-| Thumbnail | :heavy_check_mark:                                       |                          |
-| Title     | :heavy_check_mark:                                       |                          |
-| Link      | :x: _currently links by `<a>` should link with `<Link>`_ | LOW...working fine as is |
+| Name      | Status                                                   |  Priority  |
+| --------- | -------------------------------------------------------- | :--------: |
+| Plays     | :x:                                                      |    HIGH    |
+| Thumbnail | :heavy_check_mark:                                       |            |
+| Title     | :heavy_check_mark:                                       |            |
+| Link      | :x: _currently links by `<a>` should link with `<Link>`_ | FUNCTIONAL |
 
-### :heavy_check_mark: Stars
+### :x: Stars
 
 | Name                 | Status             | Priority |
 | -------------------- | ------------------ | :------: |
 | Add Bookmark         | :heavy_check_mark: |          |
 | Add Global Attribute | :x:                |   HIGH   |
-| Remove               | :heavy_check_mark: |          |
+| Remove Star          | :heavy_check_mark: |          |
 
 ## :heavy_check_mark: Form
 
-| Name             | Status                    |                   Priority                   |
-| ---------------- | ------------------------- | :------------------------------------------: |
-| Add Category     | :x: _create new category_ | LOW...might remove related database from app |
-| Add Star         | :heavy_check_mark:        |                                              |
-| Add NoStar-label | :heavy_check_mark:        |                                              |
+| Name             | Status             |
+| ---------------- | ------------------ |
+| Add Star         | :heavy_check_mark: |
+| Add NoStar-label | :heavy_check_mark: |
 
 ### :x: Used Attributes
+
+| Name       | Status | Priority |
+| ---------- | ------ | :------: |
+| Attributes | :x:    |   HIGH   |
 
 ## Star Page
 
 ### :x: Dropbox
 
-### :heavy_check_mark: Image
+| Name        | Status | Priority |
+| ----------- | ------ | :------: |
+| Drop Area   | :x:    |   HIGH   |
+| Delete Star | :x:    |   HIGH   |
+
+### :x: Image
 
 | Name         | Status | Priority |
 | ------------ | ------ | :------: |
 | Delete Image | :x:    |   HIGH   |
 | Delete Star  | :x:    |   HIGH   |
 
-### :heavy_check_mark: Title
+### :x: Star Name
 
 | Name   | Status | Priority |
 | ------ | ------ | :------: |
@@ -112,7 +118,19 @@
 
 ### :x: Input Fields
 
+| Name       | Status | Priority |
+| ---------- | ------ | :------: |
+| Breast     | :x:    |   HIGH   |
+| Eye Color  | :x:    |   HIGH   |
+| Hair Color | :x:    |   HIGH   |
+| Hair Style | :x:    |   HIGH   |
+
 ### :x: Attribute input field
+
+| Name  | Status | Priority |
+| ----- | ------ | :------: |
+| Input | :x:    |   HIGH   |
+| List  | :x:    |   HIGH   |
 
 ### :x: Video list
 

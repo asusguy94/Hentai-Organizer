@@ -344,7 +344,7 @@ class VideoPage extends Component {
                                 </div>
 
                                 <ContextMenu id='title'>
-                                    <hr />
+                                    <MenuItem divider />
 
                                     <MenuItem onClick={() => this.handleFranchise_copy()}>
                                         <i className='far fa-copy' /> Copy Franchise
@@ -480,7 +480,7 @@ class VideoPage extends Component {
                                 <i className='far fa-trash-alt' /> Remove Plays
                             </MenuItem>
 
-                            <hr />
+                            <MenuItem divider />
 
                             <MenuItem onClick={() => this.handleFname_copy()}>
                                 <i className='far fa-copy' /> Copy Filename
@@ -534,8 +534,6 @@ class VideoPage extends Component {
                                     </div>
 
                                     <ContextMenu id={`bookmark-${i}`}>
-                                        <hr />
-
                                         <MenuItem
                                             onClick={() => {
                                                 this.handleModal(

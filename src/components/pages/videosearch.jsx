@@ -177,6 +177,24 @@ class VideoSearchPage extends Component {
                         <label htmlFor='alphabetically_desc'>Z-A</label>
                     </div>
 
+                    <div className='input-wrapper disabled'>
+                        <input id='added_desc' type='radio' name='sort' />
+                        <label htmlFor='added_desc'>Old Upload</label>
+                    </div>
+                    <div className='input-wrapper disabled'>
+                        <input id='added_asc' type='radio' name='sort' />
+                        <label htmlFor='added_asc'>New Upload</label>
+                    </div>
+
+                    <div className='input-wrapper disabled'>
+                        <input id='date_desc' type='radio' name='sort' />
+                        <label htmlFor='date_desc'>Oldest</label>
+                    </div>
+                    <div className='input-wrapper disabled'>
+                        <input id='date_asc' type='radio' name='sort' />
+                        <label htmlFor='date_asc'>Newest</label>
+                    </div>
+
                     <div className='input-wrapper'>
                         <input id='popularity_desc' type='radio' name='sort' onChange={this.popular_desc.bind(this)} />
                         <label htmlFor='popularity_desc'>Most Popular</label>

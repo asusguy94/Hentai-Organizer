@@ -38,21 +38,25 @@ class App extends Component {
                             <Route path='/video/:id' component={VideoPage} />
 
                             <Route path='/stars/search'>
-                                <p>Stars Search Page</p>
+                                <h2>Stars Search Page</h2>
+                            </Route>
+
+                            <Route path='/stars'>
+                                <h2>Stars Page</h2>
                             </Route>
 
                             <Route path='/star/:id' component={StarPage} />
 
                             <Route path='/generate/thumbnails'>
-                                <p>Generate Thumbnails Page</p>
+                                <h2>Generate Thumbnails Page</h2>
                             </Route>
 
                             <Route path='/generate/vtt'>
-                                <p>VTT Page</p>
+                                <h2>VTT Page</h2>
                             </Route>
 
                             <Route path='/franchise'>
-                                <p>Franchise Page</p>
+                                <h2>Franchise Page</h2>
                             </Route>
 
                             <Route path='/' component={HomePage} />

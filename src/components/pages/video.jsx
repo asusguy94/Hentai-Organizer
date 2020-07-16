@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
-import Axios from 'axios'
 
+import Axios from 'axios'
 import { PlyrComponent } from 'plyr-react'
 import Hls from 'hls.js'
 import { ContextMenu, ContextMenuTrigger, MenuItem } from 'react-contextmenu'
@@ -344,6 +344,14 @@ class VideoPage extends Component {
                                 </div>
 
                                 <ContextMenu id='title'>
+                                    <MenuItem disabled>
+                                        <i className='far fa-edit' /> Rename Title
+                                    </MenuItem>
+
+                                    <MenuItem disabled>
+                                        <i className='far fa-edit' /> Rename Franchise
+                                    </MenuItem>
+
                                     <MenuItem divider />
 
                                     <MenuItem onClick={() => this.handleFranchise_copy()}>
@@ -414,10 +422,10 @@ class VideoPage extends Component {
                                         controls: ['play-large', 'play', 'current-time', 'progress', 'duration', 'fullscreen'],
                                         hideControls: false,
                                         ratio: '21:9',
-                                        keyboard: { global: true },
+                                        keyboard: { global: true }, // TODO Create own keyboard shortcuts/commands
                                         seekTime: this.state.seekSpeed.regular,
                                         previewThumbnails: {
-                                            enabled: true,
+                                            enabled: true, // TODO Check if this should be enabled...perhaps from config.source, or config.api later
                                             src: `${config.source}/vtt/${this.state.video.id}.vtt`,
                                         },
                                     }}
@@ -538,7 +546,7 @@ class VideoPage extends Component {
                                             onClick={() => {
                                                 this.handleModal(
                                                     'Add Attribute',
-
+                                                    // TODO filter out existing data
                                                     Object.keys(this.state.attributes).map((attribute_i) => {
                                                         return (
                                                             <div
@@ -613,7 +621,11 @@ class VideoPage extends Component {
                             this.state.video.related.map((item, i) => [
                                 <a className='episode row' href={`/video/${item.id}`} key={i}>
                                     <span className='episode__plays col-2'>0 Plays</span>
-                                    <img className='episode__thumbnail' src={`${config.source}/images/videos/${item.id}-290`} />
+                                    <img
+                                        className='episode__thumbnail'
+                                        src={`${config.source}/images/videos/${item.id}-290`}
+                                        alt='thumbnail'
+                                    />
                                     <span className='episode__title col-8'>{item.name}</span>
                                 </a>,
                             ])}

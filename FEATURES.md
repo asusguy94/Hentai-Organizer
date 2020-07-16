@@ -15,6 +15,10 @@
 
 ## :heavy_check_mark: Videos
 
+| Name       | Status             |
+| ---------- | ------------------ |
+| Video Link | :heavy_check_mark: |
+
 ## :x: Star Search
 
 ## :x: Stars
@@ -29,27 +33,26 @@
 
 ### :heavy_check_mark: Heading
 
-| Name             | Status             |             Priority              |
-| ---------------- | ------------------ | :-------------------------------: |
-| Rename Title     | :x:                |               HIGH                |
-| Rename Franchise | :x:                |               HIGH                |
-| Add Alias        | :x:                | LOW...might remove alias from app |
-| Copy Franchise   | :heavy_check_mark: |                                   |
-| Edit Date        | :heavy_check_mark: |                                   |
+| Name             | Status             | Priority |
+| ---------------- | ------------------ | :------: |
+| Rename Title     | :x:                |   HIGH   |
+| Rename Franchise | :x:                |   HIGH   |
+| Copy Franchise   | :heavy_check_mark: |          |
+| Edit Date        | :heavy_check_mark: |          |
+| Next ID          | :heavy_check_mark: |          |
 
 ### :heavy_check_mark: Video
 
-| Name             | Status                                  |         Priority          |
-| ---------------- | --------------------------------------- | :-----------------------: |
-| Add Bookmark     | :heavy_check_mark:                      |                           |
-| Uncensor/Censor  | :heavy_check_mark:                      |                           |
-| Create Thumbnail | :x:                                     | LOW...did not work before |
-| Remove Plays     | :heavy_check_mark:                      |                           |
-| Rename File      | :x:                                     |           HIGH            |
-| Copy Filename    | :heavy_check_mark:                      |                           |
-| Update Video     | :x: _replace existing data in database_ |           HIGH            |
-| Update Bookmarks | :x: _offset bookmarks by 6 seconds_     |           HIGH            |
-| Delete Video     | :x:                                     |           HIGH            |
+| Name             | Status                                  | Priority |
+| ---------------- | --------------------------------------- | :------: |
+| Add Bookmark     | :heavy_check_mark:                      |          |
+| UnCensor/Censor  | :heavy_check_mark:                      |          |
+| Remove Plays     | :heavy_check_mark:                      |          |
+| Rename File      | :x:                                     |   HIGH   |
+| Copy Filename    | :heavy_check_mark:                      |          |
+| Update Video     | :x: _replace existing data in database_ |   HIGH   |
+| Update Bookmarks | :x: _offset bookmarks by 6 seconds_     |   HIGH   |
+| Delete Video     | :x:                                     |   HIGH   |
 
 ### :x: Bookmark
 

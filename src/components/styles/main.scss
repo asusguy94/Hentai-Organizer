@@ -9,6 +9,7 @@
 /* Star */
 .star {
     &__image {
+        // Prevent large images from beeing oversized
         max-height: 275px;
         max-width: 200px;
     }

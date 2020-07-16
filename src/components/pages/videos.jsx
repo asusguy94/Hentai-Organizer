@@ -15,9 +15,7 @@ class VideosPage extends Component {
                 <div className='list-group'>
                     {Object.keys(this.state.data).map((key, i) => (
                         <li key={i} className='list-group-item list-group-item-action'>
-                            <a href={`video/${this.state.data[key].id}`}>
-                                {this.state.data[key].name}
-                            </a>
+                            <a href={`video/${this.state.data[key].id}`}>{this.state.data[key].name}</a>
                         </li>
                     ))}
                 </div>
@@ -30,9 +28,7 @@ class VideosPage extends Component {
     }
 
     getData(limit = this.state.limit) {
-        Axios.get(`${config.api}/videos.php?limit=${limit}`).then(({ data }) =>
-            this.setState({ data })
-        )
+        Axios.get(`${config.api}/videos.php?limit=${limit}`).then(({ data }) => this.setState({ data }))
     }
 }
 

@@ -19,11 +19,26 @@
 
 ## :x: Video Search
 
-## :heavy_check_mark: Videos
+### :x: Main Section
 
-| Name       | Status             |
-| ---------- | ------------------ |
-| Video Link | :heavy_check_mark: |
+| Name          | Status             | Priority |
+| ------------- | ------------------ | :------: |
+| Video         | :heavy_check_mark: |          |
+| Video Ribbon  | :x:                |   HIGH   |
+| Video Counter | :x:                |   HIGH   |
+
+### :x: Sidebar
+
+| Name               | Status             |  Priority  |
+| ------------------ | ------------------ | :--------: |
+| Censored TOGGLE    | :x:                |    HIGH    |
+| Star TOGGLE        | :x:                |    HIGH    |
+| Quality TOGGLE     | :x:                |    HIGH    |
+| Title Search       | :heavy_check_mark: |            |
+| Existing TOGGLE    | :x:                |    LOW     |
+| Sort               | :x:                | FUNCTIONAL |
+| Category CHECKBOX  | :heavy_check_mark: |            |
+| Attribute CHECKBOX | :heavy_check_mark: |            |
 
 ## :x: Star Search
 

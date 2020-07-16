@@ -13,34 +13,52 @@
 | Recent Videos  | :heavy_check_mark: |
 | Newest Videos  | :heavy_check_mark: |
 | Popular Videos | :heavy_check_mark: |
-| Random         | :heavy_check_mark: |
+| Random Videos  | :heavy_check_mark: |
 
 ## :x: Add Videos
 
 ## :x: Video Search
 
-### :x: Main Section
+### :heavy_check_mark: Main Section
 
-| Name          | Status             | Priority |
-| ------------- | ------------------ | :------: |
-| Video         | :heavy_check_mark: |          |
-| Video Ribbon  | :x:                |   HIGH   |
-| Video Counter | :x:                |   HIGH   |
+| Name          | Status             |
+| ------------- | ------------------ |
+| Video         | :heavy_check_mark: |
+| Video Ribbon  | :heavy_check_mark: |
+| Video Counter | :heavy_check_mark: |
 
 ### :x: Sidebar
 
-| Name               | Status             |  Priority  |
-| ------------------ | ------------------ | :--------: |
-| Censored TOGGLE    | :x:                |    HIGH    |
-| Star TOGGLE        | :x:                |    HIGH    |
-| Quality TOGGLE     | :x:                |    HIGH    |
-| Title Search       | :heavy_check_mark: |            |
-| Existing TOGGLE    | :x:                |    LOW     |
-| Sort               | :x:                | FUNCTIONAL |
-| Category CHECKBOX  | :heavy_check_mark: |            |
-| Attribute CHECKBOX | :heavy_check_mark: |            |
+| Name                 | Status             |  Priority  |
+| -------------------- | ------------------ | :--------: |
+| Censored _TOGGLE_    | :x:                |    HIGH    |
+| Star _TOGGLE_        | :x:                |    HIGH    |
+| Quality _TOGGLE_     | :x:                |    HIGH    |
+| Title Search _INPUT_ | :heavy_check_mark: |            |
+| Existing _TOGGLE_    | :x:                |    LOW     |
+| Sort                 | :x:                | FUNCTIONAL |
+| Category _CHECKBOX_  | :heavy_check_mark: |            |
+| Attribute _CHECKBOX_ | :heavy_check_mark: |            |
 
 ## :x: Star Search
+
+### :x: Main Section
+
+| Name         | Status | Priority |
+| ------------ | ------ | :------: |
+| Star         | :x:    |   HIGH   |
+| Star Counter | :x:    |   HIGH   |
+
+### :x: Sidebar
+
+| Name                  | Status | Priority |
+| --------------------- | ------ | :------: |
+| Star Search _INPUT_   | :x:    |   HIGH   |
+| Breast _RADIO_        | :x:    |   HIGH   |
+| Eyecolor _RADIO_      | :x:    |   HIGH   |
+| Haircolor _RADIO_     | :x:    |   HIGH   |
+| Hairstyle _RADIO_     | :x:    |   HIGH   |
+| Attributes _CHECKBOX_ | :x:    |   HIGH   |
 
 ## :x: Stars
 
@@ -106,7 +124,7 @@
 
 | Name             | Status             |
 | ---------------- | ------------------ |
-| Add Star         | :heavy_check_mark: |
+| Add Star _INPUT_ | :heavy_check_mark: |
 | Add NoStar-label | :heavy_check_mark: |
 
 ### :x: Used Attributes
@@ -139,19 +157,19 @@
 
 ### :x: Input Fields
 
-| Name       | Status | Priority |
-| ---------- | ------ | :------: |
-| Breast     | :x:    |   HIGH   |
-| Eye Color  | :x:    |   HIGH   |
-| Hair Color | :x:    |   HIGH   |
-| Hair Style | :x:    |   HIGH   |
+| Name               | Status | Priority |
+| ------------------ | ------ | :------: |
+| Breast _INPUT_     | :x:    |   HIGH   |
+| Eye Color _INPUT_  | :x:    |   HIGH   |
+| Hair Color _INPUT_ | :x:    |   HIGH   |
+| Hair Style _INPUT_ | :x:    |   HIGH   |
 
 ### :x: Attribute input field
 
-| Name  | Status | Priority |
-| ----- | ------ | :------: |
-| Input | :x:    |   HIGH   |
-| List  | :x:    |   HIGH   |
+| Name           | Status | Priority |
+| -------------- | ------ | :------: |
+| Input          | :x:    |   HIGH   |
+| Attribute List | :x:    |   HIGH   |
 
 ### :x: Video list
 

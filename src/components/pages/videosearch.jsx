@@ -266,7 +266,10 @@ class VideoSearchPage extends Component {
                                         src={`${config.source}/images/videos/${this.state.videos[i].id}-290`}
                                         alt='video'
                                     />
+
                                     <span className='title card-title text-center'>{this.state.videos[i].name}</span>
+
+                                    <span className='ribbon'>{this.state.videos[i].quality}</span>
                                 </a>
                             ))}
                     </div>

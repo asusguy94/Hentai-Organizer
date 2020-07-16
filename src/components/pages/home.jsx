@@ -69,6 +69,7 @@ class HomePage extends Component {
                     <h2>
                         {obj.label} Videos (<span className='count'>{obj.limit}</span>)
                     </h2>
+
                     <div className='row'>
                         {Object.keys(obj.data).map((i) => (
                             <Link className='video col-1 px-0 mx-3 ribbon-container' to={`/video/${obj.data[i].id}`} key={i}>
@@ -79,6 +80,8 @@ class HomePage extends Component {
                                 />
 
                                 <span className='title mx-auto d-block'>{obj.data[i].name}</span>
+
+                                {obj.data[i].plays > 0 && <span className='ribbon'>{obj.data[i].plays}</span>}
                             </Link>
                         ))}
                     </div>

@@ -2,6 +2,13 @@
 
 ## :heavy_check_mark: Home Page
 
+| Name           | Status             |
+| -------------- | ------------------ |
+| Recent Videos  | :heavy_check_mark: |
+| Newest Videos  | :heavy_check_mark: |
+| Popular Videos | :heavy_check_mark: |
+| Random         | :heavy_check_mark: |
+
 ## :x: Add Videos
 
 ## :x: Video Search

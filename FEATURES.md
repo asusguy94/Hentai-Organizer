@@ -3,7 +3,7 @@
 |  Priority  | Explanation                                                                  |
 | :--------: | ---------------------------------------------------------------------------- |
 |    HIGH    | Feature will be implemented as soon as possible                              |
-|    LOW     | Feature will take some time to implement, or might not be implemented at all |
+|    LOW     | Feature will take some time to implement, or might be removed                |
 | FUNCTIONAL | The functionality of the feature is implemented, but might be improved later |
 
 ## :heavy_check_mark: Home Page

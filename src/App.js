@@ -8,6 +8,7 @@ import NavBar from './components/navbar'
 import HomePage from './components/pages/home'
 import VideosPage from './components/pages/videos'
 import VideoPage from './components/pages/video'
+import StarPage from './components/pages/star'
 
 /* Style */
 import './components/styles/main.scss'
@@ -39,6 +40,8 @@ class App extends Component {
                             <Route path='/stars/search'>
                                 <p>Stars Search Page</p>
                             </Route>
+
+                            <Route path='/star/:id' component={StarPage} />
 
                             <Route path='/generate/thumbnails'>
                                 <p>Generate Thumbnails Page</p>

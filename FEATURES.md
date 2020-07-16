@@ -84,3 +84,29 @@
 | Add NoStar-label | :heavy_check_mark:        |                                              |
 
 ### :x: Used Attributes
+
+## Star Page
+
+### :x: Dropbox
+
+### :heavy_check_mark: Image
+
+| Name         | Status | Priority |
+| ------------ | ------ | :------: |
+| Delete Image | :x:    |   HIGH   |
+| Delete Star  | :x:    |   HIGH   |
+
+### :heavy_check_mark: Title
+
+| Name   | Status | Priority |
+| ------ | ------ | :------: |
+| Rename | :x:    |   HIGH   |
+
+### :x: Input Fields
+
+### :x: Attribute input field
+
+### :x: Video list
+
+_missing hover action_
+_img instead of video_

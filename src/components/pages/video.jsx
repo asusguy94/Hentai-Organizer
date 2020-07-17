@@ -266,11 +266,9 @@ class VideoPage extends Component {
 
                             let attributes = this.state.stars.filter((star) => {
                                 if (star.id === starID) {
-                                    star.attributes.map((attribute) => {
-                                        return attribute
-                                    })
-                                    return star.attributes
+                                    return star
                                 }
+                                return null
                             })[0].attributes
 
                             if (item.attributes.length > attributes.length) {
@@ -278,11 +276,12 @@ class VideoPage extends Component {
                                 item.attributes = item.attributes.filter((attribute) => {
                                     let match = false
                                     attributes.filter((attributeItem) => {
-                                        if (attribute.id == attributeItem.id) {
+                                        if (attribute.id === attributeItem.id) {
                                             match = true
                                         }
                                     })
                                     if (!match) return attribute
+                                    return null
                                 })
                             } else {
                                 // Bookmark has only attributes from star
@@ -499,7 +498,7 @@ class VideoPage extends Component {
 
                         <ContextMenu id='video'>
                             <MenuItem
-                                disabled={this.state.video.noStar}
+                                disabled={this.state.video.noStar === 1}
                                 onClick={() => {
                                     this.handleModal(
                                         'Add Bookmark',
@@ -792,7 +791,7 @@ class VideoPage extends Component {
                                                 this.handleStar_add(e.target.value)
                                             }
                                         }}
-                                        disabled={this.state.video.noStar}
+                                        disabled={this.state.video.noStar === 1}
                                     />
 
                                     <input
@@ -800,7 +799,7 @@ class VideoPage extends Component {
                                         name='no-star'
                                         id='no-star'
                                         onChange={this.handleNoStar.bind(this)}
-                                        defaultChecked={this.state.video.noStar}
+                                        defaultChecked={this.state.video.noStar === 1}
                                         disabled={this.state.bookmarks.length || this.state.stars.length}
                                     />
                                     <label htmlFor='no-star'>No Star</label>

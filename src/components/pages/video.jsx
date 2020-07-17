@@ -275,7 +275,7 @@ class VideoPage extends Component {
                                 // Bookmark have at least 1 attribute not from star
                                 item.attributes = item.attributes.filter((attribute) => {
                                     let match = false
-                                    attributes.filter((attributeItem) => {
+                                    attributes.forEach((attributeItem) => {
                                         if (attribute.id === attributeItem.id) {
                                             match = true
                                         }

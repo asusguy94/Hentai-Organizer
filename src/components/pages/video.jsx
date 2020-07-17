@@ -108,7 +108,10 @@ class VideoPage extends Component {
             data: null,
         },
         newVideo: false,
-        inputValue: '',
+        input: {
+            star: '',
+            date: '',
+        },
     }
 
     handleWheel(e) {
@@ -356,7 +359,7 @@ class VideoPage extends Component {
 
     /* Date - own class */
     handleDate() {
-        Axios.get(`${config.api}/setdate.php?videoID=${this.state.video.id}&date=${this.state.inputValue}`).then(({ data }) => {
+        Axios.get(`${config.api}/setdate.php?videoID=${this.state.video.id}&date=${this.state.input.date}`).then(({ data }) => {
             if (data.success) {
                 this.setState((prevState) => {
                     let date = prevState.video.date
@@ -366,13 +369,28 @@ class VideoPage extends Component {
                 })
             }
 
-            this.setState({ inputValue: '' })
+            this.handleInput_reset('date')
         })
     }
 
-    handleInput(e) {
+    handleInput(e, field) {
         let inputValue = e.target.value
-        this.setState({ inputValue })
+
+        this.setState((prevState) => {
+            let input = prevState.input
+            input[field] = inputValue
+
+            return { input }
+        })
+    }
+
+    handleInput_reset(field) {
+        this.setState((prevState) => {
+            let input = prevState.input
+            input[field] = ''
+
+            return { input }
+        })
     }
 
     handleNoStar(e) {
@@ -399,6 +417,8 @@ class VideoPage extends Component {
                     return { stars }
                 })
             }
+
+            this.handleInput_reset('star')
         })
     }
 
@@ -477,7 +497,8 @@ class VideoPage extends Component {
                                                 <input
                                                     type='text'
                                                     className='text-center'
-                                                    onChange={(e) => this.handleInput(e)}
+                                                    value={this.state.input.date}
+                                                    onChange={(e) => this.handleInput(e, 'date')}
                                                     ref={(input) => input && input.focus()}
                                                     onKeyDown={(e) => {
                                                         if (e.key === 'Enter') {
@@ -838,7 +859,8 @@ class VideoPage extends Component {
                                     <input
                                         type='text'
                                         id='add-star'
-                                        onChange={(e) => this.handleInput(e)}
+                                        value={this.state.input.star}
+                                        onChange={(e) => this.handleInput(e, 'star')}
                                         onKeyDown={(e) => {
                                             if (e.key === 'Enter') {
                                                 e.preventDefault()

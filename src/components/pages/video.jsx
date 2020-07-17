@@ -775,20 +775,7 @@ class VideoPage extends Component {
                 </section>
 
                 <aside className='col-3'>
-                    <div id='franchise'>
-                        {this.state.video.related.length > 1 && <h2>Episodes</h2> &&
-                            this.state.video.related.map((item, i) => [
-                                <a className='episode row' href={`/video/${item.id}`} key={i}>
-                                    <span className='episode__plays col-2'>0 Plays</span>
-                                    <img
-                                        className='episode__thumbnail'
-                                        src={`${config.source}/images/videos/${item.id}-290`}
-                                        alt='thumbnail'
-                                    />
-                                    <span className='episode__title col-8'>{item.name}</span>
-                                </a>,
-                            ])}
-                    </div>
+                    <Franchise video={this.state.video} />
 
                     <div id='stars' className='row justify-content-center'>
                         {this.state.loaded.stars &&
@@ -1078,6 +1065,25 @@ class VideoPage extends Component {
                 })
             })
     }
+}
+
+class Franchise extends Component {
+    render() {
+        return (
+            <div id='franchise'>
+                {this.props.video.related.length > 1 && <h2>Episodes</h2> &&
+                    this.props.video.related.map((item, i) => (
+                        <a className='episode row' href={`/video/${item.id}`} key={i}>
+                            <span className='episode__plays col-2'>0 Plays</span>
+                            <img className='episode__thumbnail' src={`${config.source}/images/videos/${item.id}-290`} alt='thumbnail' />
+                            <span className='episode__title col-8'>{item.name}</span>
+                        </a>
+                    ))}
+            </div>
+        )
+    }
+
+    franchise() {}
 }
 
 export default VideoPage

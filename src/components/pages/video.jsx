@@ -470,7 +470,7 @@ class VideoPage extends Component {
                                                 <input
                                                     type='text'
                                                     className='text-center'
-                                                    onChange={this.handleInput.bind(this)}
+                                                    onChange={(e) => this.handleInput(e)}
                                                     ref={(input) => input && input.focus()}
                                                     onKeyDown={(e) => {
                                                         if (e.key === 'Enter') {
@@ -505,7 +505,7 @@ class VideoPage extends Component {
                         </div>
                     </header>
 
-                    <div className='video-container' onWheel={this.handleWheel.bind(this)}>
+                    <div className='video-container' onWheel={(e) => this.handleWheel(e)}>
                         <ContextMenuTrigger id='video'>
                             {this.state.loaded.video && (
                                 <PlyrComponent
@@ -831,7 +831,7 @@ class VideoPage extends Component {
                                     <input
                                         type='text'
                                         id='add-star'
-                                        onChange={this.handleInput.bind(this)}
+                                        onChange={(e) => this.handleInput(e)}
                                         onKeyDown={(e) => {
                                             if (e.key === 'Enter') {
                                                 e.preventDefault()
@@ -846,7 +846,7 @@ class VideoPage extends Component {
                                         type='checkbox'
                                         name='no-star'
                                         id='no-star'
-                                        onChange={this.handleNoStar.bind(this)}
+                                        onChange={(e) => this.handleNoStar(e)}
                                         defaultChecked={this.state.video.noStar === 1}
                                         disabled={this.state.bookmarks.length || this.state.stars.length}
                                     />

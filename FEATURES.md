@@ -96,7 +96,7 @@
 | Name              | Status             | Priority |
 | ----------------- | ------------------ | :------: |
 | Add Star          | :x:                |   HIGH   |
-| Remove Star       | :x:                |   HIGH   |
+| Remove Star       | :heavy_check_mark: |          |
 | Add Attribute     | :heavy_check_mark: |          |
 | Remove Attributes | :x:                |   HIGH   |
 | Change Category   | :heavy_check_mark: |          |

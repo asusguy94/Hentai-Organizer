@@ -51,7 +51,12 @@ class VideoPage extends Component {
             {
                 id: 0,
                 name: '',
-                // TODO Should contain star-attributes
+                attributes: [
+                    {
+                        id: 0,
+                        name: '',
+                    },
+                ],
             },
         ],
 
@@ -247,6 +252,52 @@ class VideoPage extends Component {
             })
 
             this.setState({ bookmarks: obj })
+        })
+    }
+
+    handleBookmark_removeStar(bookmark) {
+        Axios.get(`${config.api}/removebookmarkstar.php?bookmarkID=${bookmark.id}`).then(({ data }) => {
+            if (data.success) {
+                this.setState((prevState) => {
+                    let bookmarks = prevState.bookmarks
+                    bookmarks.map((item) => {
+                        if (item.id === bookmark.id) {
+                            let starID = bookmark.starID
+
+                            let attributes = this.state.stars.filter((star) => {
+                                if (star.id === starID) {
+                                    star.attributes.map((attribute) => {
+                                        return attribute
+                                    })
+                                    return star.attributes
+                                }
+                            })[0].attributes
+
+                            if (item.attributes.length > attributes.length) {
+                                // Bookmark have at least 1 attribute not from star
+                                item.attributes = item.attributes.filter((attribute) => {
+                                    let match = false
+                                    attributes.filter((attributeItem) => {
+                                        if (attribute.id == attributeItem.id) {
+                                            match = true
+                                        }
+                                    })
+                                    if (!match) return attribute
+                                })
+                            } else {
+                                // Bookmark has only attributes from star
+                                item.attributes = []
+                            }
+
+                            item.starID = 0
+                        }
+
+                        return item
+                    })
+
+                    return { bookmarks }
+                })
+            }
         })
     }
 
@@ -562,7 +613,10 @@ class VideoPage extends Component {
                                             <i className='far fa-plus' /> Add Star
                                         </MenuItem>
 
-                                        <MenuItem disabled>
+                                        <MenuItem
+                                            disabled={this.state.bookmarks[i].starID === 0}
+                                            onClick={() => this.handleBookmark_removeStar(this.state.bookmarks[i])}
+                                        >
                                             <i className='far fa-trash-alt' /> Remove Star
                                         </MenuItem>
 

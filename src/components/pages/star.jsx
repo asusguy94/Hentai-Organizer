@@ -69,7 +69,7 @@ class StarPage extends Component {
                                     src={`${config.source}/videos/${this.state.videos[i].fname}`}
                                     poster={`${config.source}/images/videos/${this.state.videos[i].id}-290`}
                                     preload='metadata'
-                                    mutedbpp
+                                    muted
                                 />
 
                                 <span className='title card-title'>{this.state.videos[i].name}</span>

@@ -255,6 +255,53 @@ class VideoPage extends Component {
         })
     }
 
+    handleBookmark_clearAttributes(bookmark) {
+        Axios.get(`${config.api}/removebookmarkattributes.php?bookmarkID=${bookmark.id}`).then(({ data }) => {
+            if (data.success) {
+                this.setState((prevState) => {
+                    let bookmarks = prevState.bookmarks
+                    bookmarks.map((item) => {
+                        if (item.id === bookmark.id) {
+                            let starID = bookmark.starID
+
+                            if (starID !== 0) {
+                                let attributes = this.attributesFromStar(starID)
+
+                                if (item.attributes.length > attributes.length) {
+                                    // Bookmark have at least 1 attribute not from star
+                                    item.attributes = item.attributes.filter((attribute) => {
+                                        let match = false
+                                        attributes.forEach((attributeItem) => {
+                                            if (attribute.id === attributeItem.id) match = true
+                                        })
+                                        if (match) return attribute
+                                        return null
+                                    })
+                                }
+                            } else {
+                                // bookmark does not have a star
+                                item.attributes = []
+                            }
+                        }
+
+                        return item
+                    })
+
+                    return { bookmarks }
+                })
+            }
+        })
+    }
+
+    attributesFromStar(starID) {
+        return this.state.stars.filter((star) => {
+                                if (star.id === starID) {
+                                    return star
+                                }
+                                return null
+                            })[0].attributes
+    }
+
     handleBookmark_removeStar(bookmark) {
         Axios.get(`${config.api}/removebookmarkstar.php?bookmarkID=${bookmark.id}`).then(({ data }) => {
             if (data.success) {
@@ -264,12 +311,7 @@ class VideoPage extends Component {
                         if (item.id === bookmark.id) {
                             let starID = bookmark.starID
 
-                            let attributes = this.state.stars.filter((star) => {
-                                if (star.id === starID) {
-                                    return star
-                                }
-                                return null
-                            })[0].attributes
+                            let attributes = this.attributesFromStar(starID)
 
                             if (item.attributes.length > attributes.length) {
                                 // Bookmark have at least 1 attribute not from star
@@ -649,7 +691,13 @@ class VideoPage extends Component {
                                             <i className='far fa-plus' /> Add Attribute
                                         </MenuItem>
 
-                                        <MenuItem disabled>
+                                        <MenuItem
+                                            disabled={
+                                                /* TODO Check if star bookmark has only star-attributes */
+                                                this.state.bookmarks[i].attributes.length === 0
+                                            }
+                                            onClick={() => this.handleBookmark_clearAttributes(this.state.bookmarks[i])}
+                                        >
                                             <i className='far fa-trash-alt' /> Remove Attributes
                                         </MenuItem>
 

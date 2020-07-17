@@ -185,6 +185,13 @@ class VideoPage extends Component {
                     attributes,
                 })
 
+                bookmarks.sort((a, b) => {
+                    let valA = a.start
+                    let valB = b.start
+
+                    return valA - valB
+                })
+
                 return { bookmarks }
             })
         }

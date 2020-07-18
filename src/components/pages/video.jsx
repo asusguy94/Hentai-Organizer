@@ -953,7 +953,7 @@ class VideoPage extends Component {
                         localStorage.video = this.state.video.id
                         localStorage.bookmark = 0
 
-                        this.setState({ newVideo: false })
+                        this.setState({ newVideo: true })
 
                         hls.startLoad()
                     }

@@ -15,7 +15,6 @@ import VideoSearchPage from './components/pages/videosearch'
 import './components/styles/main.scss'
 
 // TODO Rewrite scss files, currently rules might overwrite another
-// TODO Loader is not rendering
 
 class App extends Component {
     render() {

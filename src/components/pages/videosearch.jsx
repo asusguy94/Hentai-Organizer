@@ -295,7 +295,7 @@ class VideoSearchPage extends Component {
                     )}
 
                     <div className='row justify-content-center'>
-                        {this.state.loaded.videos &&
+                        {this.state.loaded.videos ? (
                             Object.keys(this.state.videos).map((i) => (
                                 <a
                                     key={i}
@@ -312,7 +312,10 @@ class VideoSearchPage extends Component {
 
                                     <span className='ribbon'>{this.state.videos[i].quality}</span>
                                 </a>
-                            ))}
+                            ))
+                        ) : (
+                            <div id='loader'></div>
+                        )}
                     </div>
                 </section>
             </div>

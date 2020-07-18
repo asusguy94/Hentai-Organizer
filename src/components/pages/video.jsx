@@ -31,7 +31,6 @@ class VideoPage extends Component {
             },
             quality: 0,
             censored: false,
-            plays: 0,
             attributes: [
                 // TODO get from bookmark-attributes_table and stars_table
                 {
@@ -43,6 +42,7 @@ class VideoPage extends Component {
                 {
                     id: 0,
                     name: 0,
+                    plays: 0,
                 },
             ],
             noStar: 0,
@@ -435,20 +435,11 @@ class VideoPage extends Component {
 
     /* Plays - own class? */
     handlePlays_add() {
-        Axios.get(`${config.api}/addplay.php?videoID=${this.state.video.id}`).then(() => {
-            console.log('Play Added')
-        })
+        Axios.get(`${config.api}/addplay.php?videoID=${this.state.video.id}`)
     }
 
     handlePlays_reset() {
-        Axios.get(`${config.api}/removeplays.php?videoID=${this.state.video.id}`).then(() => {
-            this.setState((prevState) => {
-                let video = prevState.video
-                video.plays = 0
-
-                return { video }
-            })
-        })
+        Axios.get(`${config.api}/removeplays.php?videoID=${this.state.video.id}`)
     }
 
     render() {
@@ -497,7 +488,6 @@ class VideoPage extends Component {
                                                 <input
                                                     type='text'
                                                     className='text-center'
-                                                    value={this.state.input.date}
                                                     onChange={(e) => this.handleInput(e, 'date')}
                                                     ref={(input) => input && input.focus()}
                                                     onKeyDown={(e) => {

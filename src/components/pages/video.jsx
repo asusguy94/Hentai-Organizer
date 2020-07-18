@@ -213,6 +213,13 @@ class VideoPage extends Component {
                     return bookmarks[i]
                 })
 
+                bookmarks.sort((a, b) => {
+                    let valA = a.start
+                    let valB = b.start
+
+                    return valA - valB
+                })
+
                 this.setState({ bookmarks: arr })
             }
         })

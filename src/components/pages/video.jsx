@@ -926,9 +926,9 @@ class VideoPage extends Component {
                 hls.on(Hls.Events.MANIFEST_PARSED, (e, data) => {
                     const dataLevels = data['levels'].length - 1
 
-                    let levels = { 1080: 3, 720: 2, 480: 1, 360: 0 }
-                    let maxLevel = levels[1080]
-                    let maxStartLevel = levels[720]
+                    const levels = config.hls.levels
+                    const maxLevel = levels[config.hls.maxLevel]
+                    const maxStartLevel = levels[config.hls.maxStartLevel]
 
                     // Default start level to maxLevel-1
                     let desiredStartLevel = maxLevel - 1

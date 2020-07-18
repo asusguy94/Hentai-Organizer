@@ -7,6 +7,32 @@ import '../styles/star.scss'
 
 import config from '../config'
 
+class StarVideos extends Component {
+    render() {
+        const { videos } = this.props
+
+        return (
+            <div id='videos' className='row'>
+                {Object.keys(videos).map((key, i) => (
+                    <a key={i} className='video card' style={{ width: 290 }} href={`/video/${videos[i].id}`}>
+                        <img alt='video' className='card-img-top' src={`${config.source}/images/videos/${videos[i].id}-290`} />
+
+                        <video // show this on hover
+                            className='card-img-top d-none'
+                            src={`${config.source}/videos/${videos[i].fname}`}
+                            poster={`${config.source}/images/videos/${videos[i].id}-290`}
+                            preload='metadata'
+                            muted
+                        />
+
+                        <span className='title card-title'>{videos[i].name}</span>
+                    </a>
+                ))}
+            </div>
+        )
+    }
+}
+
 class StarPage extends Component {
     state = {
         star: {
@@ -54,29 +80,7 @@ class StarPage extends Component {
                 )}
 
                 <h3>Videos</h3>
-                {this.state.loaded.videos && (
-                    <div id='videos' className='row'>
-                        {Object.keys(this.state.videos).map((key, i) => (
-                            <a key={i} className='video card' style={{ width: 290 }} href={`/video/${this.state.videos[i].id}`}>
-                                <img
-                                    alt='video'
-                                    className='card-img-top'
-                                    src={`${config.source}/images/videos/${this.state.videos[i].id}-290`}
-                                />
-
-                                <video // show this on hover
-                                    className='card-img-top d-none'
-                                    src={`${config.source}/videos/${this.state.videos[i].fname}`}
-                                    poster={`${config.source}/images/videos/${this.state.videos[i].id}-290`}
-                                    preload='metadata'
-                                    muted
-                                />
-
-                                <span className='title card-title'>{this.state.videos[i].name}</span>
-                            </a>
-                        ))}
-                    </div>
-                )}
+                {this.state.loaded.videos && <StarVideos videos={this.state.videos} />}
 
                 <Modal visible={this.state.modal.visible} onClose={() => this.handleModal()} title={this.state.modal.title}>
                     {this.state.modal.data}
@@ -88,8 +92,6 @@ class StarPage extends Component {
     componentDidMount() {
         this.getData()
     }
-
-    componentDidUpdate() {}
 
     getData() {
         let { id } = this.props.match.params

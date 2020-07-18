@@ -7,25 +7,27 @@ import config from '../config'
 
 class HomeColumn extends Component {
     render() {
-        if (this.props.obj.enabled) {
+        const { obj } = this.props
+
+        if (obj.enabled) {
             return (
                 <div className='col-12'>
                     <h2>
-                        {this.props.obj.label} Videos (<span className='count'>{this.props.obj.limit}</span>)
+                        {obj.label} Videos (<span className='count'>{obj.limit}</span>)
                     </h2>
 
                     <div className='row'>
-                        {Object.keys(this.props.obj.data).map((i) => (
-                            <Link className='video col-1 px-0 mx-3 ribbon-container' to={`/video/${this.props.obj.data[i].id}`} key={i}>
+                        {Object.keys(obj.data).map((i) => (
+                            <Link className='video col-1 px-0 mx-3 ribbon-container' to={`/video/${obj.data[i].id}`} key={i}>
                                 <img
                                     className='mx-auto img-thumbnail'
                                     alt='video'
-                                    src={`${config.source}/images/videos/${this.props.obj.data[i].id}-290`}
+                                    src={`${config.source}/images/videos/${obj.data[i].id}-290`}
                                 />
 
-                                <span className='title mx-auto d-block'>{this.props.obj.data[i].name}</span>
+                                <span className='title mx-auto d-block'>{obj.data[i].name}</span>
 
-                                {this.props.obj.data[i].plays > 0 && <span className='ribbon'>{this.props.obj.data[i].plays}</span>}
+                                {obj.data[i].plays > 0 && <span className='ribbon'>{obj.data[i].plays}</span>}
                             </Link>
                         ))}
                     </div>

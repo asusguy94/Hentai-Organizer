@@ -17,7 +17,13 @@ class VideoSearchPage extends Component {
                 plays: 0,
                 categories: [],
                 attribute: [],
-                hidden: false,
+                hidden: {
+                    // allow multiple if selection is checkbox
+                    category: [], // array instead of boolean, where length=0>>>false and length>0>>>true
+                    attribute: [], // array instead of boolean, where length=0>>>false and length>0>>>true
+                    titleSearch: false,
+                    noCategory: false,
+            },
             },
         ],
 
@@ -46,13 +52,13 @@ class VideoSearchPage extends Component {
     getCount() {
         let count = 0
         this.state.videos.forEach(({ hidden }) => {
-            count += !hidden.category && !hidden.attribute && !hidden.titleSearch
+            count += !hidden.category.length && !hidden.attribute.length && !hidden.titleSearch && !hidden.noCategory
         })
         return count
     }
 
     isHidden({ hidden }) {
-        return hidden.category || hidden.attribute || hidden.titleSearch
+        return hidden.category.length || hidden.attribute.length || hidden.titleSearch || hidden.noCategory
     }
 
     handleTitleSearch(e) {
@@ -68,40 +74,75 @@ class VideoSearchPage extends Component {
     }
 
     handleCategoryFilter(e, target) {
-        let videos = this.state.videos.map((item) => {
-            if (!e.target.checked) {
-                item.hidden.category = false
-            } else {
+        let videos = this.state.videos.map((video) => {
                 if (target === null) {
-                    item.hidden.category = item.categories.map((category) => {
+                video.hidden.noCategory = e.target.checked && video.categories.length
+            } else {
+                const targetLower = target.name.toLowerCase()
+
+                if (!e.target.checked) {
+                    video.hidden.noCategory = false
+                    let match = !video.categories
+                        .map((category) => {
                         return category.toLowerCase()
-                    }).length
+                        })
+                        .includes(targetLower)
+
+                    if (match) {
+                        let index = video.hidden.category.indexOf(targetLower)
+                        video.hidden.category.splice(index, 1)
+                    }
                 } else {
-                    item.hidden.category = !item.categories
+                    let match = !video.categories
                         .map((category) => {
                             return category.toLowerCase()
                         })
-                        .includes(target.name.toLowerCase())
+                        .includes(targetLower)
+
+                    if (match && !video.hidden.category.includes(targetLower)) {
+                        video.hidden.category.push(targetLower)
                 }
             }
-            return item
+            }
+
+            return video
         })
 
         this.setState({ videos })
     }
 
     handleAttributeFilter(e, target) {
-        let videos = this.state.videos.map((item) => {
-            if (!e.target.checked) {
-                item.hidden.attribute = false
+        let videos = this.state.videos.map((video) => {
+            if (target === null) {
+                video.hidden.noCategory = e.target.checked && video.categories.length
             } else {
-                item.hidden.attribute = !item.attributes
+                const targetLower = target.name.toLowerCase()
+
+            if (!e.target.checked) {
+                    let match = !video.attributes
+                        .map((attribute) => {
+                            return attribute.toLowerCase()
+                        })
+                        .includes(targetLower)
+
+                    if (match) {
+                        let index = video.hidden.attribute.indexOf(targetLower)
+                        video.hidden.attribute.splice(index, 1)
+                    }
+            } else {
+                    let match = !video.attributes
                     .map((attribute) => {
                         return attribute.toLowerCase()
                     })
-                    .includes(target.name.toLowerCase())
+                        .includes(targetLower)
+
+                    if (match && !video.hidden.attribute.includes(targetLower)) {
+                        video.hidden.attribute.push(targetLower)
+                    }
+                }
             }
-            return item
+
+            return video
         })
 
         this.setState({ videos })
@@ -288,9 +329,10 @@ class VideoSearchPage extends Component {
                 this.setState(() => {
                     videos = videos.map((item) => {
                         item.hidden = {
-                            category: false,
-                            attribute: false,
+                            category: [],
+                            attribute: [],
                             titleSearch: false,
+                            noCategory: false,
                         }
 
                         return item

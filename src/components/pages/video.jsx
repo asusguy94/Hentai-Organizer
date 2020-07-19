@@ -915,7 +915,7 @@ class VideoPage extends Component {
             }
 
             /* HLS handler */
-            if (!this.state.loaded.hls && Hls.isSupported()) {
+            if (!this.state.loaded.hls && Hls.isSupported() && config.hls.enabled) {
                 const hls = new Hls({ autoStartLoad: false })
                 hls.loadSource(this.player.player.media.firstElementChild.getAttribute('src'))
                 hls.attachMedia(this.player.player.media)

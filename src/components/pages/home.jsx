@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom'
 
 import Axios from 'axios'
 
+import '../styles/home.scss'
+
 import config from '../config'
 
 class HomeColumn extends Component {
@@ -11,7 +13,7 @@ class HomeColumn extends Component {
 
         if (obj.enabled) {
             return (
-                <div className='col-12'>
+                <section className='col-12'>
                     <h2>
                         {obj.label} Videos (<span className='count'>{obj.limit}</span>)
                     </h2>
@@ -25,13 +27,13 @@ class HomeColumn extends Component {
                                     src={`${config.source}/images/videos/${obj.data[i].id}-290`}
                                 />
 
-                                <span className='title mx-auto d-block'>{obj.data[i].name}</span>
+                                <span className='video__title mx-auto d-block'>{obj.data[i].name}</span>
 
                                 {obj.data[i].plays > 0 && <span className='ribbon'>{obj.data[i].plays}</span>}
                             </Link>
                         ))}
                     </div>
-                </div>
+                </section>
             )
         }
         return null
@@ -68,7 +70,7 @@ class HomePage extends Component {
 
     render() {
         return (
-            <div>
+            <div className='home-page'>
                 <HomeColumn obj={this.state.recent} />
                 <HomeColumn obj={this.state.newest} />
                 <HomeColumn obj={this.state.random} />

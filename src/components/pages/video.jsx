@@ -130,13 +130,15 @@ class VideoPage extends Component {
     }
 
     handleCensor_toggle() {
-        Axios.get(`${config.api}/cen.php?id=${this.state.video.id}`).then(() => {
+        Axios.get(`${config.api}/cen.php?id=${this.state.video.id}`).then(({ data }) => {
+            if (data.success) {
             this.setState((prevState) => {
                 let video = prevState.video
                 video.censored = !video.censored
 
                 return { video }
             })
+            }
         })
     }
 
@@ -254,7 +256,8 @@ class VideoPage extends Component {
     }
 
     handleBookmark_addAttribute(attribute, bookmark) {
-        Axios.get(`${config.api}/addbookmarkattribute.php?bookmarkID=${bookmark.id}&attributeID=${attribute.id}`).then(() => {
+        Axios.get(`${config.api}/addbookmarkattribute.php?bookmarkID=${bookmark.id}&attributeID=${attribute.id}`).then(({ data }) => {
+            if (data.success) {
             let bookmarks = this.state.bookmarks
             let obj = Object.keys(bookmarks).map((i) => {
                 if (bookmarks[i].id === bookmark.id) {
@@ -269,6 +272,7 @@ class VideoPage extends Component {
             })
 
             this.setState({ bookmarks: obj })
+            }
         })
     }
 
@@ -419,7 +423,7 @@ class VideoPage extends Component {
             if (data.success) {
                 this.setState((prevState) => {
                     let stars = prevState.stars
-                    stars.push({ id: data.starID, name })
+                    stars.push({ id: data.starID, name, attributes: data.attributes })
 
                     return { stars }
                 })

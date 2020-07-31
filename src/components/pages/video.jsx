@@ -855,33 +855,43 @@ class VideoPage extends Component {
                             <hr />
 
                             {this.state.loaded.video && (
-                                <React.Fragment>
-                                    <label htmlFor='add-star'>Star</label>
-                                    <input
-                                        type='text'
-                                        id='add-star'
-                                        value={this.state.input.star}
-                                        onChange={(e) => this.handleInput(e, 'star')}
-                                        onKeyDown={(e) => {
-                                            if (e.key === 'Enter') {
-                                                e.preventDefault()
+                                <div className='form-inline justify-content-center'>
+                                    <div className='form-group mr-2'>
+                                        <label htmlFor='add-star' className='mr-1'>
+                                            Star
+                                        </label>
+                                        <input
+                                            type='text'
+                                            id='add-star'
+                                            className='form-control'
+                                            value={this.state.input.star}
+                                            onChange={(e) => this.handleInput(e, 'star')}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter') {
+                                                    e.preventDefault()
 
-                                                this.handleStar_add(e.target.value)
-                                            }
-                                        }}
-                                        disabled={this.state.video.noStar === 1}
-                                    />
+                                                    this.handleStar_add(e.target.value)
+                                                }
+                                            }}
+                                            disabled={this.state.video.noStar === 1}
+                                        />
+                                    </div>
 
-                                    <input
-                                        type='checkbox'
-                                        name='no-star'
-                                        id='no-star'
-                                        onChange={(e) => this.handleNoStar(e)}
-                                        defaultChecked={this.state.video.noStar === 1}
-                                        disabled={this.state.bookmarks.length || this.state.stars.length}
-                                    />
-                                    <label htmlFor='no-star'>No Star</label>
-                                </React.Fragment>
+                                    <div className='form-check'>
+                                        <input
+                                            type='checkbox'
+                                            name='no-star'
+                                            id='no-star'
+                                            className='form-check-input mr-1'
+                                            onChange={(e) => this.handleNoStar(e)}
+                                            defaultChecked={this.state.video.noStar === 1}
+                                            disabled={this.state.bookmarks.length || this.state.stars.length}
+                                        />
+                                        <label htmlFor='no-star' className='form-check-label'>
+                                            No Star
+                                        </label>
+                                    </div>
+                                </div>
                             )}
                         </div>
                     </div>

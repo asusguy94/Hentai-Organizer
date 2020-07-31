@@ -9,6 +9,7 @@ This is early alpha version of the next version, only use this if you're interes
    | :---: | --- |
    | `api` | The URL to the backend scripts |
    | `source` | The path to the old server...usefull for grabbing images, and also to be able to play videos |
+   | `db` | The root path for phpMyAdmin, it can usually be set to the same as `source` |
    |`hls`|`enable`: Enable HLS playback (requires special files)<br/>`maxLevel`: Highest quality allowed by HLS<br/>`maxStartLevel`: Highest initial quality allowed by HLS |
 
 2. Install NPM and then Yarn

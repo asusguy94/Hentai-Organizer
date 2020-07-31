@@ -15,7 +15,7 @@ class NavBar extends Component {
                     </li>
 
                     <li>
-                        <a href={`${config.source}/add_videos.php`} target='_blank'>
+                        <a href={`${config.source}/add_videos.php`} target='_blank' rel='noopener noreferrer'>
                             Add Videos
                         </a>
                     </li>
@@ -33,7 +33,7 @@ class NavBar extends Component {
                         <Link to='/stars/search'>Star Search</Link>
                         <ul className='sub-menu'>
                             <li>
-                                <a href={`${config.source}/stars.php`} target='_blank'>
+                                <a href={`${config.source}/stars.php`} target='_blank' rel='noopener noreferrer'>
                                     Stars
                                 </a>
                             </li>
@@ -41,12 +41,12 @@ class NavBar extends Component {
                     </li>
 
                     <li>
-                        <a href={`${config.source}/video_generatethumbnails.php`} target='_blank'>
+                        <a href={`${config.source}/video_generatethumbnails.php`} target='_blank' rel='noopener noreferrer'>
                             Generate Thumbnails
                         </a>
                         <ul className='sub-menu'>
                             <li>
-                                <a href={`${config.source}/vtt.php`} target='_blank'>
+                                <a href={`${config.source}/vtt.php`} target='_blank' rel='noopener noreferrer'>
                                     Generate WebVTT
                                 </a>
                             </li>
@@ -54,7 +54,7 @@ class NavBar extends Component {
                     </li>
 
                     <li>
-                        <a href='https://ds1517/phpMyAdmin' target='_blank'>
+                        <a href={`${config.db}/phpMyAdmin`} target='_blank' rel='noopener noreferrer'>
                             DB
                         </a>
                     </li>

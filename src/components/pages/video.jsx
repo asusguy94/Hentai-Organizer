@@ -132,12 +132,12 @@ class VideoPage extends Component {
     handleCensor_toggle() {
         Axios.get(`${config.api}/cen.php?id=${this.state.video.id}`).then(({ data }) => {
             if (data.success) {
-            this.setState((prevState) => {
-                let video = prevState.video
-                video.censored = !video.censored
+                this.setState((prevState) => {
+                    let video = prevState.video
+                    video.censored = !video.censored
 
-                return { video }
-            })
+                    return { video }
+                })
             }
         })
     }
@@ -322,11 +322,11 @@ class VideoPage extends Component {
 
     attributesFromStar(starID) {
         return this.state.stars.filter((star) => {
-                                if (star.id === starID) {
-                                    return star
-                                }
-                                return null
-                            })[0].attributes
+            if (star.id === starID) {
+                return star
+            }
+            return null
+        })[0].attributes
     }
 
     handleBookmark_removeStar(bookmark) {

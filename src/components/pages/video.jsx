@@ -1095,19 +1095,29 @@ class Franchise extends Component {
     render() {
         return (
             <div id='franchise'>
-                {this.props.video.related.length > 1 && <h2>Episodes</h2> &&
-                    this.props.video.related.map((item, i) => (
-                        <a className='episode row' href={`/video/${item.id}`} key={i}>
-                            <span className='episode__plays col-2'>0 Plays</span>
-                            <img className='episode__thumbnail' src={`${config.source}/images/videos/${item.id}-290`} alt='thumbnail' />
-                            <span className='episode__title col-8'>{item.name}</span>
-                        </a>
-                    ))}
+                {this.props.video.related.length > 1 && [
+                    <h2>Episodes</h2> &&
+                        this.props.video.related.map((item, i) => (
+                            <a className='episode row' href={`/video/${item.id}`} key={i}>
+                                <span className='episode__plays col-2'>{item.plays} Plays</span>
+
+                                <img
+                                    className='episode__thumbnail'
+                                    src={`${config.source}/images/videos/${item.id}-290`}
+                                    alt='thumbnail'
+                                />
+
+                                <span className='episode__title col-8'>
+                                    {item.name.length > config.franchise.title.maxLength
+                                        ? item.name.slice(0, config.franchise.title.maxLength - 3) + '...'
+                                        : item.name}
+                                </span>
+                            </a>
+                        )),
+                ]}
             </div>
         )
     }
-
-    franchise() {}
 }
 
 export default VideoPage

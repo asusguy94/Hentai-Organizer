@@ -1,6 +1,7 @@
 {
     "api": "http://api.hentai.ds1517",
     "source": "https://hentai.ds1517",
+    "db": "https://ds1517",
     "timeline": {
         "offset": 0.88
     },

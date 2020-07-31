@@ -24,6 +24,29 @@
         }
     }
 
+    #star {
+        #dropbox {
+            width: 200px;
+            height: 275px;
+            border: 2px dashed rgba(255, 0, 0, 0.3);
+
+            .label {
+                position: relative;
+                text-align: center;
+                top: 50%;
+            }
+        }
+
+        label {
+            margin-right: 9px;
+
+            &.bold {
+                font-weight: bold;
+                margin-right: 7px;
+            }
+        }
+    }
+
     .video {
         margin: 0 5px 10px;
     }

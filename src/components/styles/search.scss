@@ -5,6 +5,29 @@
         margin-bottom: 0;
     }
 
+    .star,
+    .video {
+        margin: 5px;
+
+        &.video {
+            width: $thumbnailWidth + px;
+
+            img {
+                width: inherit;
+                height: $thumbnailHeight + px;
+            }
+        }
+
+        &.star {
+            width: $starWidth + px;
+
+            img {
+                width: inherit;
+                height: $starHeight + px;
+            }
+        }
+    }
+
     .video {
         margin: 5px;
 
@@ -98,5 +121,9 @@
 
     .count {
         color: blue;
+    }
+
+    .global-category {
+        text-decoration: underline;
     }
 }

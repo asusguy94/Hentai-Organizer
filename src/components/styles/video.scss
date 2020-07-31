@@ -20,7 +20,7 @@
         }
 
         &__next {
-            margin-top: 1%;
+            margin-top: 0.6em;
         }
 
         .btn {
@@ -92,15 +92,9 @@
                     background-color: darkgrey;
                 }
 
-                &__plays {
-                }
-
                 &__thumbnail {
                     padding: 3px 0;
                     height: inherit;
-                }
-
-                &__title {
                 }
             }
         }

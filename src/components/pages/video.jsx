@@ -177,28 +177,30 @@ class VideoPage extends Component {
         }
 
         const success = (data, starID = 0) => {
-            let attributes = data.attributes
-            if (typeof data.attributes === 'undefined') attributes = []
+            if (data.success) {
+                let attributes = data.attributes
+                if (typeof data.attributes === 'undefined') attributes = []
 
-            this.setState((prevState) => {
-                let bookmarks = prevState.bookmarks
-                bookmarks.push({
-                    id: data.id,
-                    name: category.name,
-                    start: time,
-                    starID,
-                    attributes,
+                this.setState((prevState) => {
+                    let bookmarks = prevState.bookmarks
+                    bookmarks.push({
+                        id: data.id,
+                        name: category.name,
+                        start: time,
+                        starID,
+                        attributes,
+                    })
+
+                    bookmarks.sort((a, b) => {
+                        let valA = a.start
+                        let valB = b.start
+
+                        return valA - valB
+                    })
+
+                    return { bookmarks }
                 })
-
-                bookmarks.sort((a, b) => {
-                    let valA = a.start
-                    let valB = b.start
-
-                    return valA - valB
-                })
-
-                return { bookmarks }
-            })
+            }
         }
     }
 
@@ -228,50 +230,54 @@ class VideoPage extends Component {
     }
 
     handleBookmark_remove(id) {
-        Axios.get(`${config.api}/removebookmark.php?id=${id}`).then(() => {
-            let bookmarks = this.state.bookmarks.filter((item) => {
-                return item.id !== id
-            })
+        Axios.get(`${config.api}/removebookmark.php?id=${id}`).then(({ data }) => {
+            if (data.success) {
+                let bookmarks = this.state.bookmarks.filter((item) => {
+                    return item.id !== id
+                })
 
-            this.setState({ bookmarks })
+                this.setState({ bookmarks })
+            }
         })
     }
 
     handleBookmark_category(category, bookmark) {
-        Axios.get(`${config.api}/changebookmarkcategory.php?id=${bookmark.id}&categoryID=${category.id}`).then(() => {
-            let bookmarks = this.state.bookmarks
-            let obj = Object.keys(bookmarks).map((i) => {
-                if (bookmarks[i].id === bookmark.id) {
-                    let item = bookmarks[i]
-                    item.name = category.name
+        Axios.get(`${config.api}/changebookmarkcategory.php?id=${bookmark.id}&categoryID=${category.id}`).then(({ data }) => {
+            if (data.success) {
+                let bookmarks = this.state.bookmarks
+                let obj = Object.keys(bookmarks).map((i) => {
+                    if (bookmarks[i].id === bookmark.id) {
+                        let item = bookmarks[i]
+                        item.name = category.name
 
-                    return item
-                }
+                        return item
+                    }
 
-                return bookmarks[i]
-            })
+                    return bookmarks[i]
+                })
 
-            this.setState({ bookmarks: obj })
+                this.setState({ bookmarks: obj })
+            }
         })
     }
 
     handleBookmark_addAttribute(attribute, bookmark) {
         Axios.get(`${config.api}/addbookmarkattribute.php?bookmarkID=${bookmark.id}&attributeID=${attribute.id}`).then(({ data }) => {
             if (data.success) {
-            let bookmarks = this.state.bookmarks
-            let obj = Object.keys(bookmarks).map((i) => {
-                if (bookmarks[i].id === bookmark.id) {
-                    let item = bookmarks[i]
-                    let attributes = item.attributes
-                    attributes.push({ id: attribute.id, name: attribute.name })
+                let bookmarks = this.state.bookmarks
+                let obj = Object.keys(bookmarks).map((i) => {
+                    if (bookmarks[i].id === bookmark.id) {
+                        let item = bookmarks[i]
+                        let attributes = item.attributes
+                        attributes.push({ id: attribute.id, name: attribute.name })
 
-                    return item
-                }
+                        return item
+                    }
 
-                return bookmarks[i]
-            })
+                    return bookmarks[i]
+                })
 
-            this.setState({ bookmarks: obj })
+                this.setState({ bookmarks: obj })
             }
         })
     }
@@ -407,13 +413,15 @@ class VideoPage extends Component {
     handleNoStar(e) {
         let status = Number(e.target.checked)
 
-        Axios.get(`${config.api}/nostar.php?videoID=${this.state.video.id}&status=${status}`).then(() => {
-            this.setState((prevState) => {
-                let video = prevState.video
-                video.noStar = status
+        Axios.get(`${config.api}/nostar.php?videoID=${this.state.video.id}&status=${status}`).then(({ data }) => {
+            if (data.success) {
+                this.setState((prevState) => {
+                    let video = prevState.video
+                    video.noStar = status
 
-                return { video }
-            })
+                    return { video }
+                })
+            }
         })
     }
 
@@ -434,13 +442,15 @@ class VideoPage extends Component {
     }
 
     handleStar_remove(id) {
-        Axios.get(`${config.api}/removevideostar.php?videoID=${this.state.video.id}&starID=${id}`).then(() => {
-            let stars = this.state.stars.filter((item) => {
-                return item.id !== id
-            })
+        Axios.get(`${config.api}/removevideostar.php?videoID=${this.state.video.id}&starID=${id}`).then(({ data }) => {
+            if (data.success) {
+                let stars = this.state.stars.filter((item) => {
+                    return item.id !== id
+                })
 
-            // TODO check if star has bookmarks
-            this.setState({ stars })
+                // TODO check if star has bookmarks - evaluate if this is required, was not a feature before
+                this.setState({ stars })
+            }
         })
     }
 

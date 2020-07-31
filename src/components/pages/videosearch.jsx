@@ -18,12 +18,11 @@ class VideoSearchPage extends Component {
                 categories: [],
                 attribute: [],
                 hidden: {
-                    // allow multiple if selection is checkbox
-                    category: [], // array instead of boolean, where length=0>>>false and length>0>>>true
-                    attribute: [], // array instead of boolean, where length=0>>>false and length>0>>>true
+                    category: [],
+                    attribute: [],
                     titleSearch: false,
                     noCategory: false,
-            },
+                },
             },
         ],
 
@@ -50,15 +49,34 @@ class VideoSearchPage extends Component {
     }
 
     getCount() {
-        let count = 0
-        this.state.videos.forEach(({ hidden }) => {
-            count += !hidden.category.length && !hidden.attribute.length && !hidden.titleSearch && !hidden.noCategory
+        const obj = this.state.videos
+        let count = obj.length
+
+        obj.forEach(({ hidden }) => {
+            let value = 0
+            for (let prop in hidden) {
+                if (typeof hidden[prop] !== 'object') {
+                    value += Number(hidden[prop])
+                } else {
+                    value += Number(hidden[prop].length > 0)
+                }
+            }
+            if (value) count--
         })
         return count
     }
 
     isHidden({ hidden }) {
-        return hidden.category.length || hidden.attribute.length || hidden.titleSearch || hidden.noCategory
+        let value = 0
+        for (var prop in hidden) {
+            if (typeof hidden[prop] !== 'object') {
+                value += Number(hidden[prop])
+            } else {
+                value += Number(hidden[prop].length > 0)
+            }
+        }
+
+        return value
     }
 
     handleTitleSearch(e) {
@@ -75,7 +93,7 @@ class VideoSearchPage extends Component {
 
     handleCategoryFilter(e, target) {
         let videos = this.state.videos.map((video) => {
-                if (target === null) {
+            if (target === null) {
                 video.hidden.noCategory = e.target.checked && video.categories.length
             } else {
                 const targetLower = target.name.toLowerCase()
@@ -84,7 +102,7 @@ class VideoSearchPage extends Component {
                     video.hidden.noCategory = false
                     let match = !video.categories
                         .map((category) => {
-                        return category.toLowerCase()
+                            return category.toLowerCase()
                         })
                         .includes(targetLower)
 
@@ -101,8 +119,8 @@ class VideoSearchPage extends Component {
 
                     if (match && !video.hidden.category.includes(targetLower)) {
                         video.hidden.category.push(targetLower)
+                    }
                 }
-            }
             }
 
             return video
@@ -114,11 +132,11 @@ class VideoSearchPage extends Component {
     handleAttributeFilter(e, target) {
         let videos = this.state.videos.map((video) => {
             if (target === null) {
-                video.hidden.noCategory = e.target.checked && video.categories.length
+                video.hidden.noCategory = e.target.checked && video.attributes.length
             } else {
                 const targetLower = target.name.toLowerCase()
 
-            if (!e.target.checked) {
+                if (!e.target.checked) {
                     let match = !video.attributes
                         .map((attribute) => {
                             return attribute.toLowerCase()
@@ -129,11 +147,11 @@ class VideoSearchPage extends Component {
                         let index = video.hidden.attribute.indexOf(targetLower)
                         video.hidden.attribute.splice(index, 1)
                     }
-            } else {
+                } else {
                     let match = !video.attributes
-                    .map((attribute) => {
-                        return attribute.toLowerCase()
-                    })
+                        .map((attribute) => {
+                            return attribute.toLowerCase()
+                        })
                         .includes(targetLower)
 
                     if (match && !video.hidden.attribute.includes(targetLower)) {
@@ -248,13 +266,10 @@ class VideoSearchPage extends Component {
                     <h2>Categories</h2>
                     <div id='categories'>
                         <div className='input-wrapper'>
-                            <input
-                                type='checkbox'
-                                id='category_NULL'
-                                data-state='0'
-                                onChange={(e) => this.handleCategoryFilter(e, null)}
-                            />
-                            <label htmlFor='category_NULL'>NULL</label>
+                            <input type='checkbox' id='category_NULL' onChange={(e) => this.handleCategoryFilter(e, null)} />
+                            <label htmlFor='category_NULL' className='global-category'>
+                                NULL
+                            </label>
                         </div>
                         {this.state.loaded.categories &&
                             Object.keys(this.state.categories).map((i) => (
@@ -262,7 +277,6 @@ class VideoSearchPage extends Component {
                                     <input
                                         type='checkbox'
                                         id={`category-${this.state.categories[i].name}`}
-                                        data-state='0'
                                         onChange={(e) => this.handleCategoryFilter(e, this.state.categories[i])}
                                     />
                                     <label htmlFor={`category-${this.state.categories[i].name}`}>{this.state.categories[i].name}</label>
@@ -278,7 +292,6 @@ class VideoSearchPage extends Component {
                                     <input
                                         type='checkbox'
                                         id={`attribute-${this.state.attributes[i].name}`}
-                                        data-state='0'
                                         onChange={(e) => this.handleAttributeFilter(e, this.state.attributes[i])}
                                     />
                                     <label htmlFor={`attribute-${this.state.attributes[i].name}`}>{this.state.attributes[i].name}</label>

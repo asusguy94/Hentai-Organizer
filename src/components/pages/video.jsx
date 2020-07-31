@@ -646,6 +646,16 @@ class VideoPage extends Component {
                             <MenuItem disabled>
                                 <i className='far fa-trash-alt' /> Delete Video
                             </MenuItem>
+
+                            <MenuItem divider />
+
+                            <MenuItem
+                                onClick={() => {
+                                    window.open(`${config.source}/video.php?id=${this.state.video.id}`, '_blank')
+                                }}
+                            >
+                                Open in Backup
+                            </MenuItem>
                         </ContextMenu>
                     </div>
 

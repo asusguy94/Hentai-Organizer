@@ -32,7 +32,7 @@ class VideoPage extends Component {
             quality: 0,
             censored: false,
             attributes: [
-                // TODO get from bookmark-attributes_table and stars_table
+                // TODO get from bookmark-attributes_table and stars_table - for add_attribute
                 {
                     id: 0,
                     name: '',
@@ -147,8 +147,10 @@ class VideoPage extends Component {
     }
 
     handleVideo_play(time) {
-        this.player.player.currentTime = Number(time)
-        this.player.player.play()
+        const { player } = this.player
+
+        player.currentTime = Number(time)
+        player.play()
     }
 
     handleRibbon(star) {
@@ -456,7 +458,9 @@ class VideoPage extends Component {
 
     /* Plays - own class? */
     handlePlays_add() {
-        Axios.get(`${config.api}/addplay.php?videoID=${this.state.video.id}`)
+        Axios.get(`${config.api}/addplay.php?videoID=${this.state.video.id}`).then(() => {
+            console.log('Play Added')
+        })
     }
 
     handlePlays_reset() {
@@ -468,7 +472,7 @@ class VideoPage extends Component {
             <div className='video-page col-12 row'>
                 <section className='col-9'>
                     <header className='header row'>
-                        <div className='col-12'>
+                        <div className='col-11'>
                             <h1 className='header__title h2 align-middle'>
                                 <div className='d-inline-block align-middle'>
                                     <ContextMenuTrigger id='title'>{this.state.video.name}</ContextMenuTrigger>
@@ -533,9 +537,11 @@ class VideoPage extends Component {
                                 <i className='far fa-film' />
                                 {this.state.video.quality}
                             </div>
+                        </div>
 
+                        <div className='col-1 header__next'>
                             <a
-                                className='header__next btn btn-sm btn-outline-primary float-right'
+                                className='btn btn-sm btn-outline-primary float-right'
                                 id='next'
                                 href={`/video/${this.state.video.nextID}`}
                             >
@@ -731,10 +737,7 @@ class VideoPage extends Component {
                                         </MenuItem>
 
                                         <MenuItem
-                                            disabled={
-                                                /* TODO Check if star bookmark has only star-attributes */
-                                                this.state.bookmarks[i].attributes.length === 0
-                                            }
+                                            disabled={this.state.bookmarks[i].attributes.length === 0}
                                             onClick={() => this.handleBookmark_clearAttributes(this.state.bookmarks[i])}
                                         >
                                             <i className='far fa-trash-alt' /> Remove Attributes

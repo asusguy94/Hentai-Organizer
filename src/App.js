@@ -10,11 +10,10 @@ import VideosPage from './components/pages/videos'
 import VideoPage from './components/pages/video'
 import StarPage from './components/pages/star'
 import VideoSearchPage from './components/pages/videosearch'
+import StarSearchPage from './components/pages/starsearch'
 
 /* Style */
 import './components/styles/main.scss'
-
-// TODO Rewrite scss files, currently rules might overwrite another
 
 class App extends Component {
     render() {
@@ -35,9 +34,7 @@ class App extends Component {
 
                             <Route path='/video/:id' component={VideoPage} />
 
-                            <Route path='/stars/search'>
-                                <h2>Stars Search Page</h2>
-                            </Route>
+                            <Route path='/stars/search' component={StarSearchPage} />
 
                             <Route path='/stars'>
                                 <h2>Stars Page</h2>

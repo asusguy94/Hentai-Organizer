@@ -12,9 +12,12 @@ class VideoSearchPage extends Component {
         videos: [
             {
                 id: 0,
+                noStar: 0,
+                cen: 0,
+                quality: 360,
+                franchise: '',
                 name: '',
-                star: '',
-                website: '',
+                published: '',
                 plays: 0,
                 categories: [],
                 attribute: [],
@@ -78,6 +81,10 @@ class VideoSearchPage extends Component {
         }
 
         return value
+    }
+
+    isValidDate(date) {
+        return !!(Object.prototype.toString.call(date) === '[object Date]' && +date)
     }
 
     handleTitleSearch(e) {
@@ -167,7 +174,7 @@ class VideoSearchPage extends Component {
         this.setState({ videos })
     }
 
-    sort_asc() {
+    sort_default_asc() {
         let videos = this.state.videos
         videos.sort((a, b) => {
             let valA = a.name.toLowerCase()
@@ -179,7 +186,7 @@ class VideoSearchPage extends Component {
         this.setState({ videos })
     }
 
-    sort_desc() {
+    sort_default_desc() {
         let videos = this.state.videos
         videos.sort((b, a) => {
             let valA = a.name.toLowerCase()
@@ -191,7 +198,61 @@ class VideoSearchPage extends Component {
         this.setState({ videos })
     }
 
-    popular_asc() {
+    sort_added_asc() {
+        let videos = this.state.videos
+        videos.sort((a, b) => {
+            let valA = a.id
+            let valB = b.id
+
+            return valA - valB
+        })
+
+        this.setState({ videos })
+    }
+
+    sort_added_desc() {
+        let videos = this.state.videos
+        videos.sort((b, a) => {
+            let valA = a.id
+            let valB = b.id
+
+            return valA - valB
+        })
+
+        this.setState({ videos })
+    }
+
+    sort_date_asc() {
+        let videos = this.state.videos
+        videos.sort((a, b) => {
+            let valA = new Date(a.published)
+            let valB = new Date(b.published)
+
+            if (!this.isValidDate(valA)) valA = new Date('2900-01-01')
+            if (!this.isValidDate(valB)) valB = new Date('2900-01-01')
+
+            return valA - valB
+        })
+
+        this.setState({ videos })
+    }
+
+    sort_date_desc() {
+        let videos = this.state.videos
+        videos.sort((b, a) => {
+            let valA = new Date(a.published)
+            let valB = new Date(b.published)
+
+            if (!this.isValidDate(valA)) valA = new Date('1900-01-01')
+            if (!this.isValidDate(valB)) valB = new Date('1900-01-01')
+
+            return valA - valB
+        })
+
+        this.setState({ videos })
+    }
+
+    sort_popular_asc() {
         let videos = this.state.videos
         videos.sort((a, b) => {
             let valA = a.plays
@@ -203,7 +264,7 @@ class VideoSearchPage extends Component {
         this.setState({ videos })
     }
 
-    popular_desc() {
+    sort_popular_desc() {
         let videos = this.state.videos
         videos.sort((b, a) => {
             let valA = a.plays
@@ -229,38 +290,38 @@ class VideoSearchPage extends Component {
 
                     <h2>Sort</h2>
                     <div className='input-wrapper'>
-                        <input id='alphabetically' type='radio' name='sort' onChange={this.sort_asc.bind(this)} defaultChecked />
+                        <input id='alphabetically' type='radio' name='sort' onChange={this.sort_default_asc.bind(this)} defaultChecked />
                         <label htmlFor='alphabetically'>A-Z</label>
                     </div>
                     <div className='input-wrapper'>
-                        <input id='alphabetically_desc' type='radio' name='sort' onChange={this.sort_desc.bind(this)} />
+                        <input id='alphabetically_desc' type='radio' name='sort' onChange={this.sort_default_desc.bind(this)} />
                         <label htmlFor='alphabetically_desc'>Z-A</label>
                     </div>
 
-                    <div className='input-wrapper disabled'>
-                        <input id='added_desc' type='radio' name='sort' />
-                        <label htmlFor='added_desc'>Old Upload</label>
-                    </div>
-                    <div className='input-wrapper disabled'>
-                        <input id='added_asc' type='radio' name='sort' />
+                    <div className='input-wrapper'>
+                        <input id='added_asc' type='radio' name='sort' onChange={this.sort_added_desc.bind(this)} />
                         <label htmlFor='added_asc'>New Upload</label>
                     </div>
-
-                    <div className='input-wrapper disabled'>
-                        <input id='date_desc' type='radio' name='sort' />
-                        <label htmlFor='date_desc'>Oldest</label>
-                    </div>
-                    <div className='input-wrapper disabled'>
-                        <input id='date_asc' type='radio' name='sort' />
-                        <label htmlFor='date_asc'>Newest</label>
+                    <div className='input-wrapper'>
+                        <input id='added_desc' type='radio' name='sort' onChange={this.sort_added_asc.bind(this)} />
+                        <label htmlFor='added_desc'>Old Upload</label>
                     </div>
 
                     <div className='input-wrapper'>
-                        <input id='popularity_desc' type='radio' name='sort' onChange={this.popular_desc.bind(this)} />
+                        <input id='date_asc' type='radio' name='sort' onChange={this.sort_date_desc.bind(this)} />
+                        <label htmlFor='date_asc'>Newest</label>
+                    </div>
+                    <div className='input-wrapper'>
+                        <input id='date_desc' type='radio' name='sort' onChange={this.sort_date_asc.bind(this)} />
+                        <label htmlFor='date_desc'>Oldest</label>
+                    </div>
+
+                    <div className='input-wrapper'>
+                        <input id='popularity_desc' type='radio' name='sort' onChange={this.sort_popular_desc.bind(this)} />
                         <label htmlFor='popularity_desc'>Most Popular</label>
                     </div>
                     <div className='input-wrapper'>
-                        <input id='popularity_asc' type='radio' name='sort' onChange={this.popular_asc.bind(this)} />
+                        <input id='popularity_asc' type='radio' name='sort' onChange={this.sort_popular_asc.bind(this)} />
                         <label htmlFor='popularity_asc'>Least Popular</label>
                     </div>
 

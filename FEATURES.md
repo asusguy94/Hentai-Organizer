@@ -29,16 +29,16 @@
 
 ### :x: Sidebar
 
-| Name                 | Status             |  Priority  |
-| -------------------- | ------------------ | :--------: |
-| Censored _TOGGLE_    | :x:                |    HIGH    |
-| Star _TOGGLE_        | :x:                |    HIGH    |
-| Quality _TOGGLE_     | :x:                |    HIGH    |
-| Title Search _INPUT_ | :heavy_check_mark: |            |
-| Existing _TOGGLE_    | :x:                |    LOW     |
-| Sort                 | :x:                | FUNCTIONAL |
-| Category _CHECKBOX_  | :heavy_check_mark: |            |
-| Attribute _CHECKBOX_ | :heavy_check_mark: |            |
+| Name                 | Status             | Priority |
+| -------------------- | ------------------ | :------: |
+| Censored _TOGGLE_    | :x:                |   HIGH   |
+| Star _TOGGLE_        | :x:                |   HIGH   |
+| Quality _TOGGLE_     | :x:                |   HIGH   |
+| Title Search _INPUT_ | :heavy_check_mark: |          |
+| Existing _TOGGLE_    | :x:                |   LOW    |
+| Sort                 | :heavy_check_mark: |          |
+| Category _CHECKBOX_  | :heavy_check_mark: |          |
+| Attribute _CHECKBOX_ | :heavy_check_mark: |          |
 
 ## :x: Star Search
 
@@ -105,12 +105,12 @@
 
 ### :x: Other videos from same franchise
 
-| Name      | Status                                                   |  Priority  |
-| --------- | -------------------------------------------------------- | :--------: |
-| Plays     | :x:                                                      |    HIGH    |
-| Thumbnail | :heavy_check_mark:                                       |            |
-| Title     | :heavy_check_mark:                                       |            |
-| Link      | :x: _currently links by `<a>` should link with `<Link>`_ | FUNCTIONAL |
+| Name      | Status                                              |  Priority  |
+| --------- | --------------------------------------------------- | :--------: |
+| Plays     | :x:                                                 |    HIGH    |
+| Thumbnail | :heavy_check_mark:                                  |            |
+| Title     | :heavy_check_mark:                                  |            |
+| Link      | :heavy_check_mark: _uses `<a>` should use `<Link>`_ | FUNCTIONAL |
 
 ### :x: Stars
 

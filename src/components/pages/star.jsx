@@ -9,26 +9,93 @@ import '../styles/star.scss'
 
 import config from '../config'
 
+class StarVideo extends Component {
+    constructor(props) {
+        super(props)
+        this.state = {
+            dataSrc: `${config.source}/videos/${props.video.fname}`,
+            src: '',
+        }
+    }
+
+    async reloadVideo() {
+        this.setState((prevState) => {
+            let state = prevState
+            state.src = prevState.dataSrc
+            state.dataSrc = ''
+
+            return state
+        })
+    }
+
+    async unloadVideo() {
+        this.setState((prevState) => {
+            let state = prevState
+            state.dataSrc = prevState.src
+            state.src = ''
+
+            return state
+        })
+    }
+
+    playFrom(video, time = 0) {
+        if (time) video.currentTime = Number(time)
+        video.play()
+    }
+
+    startThumbnailPlayback(video) {
+        video.playbackRate = 5
+        this.playFrom(video, 120)
+    }
+
+    handleMouseEnter(e) {
+        const { target } = e
+
+        if (this.state.dataSrc.length && !this.state.src.length) {
+            this.reloadVideo().then(() => {
+                this.startThumbnailPlayback(target)
+            })
+        }
+    }
+
+    handleMouseLeave() {
+        if (!this.state.dataSrc.length && this.state.src.length) {
+            this.unloadVideo()
+        }
+    }
+
+    render() {
+        const { video } = this.props
+
+        return (
+            <a className='video card' href={`/video/${video.id}`}>
+                <video
+                    className='card-img-top'
+                    src={this.state.src}
+                    data-src={this.state.dataSrc}
+                    poster={`${config.source}/images/videos/${video.id}-290`}
+                    preload='metadata'
+                    muted
+                    onMouseEnter={this.handleMouseEnter.bind(this)}
+                    onMouseLeave={this.handleMouseLeave.bind(this)}
+                />
+
+                <span className='title card-title'>{video.name}</span>
+            </a>
+        )
+    }
+}
+
 class StarVideos extends Component {
+    // store src and data-src in state object
+
     render() {
         const { videos } = this.props
 
         return (
             <div id='videos' className={this.props.className}>
                 {Object.keys(videos).map((i) => (
-                    <a key={i} className='video card' href={`/video/${videos[i].id}`}>
-                        <img alt='video' className='card-img-top' src={`${config.source}/images/videos/${videos[i].id}-290`} />
-
-                        <video
-                            className='card-img-top d-none'
-                            src={`${config.source}/videos/${videos[i].fname}`}
-                            poster={`${config.source}/images/videos/${videos[i].id}-290`}
-                            preload='metadata'
-                            muted
-                        />
-
-                        <span className='title card-title'>{videos[i].name}</span>
-                    </a>
+                    <StarVideo video={videos[i]} key={i} />
                 ))}
             </div>
         )

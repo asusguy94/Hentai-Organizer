@@ -132,6 +132,17 @@ class StarInputForm extends Component {
             if (id.length) {
                 this.update(value, id)
             }
+
+            if (this.props.emptyByDefault) {
+                this.setState((prevState) => {
+                    let input = prevState.input
+                    input.value = ''
+
+                    return { input }
+                })
+
+                this.input.value = ''
+            }
         }
     }
 
@@ -142,6 +153,10 @@ class StarInputForm extends Component {
         return clientValue !== serverValue
     }
 
+    componentDidMount() {
+        this.input = null
+    }
+
     render() {
         return (
             <div className='input-wrapper'>
@@ -150,6 +165,7 @@ class StarInputForm extends Component {
                 </label>
 
                 <input
+                    ref={(input) => (this.input = input)}
                     type={this.props.type}
                     id={this.props.name.toLowerCase()}
                     defaultValue={this.props.emptyByDefault ? '' : this.props.value}

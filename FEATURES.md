@@ -166,10 +166,10 @@
 
 ### :heavy_check_mark: Attribute input field
 
-| Name             | Status                                  |  Priority  |
-| ---------------- | --------------------------------------- | :--------: |
-| Input            | :heavy_check_mark: Field does not reset | FUNCTIONAL |
-| Attribute List   | :heavy_check_mark:                      |            |
-| Remove Attribute | :heavy_check_mark: Page reload          | FUNCTIONAL |
+| Name             | Status                         |  Priority  |
+| ---------------- | ------------------------------ | :--------: |
+| Input            | :heavy_check_mark:             |            |
+| Attribute List   | :heavy_check_mark:             |            |
+| Remove Attribute | :heavy_check_mark: Page reload | FUNCTIONAL |
 
 ### :heavy_check_mark: Video list

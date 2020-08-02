@@ -87,8 +87,6 @@ class StarVideo extends Component {
 }
 
 class StarVideos extends Component {
-    // store src and data-src in state object
-
     render() {
         const { videos } = this.props
 
@@ -131,7 +129,7 @@ class StarInputForm extends Component {
     keyPress(e) {
         if (e.key === 'Enter') {
             let { id, value } = this.state.input
-            if (id.length && value.length) {
+            if (id.length) {
                 this.update(value, id)
             }
         }
@@ -145,8 +143,6 @@ class StarInputForm extends Component {
     }
 
     render() {
-        // FIXME input not updating on empty field -- because php checks if input is empty
-
         return (
             <div className='input-wrapper'>
                 <label className={this.isChanged() ? 'bold' : ''} htmlFor={this.props.name.toLowerCase()}>
@@ -181,6 +177,7 @@ class StarForm extends Component {
         super(props)
         this.update = (value, label) => props.update(value, label)
         this.addAttribute = (value, label) => props.addAttribute(value, label)
+        this.removeAttribute = (value) => props.removeAttribute(value)
     }
 
     render() {
@@ -198,27 +195,65 @@ class StarForm extends Component {
                     emptyByDefault
                     value={data.attribute}
                     list={starData.attribute}
-                />
+                >
+                    <StarAttributes data={data.attribute} remove={this.removeAttribute} />
+                </StarInputForm>
             </React.Fragment>
         )
+    }
+}
+
+class StarAttributes extends Component {
+    constructor(props) {
+        super(props)
+        this.remove = (item) => props.remove(item)
+    }
+
+    render() {
+        return this.props.data.map((element, i) => (
+            <span key={i}>
+                <ContextMenuTrigger id={`attribute-${i}`} renderTag='span'>
+                    <span className='attribute ml-2'>
+                        <span className='btn btn-sm btn-outline-primary'>{element}</span>
+                    </span>
+                </ContextMenuTrigger>
+
+                <ContextMenu id={`attribute-${i}`}>
+                    <MenuItem onClick={() => this.remove(element)}>Remove</MenuItem>
+                </ContextMenu>
+            </span>
+        ))
     }
 }
 
 class StarImageDropbox extends Component {
     constructor(props) {
         super(props)
-        this.removeStar = this.props.removeStar
-        this.removeImage = this.props.removeImage
+        this.removeStar = props.removeStar
+        this.removeImage = props.removeImage
+        this.addImage = props.addImage
+    }
+
+    handleDefault(e) {
+        e.stopPropagation()
+        e.preventDefault()
+    }
+
+    handleDrop(e) {
+        this.handleDefault(e)
+
+        const image = e.dataTransfer.getData('text')
+        this.addImage(image)
     }
 
     render() {
-        let { image } = this.props
+        let { star } = this.props
 
-        if (image !== null) {
+        if (star.image !== null) {
             return (
                 <React.Fragment>
                     <ContextMenuTrigger id='star__image'>
-                        <img className='star__image' src={`${config.source}/images/stars/${this.props.image}`} alt='star' />
+                        <img className='star__image' src={`${config.source}/images/stars/${star.image}`} alt='star' />
                     </ContextMenuTrigger>
 
                     <ContextMenu id='star__image'>
@@ -230,7 +265,13 @@ class StarImageDropbox extends Component {
             return (
                 <React.Fragment>
                     <ContextMenuTrigger id='star__dropbox'>
-                        <div id='dropbox'>
+                        <div
+                            id='dropbox'
+                            onDragEnter={this.handleDefault.bind(this)}
+                            onDragExit={this.handleDefault.bind(this)}
+                            onDragOver={this.handleDefault.bind(this)}
+                            onDrop={this.handleDrop.bind(this)}
+                        >
                             <div className='unselectable label'>Drop Image Here</div>
                         </div>
                     </ContextMenuTrigger>
@@ -293,7 +334,7 @@ class StarPage extends Component {
         })
     }
 
-    handleStar_updateInfo(label, value) {
+    handleStar_updateInfo(value, label) {
         Axios.get(`${config.api}/changestarinfo.php?starID=${this.state.star.id}&label=${label}&value=${value}`).then(({ data }) => {
             if (data.success) {
                 this.setState((prevState) => {
@@ -315,10 +356,15 @@ class StarPage extends Component {
 
                     return { star }
                 })
+            }
+        })
+    }
 
-                setTimeout(() => {
-                    console.log(this.state.star)
-                }, 1000)
+    handleStar_removeAttribute(value) {
+        Axios.get(`${config.api}/removestarattribute.php?starID=${this.state.star.id}&attribute=${value}`).then(({ data }) => {
+            if (data.success) {
+                window.location.reload()
+                // TODO Map out what attribute should be removed
             }
         })
     }
@@ -332,19 +378,42 @@ class StarPage extends Component {
     }
 
     handleStar_removeImage() {
-        console.log(`remove image WHERE starID=${this.state.star.id}`)
+        Axios.get(`${config.source}/ajax/remove_star_image.php?id=${this.state.star.id}`).then(({ data }) => {
+            if (data.success) {
+                this.setState((prevState) => {
+                    let star = prevState.star
+                    star.image = null
+
+                    return { star }
+                })
+            }
+        })
+    }
+
+    addImage(image) {
+        Axios.get(`${config.source}/ajax/add_star_image.php?id=${this.state.star.id}&image=${image}`).then(({ data }) => {
+            if (data.success) {
+                this.setState((prevState) => {
+                    let star = prevState.star
+                    star.image = `${this.state.star.id}.jpg`
+
+                    return { star }
+                })
+            }
+        })
     }
 
     render() {
         return (
-            <div className='star-page col-7'>
-                <div className='row'>
+            <div className='star-page col-12'>
+                <div>
                     {this.state.loaded.star && (
-                        <div id='star' className='col-3 border'>
+                        <div id='star'>
                             <StarImageDropbox
-                                image={this.state.star.image}
+                                star={this.state.star}
                                 removeStar={() => this.handleStar_remove()}
                                 removeImage={() => this.handleStar_removeImage()}
+                                addImage={(image) => this.addImage(image)}
                             />
 
                             <ContextMenuTrigger id='title'>
@@ -360,6 +429,7 @@ class StarPage extends Component {
                             <StarForm
                                 update={(label, value) => this.handleStar_updateInfo(label, value)}
                                 addAttribute={(value) => this.handleStar_addAttribute(value)}
+                                removeAttribute={(value) => this.handleStar_removeAttribute(value)}
                                 data={this.state.star.info}
                                 starData={this.state.starData}
                             />

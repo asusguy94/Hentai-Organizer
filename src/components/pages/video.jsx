@@ -721,25 +721,35 @@ class VideoPage extends Component {
 
                                         <MenuItem
                                             onClick={() => {
+                                                const { bookmarks, attributes } = this.state
+                                                const bookmarkAttributes = bookmarks[i].attributes
+
                                                 this.handleModal(
                                                     'Add Attribute',
-                                                    // TODO filter out existing data
                                                     Object.keys(this.state.attributes).map((attribute_i) => {
-                                                        return (
-                                                            <div
-                                                                key={attribute_i}
-                                                                className='btn btn-sm btn-outline-primary d-block w-auto'
-                                                                onClick={() => {
-                                                                    this.handleModal()
-                                                                    this.handleBookmark_addAttribute(
-                                                                        this.state.attributes[attribute_i],
-                                                                        this.state.bookmarks[i]
-                                                                    )
-                                                                }}
-                                                            >
-                                                                {this.state.attributes[attribute_i].name}
-                                                            </div>
-                                                        )
+                                                        const attribute = attributes[attribute_i]
+
+                                                        let match = false
+                                                        bookmarkAttributes.forEach((item) => {
+                                                            if (item.id === attribute.id) match = true
+                                                        })
+
+                                                        if (!match) {
+                                                            return (
+                                                                <div
+                                                                    key={attribute_i}
+                                                                    className='btn btn-sm btn-outline-primary d-block w-auto'
+                                                                    onClick={() => {
+                                                                        this.handleModal()
+                                                                        this.handleBookmark_addAttribute(attribute, bookmarks[i])
+                                                                    }}
+                                                                >
+                                                                    {attribute.name}
+                                                                </div>
+                                                            )
+                                                        }
+
+                                                        return null
                                                     })
                                                 )
                                             }}

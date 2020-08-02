@@ -13,7 +13,7 @@ class StarVideo extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            dataSrc: `${config.source}/videos/${props.video.fname}`,
+            dataSrc: `${config.source}/videothumb/${props.video.id}.mp4`,
             src: '',
         }
     }

@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { Link } from 'react-router-dom'
 
 import Axios from 'axios'
 import { PlyrComponent } from 'plyr-react'
@@ -812,12 +813,10 @@ class VideoPage extends Component {
                                                 alt='star'
                                                 src={`${config.source}/images/stars/${this.state.stars[i].id}`}
                                             />
-                                            <a
-                                                href={`${config.source}/star.php?id=${this.state.stars[i].id}`}
-                                                className='star__name d-block'
-                                            >
+
+                                            <Link to={`/star/${this.state.stars[i].id}`} className='star__name d-block'>
                                                 {this.state.stars[i].name}
-                                            </a>
+                                            </Link>
 
                                             {this.handleRibbon(this.state.stars[i])}
                                         </ContextMenuTrigger>

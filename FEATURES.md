@@ -42,23 +42,23 @@
 
 ## :x: Star Search
 
-### :x: Main Section
+### :heavy_check_mark: Main Section
 
-| Name         | Status | Priority |
-| ------------ | ------ | :------: |
-| Star         | :x:    |   HIGH   |
-| Star Counter | :x:    |   HIGH   |
+| Name         | Status             |
+| ------------ | ------------------ |
+| Star         | :heavy_check_mark: |
+| Star Counter | :heavy_check_mark: |
 
 ### :x: Sidebar
 
-| Name                  | Status | Priority |
-| --------------------- | ------ | :------: |
-| Star Search _INPUT_   | :x:    |   HIGH   |
-| Breast _RADIO_        | :x:    |   HIGH   |
-| Eyecolor _RADIO_      | :x:    |   HIGH   |
-| Haircolor _RADIO_     | :x:    |   HIGH   |
-| Hairstyle _RADIO_     | :x:    |   HIGH   |
-| Attributes _CHECKBOX_ | :x:    |   HIGH   |
+| Name                  | Status             | Priority |
+| --------------------- | ------------------ | :------: |
+| Star Search _INPUT_   | :heavy_check_mark: |          |
+| Breast _RADIO_        | :heavy_check_mark: |          |
+| Eyecolor _RADIO_      | :x:                |   LOW    |
+| Haircolor _RADIO_     | :heavy_check_mark: |          |
+| Hairstyle _RADIO_     | :x:                |   HIGH   |
+| Attributes _CHECKBOX_ | :heavy_check_mark: |          |
 
 ## :x: Stars
 
@@ -80,16 +80,16 @@
 
 ### :x: Video
 
-| Name             | Status                                  | Priority |
-| ---------------- | --------------------------------------- | :------: |
-| Add Bookmark     | :heavy_check_mark:                      |          |
-| UnCensor/Censor  | :heavy_check_mark:                      |          |
-| Remove Plays     | :heavy_check_mark:                      |          |
-| Rename File      | :x:                                     |   HIGH   |
-| Copy Filename    | :heavy_check_mark:                      |          |
-| Update Video     | :x: _replace existing data in database_ |   HIGH   |
-| Update Bookmarks | :x: _offset bookmarks by 6 seconds_     |   HIGH   |
-| Delete Video     | :x:                                     |   HIGH   |
+| Name             | Status                                | Priority |
+| ---------------- | ------------------------------------- | :------: |
+| Add Bookmark     | :heavy_check_mark:                    |          |
+| UnCensor/Censor  | :heavy_check_mark:                    |          |
+| Remove Plays     | :heavy_check_mark:                    |          |
+| Rename File      | :x:                                   |   HIGH   |
+| Copy Filename    | :heavy_check_mark:                    |          |
+| Update Video     | :x: replace existing data in database |   HIGH   |
+| Update Bookmarks | :x: offset bookmarks by 6 seconds     |   HIGH   |
+| Delete Video     | :x:                                   |   HIGH   |
 
 ### :x: Bookmark
 
@@ -98,19 +98,19 @@
 | Add Star          | :x:                |   HIGH   |
 | Remove Star       | :heavy_check_mark: |          |
 | Add Attribute     | :heavy_check_mark: |          |
-| Remove Attributes | :x:                |   HIGH   |
+| Remove Attributes | :heavy_check_mark: |          |
 | Change Category   | :heavy_check_mark: |          |
 | Change Time       | :heavy_check_mark: |          |
 | Delete Bookmark   | :heavy_check_mark: |          |
 
-### :x: Other videos from same franchise
+### :heavy_check_mark: Other videos from same franchise
 
-| Name      | Status                                              |  Priority  |
-| --------- | --------------------------------------------------- | :--------: |
-| Plays     | :x:                                                 |    HIGH    |
-| Thumbnail | :heavy_check_mark:                                  |            |
-| Title     | :heavy_check_mark:                                  |            |
-| Link      | :heavy_check_mark: _uses `<a>` should use `<Link>`_ | FUNCTIONAL |
+| Name      | Status                                            |  Priority  |
+| --------- | ------------------------------------------------- | :--------: |
+| Plays     | :heavy_check_mark: reload to refresh section      | FUNCTIONAL |
+| Thumbnail | :heavy_check_mark:                                |            |
+| Title     | :heavy_check_mark:                                |            |
+| Link      | :heavy_check_mark: uses `<a>` should use `<Link>` | FUNCTIONAL |
 
 ### :x: Stars
 
@@ -133,7 +133,7 @@
 | ---------- | ------ | :------: |
 | Attributes | :x:    |   HIGH   |
 
-## Star Page
+## :x: Star Page
 
 ### :x: Dropbox
 
@@ -155,23 +155,21 @@
 | ------ | ------ | :------: |
 | Rename | :x:    |   HIGH   |
 
-### :x: Input Fields
+### :heavy_check_mark: Input Fields
 
-| Name               | Status | Priority |
-| ------------------ | ------ | :------: |
-| Breast _INPUT_     | :x:    |   HIGH   |
-| Eye Color _INPUT_  | :x:    |   HIGH   |
-| Hair Color _INPUT_ | :x:    |   HIGH   |
-| Hair Style _INPUT_ | :x:    |   HIGH   |
+| Name               | Status             |
+| ------------------ | ------------------ |
+| Breast _INPUT_     | :heavy_check_mark: |
+| Eye Color _INPUT_  | :heavy_check_mark: |
+| Hair Color _INPUT_ | :heavy_check_mark: |
+| Hair Style _INPUT_ | :heavy_check_mark: |
 
-### :x: Attribute input field
+### :heavy_check_mark: Attribute input field
 
-| Name           | Status | Priority |
-| -------------- | ------ | :------: |
-| Input          | :x:    |   HIGH   |
-| Attribute List | :x:    |   HIGH   |
+| Name             | Status                                  |  Priority  |
+| ---------------- | --------------------------------------- | :--------: |
+| Input            | :heavy_check_mark: Field does not reset | FUNCTIONAL |
+| Attribute List   | :heavy_check_mark:                      |            |
+| Remove Attribute | :heavy_check_mark: Page reload          | FUNCTIONAL |
 
-### :x: Video list
-
-_missing hover action_
-_img instead of video_
+### :heavy_check_mark: Video list

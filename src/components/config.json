@@ -13,7 +13,7 @@
     },
     "franchise": {
         "title": {
-            "maxLength": 45
+            "maxLength": 43
         }
     }
 }

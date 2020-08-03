@@ -120,6 +120,8 @@ class VideoPage extends Component {
     }
 
     handleModal(title = null, data = null) {
+        if (title !== null && data !== null && this.state.modal.visible) this.handleModal()
+
         this.setState((prevState) => {
             let modal = prevState.modal
             modal.title = title

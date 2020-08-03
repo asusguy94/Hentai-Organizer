@@ -33,7 +33,6 @@ class VideoPage extends Component {
             quality: 0,
             censored: false,
             attributes: [
-                // TODO get from bookmark-attributes_table and stars_table - for add_attribute
                 {
                     id: 0,
                     name: '',
@@ -453,8 +452,19 @@ class VideoPage extends Component {
                     return item.id !== id
                 })
 
-                // TODO check if star has bookmarks - evaluate if this is required, was not a feature before
                 this.setState({ stars })
+            }
+        })
+    }
+
+    handleStar_addAttribute(star, attribute) {
+        Axios.get(
+            `${config.api}/addbookmarkattribute.php?videoID=${this.state.video.id}&starID=${star.id}&attributeID=${attribute.id}`
+        ).then(({ data }) => {
+            if (data.success) {
+                // TODO Update state
+
+                window.location.reload()
             }
         })
     }
@@ -862,7 +872,31 @@ class VideoPage extends Component {
                                             <i className='far fa-plus' /> Add Bookmark
                                         </MenuItem>
 
-                                        <MenuItem disabled>
+                                        <MenuItem
+                                            onClick={() => {
+                                                const { attributes } = this.state
+
+                                                this.handleModal(
+                                                    'Add Global Attribute',
+                                                    Object.keys(attributes).map((attribute_i) => {
+                                                        const attribute = attributes[attribute_i]
+
+                                                        return (
+                                                            <div
+                                                                key={attribute_i}
+                                                                className='btn btn-sm btn-outline-primary d-block w-auto'
+                                                                onClick={() => {
+                                                                    this.handleModal()
+                                                                    this.handleStar_addAttribute(this.state.stars[i], attribute)
+                                                                }}
+                                                            >
+                                                                {attribute.name}
+                                                            </div>
+                                                        )
+                                                    })
+                                                )
+                                            }}
+                                        >
                                             <i className='far fa-plus' /> Add Global Attribute
                                         </MenuItem>
 

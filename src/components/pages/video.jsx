@@ -462,9 +462,9 @@ class VideoPage extends Component {
             `${config.api}/addbookmarkattribute.php?videoID=${this.state.video.id}&starID=${star.id}&attributeID=${attribute.id}`
         ).then(({ data }) => {
             if (data.success) {
-                // TODO Update state
-
                 window.location.reload()
+
+                // TODO Update state object
             }
         })
     }

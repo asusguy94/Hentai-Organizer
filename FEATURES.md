@@ -107,18 +107,18 @@
 
 | Name      | Status                                            |  Priority  |
 | --------- | ------------------------------------------------- | :--------: |
-| Plays     | :heavy_check_mark: reload to refresh section      | FUNCTIONAL |
+| Plays     | :heavy_check_mark: user-reload to refresh         | FUNCTIONAL |
 | Thumbnail | :heavy_check_mark:                                |            |
 | Title     | :heavy_check_mark:                                |            |
 | Link      | :heavy_check_mark: uses `<a>` should use `<Link>` | FUNCTIONAL |
 
-### :x: Stars
+### :heavy_check_mark: Stars
 
-| Name                 | Status             | Priority |
-| -------------------- | ------------------ | :------: |
-| Add Bookmark         | :heavy_check_mark: |          |
-| Add Global Attribute | :x:                |   HIGH   |
-| Remove Star          | :heavy_check_mark: |          |
+| Name                 | Status                         |  Priority  |
+| -------------------- | ------------------------------ | :--------: |
+| Add Bookmark         | :heavy_check_mark:             |            |
+| Add Global Attribute | :heavy_check_mark: Page reload | FUNCTIONAL |
+| Remove Star          | :heavy_check_mark:             |            |
 
 ## :heavy_check_mark: Form
 
@@ -127,7 +127,7 @@
 | Add Star _INPUT_ | :heavy_check_mark: |
 | Add NoStar-label | :heavy_check_mark: |
 
-### :x: Used Attributes
+## :x: Used Attributes
 
 | Name       | Status | Priority |
 | ---------- | ------ | :------: |
@@ -137,10 +137,10 @@
 
 ### :x: Dropbox
 
-| Name        | Status | Priority |
-| ----------- | ------ | :------: |
-| Drop Area   | :x:    |   HIGH   |
-| Delete Star | :x:    |   HIGH   |
+| Name        | Status             | Priority |
+| ----------- | ------------------ | :------: |
+| Drop Area   | :heavy_check_mark: |          |
+| Delete Star | :x:                |   HIGH   |
 
 ### :x: Image
 

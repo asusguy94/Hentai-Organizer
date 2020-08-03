@@ -380,7 +380,8 @@ class StarPage extends Component {
         Axios.get(`${config.api}/removestarattribute.php?starID=${this.state.star.id}&attribute=${value}`).then(({ data }) => {
             if (data.success) {
                 window.location.reload()
-                // TODO Map out what attribute should be removed
+
+                // TODO Update state object
             }
         })
     }

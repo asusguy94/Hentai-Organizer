@@ -3,7 +3,8 @@
     "source": "https://hentai.ds1517",
     "db": "https://ds1517",
     "timeline": {
-        "offset": 0.88
+        "offset": 0.88,
+        "spacing": 2
     },
     "hls": {
         "enabled": true,

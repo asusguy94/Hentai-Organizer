@@ -144,10 +144,10 @@
 
 ### :x: Image
 
-| Name         | Status | Priority |
-| ------------ | ------ | :------: |
-| Delete Image | :x:    |   HIGH   |
-| Delete Star  | :x:    |   HIGH   |
+| Name         | Status             | Priority |
+| ------------ | ------------------ | :------: |
+| Delete Image | :heavy_check_mark: |          |
+| Delete Star  | :x:                |   HIGH   |
 
 ### :x: Star Name
 

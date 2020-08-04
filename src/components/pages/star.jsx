@@ -43,9 +43,30 @@ class StarVideo extends Component {
         video.play()
     }
 
-    startThumbnailPlayback(video) {
-        video.playbackRate = 5
-        this.playFrom(video, 120)
+    stopFrom(video, time) {
+        if (time) video.currentTime = Number(time)
+        video.pause()
+    }
+
+    async startThumbnailPlayback(video) {
+        let time = 100
+        let offset = 60
+        let duration = 1.5
+
+        this.playFrom(video, time)
+        this.thumbnail = setInterval(() => {
+            time += offset
+            if (time > video.duration) {
+                this.stopThumbnailPlayback(video)
+                this.startThumbnailPlayback(video)
+            }
+            this.playFrom(video, (time += offset))
+        }, duration * 1000)
+    }
+
+    async stopThumbnailPlayback(video) {
+        this.stopFrom(video)
+        clearInterval(this.thumbnail)
     }
 
     handleMouseEnter(e) {
@@ -58,9 +79,14 @@ class StarVideo extends Component {
         }
     }
 
-    handleMouseLeave() {
+    handleMouseLeave(e) {
+        const { target } = e
+
         if (!this.state.dataSrc.length && this.state.src.length) {
             this.unloadVideo()
+            this.stopThumbnailPlayback(target).then(() => {
+                this.unloadVideo()
+            })
         }
     }
 

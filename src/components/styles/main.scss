@@ -41,7 +41,8 @@
     }
 }
 
-.unselectable {
+.unselectable,
+input[disabled] + label {
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;

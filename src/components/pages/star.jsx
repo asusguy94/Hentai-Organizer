@@ -83,7 +83,6 @@ class StarVideo extends Component {
         const { target } = e
 
         if (!this.state.dataSrc.length && this.state.src.length) {
-            this.unloadVideo()
             this.stopThumbnailPlayback(target).then(() => {
                 this.unloadVideo()
             })

@@ -3,7 +3,7 @@ import React, { Component } from 'react'
 import Axios from 'axios'
 import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu'
 
-import Modal from '../modal'
+import Modal, { handleModal } from '../modal'
 
 import '../styles/star.scss'
 
@@ -327,6 +327,11 @@ class StarImageDropbox extends Component {
 }
 
 class StarPage extends Component {
+    constructor(props) {
+        super(props)
+        this.handleModal = handleModal
+    }
+
     state = {
         star: {
             id: 0,
@@ -362,17 +367,6 @@ class StarPage extends Component {
             visible: false,
             data: null,
         },
-    }
-
-    handleModal(title = null, data = null) {
-        this.setState((prevState) => {
-            let modal = prevState.modal
-            modal.title = title
-            modal.data = data
-            modal.visible = !modal.visible
-
-            return { modal }
-        })
     }
 
     handleStar_updateInfo(value, label) {

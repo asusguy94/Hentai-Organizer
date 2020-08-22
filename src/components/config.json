@@ -16,5 +16,8 @@
         "title": {
             "maxLength": 43
         }
+    },
+    "theme": {
+        "fa": "far"
     }
 }

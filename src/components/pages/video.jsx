@@ -495,7 +495,7 @@ class VideoPage extends Component {
                                     <MenuItem divider />
 
                                     <MenuItem onClick={() => this.handleFranchise_copy()}>
-                                        <i className='far fa-copy' /> Copy Franchise
+                                        <i className={`${config.theme.fa} fa-copy`} /> Copy Franchise
                                     </MenuItem>
                                 </ContextMenu>
 
@@ -506,7 +506,7 @@ class VideoPage extends Component {
 
                             <div className='header__date btn btn-sm btn-outline-primary'>
                                 <ContextMenuTrigger id='menu__date'>
-                                    <i className='far fa-calendar-check' />
+                                    <i className={`${config.theme.fa} fa-calendar-check`} />
                                     {this.state.video.date.published}
                                 </ContextMenuTrigger>
 
@@ -532,14 +532,14 @@ class VideoPage extends Component {
                                             )
                                         }}
                                     >
-                                        <i className='far fa-edit' />
+                                        <i className={`${config.theme.fa} fa-edit`} />
                                         Edit Date
                                     </MenuItem>
                                 </ContextMenu>
                             </div>
 
                             <div className='header__quality btn btn-sm btn-outline-primary'>
-                                <i className='far fa-film' />
+                                <i className={`${config.theme.fa} fa-film`} />
                                 {this.state.video.quality}
                             </div>
                         </div>
@@ -611,45 +611,45 @@ class VideoPage extends Component {
                                     )
                                 }}
                             >
-                                <i className='far fa-plus' /> Add Bookmark
+                                <i className={`${config.theme.fa} fa-plus`} /> Add Bookmark
                             </MenuItem>
 
                             <MenuItem onClick={() => this.handleCensor_toggle()}>
                                 {this.state.video.censored ? (
                                     <React.Fragment>
-                                        <i className='far fa-check-circle' /> UnCensor
+                                        <i className={`${config.theme.fa} fa-check-circle`} /> UnCensor
                                     </React.Fragment>
                                 ) : (
                                     <React.Fragment>
-                                        <i className='far fa-exclamation-circle' /> Censor
+                                        <i className={`${config.theme.fa} fa-exclamation-circle`} /> Censor
                                     </React.Fragment>
                                 )}
                             </MenuItem>
 
                             <MenuItem onClick={() => this.handlePlays_reset()}>
-                                <i className='far fa-trash-alt' /> Remove Plays
+                                <i className={`${config.theme.fa} fa-trash-alt`} /> Remove Plays
                             </MenuItem>
 
                             <MenuItem divider />
 
                             <MenuItem onClick={() => this.handleFname_copy()}>
-                                <i className='far fa-copy' /> Copy Filename
+                                <i className={`${config.theme.fa} fa-copy`} /> Copy Filename
                             </MenuItem>
 
                             <MenuItem divider />
 
                             <MenuItem disabled>
-                                <i className='far fa-edit' /> Update Video
+                                <i className={`${config.theme.fa} fa-edit`} /> Update Video
                             </MenuItem>
 
                             <MenuItem disabled>
-                                <i className='far fa-edit' /> Update Bookmarks
+                                <i className={`${config.theme.fa} fa-edit`} /> Update Bookmarks
                             </MenuItem>
 
                             <MenuItem divider />
 
                             <MenuItem disabled>
-                                <i className='far fa-trash-alt' /> Delete Video
+                                <i className={`${config.theme.fa} fa-trash-alt`} /> Delete Video
                             </MenuItem>
 
                             <MenuItem divider />
@@ -711,14 +711,14 @@ class VideoPage extends Component {
 
                                     <ContextMenu id={`bookmark-${i}`}>
                                         <MenuItem disabled>
-                                            <i className='far fa-plus' /> Add Star
+                                            <i className={`${config.theme.fa} fa-plus`} /> Add Star
                                         </MenuItem>
 
                                         <MenuItem
                                             disabled={this.state.bookmarks[i].starID === 0}
                                             onClick={() => this.handleBookmark_removeStar(this.state.bookmarks[i])}
                                         >
-                                            <i className='far fa-trash-alt' /> Remove Star
+                                            <i className={`${config.theme.fa} fa-trash-alt`} /> Remove Star
                                         </MenuItem>
 
                                         <MenuItem divider />
@@ -758,14 +758,14 @@ class VideoPage extends Component {
                                                 )
                                             }}
                                         >
-                                            <i className='far fa-plus' /> Add Attribute
+                                            <i className={`${config.theme.fa} fa-plus`} /> Add Attribute
                                         </MenuItem>
 
                                         <MenuItem
                                             disabled={this.state.bookmarks[i].attributes.length === 0}
                                             onClick={() => this.handleBookmark_clearAttributes(this.state.bookmarks[i])}
                                         >
-                                            <i className='far fa-trash-alt' /> Remove Attributes
+                                            <i className={`${config.theme.fa} fa-trash-alt`} /> Remove Attributes
                                         </MenuItem>
 
                                         <MenuItem
@@ -797,15 +797,15 @@ class VideoPage extends Component {
                                                 )
                                             }}
                                         >
-                                            <i className='far fa-edit' /> Change Category
+                                            <i className={`${config.theme.fa} fa-edit`} /> Change Category
                                         </MenuItem>
 
                                         <MenuItem onClick={() => this.handleBookmark_time(this.state.bookmarks[i].id)}>
-                                            <i className='far fa-clock' /> Change Time
+                                            <i className={`${config.theme.fa} fa-clock`} /> Change Time
                                         </MenuItem>
 
                                         <MenuItem onClick={() => this.handleBookmark_remove(this.state.bookmarks[i].id)}>
-                                            <i className='far fa-trash-alt' /> Delete
+                                            <i className={`${config.theme.fa} fa-trash-alt`} /> Delete
                                         </MenuItem>
                                     </ContextMenu>
                                 </React.Fragment>
@@ -861,7 +861,7 @@ class VideoPage extends Component {
                                                 )
                                             }}
                                         >
-                                            <i className='far fa-plus' /> Add Bookmark
+                                            <i className={`${config.theme.fa} fa-plus`} /> Add Bookmark
                                         </MenuItem>
 
                                         <MenuItem
@@ -889,11 +889,11 @@ class VideoPage extends Component {
                                                 )
                                             }}
                                         >
-                                            <i className='far fa-plus' /> Add Global Attribute
+                                            <i className={`${config.theme.fa} fa-plus`} /> Add Global Attribute
                                         </MenuItem>
 
                                         <MenuItem onClick={() => this.handleStar_remove(this.state.stars[i].id)}>
-                                            <i className='far fa-trash-alt' /> Remove
+                                            <i className={`${config.theme.fa} fa-trash-alt`} /> Remove
                                         </MenuItem>
                                     </ContextMenu>
                                 </div>

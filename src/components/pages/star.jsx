@@ -268,6 +268,10 @@ class StarAttributes extends Component {
 }
 
 class StarImageDropbox extends Component {
+    state = {
+        hover: false,
+    }
+
     constructor(props) {
         super(props)
         this.removeStar = props.removeStar
@@ -280,11 +284,35 @@ class StarImageDropbox extends Component {
         e.preventDefault()
     }
 
+    handleEnter(e) {
+        this.handleDefault(e)
+
+        this.setHover()
+    }
+
+    handleLeave(e) {
+        this.handleDefault(e)
+
+        this.clearHover()
+    }
+
     handleDrop(e) {
         this.handleDefault(e)
 
         const image = e.dataTransfer.getData('text')
         this.addImage(image)
+    }
+
+    isHover() {
+        return this.state.hover
+    }
+
+    setHover() {
+        this.setState({ hover: true })
+    }
+
+    clearHover() {
+        this.setState({ hover: false })
     }
 
     render() {
@@ -310,12 +338,13 @@ class StarImageDropbox extends Component {
                     <ContextMenuTrigger id='star__dropbox'>
                         <div
                             id='dropbox'
-                            onDragEnter={this.handleDefault.bind(this)}
-                            onDragExit={this.handleDefault.bind(this)}
-                            onDragOver={this.handleDefault.bind(this)}
+                            className={`unselectable ${this.isHover() ? 'hover' : ''}`}
+                            onDragEnter={this.handleEnter.bind(this)}
+                            onDragOver={this.handleEnter.bind(this)}
+                            onDragLeave={this.handleLeave.bind(this)}
                             onDrop={this.handleDrop.bind(this)}
                         >
-                            <div className='unselectable label'>Drop Image Here</div>
+                            <div className='label'>Drop Image Here</div>
                         </div>
                     </ContextMenuTrigger>
 

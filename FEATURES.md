@@ -140,10 +140,11 @@
 
 ### :x: Dropbox
 
-| Name        | Status             | Priority |
-| ----------- | ------------------ | :------: |
-| Drop Area   | :heavy_check_mark: |          |
-| Delete Star | :x:                |   HIGH   |
+| Name         | Status             | Priority |
+| ------------ | ------------------ | :------: |
+| Drop Area    | :heavy_check_mark: |          |
+| Delete Star  | :x:                |   HIGH   |
+| [ImageHover] |                    |          |
 
 ### :x: Image
 

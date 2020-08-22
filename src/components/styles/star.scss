@@ -30,6 +30,10 @@
             height: 275px;
             border: 2px dashed rgba(255, 0, 0, 0.3);
 
+            &.hover {
+                border-color: red;
+            }
+
             .label {
                 position: relative;
                 text-align: center;

@@ -68,28 +68,28 @@
 
 ## :x: Video Page
 
-### :x: Heading
+### :heavy_check_mark: Heading
 
-| Name             | Status             | Priority |
-| ---------------- | ------------------ | :------: |
-| Rename Title     | :x:                |   HIGH   |
-| Rename Franchise | :x:                |   HIGH   |
-| Copy Franchise   | :heavy_check_mark: |          |
-| Edit Date        | :heavy_check_mark: |          |
-| Next ID          | :heavy_check_mark: |          |
+| Name             | Status                         |  Priority  |
+| ---------------- | ------------------------------ | :--------: |
+| Rename Title     | :heavy_check_mark: Page reload | FUNCTIONAL |
+| Rename Franchise | :heavy_check_mark: Page reload | FUNCTIONAL |
+| Copy Franchise   | :heavy_check_mark:             |            |
+| Edit Date        | :heavy_check_mark:             |            |
+| Next ID          | :heavy_check_mark:             |            |
 
 ### :x: Video
 
-| Name             | Status                                | Priority |
-| ---------------- | ------------------------------------- | :------: |
-| Add Bookmark     | :heavy_check_mark:                    |          |
-| UnCensor/Censor  | :heavy_check_mark:                    |          |
-| Remove Plays     | :heavy_check_mark:                    |          |
-| Rename File      | :x:                                   |   HIGH   |
-| Copy Filename    | :heavy_check_mark:                    |          |
-| Update Video     | :x: replace existing data in database |   HIGH   |
-| Update Bookmarks | :x: offset bookmarks by 6 seconds     |   HIGH   |
-| Delete Video     | :x:                                   |   HIGH   |
+| Name             | Status                                |  Priority  |
+| ---------------- | ------------------------------------- | :--------: |
+| Add Bookmark     | :heavy_check_mark:                    |            |
+| UnCensor/Censor  | :heavy_check_mark:                    |            |
+| Remove Plays     | :heavy_check_mark:                    |            |
+| Rename File      | :heavy_check_mark: Page reload        | FUNCTIONAL |
+| Copy Filename    | :heavy_check_mark:                    |            |
+| Update Video     | :x: replace existing data in database |    HIGH    |
+| Update Bookmarks | :x: offset bookmarks by 6 seconds     |    HIGH    |
+| Delete Video     | :x:                                   |    HIGH    |
 
 ### :x: Bookmark
 

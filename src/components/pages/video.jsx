@@ -168,6 +168,18 @@ class VideoPage extends Component {
         )
     }
 
+    handleVideo_getAttributes() {
+        const attributeArr = []
+
+        this.state.bookmarks.forEach(({ attributes }) => {
+            attributes.forEach((attribute) => {
+                if (!attributeArr.some((e) => e.id === attribute.id)) attributeArr.push(attribute)
+            })
+        })
+
+        return attributeArr
+    }
+
     handleRibbon(star) {
         let hasBookmark = false
 
@@ -557,6 +569,21 @@ class VideoPage extends Component {
             return { bookmarks }
         })
     }
+
+    attribute_setActive(attribute) {
+        this.bookmark_clearActive()
+
+        this.setState((prevState) => {
+            let bookmarks = prevState.bookmarks.map((bookmark) => {
+                if (bookmark.attributes.some((e) => e.id === attribute.id)) bookmark.active = true
+
+                return bookmark
+            })
+
+            return { bookmarks }
+        })
+    }
+
     render() {
         return (
             <div className='video-page col-12 row'>
@@ -824,7 +851,7 @@ class VideoPage extends Component {
                                     <div
                                         className={`btn btn-sm ${
                                             this.bookmark_isActive(this.state.bookmarks[i])
-                                                ? 'btn-success'
+                                                ? 'btn-primary'
                                                 : this.bookmark_hasStar(this.state.bookmarks[i])
                                                 ? 'btn-outline-primary'
                                                 : 'btn-outline-secondary'
@@ -1104,6 +1131,21 @@ class VideoPage extends Component {
                                 </div>
                             )}
                         </div>
+                    </div>
+
+                    <div id='attributes' className='row justify-content-center'>
+                        {this.state.loaded.video &&
+                            this.state.loaded.stars &&
+                            this.handleVideo_getAttributes().map((item, i) => (
+                                <div
+                                    key={i}
+                                    className='btn btn-outline-primary m-2 attribute'
+                                    onMouseEnter={() => this.attribute_setActive(item)}
+                                    onMouseLeave={() => this.bookmark_clearActive()}
+                                >
+                                    {item.name}
+                                </div>
+                            ))}
                     </div>
                 </aside>
 

@@ -102,6 +102,7 @@
 | Change Category   | :heavy_check_mark: |          |
 | Change Time       | :heavy_check_mark: |          |
 | Delete Bookmark   | :heavy_check_mark: |          |
+| [Hover]           | :heavy_check_mark: |          |
 
 ### :heavy_check_mark: Other videos from same franchise
 
@@ -119,6 +120,7 @@
 | Add Bookmark         | :heavy_check_mark:             |            |
 | Add Global Attribute | :heavy_check_mark: Page reload | FUNCTIONAL |
 | Remove Star          | :heavy_check_mark:             |            |
+| [Hover]              | :heavy_check_mark:             |            |
 
 ## :heavy_check_mark: Form
 
@@ -127,11 +129,12 @@
 | Add Star _INPUT_ | :heavy_check_mark: |
 | Add NoStar-label | :heavy_check_mark: |
 
-## :x: Used Attributes
+## :heavy_check_mark: Used Attributes
 
-| Name       | Status | Priority |
-| ---------- | ------ | :------: |
-| Attributes | :x:    |   HIGH   |
+| Name       | Status             |
+| ---------- | ------------------ |
+| Attributes | :heavy_check_mark: |
+| [Hover]    | :heavy_check_mark: |
 
 ## :x: Star Page
 

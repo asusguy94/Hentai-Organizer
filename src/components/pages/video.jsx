@@ -152,6 +152,12 @@ class VideoPage extends Component {
         player.play()
     }
 
+    handleVideo_pause() {
+        const { player } = this.player
+
+        player.pause()
+    }
+
     handleVideo_rename() {
         Axios.get(`${config.source}/ajax/file_rename.php?videoID=${this.state.video.id}&videoPath=${this.state.input.video}`).then(
             ({ data }) => {
@@ -494,9 +500,14 @@ class VideoPage extends Component {
             `${config.api}/addbookmarkattribute.php?videoID=${this.state.video.id}&starID=${star.id}&attributeID=${attribute.id}`
         ).then(({ data }) => {
             if (data.success) {
-                window.location.reload()
+                this.setState((prevState) => {
+                    let loaded = prevState.loaded
+                    loaded.bookmarks = false
 
-                // TODO Update state object
+                    return { loaded }
+                }).then(() => {
+                    this.getData()
+                })
             }
         })
     }
@@ -1168,17 +1179,17 @@ class VideoPage extends Component {
                     /* Improve this */
                     if (Number(localStorage.video) === this.state.video.id) {
                         hls.startLoad(Number(localStorage.bookmark))
-
-                        if (Boolean(Number(localStorage.playing))) this.handleVideo_play(localStorage.bookmark)
+                        if (Number(localStorage.playing)) this.handleVideo_play(localStorage.bookmark)
 
                         this.setState({ newVideo: false })
                     } else {
                         localStorage.video = this.state.video.id
                         localStorage.bookmark = 0
 
-                        this.setState({ newVideo: true })
-
                         hls.startLoad()
+                        this.handleVideo_pause()
+
+                        this.setState({ newVideo: true })
                     }
                 })
 

@@ -118,6 +118,9 @@ class VideoPage extends Component {
         input: {
             star: '',
             date: '',
+            franchise: '',
+            title: '',
+            video: '',
         },
     }
 
@@ -147,6 +150,16 @@ class VideoPage extends Component {
 
         player.currentTime = Number(time)
         player.play()
+    }
+
+    handleVideo_rename() {
+        Axios.get(`${config.source}/ajax/file_rename.php?videoID=${this.state.video.id}&videoPath=${this.state.input.video}`).then(
+            ({ data }) => {
+                if (data.success) {
+                    window.location.reload()
+                }
+            }
+        )
     }
 
     handleRibbon(star) {
@@ -368,9 +381,33 @@ class VideoPage extends Component {
         })
     }
 
+    handleTitle_rename() {
+        const { title } = this.state.input
+
+        Axios.get(`${config.api}/renametitle.php?videoID=${this.state.video.id}&name=${title}`).then(({ data }) => {
+            if (data.success) {
+                window.location.reload()
+            }
+        })
+
+        this.handleInput_reset('title')
+    }
+
     /* Franchise - own class? */
     async handleFranchise_copy() {
         await navigator.clipboard.writeText(this.state.video.franchise)
+    }
+
+    handleFranchise_rename() {
+        Axios.get(`${config.api}/renamefranchise.php?videoID=${this.state.video.id}&name=${this.state.input.franchise}`).then(
+            ({ data }) => {
+                if (data.success) {
+                    window.location.reload()
+                }
+            }
+        )
+
+        this.handleInput_reset('franchise')
     }
 
     /* Date - own class */
@@ -521,12 +558,54 @@ class VideoPage extends Component {
                                 </div>
 
                                 <ContextMenu id='title'>
-                                    <MenuItem disabled>
-                                        <i className='far fa-edit' /> Rename Title
+                                    <MenuItem
+                                        onClick={() => {
+                                            this.handleModal(
+                                                'Change Title',
+                                                <input
+                                                    type='text'
+                                                    className='text-center'
+                                                    defaultValue={this.state.video.name}
+                                                    onChange={(e) => this.handleInput(e, 'title')}
+                                                    ref={(input) => input && input.focus()}
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === 'Enter') {
+                                                            e.preventDefault()
+
+                                                            this.handleModal()
+                                                            this.handleTitle_rename()
+                                                        }
+                                                    }}
+                                                />
+                                            )
+                                        }}
+                                    >
+                                        <i className={`${config.theme.fa} fa-edit`} /> Rename Title
                                     </MenuItem>
 
-                                    <MenuItem disabled>
-                                        <i className='far fa-edit' /> Rename Franchise
+                                    <MenuItem
+                                        onClick={() => {
+                                            this.handleModal(
+                                                'Change Franchise',
+                                                <input
+                                                    type='text'
+                                                    className='text-center'
+                                                    defaultValue={this.state.video.franchise}
+                                                    onChange={(e) => this.handleInput(e, 'franchise')}
+                                                    ref={(input) => input && input.focus()}
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === 'Enter') {
+                                                            e.preventDefault()
+
+                                                            this.handleModal()
+                                                            this.handleFranchise_rename()
+                                                        }
+                                                    }}
+                                                />
+                                            )
+                                        }}
+                                    >
+                                        <i className={`${config.theme.fa} fa-edit`} /> Rename Franchise
                                     </MenuItem>
 
                                     <MenuItem divider />
@@ -665,6 +744,31 @@ class VideoPage extends Component {
 
                             <MenuItem onClick={() => this.handlePlays_reset()}>
                                 <i className={`${config.theme.fa} fa-trash-alt`} /> Remove Plays
+                            </MenuItem>
+
+                            <MenuItem
+                                onClick={() => {
+                                    this.handleModal(
+                                        'Rename Video',
+                                        <input
+                                            type='text'
+                                            className='text-center'
+                                            defaultValue={this.state.video.path.file}
+                                            onChange={(e) => this.handleInput(e, 'video')}
+                                            ref={(input) => input && input.focus()}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter') {
+                                                    e.preventDefault()
+
+                                                    this.handleModal()
+                                                    this.handleVideo_rename()
+                                                }
+                                            }}
+                                        />
+                                    )
+                                }}
+                            >
+                                <i className={`${config.theme.fa} fa-edit`} /> Rename Video
                             </MenuItem>
 
                             <MenuItem divider />
@@ -1128,18 +1232,22 @@ class VideoPage extends Component {
 
     getData() {
         let { id } = this.props.match.params
+        const { loaded } = this.state
 
-        Axios.get(`${config.api}/video.php?id=${id}`)
-            .then(({ data: video }) => this.setState({ video }))
-            .then(() => {
-                this.setState((prevState) => {
-                    let loaded = prevState.loaded
-                    loaded.video = true
+        if (!loaded.video) {
+            Axios.get(`${config.api}/video.php?id=${id}`)
+                .then(({ data: video }) => this.setState({ video }))
+                .then(() => {
+                    this.setState((prevState) => {
+                        let loaded = prevState.loaded
+                        loaded.video = true
 
-                    return { loaded }
+                        return { loaded }
+                    })
                 })
-            })
+        }
 
+        if (!loaded.bookmarks) {
             Axios.get(`${config.api}/bookmarks.php?id=${id}`)
                 .then(({ data }) => {
                     this.setState(() => {
@@ -1160,39 +1268,46 @@ class VideoPage extends Component {
                         return { loaded }
                     })
                 })
+        }
 
-        Axios.get(`${config.api}/stars.php?id=${id}`)
-            .then(({ data: stars }) => this.setState({ stars }))
-            .then(() => {
-                this.setState((prevState) => {
-                    let loaded = prevState.loaded
-                    loaded.stars = true
+        if (!loaded.stars) {
+            Axios.get(`${config.api}/stars.php?id=${id}`)
+                .then(({ data: stars }) => this.setState({ stars }))
+                .then(() => {
+                    this.setState((prevState) => {
+                        let loaded = prevState.loaded
+                        loaded.stars = true
 
-                    return { loaded }
+                        return { loaded }
+                    })
                 })
-            })
+        }
 
-        Axios.get(`${config.api}/categories.php`)
-            .then(({ data: categories }) => this.setState({ categories }))
-            .then(() => {
-                this.setState((prevState) => {
-                    let loaded = prevState.loaded
-                    loaded.categories = true
+        if (!loaded.categories) {
+            Axios.get(`${config.api}/categories.php`)
+                .then(({ data: categories }) => this.setState({ categories }))
+                .then(() => {
+                    this.setState((prevState) => {
+                        let loaded = prevState.loaded
+                        loaded.categories = true
 
-                    return { loaded }
+                        return { loaded }
+                    })
                 })
-            })
+        }
 
-        Axios.get(`${config.api}/attributes.php?method=video`)
-            .then(({ data: attributes }) => this.setState({ attributes }))
-            .then(() => {
-                this.setState((prevState) => {
-                    let loaded = prevState.loaded
-                    loaded.attributes = true
+        if (!loaded.attributes) {
+            Axios.get(`${config.api}/attributes.php?method=video`)
+                .then(({ data: attributes }) => this.setState({ attributes }))
+                .then(() => {
+                    this.setState((prevState) => {
+                        let loaded = prevState.loaded
+                        loaded.attributes = true
 
-                    return { loaded }
+                        return { loaded }
+                    })
                 })
-            })
+        }
     }
 }
 

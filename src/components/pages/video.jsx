@@ -77,6 +77,8 @@ class VideoPage extends Component {
                         name: '',
                     },
                 ],
+
+                active: false,
             },
         ],
 
@@ -185,6 +187,7 @@ class VideoPage extends Component {
                         start: time,
                         starID,
                         attributes,
+                        active: false,
                     })
 
                     bookmarks.sort((a, b) => {
@@ -472,6 +475,40 @@ class VideoPage extends Component {
         Axios.get(`${config.api}/removeplays.php?videoID=${this.state.video.id}`)
     }
 
+    bookmark_hasStar(bookmark) {
+        return Boolean(bookmark.starID)
+    }
+
+    bookmark_isActive(bookmark) {
+        return Boolean(bookmark.active)
+    }
+
+    bookmark_setActive(star) {
+        this.bookmark_clearActive()
+
+        const starID = star.id
+        this.setState((prevState) => {
+            let bookmarks = prevState.bookmarks.map((item) => {
+                if (item.starID === starID) item.active = true
+
+                return item
+            })
+
+            return { bookmarks }
+        })
+    }
+
+    bookmark_clearActive() {
+        this.setState((prevState) => {
+            let bookmarks = prevState.bookmarks.map((item) => {
+                item.active = false
+
+                return item
+            })
+
+            return { bookmarks }
+        })
+    }
     render() {
         return (
             <div className='video-page col-12 row'>
@@ -670,7 +707,13 @@ class VideoPage extends Component {
                             Object.keys(this.state.bookmarks).map((i) => (
                                 <React.Fragment key={i}>
                                     <div
-                                        className='btn btn-sm btn-outline-primary bookmark'
+                                        className={`btn btn-sm ${
+                                            this.bookmark_isActive(this.state.bookmarks[i])
+                                                ? 'btn-success'
+                                                : this.bookmark_hasStar(this.state.bookmarks[i])
+                                                ? 'btn-outline-primary'
+                                                : 'btn-outline-secondary'
+                                        } bookmark`}
                                         style={{
                                             left: `${
                                                 ((this.state.bookmarks[i].start * 100) / this.state.video.duration) *
@@ -819,7 +862,12 @@ class VideoPage extends Component {
                     <div id='stars' className='row justify-content-center'>
                         {this.state.loaded.stars &&
                             Object.keys(this.state.stars).map((i) => (
-                                <div key={i} className='star col-4'>
+                                <div
+                                    key={i}
+                                    className='star col-4'
+                                    onMouseEnter={() => this.bookmark_setActive(this.state.stars[i])}
+                                    onMouseLeave={() => this.bookmark_clearActive()}
+                                >
                                     <div className='card mb-2 ribbon-container'>
                                         <ContextMenuTrigger id={`star-${i}`}>
                                             <img
@@ -1092,16 +1140,26 @@ class VideoPage extends Component {
                 })
             })
 
-        Axios.get(`${config.api}/bookmarks.php?id=${id}`)
-            .then(({ data: bookmarks }) => this.setState({ bookmarks }))
-            .then(() => {
-                this.setState((prevState) => {
-                    let loaded = prevState.loaded
-                    loaded.bookmarks = true
+            Axios.get(`${config.api}/bookmarks.php?id=${id}`)
+                .then(({ data }) => {
+                    this.setState(() => {
+                        let bookmarks = data.map((item) => {
+                            item.active = false
 
-                    return { loaded }
+                            return item
+                        })
+
+                        return { bookmarks }
+                    })
                 })
-            })
+                .then(() => {
+                    this.setState((prevState) => {
+                        let loaded = prevState.loaded
+                        loaded.bookmarks = true
+
+                        return { loaded }
+                    })
+                })
 
         Axios.get(`${config.api}/stars.php?id=${id}`)
             .then(({ data: stars }) => this.setState({ stars }))

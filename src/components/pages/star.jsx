@@ -13,7 +13,7 @@ class StarVideo extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            dataSrc: `${config.source}/videothumb/${props.video.id}.mp4`,
+            dataSrc: `${config.source}/videos/${props.video.fname}`,
             src: '',
         }
     }
@@ -430,7 +430,7 @@ class StarPage extends Component {
         })
     }
 
-    addImage(image) {
+    handleStar_addImage(image) {
         Axios.get(`${config.source}/ajax/add_star_image.php?id=${this.state.star.id}&image=${image}`).then(({ data }) => {
             if (data.success) {
                 this.setState((prevState) => {
@@ -453,7 +453,7 @@ class StarPage extends Component {
                                 star={this.state.star}
                                 removeStar={() => this.handleStar_remove()}
                                 removeImage={() => this.handleStar_removeImage()}
-                                addImage={(image) => this.addImage(image)}
+                                addImage={(image) => this.handleStar_addImage(image)}
                             />
 
                             <ContextMenuTrigger id='title'>

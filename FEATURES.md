@@ -144,7 +144,7 @@
 | ------------ | ------------------ | :------: |
 | Drop Area    | :heavy_check_mark: |          |
 | Delete Star  | :x:                |   HIGH   |
-| [ImageHover] |                    |          |
+| [ImageHover] | :heavy_check_mark: |          |
 
 ### :x: Image
 
@@ -177,3 +177,9 @@
 | Remove Attribute | :heavy_check_mark: Page reload | FUNCTIONAL |
 
 ### :heavy_check_mark: Video list
+
+| Name            | Status             |
+| --------------- | ------------------ |
+| Video Thumbnail | :heavy_check_mark: |
+| Video Title     | :heavy_check_mark: |
+| [Hover]         | :heavy_check_mark: |

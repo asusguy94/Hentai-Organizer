@@ -1,7 +1,4 @@
-/* Context Menu */
 @import 'context-menu';
-
-/* Ribbon */
 @import 'ribbon';
 
 /* Star */
@@ -42,7 +39,7 @@
 }
 
 .unselectable,
-input[disabled] + label {
+label {
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;

@@ -512,14 +512,7 @@ class VideoPage extends Component {
             `${config.api}/addbookmarkattribute.php?videoID=${this.state.video.id}&starID=${star.id}&attributeID=${attribute.id}`
         ).then(({ data }) => {
             if (data.success) {
-                this.setState((prevState) => {
-                    let loaded = prevState.loaded
-                    loaded.bookmarks = false
-
-                    return { loaded }
-                }).then(() => {
-                    this.getData()
-                })
+                this.reset().then(this.getData())
             }
         })
     }
@@ -581,6 +574,15 @@ class VideoPage extends Component {
             })
 
             return { bookmarks }
+        })
+    }
+
+    async reset() {
+        this.setState((prevState) => {
+            let loaded = prevState.loaded
+            loaded.bookmarks = false
+
+            return { loaded }
         })
     }
 
@@ -1166,6 +1168,10 @@ class VideoPage extends Component {
         if (this.state.loaded.video) {
             /* Events Handler */
             if (!this.state.loaded.videoEvents) {
+                if (Number(localStorage.video) !== this.state.video.id) {
+                    localStorage.playing = 0
+                }
+
                 this.player.player.on('timeupdate', () => {
                     if (this.player.player.currentTime) {
                         localStorage.bookmark = Math.round(this.player.player.currentTime)

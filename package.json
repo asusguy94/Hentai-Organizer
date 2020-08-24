@@ -21,8 +21,9 @@
         "@types/react-router-dom": "^5.1.5"
     },
     "scripts": {
-        "start": "react-scripts start",
-        "build": "react-scripts build"
+        "start": "npx cross-env PORT=3002 react-scripts start",
+        "build": "react-scripts build",
+        "server": "npx serve -l 5002 -s build"
     },
     "eslintConfig": {
         "extends": "react-app"

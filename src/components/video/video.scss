@@ -1,6 +1,6 @@
-@import 'functions';
+@import '../styles/functions';
 
-.video-page {
+#video-page {
     .header {
         margin-bottom: 15px;
 
@@ -68,10 +68,6 @@
 
         #stars {
             text-align: center;
-
-            hr {
-                width: 60%;
-            }
         }
 
         #franchise {
@@ -97,6 +93,10 @@
                     height: inherit;
                 }
             }
+        }
+
+        hr {
+            width: 60%;
         }
     }
 

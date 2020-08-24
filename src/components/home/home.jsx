@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 
 import Axios from 'axios'
 
-import '../styles/home.scss'
+import './home.scss'
 
 import config from '../config'
 
@@ -15,21 +15,21 @@ class HomeColumn extends Component {
             return (
                 <section className='col-12'>
                     <h2>
-                        {obj.label} Videos (<span className='count'>{obj.limit}</span>)
+                        {obj.label} Videos (<span className='count'>{obj.data.length}</span>)
                     </h2>
 
                     <div className='row'>
-                        {Object.keys(obj.data).map((i) => (
-                            <Link className='video col-1 px-0 mx-3 ribbon-container' to={`/video/${obj.data[i].id}`} key={i}>
+                        {obj.data.map((item, i) => (
+                            <Link className='video col-1 px-0 mx-3 ribbon-container' to={`/video/${item.id}`} key={i}>
                                 <img
                                     className='mx-auto img-thumbnail'
                                     alt='video'
-                                    src={`${config.source}/images/videos/${obj.data[i].id}-290`}
+                                    src={`${config.source}/images/videos/${item.id}-290`}
                                 />
 
-                                <span className='video__title mx-auto d-block'>{obj.data[i].name}</span>
+                                <span className='video__title mx-auto d-block'>{item.name}</span>
 
-                                {obj.data[i].plays > 0 && <span className='ribbon'>{obj.data[i].plays}</span>}
+                                {item.plays > 0 && <span className='ribbon'>{item.plays}</span>}
                             </Link>
                         ))}
                     </div>
@@ -71,19 +71,17 @@ class HomePage extends Component {
     render() {
         return (
             <div className='home-page'>
-                <HomeColumn obj={this.state.recent} />
-                <HomeColumn obj={this.state.newest} />
-                <HomeColumn obj={this.state.random} />
-                <HomeColumn obj={this.state.popular} />
+                {Object.keys(this.state).map((item, i) => (
+                    <HomeColumn obj={this.state[item]} key={i} />
+                ))}
             </div>
         )
     }
 
     componentDidMount() {
-        if (this.state.recent.enabled) this.getData('recent')
-        if (this.state.newest.enabled) this.getData('newest')
-        if (this.state.popular.enabled) this.getData('popular')
-        if (this.state.random.enabled) this.getData('random')
+        Object.keys(this.state).forEach((item) => {
+            if (this.state[item].enabled) this.getData(item)
+        })
     }
 
     getData(type, limit = this.state[type].limit) {

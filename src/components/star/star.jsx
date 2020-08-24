@@ -3,9 +3,9 @@ import React, { Component } from 'react'
 import Axios from 'axios'
 import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu'
 
-import Modal, { handleModal } from '../modal'
+import Modal, { handleModal } from '../modal/modal'
 
-import '../styles/star.scss'
+import './star.scss'
 
 import config from '../config'
 

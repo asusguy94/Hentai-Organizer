@@ -3,7 +3,7 @@ import React, { Component } from 'react'
 import Axios from 'axios'
 import ScrollToTop from 'react-scroll-to-top'
 
-import '../styles/search.scss'
+import './search.scss'
 
 import config from '../config.json'
 

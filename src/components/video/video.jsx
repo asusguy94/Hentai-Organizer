@@ -7,9 +7,9 @@ import Hls from 'hls.js'
 import { ContextMenu, ContextMenuTrigger, MenuItem } from 'react-contextmenu'
 import ReactTooltip from 'react-tooltip'
 
-import Modal, { handleModal } from '../modal'
+import Modal, { handleModal } from '../modal/modal'
 
-import '../styles/video.scss'
+import './video.scss'
 
 import config from '../config'
 
@@ -588,7 +588,7 @@ class VideoPage extends Component {
 
     render() {
         return (
-            <div className='video-page col-12 row'>
+            <div id='video-page' className='col-12 row'>
                 <section className='col-9'>
                     <header className='header row'>
                         <div className='col-11'>
@@ -853,7 +853,7 @@ class VideoPage extends Component {
                                     <div
                                         className={`btn btn-sm ${
                                             this.bookmark_isActive(this.state.bookmarks[i])
-                                                ? 'btn-primary'
+                                                ? 'btn-info'
                                                 : this.bookmark_hasStar(this.state.bookmarks[i])
                                                 ? 'btn-outline-primary'
                                                 : 'btn-outline-secondary'
@@ -1132,10 +1132,12 @@ class VideoPage extends Component {
                                     </div>
                                 </div>
                             )}
+
+                            <hr className='pt-2' />
                         </div>
                     </div>
 
-                    <div id='attributes' className='row justify-content-center'>
+                    <div id='attributes' className='row col-12 justify-content-center'>
                         {this.state.loaded.video &&
                             this.state.loaded.stars &&
                             this.handleVideo_getAttributes().map((item, i) => (

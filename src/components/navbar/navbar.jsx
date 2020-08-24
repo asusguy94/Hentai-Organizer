@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 
-import './styles/navbar.scss'
+import './navbar.scss'
 
-import config from './config.json'
+import config from '../config.json'
 
 class NavBar extends Component {
     render() {
@@ -36,6 +36,22 @@ class NavBar extends Component {
                                 <a href={`${config.source}/stars.php`} target='_blank' rel='noopener noreferrer'>
                                     Stars
                                 </a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <li>
+                        <Link to='/settings' className='d-none'>
+                            Settings
+                        </Link>
+
+                        <ul className='sub-menu'>
+                            <li>
+                                <Link to='/editor/category'>Category Editor</Link>
+                            </li>
+
+                            <li>
+                                <Link to='/editor/attribute'>Attribute Editor</Link>
                             </li>
                         </ul>
                     </li>

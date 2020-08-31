@@ -3,6 +3,8 @@ import React, { Component } from 'react'
 import Axios from 'axios'
 import ScrollToTop from 'react-scroll-to-top'
 
+import Ribbon from '../ribbon/ribbon'
+
 import './search.scss'
 
 import config from '../config.json'
@@ -381,7 +383,7 @@ class VideoSearchPage extends Component {
 
                                     <span className='title card-title text-center'>{video.name}</span>
 
-                                    <span className='ribbon'>{this.state.videos[i].quality}</span>
+                                    <Ribbon label={video.quality} />
                                 </a>
                             ))
                         ) : (

@@ -1,6 +1,6 @@
 @import '../styles/functions';
 
-.star-page {
+#star-page {
     aside {
         #relations {
             text-align: center;
@@ -56,7 +56,11 @@
     }
 
     .video {
-        margin: 0 5px 10px;
+        margin: 0 10px 10px 5px;
         width: $thumbnailWidth + px;
+
+        span {
+            text-align: center;
+        }
     }
 }

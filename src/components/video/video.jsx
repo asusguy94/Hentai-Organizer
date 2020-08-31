@@ -9,6 +9,7 @@ import ReactTooltip from 'react-tooltip'
 import KeyboardEventHandler from 'react-keyboard-event-handler'
 
 import Modal, { handleModal } from '../modal/modal'
+import Ribbon from '../ribbon/ribbon'
 
 import './video.scss'
 
@@ -222,7 +223,7 @@ class VideoPage extends Component {
             if (!hasBookmark && bookmark.starID === star.id) hasBookmark = true
         })
 
-        if (!hasBookmark) return <span className='ribbon'>NEW</span>
+        if (!hasBookmark) return <Ribbon label='NEW' />
     }
 
     /* Bookmarks - own class? */

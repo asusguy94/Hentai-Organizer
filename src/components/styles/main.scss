@@ -20,7 +20,7 @@
 }
 
 .btn {
-    cursor: default;
+    cursor: default !important;
 }
 
 @for $i from 1 through 6 {

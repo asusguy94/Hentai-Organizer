@@ -480,8 +480,8 @@ class StarPage extends Component {
 
     render() {
         return (
-            <div className='star-page col-12'>
-                <div>
+            <div id='star-page' className='col-12 row'>
+                <section className='col-7'>
                     {this.state.loaded.star && (
                         <div id='star'>
                             <StarImageDropbox
@@ -510,10 +510,19 @@ class StarPage extends Component {
                             />
                         </div>
                     )}
-                </div>
 
-                <h3>Videos</h3>
-                {this.state.loaded.videos && <StarVideos className='row col-12' videos={this.state.videos} />}
+                    <h3>Videos</h3>
+                    {this.state.loaded.videos && <StarVideos className='row' videos={this.state.videos} />}
+                </section>
+
+                <aside className='col-5'>
+                    <div className='card'>
+                        <h2 className='card-header text-center'>Star Relation</h2>
+                        <div className='card-body'>
+                            <div id='relations'></div>
+                        </div>
+                    </div>
+                </aside>
 
                 <Modal visible={this.state.modal.visible} onClose={() => this.handleModal()} title={this.state.modal.title}>
                     {this.state.modal.data}

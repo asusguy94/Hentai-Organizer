@@ -205,6 +205,16 @@ class VideoPage extends Component {
         return attributeArr
     }
 
+    handleVideo_delete() {
+        const { video } = this.state
+
+        Axios.get(`${config.source}/ajax/remove_video.php?videoID=${video.id}`).then(({ data }) => {
+            if (data.success) {
+                window.location.href = '/videos'
+            }
+        })
+    }
+
     handleRibbon(star) {
         let hasBookmark = false
 
@@ -866,7 +876,7 @@ class VideoPage extends Component {
 
                             <MenuItem divider />
 
-                            <MenuItem disabled>
+                            <MenuItem disabled={this.state.stars.length !== 0} onClick={() => this.handleVideo_delete()}>
                                 <i className={`${config.theme.fa} fa-trash-alt`} /> Delete Video
                             </MenuItem>
 

@@ -266,10 +266,10 @@ class VideoPage extends Component {
             if (data.success) {
                 let bookmarks = this.state.bookmarks
 
-                let arr = Object.keys(bookmarks).map((i) => {
-                    if (bookmarks[i].id === id) bookmarks[i].start = time
+                let arr = bookmarks.map((bookmark) => {
+                    if (bookmark.id === id) bookmark.start = time
 
-                    return bookmarks[i]
+                    return bookmark
                 })
 
                 bookmarks.sort((a, b) => {
@@ -300,15 +300,12 @@ class VideoPage extends Component {
         Axios.get(`${config.api}/changebookmarkcategory.php?id=${bookmark.id}&categoryID=${category.id}`).then(({ data }) => {
             if (data.success) {
                 let bookmarks = this.state.bookmarks
-                let obj = Object.keys(bookmarks).map((i) => {
-                    if (bookmarks[i].id === bookmark.id) {
-                        let item = bookmarks[i]
-                        item.name = category.name
-
-                        return item
+                let obj = bookmarks.map((bookmarkItem) => {
+                    if (bookmarkItem.id === bookmark.id) {
+                        bookmarkItem.name = category.name
                     }
 
-                    return bookmarks[i]
+                    return bookmarkItem
                 })
 
                 this.setState({ bookmarks: obj })
@@ -320,16 +317,12 @@ class VideoPage extends Component {
         Axios.get(`${config.api}/addbookmarkattribute.php?bookmarkID=${bookmark.id}&attributeID=${attribute.id}`).then(({ data }) => {
             if (data.success) {
                 let bookmarks = this.state.bookmarks
-                let obj = Object.keys(bookmarks).map((i) => {
-                    if (bookmarks[i].id === bookmark.id) {
-                        let item = bookmarks[i]
-                        let attributes = item.attributes
-                        attributes.push({ id: attribute.id, name: attribute.name })
-
-                        return item
+                let obj = bookmarks.map((bookmarkItem) => {
+                    if (bookmarkItem.id === bookmark.id) {
+                        bookmarkItem.attributes.push({ id: attribute.id, name: attribute.name })
                     }
 
-                    return bookmarks[i]
+                    return bookmarkItem
                 })
 
                 this.setState({ bookmarks: obj })
@@ -350,12 +343,11 @@ class VideoPage extends Component {
                                 let attributes = this.attributesFromStar(starID)
 
                                 if (item.attributes.length > attributes.length) {
-                                    // Bookmark have at least 1 attribute not from star
                                     item.attributes = item.attributes.filter((attribute) => {
-                                        let match = false
-                                        attributes.forEach((attributeItem) => {
-                                            if (attribute.id === attributeItem.id) match = true
+                                        let match = attributes.some((bookmarkAttribute) => {
+                                            return bookmarkAttribute.name === attribute.name
                                         })
+
                                         if (match) return attribute
                                         return null
                                     })
@@ -398,12 +390,8 @@ class VideoPage extends Component {
                             if (item.attributes.length > attributes.length) {
                                 // Bookmark have at least 1 attribute not from star
                                 item.attributes = item.attributes.filter((attribute) => {
-                                    let match = false
-                                    attributes.forEach((attributeItem) => {
-                                        if (attribute.id === attributeItem.id) {
-                                            match = true
-                                        }
-                                    })
+                                    let match = attributes.some((starAttribute) => starAttribute.name === attribute.name)
+
                                     if (!match) return attribute
                                     return null
                                 })
@@ -593,7 +581,7 @@ class VideoPage extends Component {
 
         this.setState((prevState) => {
             let bookmarks = prevState.bookmarks.map((bookmark) => {
-                if (bookmark.attributes.some((e) => e.id === attribute.id)) bookmark.active = true
+                if (bookmark.attributes.some((bookmarkAttribute) => bookmarkAttribute.id === attribute.id)) bookmark.active = true
 
                 return bookmark
             })
@@ -799,17 +787,17 @@ class VideoPage extends Component {
                                 onClick={() => {
                                     this.handleModal(
                                         'Add Bookmark',
-                                        Object.keys(this.state.categories).map((i) => {
+                                        this.state.categories.map((category, i) => {
                                             return (
                                                 <div
                                                     key={i}
                                                     className='btn btn-sm btn-outline-primary d-block'
                                                     onClick={() => {
                                                         this.handleModal()
-                                                        this.handleBookmark_add(this.state.categories[i])
+                                                        this.handleBookmark_add(category)
                                                     }}
                                                 >
-                                                    {this.state.categories[i].name}
+                                                    {category.name}
                                                 </div>
                                             )
                                         })
@@ -897,47 +885,44 @@ class VideoPage extends Component {
                     <div className='col-12' id='timeline'>
                         {this.state.loaded.bookmarks &&
                             this.state.loaded.video &&
-                            Object.keys(this.state.bookmarks).map((i) => (
+                            this.state.bookmarks.map((bookmark, i) => (
                                 <React.Fragment key={i}>
                                     <div
                                         className={`btn btn-sm ${
-                                            this.bookmark_isActive(this.state.bookmarks[i])
+                                            this.bookmark_isActive(bookmark)
                                                 ? 'btn-info'
-                                                : this.bookmark_hasStar(this.state.bookmarks[i])
+                                                : this.bookmark_hasStar(bookmark)
                                                 ? 'btn-outline-primary'
                                                 : 'btn-outline-secondary'
                                         } bookmark`}
                                         style={{
-                                            left: `${
-                                                ((this.state.bookmarks[i].start * 100) / this.state.video.duration) *
-                                                config.timeline.offset
-                                            }%`,
+                                            left: `${((bookmark.start * 100) / this.state.video.duration) * config.timeline.offset}%`,
                                         }}
-                                        onClick={() => this.handleVideo_play(this.state.bookmarks[i].start)}
+                                        onClick={() => this.handleVideo_play(bookmark.start)}
                                         ref={(bookmark) => (this.bookmarks[i] = bookmark)}
                                         data-level={1}
                                     >
                                         <ContextMenuTrigger id={`bookmark-${i}`}>
                                             <div data-tip={true} data-for={`bookmark-info-${i}`}>
-                                                {this.state.bookmarks[i].name}
+                                                {bookmark.name}
                                             </div>
                                         </ContextMenuTrigger>
 
-                                        {(this.state.bookmarks[i].starID !== 0 || this.state.bookmarks[i].attributes.length > 0) && (
+                                        {(bookmark.starID !== 0 || bookmark.attributes.length > 0) && (
                                             <ReactTooltip id={`bookmark-info-${i}`} effect='solid'>
-                                                {this.state.bookmarks[i].starID !== 0 && (
+                                                {bookmark.starID !== 0 && (
                                                     <img
                                                         alt='star'
                                                         className='star__image'
-                                                        data-star-id={this.state.bookmarks[i].starID}
-                                                        src={`${config.source}/images/stars/${this.state.bookmarks[i].starID}`}
+                                                        data-star-id={bookmark.starID}
+                                                        src={`${config.source}/images/stars/${bookmark.starID}`}
                                                     />
                                                 )}
 
-                                                {Object.keys(this.state.bookmarks[i].attributes).map((bookmark_i) => [
-                                                    this.state.bookmarks[i].attributes[bookmark_i].id !== 0 && (
-                                                        <div key={bookmark_i} className='attribute btn btn-sm btn-light'>
-                                                            {this.state.bookmarks[i].attributes[bookmark_i].name}
+                                                {bookmark.attributes.map((attribute, attribute_i) => [
+                                                    attribute.id !== 0 && (
+                                                        <div key={attribute_i} className='attribute btn btn-sm btn-light'>
+                                                            {attribute.name}
                                                         </div>
                                                     ),
                                                 ])}
@@ -961,36 +946,33 @@ class VideoPage extends Component {
 
                                         <MenuItem
                                             onClick={() => {
-                                                const { bookmarks, attributes } = this.state
-                                                const bookmarkAttributes = bookmarks[i].attributes
+                                                const bookmark = this.state.bookmarks[i]
 
                                                 this.handleModal(
                                                     'Add Attribute',
-                                                    Object.keys(this.state.attributes).map((attribute_i) => {
-                                                        const attribute = attributes[attribute_i]
+                                                    this.state.attributes
+                                                        .filter((attributeItem) => {
+                                                            let match = bookmark.attributes.some(
+                                                                (bookmarkAttribute) => attributeItem.name === bookmarkAttribute.name
+                                                            )
 
-                                                        let match = false
-                                                        bookmarkAttributes.forEach((item) => {
-                                                            if (item.id === attribute.id) match = true
+                                                            if (!match) return attributeItem
+                                                            return null
                                                         })
-
-                                                        if (!match) {
+                                                        .map((attributeItem, attribute_i) => {
                                                             return (
                                                                 <div
                                                                     key={attribute_i}
                                                                     className='btn btn-sm btn-outline-primary d-block w-auto'
                                                                     onClick={() => {
                                                                         this.handleModal()
-                                                                        this.handleBookmark_addAttribute(attribute, bookmarks[i])
+                                                                        this.handleBookmark_addAttribute(attributeItem, bookmark)
                                                                     }}
                                                                 >
-                                                                    {attribute.name}
+                                                                    {attributeItem.name}
                                                                 </div>
                                                             )
-                                                        }
-
-                                                        return null
-                                                    })
+                                                        })
                                                 )
                                             }}
                                         >
@@ -1006,30 +988,24 @@ class VideoPage extends Component {
 
                                         <MenuItem
                                             onClick={() => {
+                                                const bookmark = this.state.bookmarks[i]
+
                                                 this.handleModal(
                                                     'Change Category',
-
-                                                    Object.keys(this.state.categories)
-                                                        .filter((category_i) => {
-                                                            return this.state.categories[category_i].name !== this.state.bookmarks[i].name
-                                                        })
-                                                        .map((category_i) => {
-                                                            return (
-                                                                <div
-                                                                    key={category_i}
-                                                                    className='btn btn-sm btn-outline-primary d-block w-auto'
-                                                                    onClick={() => {
-                                                                        this.handleModal()
-                                                                        this.handleBookmark_category(
-                                                                            this.state.categories[category_i],
-                                                                            this.state.bookmarks[i]
-                                                                        )
-                                                                    }}
-                                                                >
-                                                                    {this.state.categories[category_i].name}
-                                                                </div>
-                                                            )
-                                                        })
+                                                    this.state.categories
+                                                        .filter((category) => category.name !== bookmark.name)
+                                                        .map((category, category_i) => (
+                                                            <div
+                                                                key={category_i}
+                                                                className='btn btn-outline-primary d-block w-auto'
+                                                                onClick={() => {
+                                                                    this.handleModal()
+                                                                    this.handleBookmark_category(category, bookmark)
+                                                                }}
+                                                            >
+                                                                {category.name}
+                                                            </div>
+                                                        ))
                                                 )
                                             }}
                                         >
@@ -1054,11 +1030,11 @@ class VideoPage extends Component {
 
                     <div id='stars' className='row justify-content-center'>
                         {this.state.loaded.stars &&
-                            Object.keys(this.state.stars).map((i) => (
+                            this.state.stars.map((starItem, i) => (
                                 <div
                                     key={i}
                                     className='star col-4'
-                                    onMouseEnter={() => this.bookmark_setActive(this.state.stars[i])}
+                                    onMouseEnter={() => this.bookmark_setActive(starItem)}
                                     onMouseLeave={() => this.bookmark_clearActive()}
                                 >
                                     <div className='card mb-2 ribbon-container'>
@@ -1066,14 +1042,14 @@ class VideoPage extends Component {
                                             <img
                                                 className='star__image card-img-top'
                                                 alt='star'
-                                                src={`${config.source}/images/stars/${this.state.stars[i].id}`}
+                                                src={`${config.source}/images/stars/${starItem.id}`}
                                             />
 
-                                            <Link to={`/star/${this.state.stars[i].id}`} className='star__name d-block'>
-                                                {this.state.stars[i].name}
+                                            <Link to={`/star/${starItem.id}`} className='star__name d-block'>
+                                                {starItem.name}
                                             </Link>
 
-                                            {this.handleRibbon(this.state.stars[i])}
+                                            {this.handleRibbon(starItem)}
                                         </ContextMenuTrigger>
                                     </div>
 
@@ -1082,20 +1058,17 @@ class VideoPage extends Component {
                                             onClick={() => {
                                                 this.handleModal(
                                                     'Add Bookmark',
-                                                    Object.keys(this.state.categories).map((category_i) => {
+                                                    this.state.categories.map((categoryItem, category_i) => {
                                                         return (
                                                             <div
                                                                 key={category_i}
                                                                 className='btn btn-sm btn-outline-primary d-block w-auto'
                                                                 onClick={() => {
                                                                     this.handleModal()
-                                                                    this.handleBookmark_add(
-                                                                        this.state.categories[category_i],
-                                                                        this.state.stars[i]
-                                                                    )
+                                                                    this.handleBookmark_add(categoryItem, starItem)
                                                                 }}
                                                             >
-                                                                {this.state.categories[category_i].name}
+                                                                {categoryItem.name}
                                                             </div>
                                                         )
                                                     })
@@ -1111,19 +1084,17 @@ class VideoPage extends Component {
 
                                                 this.handleModal(
                                                     'Add Global Attribute',
-                                                    Object.keys(attributes).map((attribute_i) => {
-                                                        const attribute = attributes[attribute_i]
-
+                                                    this.state.attributes.map((attributeItem, attribute_i) => {
                                                         return (
                                                             <div
                                                                 key={attribute_i}
                                                                 className='btn btn-sm btn-outline-primary d-block w-auto'
                                                                 onClick={() => {
                                                                     this.handleModal()
-                                                                    this.handleStar_addAttribute(this.state.stars[i], attribute)
+                                                                    this.handleStar_addAttribute(starItem, attributeItem)
                                                                 }}
                                                             >
-                                                                {attribute.name}
+                                                                {attributeItem.name}
                                                             </div>
                                                         )
                                                     })
@@ -1133,7 +1104,7 @@ class VideoPage extends Component {
                                             <i className={`${config.theme.fa} fa-plus`} /> Add Global Attribute
                                         </MenuItem>
 
-                                        <MenuItem onClick={() => this.handleStar_remove(this.state.stars[i].id)}>
+                                        <MenuItem onClick={() => this.handleStar_remove(starItem.id)}>
                                             <i className={`${config.theme.fa} fa-trash-alt`} /> Remove
                                         </MenuItem>
                                     </ContextMenu>

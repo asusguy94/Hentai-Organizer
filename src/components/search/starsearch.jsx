@@ -5,7 +5,7 @@ import ScrollToTop from 'react-scroll-to-top'
 
 import './search.scss'
 
-import config from '../config.json'
+import config from '../config'
 
 class StarSearchPage extends Component {
     state = {
@@ -230,15 +230,15 @@ class StarSearchPage extends Component {
                         </div>
 
                         {this.state.loaded.breasts &&
-                            Object.keys(this.state.breasts).map((i) => (
+                            this.state.breasts.map((breast, i) => (
                                 <div className='input-wrapper' key={i}>
                                     <input
                                         type='radio'
                                         name='breast'
-                                        id={`category-${this.state.breasts[i]}`}
-                                        onChange={(e) => this.handleBreastFilter(e, this.state.breasts[i])}
+                                        id={`category-${breast}`}
+                                        onChange={(e) => this.handleBreastFilter(e, breast)}
                                     />
-                                    <label htmlFor={`category-${this.state.breasts[i]}`}>{this.state.breasts[i]}</label>
+                                    <label htmlFor={`category-${breast}`}>{breast}</label>
                                 </div>
                             ))}
                     </div>
@@ -259,15 +259,15 @@ class StarSearchPage extends Component {
                         </div>
 
                         {this.state.loaded.haircolors &&
-                            Object.keys(this.state.haircolors).map((i) => (
+                            this.state.haircolors.map((hairColor, i) => (
                                 <div className='input-wrapper' key={i}>
                                     <input
                                         type='radio'
                                         name='haircolor'
-                                        id={`haircolor-${this.state.haircolors[i]}`}
-                                        onChange={() => this.handleHaircolorFilter(this.state.haircolors[i])}
+                                        id={`haircolor-${hairColor}`}
+                                        onChange={() => this.handleHaircolorFilter(hairColor)}
                                     />
-                                    <label htmlFor={`haircolor-${this.state.haircolors[i]}`}>{this.state.haircolors[i]}</label>
+                                    <label htmlFor={`haircolor-${hairColor}`}>{hairColor}</label>
                                 </div>
                             ))}
                     </div>
@@ -275,14 +275,14 @@ class StarSearchPage extends Component {
                     <h2>Attributes</h2>
                     <div id='attributes'>
                         {this.state.loaded.attributes &&
-                            Object.keys(this.state.attributes).map((i) => (
+                            this.state.attributes.map((attribute, i) => (
                                 <div className='input-wrapper' key={i}>
                                     <input
                                         type='checkbox'
-                                        id={`attribute-${this.state.attributes[i]}`}
-                                        onChange={(e) => this.handleAttributeFilter(e, this.state.attributes[i])}
+                                        id={`attribute-${attribute}`}
+                                        onChange={(e) => this.handleAttributeFilter(e, attribute)}
                                     />
-                                    <label htmlFor={`attribute-${this.state.attributes[i]}`}>{this.state.attributes[i]}</label>
+                                    <label htmlFor={`attribute-${attribute}`}>{attribute}</label>
                                 </div>
                             ))}
                     </div>
@@ -297,19 +297,15 @@ class StarSearchPage extends Component {
 
                     <div className='row justify-content-center'>
                         {this.state.loaded.stars ? (
-                            Object.keys(this.state.stars).map((i) => (
+                            this.state.stars.map((star, i) => (
                                 <a
                                     key={i}
-                                    href={`/star/${this.state.stars[i].id}`}
-                                    className={`star ribbon-container card ${this.isHidden(this.state.stars[i]) ? 'd-none' : ''}`}
+                                    href={`/star/${star.id}`}
+                                    className={`star ribbon-container card ${this.isHidden(star) ? 'd-none' : ''}`}
                                 >
-                                    <img
-                                        className='card-img-top'
-                                        src={`${config.source}/images/stars/${this.state.stars[i].image}`}
-                                        alt='star'
-                                    />
+                                    <img className='card-img-top' src={`${config.source}/images/stars/${star.image}`} alt='star' />
 
-                                    <span className='title card-title text-center'>{this.state.stars[i].name}</span>
+                                    <span className='title card-title text-center'>{star.name}</span>
                                 </a>
                             ))
                         ) : (

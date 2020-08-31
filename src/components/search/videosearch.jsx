@@ -334,14 +334,14 @@ class VideoSearchPage extends Component {
                             </label>
                         </div>
                         {this.state.loaded.categories &&
-                            Object.keys(this.state.categories).map((i) => (
+                            this.state.categories.map((category, i) => (
                                 <div className='input-wrapper' key={i}>
                                     <input
                                         type='checkbox'
-                                        id={`category-${this.state.categories[i].name}`}
-                                        onChange={(e) => this.handleCategoryFilter(e, this.state.categories[i])}
+                                        id={`category-${category.name}`}
+                                        onChange={(e) => this.handleCategoryFilter(e, category)}
                                     />
-                                    <label htmlFor={`category-${this.state.categories[i].name}`}>{this.state.categories[i].name}</label>
+                                    <label htmlFor={`category-${category.name}`}>{category.name}</label>
                                 </div>
                             ))}
                     </div>
@@ -349,14 +349,14 @@ class VideoSearchPage extends Component {
                     <h2>Attributes</h2>
                     <div id='attributes'>
                         {this.state.loaded.attributes &&
-                            Object.keys(this.state.attributes).map((i) => (
+                            this.state.attributes.map((attribute, i) => (
                                 <div className='input-wrapper' key={i}>
                                     <input
                                         type='checkbox'
-                                        id={`attribute-${this.state.attributes[i].name}`}
-                                        onChange={(e) => this.handleAttributeFilter(e, this.state.attributes[i])}
+                                        id={`attribute-${attribute.name}`}
+                                        onChange={(e) => this.handleAttributeFilter(e, attribute)}
                                     />
-                                    <label htmlFor={`attribute-${this.state.attributes[i].name}`}>{this.state.attributes[i].name}</label>
+                                    <label htmlFor={`attribute-${attribute.name}`}>{attribute.name}</label>
                                 </div>
                             ))}
                     </div>
@@ -371,19 +371,15 @@ class VideoSearchPage extends Component {
 
                     <div className='row justify-content-center'>
                         {this.state.loaded.videos ? (
-                            Object.keys(this.state.videos).map((i) => (
+                            this.state.videos.map((video, i) => (
                                 <a
                                     key={i}
-                                    className={`video ribbon-container card ${this.isHidden(this.state.videos[i]) && 'd-none'}`}
-                                    href={`/video/${this.state.videos[i].id}`}
+                                    className={`video ribbon-container card ${this.isHidden(video) && 'd-none'}`}
+                                    href={`/video/${video.id}`}
                                 >
-                                    <img
-                                        className='card-img-top'
-                                        src={`${config.source}/images/videos/${this.state.videos[i].id}-290`}
-                                        alt='video'
-                                    />
+                                    <img className='card-img-top' src={`${config.source}/images/videos/${video.id}-290`} alt='video' />
 
-                                    <span className='title card-title text-center'>{this.state.videos[i].name}</span>
+                                    <span className='title card-title text-center'>{video.name}</span>
 
                                     <span className='ribbon'>{this.state.videos[i].quality}</span>
                                 </a>

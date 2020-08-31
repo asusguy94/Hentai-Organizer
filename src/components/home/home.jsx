@@ -71,16 +71,16 @@ class HomePage extends Component {
     render() {
         return (
             <div className='home-page'>
-                {Object.keys(this.state).map((item, i) => (
-                    <HomeColumn obj={this.state[item]} key={i} />
+                {Object.keys(this.state).map((key, i) => (
+                    <HomeColumn obj={this.state[key]} key={i} />
                 ))}
             </div>
         )
     }
 
     componentDidMount() {
-        Object.keys(this.state).forEach((item) => {
-            if (this.state[item].enabled) this.getData(item)
+        Object.keys(this.state).forEach((key) => {
+            if (this.state[key].enabled) this.getData(key)
         })
     }
 

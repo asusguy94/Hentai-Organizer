@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 
 import Axios from 'axios'
 import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu'
+import { Helmet } from 'react-helmet-async'
 
 import Modal, { handleModal } from '../modal/modal'
 
@@ -481,6 +482,10 @@ class StarPage extends Component {
     render() {
         return (
             <div id='star-page' className='col-12 row'>
+                <Helmet>
+                    <title>{this.state.star.name}</title>
+                </Helmet>
+
                 <section className='col-7'>
                     {this.state.loaded.star && (
                         <div id='star'>

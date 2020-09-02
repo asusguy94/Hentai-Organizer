@@ -399,6 +399,8 @@ class VideoSearchPage extends Component {
 
     componentDidMount() {
         this.getData()
+
+        document.title = 'Video Search'
     }
 
     getData() {

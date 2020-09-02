@@ -7,6 +7,7 @@ import Hls from 'hls.js'
 import { ContextMenu, ContextMenuTrigger, MenuItem } from 'react-contextmenu'
 import ReactTooltip from 'react-tooltip'
 import KeyboardEventHandler from 'react-keyboard-event-handler'
+import { Helmet } from 'react-helmet-async'
 
 import Modal, { handleModal } from '../modal/modal'
 import Ribbon from '../ribbon/ribbon'
@@ -638,6 +639,10 @@ class VideoPage extends Component {
     render() {
         return (
             <div id='video-page' className='col-12 row'>
+                <Helmet>
+                    <title>{this.state.video.name}</title>
+                </Helmet>
+
                 <section className='col-9'>
                     <header className='header row'>
                         <div className='col-11'>

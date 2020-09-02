@@ -321,6 +321,8 @@ class StarSearchPage extends Component {
 
     componentDidMount() {
         this.getData()
+
+        document.title = 'Star Search'
     }
 
     getData() {

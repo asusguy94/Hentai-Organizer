@@ -612,6 +612,7 @@ class VideoPage extends Component {
     }
 
     handleKeyPress(key, e) {
+        if (e.target.tagName === 'INPUT') return
         e.preventDefault()
 
         switch (key) {

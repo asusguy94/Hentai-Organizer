@@ -21,7 +21,7 @@ This is early alpha version of the next version, only use this if you're interes
 
 > Backend scripts can be found in the **_releases_** section. The backend script version needs to match the version of the app
 
-1. Run the backend scripts on a separate web-path. Using WAPMP / LAMP / XAMP should work fine.
+1. Run the backend scripts on a separate web-path. Using WAMP / LAMP / XAMP should work fine.
 2. Make sure the previous branch (@v2) of this app is running in the background
 
 3. The backend scripts uses uses the same database structure as the current version, and should work without issues.

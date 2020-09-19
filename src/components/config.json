@@ -19,5 +19,12 @@
     },
     "theme": {
         "fa": "far"
+    },
+    "overlay": {
+        "success": "checkbox.png"
+    },
+    "filter": {
+        "search": true,
+        "startsWithOnTop": true
     }
 }

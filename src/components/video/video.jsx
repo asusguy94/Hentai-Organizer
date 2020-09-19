@@ -10,6 +10,7 @@ import KeyboardEventHandler from 'react-keyboard-event-handler'
 import { Helmet } from 'react-helmet-async'
 
 import Modal, { handleModal } from '../modal/modal'
+import Overlay, { handleOverlay } from '../overlay/overlay'
 import Ribbon from '../ribbon/ribbon'
 
 import './video.scss'
@@ -17,9 +18,12 @@ import './video.scss'
 import config from '../config'
 
 class VideoPage extends Component {
-    constructor(props) {
-        super(props)
+    constructor() {
+        super()
         this.handleModal = handleModal
+        this.handleOverlay = handleOverlay
+
+        this.player = React.createRef()
     }
 
     state = {
@@ -116,6 +120,11 @@ class VideoPage extends Component {
         modal: {
             visible: false,
             data: null,
+            filter: false,
+        },
+        overlay: {
+            visible: false,
+            data: null,
         },
         newVideo: false,
         input: {
@@ -135,7 +144,7 @@ class VideoPage extends Component {
         Axios.get(`${config.api}/cen.php?id=${this.state.video.id}`).then(({ data }) => {
             if (data.success) {
                 this.setState((prevState) => {
-                    let video = prevState.video
+                    const { video } = prevState
                     video.censored = !video.censored
 
                     return { video }
@@ -218,18 +227,14 @@ class VideoPage extends Component {
     }
 
     handleRibbon(star) {
-        let hasBookmark = false
-
-        this.state.bookmarks.forEach((bookmark) => {
-            if (!hasBookmark && bookmark.starID === star.id) hasBookmark = true
-        })
+        const hasBookmark = this.state.bookmarks.some((bookmark) => bookmark.starID === star.id)
 
         if (!hasBookmark) return <Ribbon label='NEW' />
     }
 
     /* Bookmarks - own class? */
     handleBookmark_add(category, star = null) {
-        let time = Math.round(this.player.player.currentTime)
+        const time = Math.round(this.player.player.currentTime)
         if (time) {
             if (star === null) {
                 Axios.get(
@@ -244,11 +249,14 @@ class VideoPage extends Component {
 
         const success = (data, starID = 0) => {
             if (data.success) {
+                this.handleOverlay(config.overlay.success)
+
                 let attributes = data.attributes
                 if (typeof data.attributes === 'undefined') attributes = []
 
                 this.setState((prevState) => {
-                    let bookmarks = prevState.bookmarks
+                    const { bookmarks } = prevState
+
                     bookmarks.push({
                         id: data.id,
                         name: category.name,
@@ -272,26 +280,24 @@ class VideoPage extends Component {
     }
 
     handleBookmark_time(id) {
-        let time = Math.round(this.player.player.currentTime)
+        const time = Math.round(this.player.player.currentTime)
 
         Axios.get(`${config.api}/changebookmarktime.php?id=${id}&time=${time}`).then(({ data }) => {
             if (data.success) {
-                let bookmarks = this.state.bookmarks
+                const bookmarks = this.state.bookmarks
+                    .map((bookmark) => {
+                        if (bookmark.id === id) bookmark.start = time
 
-                let arr = bookmarks.map((bookmark) => {
-                    if (bookmark.id === id) bookmark.start = time
+                        return bookmark
+                    })
+                    .sort((a, b) => {
+                        let valA = a.start
+                        let valB = b.start
 
-                    return bookmark
-                })
+                        return valA - valB
+                    })
 
-                bookmarks.sort((a, b) => {
-                    let valA = a.start
-                    let valB = b.start
-
-                    return valA - valB
-                })
-
-                this.setState({ bookmarks: arr })
+                this.setState({ bookmarks })
             }
         })
     }
@@ -299,7 +305,7 @@ class VideoPage extends Component {
     handleBookmark_remove(id) {
         Axios.get(`${config.api}/removebookmark.php?id=${id}`).then(({ data }) => {
             if (data.success) {
-                let bookmarks = this.state.bookmarks.filter((item) => {
+                const bookmarks = this.state.bookmarks.filter((item) => {
                     return item.id !== id
                 })
 
@@ -311,8 +317,9 @@ class VideoPage extends Component {
     handleBookmark_category(category, bookmark) {
         Axios.get(`${config.api}/changebookmarkcategory.php?id=${bookmark.id}&categoryID=${category.id}`).then(({ data }) => {
             if (data.success) {
-                let bookmarks = this.state.bookmarks
-                let obj = bookmarks.map((bookmarkItem) => {
+                this.handleOverlay(config.overlay.success)
+
+                const bookmarks = this.state.bookmarks.map((bookmarkItem) => {
                     if (bookmarkItem.id === bookmark.id) {
                         bookmarkItem.name = category.name
                     }
@@ -320,7 +327,7 @@ class VideoPage extends Component {
                     return bookmarkItem
                 })
 
-                this.setState({ bookmarks: obj })
+                this.setState({ bookmarks })
             }
         })
     }
@@ -328,8 +335,9 @@ class VideoPage extends Component {
     handleBookmark_addAttribute(attribute, bookmark) {
         Axios.get(`${config.api}/addbookmarkattribute.php?bookmarkID=${bookmark.id}&attributeID=${attribute.id}`).then(({ data }) => {
             if (data.success) {
-                let bookmarks = this.state.bookmarks
-                let obj = bookmarks.map((bookmarkItem) => {
+                this.handleOverlay(config.overlay.success)
+
+                const bookmarks = this.state.bookmarks.map((bookmarkItem) => {
                     if (bookmarkItem.id === bookmark.id) {
                         bookmarkItem.attributes.push({ id: attribute.id, name: attribute.name })
                     }
@@ -337,7 +345,7 @@ class VideoPage extends Component {
                     return bookmarkItem
                 })
 
-                this.setState({ bookmarks: obj })
+                this.setState({ bookmarks })
             }
         })
     }
@@ -346,17 +354,16 @@ class VideoPage extends Component {
         Axios.get(`${config.api}/removebookmarkattributes.php?bookmarkID=${bookmark.id}`).then(({ data }) => {
             if (data.success) {
                 this.setState((prevState) => {
-                    let bookmarks = prevState.bookmarks
-                    bookmarks.map((item) => {
+                    const bookmarks = prevState.bookmarks.map((item) => {
                         if (item.id === bookmark.id) {
-                            let starID = bookmark.starID
+                            const starID = bookmark.starID
 
                             if (starID !== 0) {
-                                let attributes = this.attributesFromStar(starID)
+                                const attributes = this.attributesFromStar(starID)
 
                                 if (item.attributes.length > attributes.length) {
                                     item.attributes = item.attributes.filter((attribute) => {
-                                        let match = attributes.some((bookmarkAttribute) => {
+                                        const match = attributes.some((bookmarkAttribute) => {
                                             return bookmarkAttribute.name === attribute.name
                                         })
 
@@ -388,21 +395,29 @@ class VideoPage extends Component {
         })[0].attributes
     }
 
+    handleBookmark_addStar(bookmark, star) {
+        Axios.get(`${config.api}/addbookmarkstar.php?starID=${star.id}&bookmarkID=${bookmark.id}`).then(({ data }) => {
+            if (data.success) {
+                // TODO use state instead of window
+                window.location.reload()
+            }
+        })
+    }
+
     handleBookmark_removeStar(bookmark) {
         Axios.get(`${config.api}/removebookmarkstar.php?bookmarkID=${bookmark.id}`).then(({ data }) => {
             if (data.success) {
                 this.setState((prevState) => {
-                    let bookmarks = prevState.bookmarks
-                    bookmarks.map((item) => {
+                    const bookmarks = prevState.bookmarks.map((item) => {
                         if (item.id === bookmark.id) {
-                            let starID = bookmark.starID
+                            const starID = bookmark.starID
 
-                            let attributes = this.attributesFromStar(starID)
+                            const attributes = this.attributesFromStar(starID)
 
                             if (item.attributes.length > attributes.length) {
                                 // Bookmark have at least 1 attribute not from star
                                 item.attributes = item.attributes.filter((attribute) => {
-                                    let match = attributes.some((starAttribute) => starAttribute.name === attribute.name)
+                                    const match = attributes.some((starAttribute) => starAttribute.name === attribute.name)
 
                                     if (!match) return attribute
                                     return null
@@ -458,7 +473,7 @@ class VideoPage extends Component {
         Axios.get(`${config.api}/setdate.php?videoID=${this.state.video.id}&date=${this.state.input.date}`).then(({ data }) => {
             if (data.success) {
                 this.setState((prevState) => {
-                    let date = prevState.video.date
+                    const { date } = prevState.video
                     date.published = data.date
 
                     return { date }
@@ -470,10 +485,10 @@ class VideoPage extends Component {
     }
 
     handleInput(e, field) {
-        let inputValue = e.target.value
+        const inputValue = e.target.value
 
         this.setState((prevState) => {
-            let input = prevState.input
+            const { input } = prevState
             input[field] = inputValue
 
             return { input }
@@ -482,7 +497,7 @@ class VideoPage extends Component {
 
     handleInput_reset(field) {
         this.setState((prevState) => {
-            let input = prevState.input
+            const { input } = prevState
             input[field] = ''
 
             return { input }
@@ -490,12 +505,12 @@ class VideoPage extends Component {
     }
 
     handleNoStar(e) {
-        let status = Number(e.target.checked)
+        const status = Number(e.target.checked)
 
         Axios.get(`${config.api}/nostar.php?videoID=${this.state.video.id}&status=${status}`).then(({ data }) => {
             if (data.success) {
                 this.setState((prevState) => {
-                    let video = prevState.video
+                    const { video } = prevState
                     video.noStar = status
 
                     return { video }
@@ -509,7 +524,7 @@ class VideoPage extends Component {
         Axios.get(`${config.api}/addstar.php?name=${name}&videoID=${this.state.video.id}`).then(({ data }) => {
             if (data.success) {
                 this.setState((prevState) => {
-                    let stars = prevState.stars
+                    const { stars } = prevState
                     stars.push({ id: data.starID, name, attributes: data.attributes })
 
                     return { stars }
@@ -523,7 +538,7 @@ class VideoPage extends Component {
     handleStar_remove(id) {
         Axios.get(`${config.api}/removevideostar.php?videoID=${this.state.video.id}&starID=${id}`).then(({ data }) => {
             if (data.success) {
-                let stars = this.state.stars.filter((item) => {
+                const stars = this.state.stars.filter((item) => {
                     return item.id !== id
                 })
 
@@ -537,7 +552,9 @@ class VideoPage extends Component {
             `${config.api}/addbookmarkattribute.php?videoID=${this.state.video.id}&starID=${star.id}&attributeID=${attribute.id}`
         ).then(({ data }) => {
             if (data.success) {
-                this.reset().then(this.getData())
+                this.handleOverlay(config.overlay.success)
+
+                this.reset('bookmarks').then(this.getData())
             }
         })
     }
@@ -566,10 +583,10 @@ class VideoPage extends Component {
 
         const starID = star.id
         this.setState((prevState) => {
-            let bookmarks = prevState.bookmarks.map((item) => {
-                if (item.starID === starID) item.active = true
+            const bookmarks = prevState.bookmarks.map((bookmark) => {
+                if (bookmark.starID === starID) bookmark.active = true
 
-                return item
+                return bookmark
             })
 
             return { bookmarks }
@@ -578,7 +595,7 @@ class VideoPage extends Component {
 
     bookmark_clearActive() {
         this.setState((prevState) => {
-            let bookmarks = prevState.bookmarks.map((item) => {
+            const bookmarks = prevState.bookmarks.map((item) => {
                 item.active = false
 
                 return item
@@ -592,7 +609,7 @@ class VideoPage extends Component {
         this.bookmark_clearActive()
 
         this.setState((prevState) => {
-            let bookmarks = prevState.bookmarks.map((bookmark) => {
+            const bookmarks = prevState.bookmarks.map((bookmark) => {
                 if (bookmark.attributes.some((bookmarkAttribute) => bookmarkAttribute.id === attribute.id)) bookmark.active = true
 
                 return bookmark
@@ -602,10 +619,10 @@ class VideoPage extends Component {
         })
     }
 
-    async reset() {
+    async reset(type) {
         this.setState((prevState) => {
-            let loaded = prevState.loaded
-            loaded.bookmarks = false
+            const { loaded } = prevState
+            loaded[type] = false
 
             return { loaded }
         })
@@ -629,8 +646,9 @@ class VideoPage extends Component {
                 // TODO use state instead of window
                 if (this.state.video.nextID) {
                     window.location.href = this.state.video.nextID
+                } else {
+                    window.location.href = '/videos'
                 }
-
                 break
             default:
                 console.log(`${key} was pressed`)
@@ -659,7 +677,6 @@ class VideoPage extends Component {
                                                 'Change Title',
                                                 <input
                                                     type='text'
-                                                    className='text-center'
                                                     defaultValue={this.state.video.name}
                                                     onChange={(e) => this.handleInput(e, 'title')}
                                                     ref={(input) => input && input.focus()}
@@ -684,7 +701,6 @@ class VideoPage extends Component {
                                                 'Change Franchise',
                                                 <input
                                                     type='text'
-                                                    className='text-center'
                                                     defaultValue={this.state.video.franchise}
                                                     onChange={(e) => this.handleInput(e, 'franchise')}
                                                     ref={(input) => input && input.focus()}
@@ -728,7 +744,6 @@ class VideoPage extends Component {
                                                 'Change Time',
                                                 <input
                                                     type='text'
-                                                    className='text-center'
                                                     onChange={(e) => this.handleInput(e, 'date')}
                                                     ref={(input) => input && input.focus()}
                                                     onKeyDown={(e) => {
@@ -817,7 +832,8 @@ class VideoPage extends Component {
                                                     {category.name}
                                                 </div>
                                             )
-                                        })
+                                        }),
+                                        true
                                     )
                                 }}
                             >
@@ -846,7 +862,6 @@ class VideoPage extends Component {
                                         'Rename Video',
                                         <input
                                             type='text'
-                                            className='text-center'
                                             defaultValue={this.state.video.path.file}
                                             onChange={(e) => this.handleInput(e, 'video')}
                                             ref={(input) => input && input.focus()}
@@ -948,13 +963,42 @@ class VideoPage extends Component {
                                     </div>
 
                                     <ContextMenu id={`bookmark-${i}`}>
-                                        <MenuItem disabled>
+                                        <MenuItem
+                                            disabled={bookmark.starID !== 0 || (bookmark.starID === 0 && !this.state.stars.length)}
+                                            onClick={() => {
+                                                if (this.state.stars.length > 1) {
+                                                    const stars = document.getElementsByClassName('star')
+
+                                                    for (let i = 0; i < stars.length; i++) {
+                                                        // Hover -- ENTER
+                                                        stars[i].addEventListener('mouseenter', () => {
+                                                            stars[i].classList.add('star--active')
+                                                        })
+
+                                                        // Hover -- LEAVE
+                                                        stars[i].addEventListener('mouseleave', () => {
+                                                            stars[i].classList.remove('star--active')
+                                                        })
+
+                                                        // TODO don't use addEventListener
+                                                        // TODO Terminate all events if clicked
+                                                        stars[i].addEventListener('click', () => {
+                                                            const star = this.state.stars[i]
+
+                                                            this.handleBookmark_addStar(bookmark, star)
+                                                        })
+                                                    }
+                                                } else {
+                                                    this.handleBookmark_addStar(bookmark, this.state.stars[0])
+                                                }
+                                            }}
+                                        >
                                             <i className={`${config.theme.fa} fa-plus`} /> Add Star
                                         </MenuItem>
 
                                         <MenuItem
-                                            disabled={this.state.bookmarks[i].starID === 0}
-                                            onClick={() => this.handleBookmark_removeStar(this.state.bookmarks[i])}
+                                            disabled={bookmark.starID === 0}
+                                            onClick={() => this.handleBookmark_removeStar(bookmark)}
                                         >
                                             <i className={`${config.theme.fa} fa-trash-alt`} /> Remove Star
                                         </MenuItem>
@@ -963,13 +1007,11 @@ class VideoPage extends Component {
 
                                         <MenuItem
                                             onClick={() => {
-                                                const bookmark = this.state.bookmarks[i]
-
                                                 this.handleModal(
                                                     'Add Attribute',
                                                     this.state.attributes
                                                         .filter((attributeItem) => {
-                                                            let match = bookmark.attributes.some(
+                                                            const match = bookmark.attributes.some(
                                                                 (bookmarkAttribute) => attributeItem.name === bookmarkAttribute.name
                                                             )
 
@@ -989,7 +1031,8 @@ class VideoPage extends Component {
                                                                     {attributeItem.name}
                                                                 </div>
                                                             )
-                                                        })
+                                                        }),
+                                                    true
                                                 )
                                             }}
                                         >
@@ -997,7 +1040,7 @@ class VideoPage extends Component {
                                         </MenuItem>
 
                                         <MenuItem
-                                            disabled={this.state.bookmarks[i].attributes.length === 0}
+                                            disabled={bookmark.attributes.length === 0}
                                             onClick={() => this.handleBookmark_clearAttributes(this.state.bookmarks[i])}
                                         >
                                             <i className={`${config.theme.fa} fa-trash-alt`} /> Remove Attributes
@@ -1005,8 +1048,6 @@ class VideoPage extends Component {
 
                                         <MenuItem
                                             onClick={() => {
-                                                const bookmark = this.state.bookmarks[i]
-
                                                 this.handleModal(
                                                     'Change Category',
                                                     this.state.categories
@@ -1022,7 +1063,8 @@ class VideoPage extends Component {
                                                             >
                                                                 {category.name}
                                                             </div>
-                                                        ))
+                                                        )),
+                                                    true
                                                 )
                                             }}
                                         >
@@ -1088,7 +1130,8 @@ class VideoPage extends Component {
                                                                 {categoryItem.name}
                                                             </div>
                                                         )
-                                                    })
+                                                    }),
+                                                    true
                                                 )
                                             }}
                                         >
@@ -1097,8 +1140,7 @@ class VideoPage extends Component {
 
                                         <MenuItem
                                             onClick={() => {
-                                                const { attributes } = this.state
-
+                                                // TODO disabled->if no bookmarks from star
                                                 this.handleModal(
                                                     'Add Global Attribute',
                                                     this.state.attributes.map((attributeItem, attribute_i) => {
@@ -1114,7 +1156,8 @@ class VideoPage extends Component {
                                                                 {attributeItem.name}
                                                             </div>
                                                         )
-                                                    })
+                                                    }),
+                                                    true
                                                 )
                                             }}
                                         >
@@ -1190,9 +1233,16 @@ class VideoPage extends Component {
                     </div>
                 </aside>
 
-                <Modal visible={this.state.modal.visible} onClose={() => this.handleModal()} title={this.state.modal.title}>
+                <Modal
+                    visible={this.state.modal.visible}
+                    title={this.state.modal.title}
+                    filter={this.state.modal.filter}
+                    onClose={() => this.handleModal()}
+                >
                     {this.state.modal.data}
                 </Modal>
+
+                <Overlay visible={this.state.overlay.visible}>{this.state.overlay.data}</Overlay>
 
                 <KeyboardEventHandler
                     handleKeys={['left', 'right', 'space', 'tab']}
@@ -1238,7 +1288,7 @@ class VideoPage extends Component {
                 })
 
                 this.setState((prevState) => {
-                    let loaded = prevState.loaded
+                    const { loaded } = prevState
                     loaded.videoEvents = true
 
                     return { loaded }
@@ -1288,7 +1338,7 @@ class VideoPage extends Component {
                 })
 
                 this.setState((prevState) => {
-                    let loaded = prevState.loaded
+                    const { loaded } = prevState
                     loaded.hls = true
 
                     return { loaded }
@@ -1310,8 +1360,8 @@ class VideoPage extends Component {
         for (let i = 1, items = this.bookmarks, LEVEL_MIN = 1, LEVEL_MAX = 10, level = LEVEL_MIN; i < items.length; i++) {
             let collision = false
 
-            let first = items[i - 1]
-            let second = items[i]
+            const first = items[i - 1]
+            const second = items[i]
 
             if (first === null || second === null) continue // skip if error
 
@@ -1335,83 +1385,69 @@ class VideoPage extends Component {
         }
     }
 
-    getData() {
-        let { id } = this.props.match.params
+    getData(videoID = null) {
+        const id = videoID || this.props.match.params.id
         const { loaded } = this.state
 
         if (!loaded.video) {
-            Axios.get(`${config.api}/video.php?id=${id}`)
-                .then(({ data: video }) => this.setState({ video }))
-                .then(() => {
-                    this.setState((prevState) => {
-                        let loaded = prevState.loaded
-                        loaded.video = true
+            Axios.get(`${config.api}/video.php?id=${id}`).then(({ data: video }) =>
+                this.setState((prevState) => {
+                    const { loaded } = prevState
+                    loaded.video = true
 
-                        return { loaded }
-                    })
+                    return { video, loaded }
                 })
+            )
         }
 
         if (!loaded.bookmarks) {
-            Axios.get(`${config.api}/bookmarks.php?id=${id}`)
-                .then(({ data }) => {
-                    this.setState(() => {
-                        let bookmarks = data.map((item) => {
-                            item.active = false
+            Axios.get(`${config.api}/bookmarks.php?id=${id}`).then(({ data }) => {
+                this.setState((prevState) => {
+                    const bookmarks = data.map((item) => {
+                        item.active = false
 
-                            return item
-                        })
-
-                        return { bookmarks }
+                        return item
                     })
-                })
-                .then(() => {
-                    this.setState((prevState) => {
-                        let loaded = prevState.loaded
-                        loaded.bookmarks = true
 
-                        return { loaded }
-                    })
+                    const { loaded } = prevState
+                    loaded.bookmarks = true
+
+                    return { bookmarks, loaded }
                 })
+            })
         }
 
         if (!loaded.stars) {
-            Axios.get(`${config.api}/stars.php?id=${id}`)
-                .then(({ data: stars }) => this.setState({ stars }))
-                .then(() => {
-                    this.setState((prevState) => {
-                        let loaded = prevState.loaded
-                        loaded.stars = true
+            Axios.get(`${config.api}/stars.php?id=${id}`).then(({ data: stars }) => {
+                this.setState((prevState) => {
+                    const { loaded } = prevState
+                    loaded.stars = true
 
-                        return { loaded }
-                    })
+                    return { stars, loaded }
                 })
+            })
         }
 
         if (!loaded.categories) {
-            Axios.get(`${config.api}/categories.php`)
-                .then(({ data: categories }) => this.setState({ categories }))
-                .then(() => {
-                    this.setState((prevState) => {
-                        let loaded = prevState.loaded
-                        loaded.categories = true
+            Axios.get(`${config.api}/categories.php`).then(({ data: categories }) => {
+                this.setState((prevState) => {
+                    const { loaded } = prevState
+                    loaded.categories = true
 
-                        return { loaded }
-                    })
+                    return { categories, loaded }
                 })
+            })
         }
 
         if (!loaded.attributes) {
-            Axios.get(`${config.api}/attributes.php?method=video`)
-                .then(({ data: attributes }) => this.setState({ attributes }))
-                .then(() => {
-                    this.setState((prevState) => {
-                        let loaded = prevState.loaded
-                        loaded.attributes = true
+            Axios.get(`${config.api}/attributes.php?method=video`).then(({ data: attributes }) => {
+                this.setState((prevState) => {
+                    const { loaded } = prevState
+                    loaded.attributes = true
 
-                        return { loaded }
-                    })
+                    return { attributes, loaded }
                 })
+            })
         }
     }
 }

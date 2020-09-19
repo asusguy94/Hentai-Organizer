@@ -1,26 +1,24 @@
 {
     "name": "hentaijs",
-    "version": "0.0.8",
+    "version": "0.1.0",
     "license": "MIT",
     "dependencies": {
         "axios": "^0.20.0",
-        "hls.js": "^0.14.11",
+        "hls.js": "^0.14.12",
         "node-sass": "^4.14.1",
         "plyr-react": "^2.2.0",
         "react": "^16.13.1",
         "react-contextmenu": "^2.14.0",
         "react-dom": "^16.13.1",
-        "react-helmet-async": "^1.0.6",
+        "react-helmet-async": "^1.0.7",
         "react-keyboard-event-handler": "^1.5.4",
-        "react-lazyload": "^3.0.0",
+        "react-lazy-load-image-component": "^1.5.0",
         "react-router-dom": "^5.2.0",
         "react-scripts": "3.4.3",
         "react-scroll-to-top": "^1.0.5",
-        "react-tooltip": "^4.2.9"
-    },
-    "devDependencies": {
-        "@types/hls.js": "^0.13.0",
-        "@types/react-router-dom": "^5.1.5"
+        "react-select": "^3.1.0",
+        "react-tooltip": "^4.2.10",
+        "react-transition-group": "^4.4.1"
     },
     "scripts": {
         "start": "npx cross-env PORT=3002 react-scripts start",

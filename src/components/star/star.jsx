@@ -21,7 +21,7 @@ class StarVideo extends Component {
 
     async reloadVideo() {
         this.setState((prevState) => {
-            let state = prevState
+            const state = prevState
             state.src = prevState.dataSrc
             state.dataSrc = ''
 
@@ -31,7 +31,7 @@ class StarVideo extends Component {
 
     async unloadVideo() {
         this.setState((prevState) => {
-            let state = prevState
+            const state = prevState
             state.dataSrc = prevState.src
             state.src = ''
 
@@ -51,8 +51,8 @@ class StarVideo extends Component {
 
     async startThumbnailPlayback(video) {
         let time = 100
-        let offset = 60
-        let duration = 1.5
+        const offset = 60
+        const duration = 1.5
 
         this.playFrom(video, time)
         this.thumbnail = setInterval(() => {
@@ -118,8 +118,8 @@ class StarVideos extends Component {
 
         return (
             <div id='videos' className={this.props.className}>
-                {Object.keys(videos).map((i) => (
-                    <StarVideo video={videos[i]} key={i} />
+                {videos.map((video, i) => (
+                    <StarVideo video={video} key={i} />
                 ))}
             </div>
         )
@@ -141,10 +141,10 @@ class StarInputForm extends Component {
     }
 
     updateValue(e) {
-        let { value: inputValue, id: inputID } = e.target
+        const { value: inputValue, id: inputID } = e.target
 
         this.setState((prevState) => {
-            let input = prevState.input
+            const { input } = prevState
             input.id = inputID
             input.value = inputValue
 
@@ -154,14 +154,14 @@ class StarInputForm extends Component {
 
     keyPress(e) {
         if (e.key === 'Enter') {
-            let { id, value } = this.state.input
+            const { id, value } = this.state.input
             if (id.length) {
                 this.update(value, id)
             }
 
             if (this.props.emptyByDefault) {
                 this.setState((prevState) => {
-                    let input = prevState.input
+                    const { input } = prevState
                     input.value = ''
 
                     return { input }
@@ -173,8 +173,8 @@ class StarInputForm extends Component {
     }
 
     isChanged() {
-        let serverValue = (this.props.emptyByDefault ? '' : this.props.value).toLowerCase()
-        let clientValue = (this.state.input.value || '').toLowerCase()
+        const serverValue = (this.props.emptyByDefault ? '' : this.props.value).toLowerCase()
+        const clientValue = (this.state.input.value || '').toLowerCase()
 
         return clientValue !== serverValue
     }
@@ -223,7 +223,7 @@ class StarForm extends Component {
     }
 
     render() {
-        let { data, starData } = this.props
+        const { data, starData } = this.props
 
         return (
             <React.Fragment>
@@ -252,16 +252,16 @@ class StarAttributes extends Component {
     }
 
     render() {
-        return this.props.data.map((element, i) => (
+        return this.props.data.map((attribute, i) => (
             <span key={i}>
                 <ContextMenuTrigger id={`attribute-${i}`} renderTag='span'>
                     <span className='attribute ml-2'>
-                        <span className='btn btn-sm btn-outline-primary'>{element}</span>
+                        <span className='btn btn-sm btn-outline-primary'>{attribute}</span>
                     </span>
                 </ContextMenuTrigger>
 
                 <ContextMenu id={`attribute-${i}`}>
-                    <MenuItem onClick={() => this.remove(element)}>Remove</MenuItem>
+                    <MenuItem onClick={() => this.remove(attribute)}>Remove</MenuItem>
                 </ContextMenu>
             </span>
         ))
@@ -317,7 +317,7 @@ class StarImageDropbox extends Component {
     }
 
     render() {
-        let { star } = this.props
+        const { star } = this.props
 
         if (star.image !== null) {
             return (
@@ -407,7 +407,7 @@ class StarPage extends Component {
         Axios.get(`${config.api}/changestarinfo.php?starID=${this.state.star.id}&label=${label}&value=${value}`).then(({ data }) => {
             if (data.success) {
                 this.setState((prevState) => {
-                    let star = prevState.star
+                    const { star } = prevState
                     star.info[label] = value
 
                     return { star }
@@ -420,7 +420,7 @@ class StarPage extends Component {
         Axios.get(`${config.api}/addstarattribute.php?starID=${this.state.star.id}&attribute=${value}`).then(({ data }) => {
             if (data.success) {
                 this.setState((prevState) => {
-                    let star = prevState.star
+                    const { star } = prevState
                     star.info.attribute.push(value)
 
                     return { star }
@@ -432,9 +432,18 @@ class StarPage extends Component {
     handleStar_removeAttribute(value) {
         Axios.get(`${config.api}/removestarattribute.php?starID=${this.state.star.id}&attribute=${value}`).then(({ data }) => {
             if (data.success) {
-                window.location.reload()
+                this.setState((prevState) => {
+                    const { star } = prevState
+                    const { attribute: attributes } = prevState.star.info
 
-                // TODO Update state object
+                    star.info.attribute = attributes.filter((attribute) => {
+                        if (attribute.toLowerCase() === value.toLowerCase()) return null
+
+                        return attribute
+                    })
+
+                    return { star }
+                })
             }
         })
     }
@@ -457,7 +466,7 @@ class StarPage extends Component {
         Axios.get(`${config.source}/ajax/remove_star_image.php?id=${this.state.star.id}`).then(({ data }) => {
             if (data.success) {
                 this.setState((prevState) => {
-                    let star = prevState.star
+                    const { star } = prevState
                     star.image = null
 
                     return { star }
@@ -529,7 +538,7 @@ class StarPage extends Component {
                     </div>
                 </aside>
 
-                <Modal visible={this.state.modal.visible} onClose={() => this.handleModal()} title={this.state.modal.title}>
+                <Modal visible={this.state.modal.visible} title={this.state.modal.title} onClose={() => this.handleModal()}>
                     {this.state.modal.data}
                 </Modal>
             </div>
@@ -541,42 +550,34 @@ class StarPage extends Component {
     }
 
     getData() {
-        let { id } = this.props.match.params
+        const { id } = this.props.match.params
 
-        Axios.get(`${config.api}/star.php?id=${id}`)
-            .then(({ data: star }) => this.setState({ star }))
-            .then(() => {
-                this.setState((prevState) => {
-                    let loaded = prevState.loaded
-                    loaded.star = true
+        Axios.get(`${config.api}/star.php?id=${id}`).then(({ data: star }) => {
+            this.setState((prevState) => {
+                const { loaded } = prevState
+                loaded.star = true
 
-                    return { loaded }
-                })
+                return { star, loaded }
             })
+        })
 
-        Axios.get(`${config.api}/videos.php?starID=${id}`)
-            .then(({ data: videos }) => this.setState({ videos }))
-            .then(() => {
-                this.setState((prevState) => {
-                    let loaded = prevState.loaded
-                    loaded.videos = true
+        Axios.get(`${config.api}/videos.php?starID=${id}`).then(({ data: videos }) => {
+            this.setState((prevState) => {
+                const { loaded } = prevState
+                loaded.videos = true
 
-                    return { loaded }
-                })
+                return { videos, loaded }
             })
+        })
 
-        Axios.get(`${config.api}/stardata.php`)
-            .then(({ data: starData }) => {
-                this.setState({ starData })
-            })
-            .then(() => {
-                this.setState((prevState) => {
-                    let loaded = prevState.loaded
-                    loaded.starData = true
+        Axios.get(`${config.api}/stardata.php`).then(({ data: starData }) => {
+            this.setState((prevState) => {
+                const { loaded } = prevState
+                loaded.starData = true
 
-                    return { loaded }
-                })
+                return { starData, loaded }
             })
+        })
     }
 }
 

@@ -1,12 +1,12 @@
 import React, { Component } from 'react'
 
+import './ribbon.scss'
+
 class Ribbon extends Component {
     render() {
         const { label } = this.props
 
-        if (label) return <span className='ribbon'>{label}</span>
-
-        return null
+        return label ? <span className='ribbon'>{label}</span> : null
     }
 }
 

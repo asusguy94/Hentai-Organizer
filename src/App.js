@@ -15,6 +15,8 @@ import VideoSearchPage from './components/search/videosearch'
 import StarSearchPage from './components/search/starsearch'
 import { AttributesPage, CategoriesPage } from './components/editor/editor'
 
+import ErrorPage from './components/404/404'
+
 /* Style */
 import './components/styles/main.scss'
 
@@ -22,50 +24,49 @@ class App extends Component {
     render() {
         return (
             <HelmetProvider>
-            <Router>
-                <NavBar />
+                <Router>
+                    <NavBar />
 
-                <main className='container-fluid'>
-                    <div className='row'>
-                        <Switch>
-                            <Route path='/videos/search' component={VideoSearchPage} />
+                    <main className='container-fluid'>
+                        <div className='row'>
+                            <Switch>
+                                <Route path='/videos/add'>
+                                    <p>Add Videos Page</p>
+                                </Route>
 
-                            <Route path='/videos/add'>
-                                <p>Add Videos Page</p>
-                            </Route>
+                                <Route path='/videos/search' component={VideoSearchPage} />
+                                <Route path='/videos' component={VideosPage} />
+                                <Route path='/video/:id' component={VideoPage} />
 
-                            <Route path='/videos' component={VideosPage} />
+                                <Route path='/stars/search' component={StarSearchPage} />
+                                <Route path='/star/:id' component={StarPage} />
 
-                            <Route path='/video/:id' component={VideoPage} />
+                                <Route path='/settings'>
+                                    <h2>Settings Page</h2>
+                                </Route>
 
-                            <Route path='/stars/search' component={StarSearchPage} />
+                                <Route path='/editor/attribute' component={AttributesPage} />
+                                <Route path='/editor/category' component={CategoriesPage} />
 
-                            <Route path='/star/:id' component={StarPage} />
+                                <Route path='/generate/thumbnails'>
+                                    <h2>Generate Thumbnails Page</h2>
+                                </Route>
 
-                            <Route path='/settings'>
-                                <h2>Settings Page</h2>
-                            </Route>
+                                <Route path='/generate/vtt'>
+                                    <h2>VTT Page</h2>
+                                </Route>
 
-                            <Route path='/editor/attribute' component={AttributesPage} />
-                            <Route path='/editor/category' component={CategoriesPage} />
+                                <Route path='/franchise'>
+                                    <h2>Franchise Page</h2>
+                                </Route>
 
-                            <Route path='/generate/thumbnails'>
-                                <h2>Generate Thumbnails Page</h2>
-                            </Route>
+                                <Route path='/' exact component={HomePage} />
 
-                            <Route path='/generate/vtt'>
-                                <h2>VTT Page</h2>
-                            </Route>
-
-                            <Route path='/franchise'>
-                                <h2>Franchise Page</h2>
-                            </Route>
-
-                            <Route path='/' component={HomePage} />
-                        </Switch>
-                    </div>
-                </main>
-            </Router>
+                                <Route path='*' component={ErrorPage} />
+                            </Switch>
+                        </div>
+                    </main>
+                </Router>
             </HelmetProvider>
         )
     }

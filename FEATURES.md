@@ -93,16 +93,16 @@
 
 ### :heavy_check_mark: Bookmark
 
-| Name              | Status                         |  Priority  |
-| ----------------- | ------------------------------ | :--------: |
-| Add Star          | :heavy_check_mark: Page Reload | FUNCTIONAL |
-| Remove Star       | :heavy_check_mark:             |            |
-| Add Attribute     | :heavy_check_mark:             |            |
-| Remove Attributes | :heavy_check_mark:             |            |
-| Change Category   | :heavy_check_mark:             |            |
-| Change Time       | :heavy_check_mark:             |            |
-| Delete Bookmark   | :heavy_check_mark:             |            |
-| [Hover]           | :heavy_check_mark:             |            |
+| Name              | Status             |
+| ----------------- | ------------------ |
+| Add Star          | :heavy_check_mark: |
+| Remove Star       | :heavy_check_mark: |
+| Add Attribute     | :heavy_check_mark: |
+| Remove Attributes | :heavy_check_mark: |
+| Change Category   | :heavy_check_mark: |
+| Change Time       | :heavy_check_mark: |
+| Delete Bookmark   | :heavy_check_mark: |
+| [Hover]           | :heavy_check_mark: |
 
 ### :heavy_check_mark: Other videos from same franchise
 

@@ -395,13 +395,40 @@ class VideoPage extends Component {
         })[0].attributes
     }
 
-    handleBookmark_addStar(bookmark, star) {
+    handleBookmark_addStar(bookmark, star, elements = null) {
         Axios.get(`${config.api}/addbookmarkstar.php?starID=${star.id}&bookmarkID=${bookmark.id}`).then(({ data }) => {
             if (data.success) {
-                // TODO use state instead of window
-                window.location.reload()
+                success()
+
+                if (elements !== null) {
+                    for (let i = 0; i < elements.length; i++) {
+                        // Remove unused classes
+                        this.listenerLeave[i]()
+
+                        // Unload listeners
+                        elements[i].removeEventListener('mouseenter', this.listenerEnter[i])
+                        elements[i].removeEventListener('mouseleave', this.listenerLeave[i])
+                        elements[i].removeEventListener('click', this.listenerClick[i])
+                    }
+                }
             }
         })
+
+        const success = () => {
+            this.setState((prevState) => {
+                const bookmarks = prevState.bookmarks.map((bookmarkItem) => {
+                    if (bookmarkItem === bookmark) {
+                        bookmarkItem.starID = star.id
+
+                        bookmark.attributes = star.attributes.concat(bookmark.attributes)
+                    }
+
+                    return bookmarkItem
+                })
+
+                return { bookmarks }
+            })
+        }
     }
 
     handleBookmark_removeStar(bookmark) {
@@ -969,24 +996,23 @@ class VideoPage extends Component {
                                                 if (this.state.stars.length > 1) {
                                                     const stars = document.getElementsByClassName('star')
 
+                                                    // Define arrays for listeners
+                                                    this.listenerEnter = []
+                                                    this.listenerLeave = []
+                                                    this.listenerClick = []
                                                     for (let i = 0; i < stars.length; i++) {
-                                                        // Hover -- ENTER
-                                                        stars[i].addEventListener('mouseenter', () => {
-                                                            stars[i].classList.add('star--active')
-                                                        })
-
-                                                        // Hover -- LEAVE
-                                                        stars[i].addEventListener('mouseleave', () => {
-                                                            stars[i].classList.remove('star--active')
-                                                        })
-
-                                                        // TODO don't use addEventListener
-                                                        // TODO Terminate all events if clicked
-                                                        stars[i].addEventListener('click', () => {
+                                                        // Define Listeners
+                                                        this.listenerEnter[i] = () => stars[i].classList.add('star--active')
+                                                        this.listenerLeave[i] = () => stars[i].classList.remove('star--active')
+                                                        this.listenerClick[i] = () => {
                                                             const star = this.state.stars[i]
+                                                            this.handleBookmark_addStar(bookmark, star, stars)
+                                                        }
 
-                                                            this.handleBookmark_addStar(bookmark, star)
-                                                        })
+                                                        // Mount Listeners
+                                                        stars[i].addEventListener('mouseenter', this.listenerEnter[i])
+                                                        stars[i].addEventListener('mouseleave', this.listenerLeave[i])
+                                                        stars[i].addEventListener('click', this.listenerClick[i])
                                                     }
                                                 } else {
                                                     this.handleBookmark_addStar(bookmark, this.state.stars[0])

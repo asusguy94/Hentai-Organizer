@@ -23,8 +23,10 @@
     "overlay": {
         "success": "checkbox.png"
     },
+    "modal": {
     "filter": {
         "search": true,
         "startsWithOnTop": true
     }
+}
 }

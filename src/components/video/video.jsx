@@ -402,13 +402,13 @@ class VideoPage extends Component {
 
                 if (elements !== null) {
                     for (let i = 0; i < elements.length; i++) {
-                        // Remove unused classes
-                        this.listenerLeave[i]()
-
                         // Unload listeners
                         elements[i].removeEventListener('mouseenter', this.listenerEnter[i])
                         elements[i].removeEventListener('mouseleave', this.listenerLeave[i])
                         elements[i].removeEventListener('click', this.listenerClick[i])
+
+                        // Remove unused classes
+                        this.listenerLeave[i]()
                     }
                 }
             }

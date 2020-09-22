@@ -52,7 +52,7 @@ class StarSearchPage extends Component {
 
         obj.forEach(({ hidden }) => {
             let value = 0
-            for (let prop in hidden) {
+            for (const prop in hidden) {
                 if (typeof hidden[prop] !== 'object') {
                     value += Number(hidden[prop])
                 } else {

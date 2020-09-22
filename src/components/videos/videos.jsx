@@ -13,9 +13,9 @@ class VideosPage extends Component {
         return (
             <div className='col'>
                 <div className='list-group'>
-                    {Object.keys(this.state.data).map((key, i) => (
+                    {this.state.data.map((video, i) => (
                         <li key={i} className='list-group-item list-group-item-action'>
-                            <a href={`video/${this.state.data[key].id}`}>{this.state.data[key].name}</a>
+                            <a href={`video/${video.id}`}>{video.name}</a>
                         </li>
                     ))}
                 </div>

@@ -87,7 +87,7 @@ class HomePage extends Component {
     getData(type, limit = this.state[type].limit) {
         Axios.get(`${config.api}/home.php?type=${type}&limit=${limit}`).then(({ data }) => {
             this.setState((prevState) => {
-                let object = prevState[type]
+                const object = prevState[type]
                 object.data = data
 
                 return { [type]: object }

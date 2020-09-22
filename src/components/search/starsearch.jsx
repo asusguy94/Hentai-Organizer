@@ -80,7 +80,7 @@ class StarSearchPage extends Component {
     handleTitleSearch(e) {
         const searchValue = e.target.value.toLowerCase()
 
-        let stars = this.state.stars.map((item) => {
+        const stars = this.state.stars.map((item) => {
             item.hidden.titleSearch = !item.name.toLowerCase().includes(searchValue)
 
             return item
@@ -90,12 +90,12 @@ class StarSearchPage extends Component {
     }
 
     handleBreastFilter(e, target) {
-        let stars = this.state.stars.map((star) => {
+        const stars = this.state.stars.map((star) => {
             star.hidden.breast = false
             if (target === null) {
                 star.hidden.noBreast = e.target.checked && star.breast.length
             } else {
-                let match = star.breast.toLowerCase() !== target.toLowerCase()
+                const match = star.breast.toLowerCase() !== target.toLowerCase()
 
                 star.hidden.breast = match
             }
@@ -106,7 +106,7 @@ class StarSearchPage extends Component {
     }
 
     handleBreastFilter_ALL() {
-        let stars = this.state.stars.map((star) => {
+        const stars = this.state.stars.map((star) => {
             star.hidden.breast = false
             star.hidden.noBreast = false
 
@@ -117,7 +117,7 @@ class StarSearchPage extends Component {
     }
 
     handleHaircolorFilter(target) {
-        let stars = this.state.stars.map((star) => {
+        const stars = this.state.stars.map((star) => {
             star.hidden.haircolor = star.haircolor.toLowerCase() !== target.toLowerCase()
 
             return star
@@ -126,7 +126,7 @@ class StarSearchPage extends Component {
     }
 
     handleHaircolorFilter_ALL() {
-        let stars = this.state.stars.map((star) => {
+        const stars = this.state.stars.map((star) => {
             star.hidden.haircolor = false
 
             return star
@@ -136,22 +136,22 @@ class StarSearchPage extends Component {
     }
 
     handleAttributeFilter(e, target) {
-        let stars = this.state.stars.map((star) => {
+        const stars = this.state.stars.map((star) => {
             const targetLower = target.toLowerCase()
 
             if (!e.target.checked) {
-                let match = !star.attributes
+                const match = !star.attributes
                     .map((attribute) => {
                         return attribute.toLowerCase()
                     })
                     .includes(targetLower)
 
                 if (match) {
-                    let index = star.hidden.attributes.indexOf(targetLower)
+                    const index = star.hidden.attributes.indexOf(targetLower)
                     star.hidden.attributes.splice(index, 1)
                 }
             } else {
-                let match = !star.attributes
+                const match = !star.attributes
                     .map((attribute) => {
                         return attribute.toLowerCase()
                     })
@@ -169,7 +169,7 @@ class StarSearchPage extends Component {
     }
 
     sort_default_asc() {
-        let stars = this.state.stars
+        const { stars } = this.state
         stars.sort((a, b) => {
             let valA = a.name.toLowerCase()
             let valB = b.name.toLowerCase()
@@ -181,7 +181,7 @@ class StarSearchPage extends Component {
     }
 
     sort_default_desc() {
-        let stars = this.state.stars
+        const { stars } = this.state
         stars.sort((b, a) => {
             let valA = a.name.toLowerCase()
             let valB = b.name.toLowerCase()
@@ -326,9 +326,8 @@ class StarSearchPage extends Component {
     }
 
     getData() {
-        Axios.get(`${config.api}/starsearch.php`)
-            .then(({ data: { stars } }) => {
-                this.setState(() => {
+        Axios.get(`${config.api}/starsearch.php`).then(({ data: { stars } }) => {
+            this.setState((prevState) => {
                     stars = stars.map((item) => {
                         item.hidden = {
                             titleSearch: false,
@@ -343,32 +342,24 @@ class StarSearchPage extends Component {
                         return item
                     })
 
-                    return { stars }
-                })
-            })
-            .then(() => {
-                this.setState((prevState) => {
-                    let loaded = prevState.loaded
+                const { loaded } = prevState
                     loaded.stars = true
 
-                    return { loaded }
+                return { stars, loaded }
                 })
             })
 
-        Axios.get(`${config.api}/stardata.php`)
-            .then(({ data }) => {
-                const { breast: breasts, eyecolor: eyecolors, haircolor: haircolors, hairstyle: hairstyles, attribute: attributes } = data
-
-                this.setState({ breasts, eyecolors, haircolors, hairstyles, attributes })
-            })
-            .then(() => {
+        Axios.get(`${config.api}/stardata.php`).then(({ data }) => {
                 this.setState((prevState) => {
-                    let loaded = prevState.loaded
+                const { breast: breasts, eyecolor: eyecolors, haircolor: haircolors, hairstyle: hairstyles, attribute: attributes } = data
+                const { loaded } = prevState
                     loaded.breasts = true
                     loaded.eyecolors = true
                     loaded.haircolors = true
                     loaded.hairstyles = true
                     loaded.attributes = true
+
+                return { breasts, eyecolors, haircolors, hairstyles, attributes, loaded }
                 })
             })
     }

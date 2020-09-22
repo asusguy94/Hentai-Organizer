@@ -416,6 +416,8 @@ class VideoPage extends Component {
         })
 
         const success = () => {
+            this.handleOverlay(config.overlay.success)
+
             this.setState((prevState) => {
                 const bookmarks = prevState.bookmarks.map((bookmarkItem) => {
                     if (bookmarkItem === bookmark) {
@@ -472,6 +474,8 @@ class VideoPage extends Component {
 
         Axios.get(`${config.api}/renametitle.php?videoID=${this.state.video.id}&name=${title}`).then(({ data }) => {
             if (data.success) {
+                handleOverlay(config.overlay.success)
+
                 this.reloadVideo().then(this.getData())
             }
         })
@@ -488,6 +492,8 @@ class VideoPage extends Component {
         Axios.get(`${config.api}/renamefranchise.php?videoID=${this.state.video.id}&name=${this.state.input.franchise}`).then(
             ({ data }) => {
                 if (data.success) {
+                    handleOverlay(config.overlay.success)
+
                     this.reloadVideo().then(this.getData())
                 }
             }
@@ -597,8 +603,10 @@ class VideoPage extends Component {
     handlePlays_reset() {
         Axios.get(`${config.api}/removeplays.php?videoID=${this.state.video.id}`).then(({ data }) => {
             if (data.success) {
+                handleOverlay(config.overlay.success)
+
                 this.reloadVideo().then(this.getData())
-    }
+            }
         })
     }
 

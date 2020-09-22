@@ -595,7 +595,11 @@ class VideoPage extends Component {
     }
 
     handlePlays_reset() {
-        Axios.get(`${config.api}/removeplays.php?videoID=${this.state.video.id}`)
+        Axios.get(`${config.api}/removeplays.php?videoID=${this.state.video.id}`).then(({ data }) => {
+            if (data.success) {
+                this.reloadVideo().then(this.getData())
+    }
+        })
     }
 
     bookmark_hasStar(bookmark) {

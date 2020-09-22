@@ -112,6 +112,7 @@ class VideoPage extends Component {
             attributes: false,
 
             videoEvents: false,
+            videoReload: false,
         },
         seekSpeed: {
             regular: 1,
@@ -471,7 +472,7 @@ class VideoPage extends Component {
 
         Axios.get(`${config.api}/renametitle.php?videoID=${this.state.video.id}&name=${title}`).then(({ data }) => {
             if (data.success) {
-                window.location.reload()
+                this.reloadVideo().then(this.getData())
             }
         })
 
@@ -487,7 +488,7 @@ class VideoPage extends Component {
         Axios.get(`${config.api}/renamefranchise.php?videoID=${this.state.video.id}&name=${this.state.input.franchise}`).then(
             ({ data }) => {
                 if (data.success) {
-                    window.location.reload()
+                    this.reloadVideo().then(this.getData())
                 }
             }
         )
@@ -650,6 +651,15 @@ class VideoPage extends Component {
         this.setState((prevState) => {
             const { loaded } = prevState
             loaded[type] = false
+
+            return { loaded }
+        })
+    }
+
+    async reloadVideo() {
+        this.setState((prevState) => {
+            const { loaded } = prevState
+            loaded.videoReload = true
 
             return { loaded }
         })
@@ -1415,11 +1425,12 @@ class VideoPage extends Component {
         const id = videoID || this.props.match.params.id
         const { loaded } = this.state
 
-        if (!loaded.video) {
+        if (!loaded.video || loaded.videoReload) {
             Axios.get(`${config.api}/video.php?id=${id}`).then(({ data: video }) =>
                 this.setState((prevState) => {
                     const { loaded } = prevState
                     loaded.video = true
+                    loaded.videoReload = false
 
                     return { video, loaded }
                 })

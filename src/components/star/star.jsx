@@ -480,7 +480,7 @@ class StarPage extends Component {
             if (data.success) {
                 this.setState((prevState) => {
                     let star = prevState.star
-                    star.image = `${this.state.star.id}.jpg?${new Date()}`
+                    star.image = `${this.state.star.id}.jpg?${Date.now()}`
 
                     return { star }
                 })

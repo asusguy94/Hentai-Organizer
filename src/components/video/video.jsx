@@ -1212,7 +1212,10 @@ class VideoPage extends Component {
                                             <i className={`${config.theme.fa} fa-plus`} /> Add Global Attribute
                                         </MenuItem>
 
-                                        <MenuItem onClick={() => this.handleStar_remove(starItem.id)}>
+                                        <MenuItem
+                                            disabled={this.state.bookmarks.some((bookmark) => bookmark.starID === starItem.id)}
+                                            onClick={() => this.handleStar_remove(starItem.id)}
+                                        >
                                             <i className={`${config.theme.fa} fa-trash-alt`} /> Remove
                                         </MenuItem>
                                     </ContextMenu>

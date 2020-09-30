@@ -23,8 +23,16 @@
             }
         }
 
-        input {
+        .input__container--autosize {
             width: 100%;
+            text-align: center;
+
+            .input--autosize {
+                min-width: 100%;
+            }
+        }
+
+        input {
             text-align: center;
         }
     }

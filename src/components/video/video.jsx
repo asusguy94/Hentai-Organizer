@@ -8,6 +8,7 @@ import { ContextMenu, ContextMenuTrigger, MenuItem } from 'react-contextmenu'
 import ReactTooltip from 'react-tooltip'
 import KeyboardEventHandler from 'react-keyboard-event-handler'
 import { Helmet } from 'react-helmet-async'
+import Autosizeinput from 'react-input-autosize'
 
 import Modal, { handleModal } from '../modal/modal'
 import Overlay, { handleOverlay } from '../overlay/overlay'
@@ -724,15 +725,16 @@ class VideoPage extends Component {
                                         onClick={() => {
                                             this.handleModal(
                                                 'Change Title',
-                                                <input
+                                                <Autosizeinput
                                                     type='text'
+                                                    className='input__container--autosize'
+                                                    inputClassName='input--autosize'
                                                     defaultValue={this.state.video.name}
                                                     onChange={(e) => this.handleInput(e, 'title')}
                                                     ref={(input) => input && input.focus()}
                                                     onKeyDown={(e) => {
                                                         if (e.key === 'Enter') {
                                                             e.preventDefault()
-
                                                             this.handleModal()
                                                             this.handleTitle_rename()
                                                         }
@@ -748,8 +750,10 @@ class VideoPage extends Component {
                                         onClick={() => {
                                             this.handleModal(
                                                 'Change Franchise',
-                                                <input
+                                                <Autosizeinput
                                                     type='text'
+                                                    className='input__container--autosize'
+                                                    inputClassName='input--autosize'
                                                     defaultValue={this.state.video.franchise}
                                                     onChange={(e) => this.handleInput(e, 'franchise')}
                                                     ref={(input) => input && input.focus()}
@@ -909,8 +913,10 @@ class VideoPage extends Component {
                                 onClick={() => {
                                     this.handleModal(
                                         'Rename Video',
-                                        <input
+                                        <Autosizeinput
                                             type='text'
+                                            className='input__container--autosize'
+                                            inputClassName='input--autosize'
                                             defaultValue={this.state.video.path.file}
                                             onChange={(e) => this.handleInput(e, 'video')}
                                             ref={(input) => input && input.focus()}

@@ -406,41 +406,41 @@ class VideoSearchPage extends Component {
     getData() {
         Axios.get(`${config.api}/videosearch.php`).then(({ data: { videos } }) => {
             this.setState((prevState) => {
-                    videos = videos.map((item) => {
-                        item.hidden = {
-                            category: [],
-                            attribute: [],
-                            titleSearch: false,
-                            noCategory: false,
-                        }
+                videos = videos.map((item) => {
+                    item.hidden = {
+                        category: [],
+                        attribute: [],
+                        titleSearch: false,
+                        noCategory: false,
+                    }
 
-                        return item
-                    })
+                    return item
+                })
 
                 const { loaded } = prevState
-                    loaded.videos = true
+                loaded.videos = true
 
                 return { videos, loaded }
-                })
             })
+        })
 
         Axios.get(`${config.api}/categories.php`).then(({ data: categories }) => {
-                this.setState((prevState) => {
-                const loaded = { prevState }
-                    loaded.categories = true
+            this.setState((prevState) => {
+                const { loaded } = prevState
+                loaded.categories = true
 
                 return { categories, loaded }
-                })
             })
+        })
 
         Axios.get(`${config.api}/attributes.php`).then(({ data: attributes }) => {
-                this.setState((prevState) => {
+            this.setState((prevState) => {
                 const { loaded } = prevState
-                    loaded.attributes = true
+                loaded.attributes = true
 
                 return { attributes, loaded }
-                })
             })
+        })
     }
 }
 

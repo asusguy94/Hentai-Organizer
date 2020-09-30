@@ -13,7 +13,7 @@ import VideoPage from './components/video/video'
 import StarPage from './components/star/star'
 import VideoSearchPage from './components/search/videosearch'
 import StarSearchPage from './components/search/starsearch'
-import { AttributesPage, CategoriesPage } from './components/editor/editor'
+import { EditorPage } from './components/editor/editor'
 
 import ErrorPage from './components/404/404'
 
@@ -45,8 +45,7 @@ class App extends Component {
                                     <h2>Settings Page</h2>
                                 </Route>
 
-                                <Route path='/editor/attribute' component={AttributesPage} />
-                                <Route path='/editor/category' component={CategoriesPage} />
+                                <Route path='/editor' component={EditorPage} />
 
                                 <Route path='/generate/thumbnails'>
                                     <h2>Generate Thumbnails Page</h2>

@@ -44,16 +44,10 @@ class NavBar extends Component {
                         <Link to='/settings' className='d-none'>
                             Settings
                         </Link>
+                    </li>
 
-                        <ul className='sub-menu'>
-                            <li>
-                                <Link to='/editor/category'>Category Editor</Link>
-                            </li>
-
-                            <li>
-                                <Link to='/editor/attribute'>Attribute Editor</Link>
-                            </li>
-                        </ul>
+                    <li>
+                        <Link to='/editor'>DB Editor</Link>
                     </li>
 
                     <li>

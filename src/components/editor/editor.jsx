@@ -99,6 +99,18 @@ class Attributes extends Component {
         })
     }
 
+    setCondition(ref, prop, value, checkbox) {
+        Axios.get(`${config.api}/setattributelimit.php?attributeID=${ref.id}&prop=${prop}&value=${value}`)
+            .then(({ data }) => {
+                if (!data.success) error()
+            })
+            .catch(() => {
+                error()
+            })
+
+        const error = () => (checkbox.checked = !checkbox.checked)
+    }
+
     render() {
         return (
             <table className='table table-striped'>
@@ -113,7 +125,12 @@ class Attributes extends Component {
 
                 <tbody>
                     {this.state.attributes.map((attribute, i) => (
-                        <Attribute key={i} data={attribute} updateAttribute={(ref, value) => this.updateAttribute(ref, value)} />
+                        <Attribute
+                            key={i}
+                            data={attribute}
+                            updateAttribute={(ref, value) => this.updateAttribute(ref, value)}
+                            setCondition={(ref, prop, value, element) => this.setCondition(ref, prop, value, element)}
+                        />
                     ))}
                 </tbody>
             </table>
@@ -142,10 +159,10 @@ class Attribute extends Component {
         }
     }
 
-    handleConditionChange(e, attribute) {
+    handleConditionChange(e, attribute, prop) {
         const value = Number(e.target.checked)
 
-        // UPDATE starOnly / videoOnly
+        this.props.setCondition(attribute, prop, value, e.target)
     }
 
     render() {
@@ -183,11 +200,19 @@ class Attribute extends Component {
                 </td>
 
                 <td>
-                    <input type='checkbox' defaultChecked={starOnly} onChange={(e) => this.handleConditionChange(e, attribute)} />
+                    <input
+                        type='checkbox'
+                        defaultChecked={starOnly}
+                        onChange={(e) => this.handleConditionChange(e, attribute, 'starOnly')}
+                    />
                 </td>
 
                 <td>
-                    <input type='checkbox' defaultChecked={videoOnly} onChange={(e) => this.handleConditionChange(e, attribute)} />
+                    <input
+                        type='checkbox'
+                        defaultChecked={videoOnly}
+                        onChange={(e) => this.handleConditionChange(e, attribute, 'videoOnly')}
+                    />
                 </td>
             </tr>
         )

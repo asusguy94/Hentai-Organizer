@@ -145,28 +145,27 @@
 | Attributes | :heavy_check_mark: |
 | [Hover]    | :heavy_check_mark: |
 
-## :x: Star Page
+## :heavy_check_mark: Star Page
 
-### :x: Dropbox
+### :heavy_check_mark: Dropbox
 
-| Name         | Status             | Priority |
-| ------------ | ------------------ | :------: |
-| Drop Area    | :heavy_check_mark: |          |
-| Delete Star  | :x:                |   HIGH   |
-| [ImageHover] | :heavy_check_mark: |          |
+| Name         | Status             |
+| ------------ | ------------------ |
+| Drop Area    | :heavy_check_mark: |
+| Delete Star  | :heavy_check_mark: |
+| [ImageHover] | :heavy_check_mark: |
 
-### :x: Image
+### :heavy_check_mark: Image
 
-| Name         | Status             | Priority |
-| ------------ | ------------------ | :------: |
-| Delete Image | :heavy_check_mark: |          |
-| Delete Star  | :x:                |   HIGH   |
+| Name         | Status             |
+| ------------ | ------------------ |
+| Delete Image | :heavy_check_mark: |
 
-### :x: Star Name
+### :heavy_check_mark: Star Name
 
-| Name   | Status | Priority |
-| ------ | ------ | :------: |
-| Rename | :x:    |   HIGH   |
+| Name   | Status             |
+| ------ | ------------------ |
+| Rename | :heavy_check_mark: |
 
 ### :heavy_check_mark: Input Fields
 

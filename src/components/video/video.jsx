@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 
 import Axios from 'axios'
-import { PlyrComponent } from 'plyr-react'
+import { PlyrComponent as Plyr } from 'plyr-react'
 import Hls from 'hls.js'
 import { ContextMenu, ContextMenuTrigger, MenuItem } from 'react-contextmenu'
 import ReactTooltip from 'react-tooltip'
@@ -24,7 +24,7 @@ class VideoPage extends Component {
         this.handleModal = handleModal
         this.handleOverlay = handleOverlay
 
-        this.player = React.createRef()
+        this.playerRef = React.createRef(null)
     }
 
     state = {
@@ -139,7 +139,8 @@ class VideoPage extends Component {
     }
 
     handleWheel(e) {
-        this.player.player.currentTime += this.state.seekSpeed.wheel * Math.sign(e.deltaY) * -1
+        const { player } = this.playerRef.current
+        player.currentTime += this.state.seekSpeed.wheel * Math.sign(e.deltaY) * -1
     }
 
     handleCensor_toggle() {
@@ -160,19 +161,19 @@ class VideoPage extends Component {
     }
 
     handleVideo_isPlaying() {
-        const { player } = this.player
+        const { player } = this.playerRef.current
 
         return player.playing
     }
 
     handleVideo_pause() {
-        const { player } = this.player
+        const { player } = this.playerRef.current
 
         player.pause()
     }
 
     handleVideo_play(time = null) {
-        const { player } = this.player
+        const { player } = this.playerRef.current
 
         if (time === null) time = player.currentTime
         player.currentTime = Number(time)
@@ -185,13 +186,13 @@ class VideoPage extends Component {
     }
 
     handleVideo_forward(time = this.state.seekSpeed.regular) {
-        const { player } = this.player
+        const { player } = this.playerRef.current
 
         player.currentTime += Number(time)
     }
 
     handleVideo_rewind(time = this.state.seekSpeed.regular) {
-        const { player } = this.player
+        const { player } = this.playerRef.current
 
         player.currentTime -= Number(time)
     }
@@ -236,7 +237,8 @@ class VideoPage extends Component {
 
     /* Bookmarks - own class? */
     handleBookmark_add(category, star = null) {
-        const time = Math.round(this.player.player.currentTime)
+        const { player } = this.playerRef.current
+        const time = Math.round(player.currentTime)
         if (time) {
             if (star === null) {
                 Axios.get(
@@ -282,7 +284,8 @@ class VideoPage extends Component {
     }
 
     handleBookmark_time(id) {
-        const time = Math.round(this.player.player.currentTime)
+        const { player } = this.playerRef.current
+        const time = Math.round(player.currentTime)
 
         Axios.get(`${config.api}/changebookmarktime.php?id=${id}&time=${time}`).then(({ data }) => {
             if (data.success) {
@@ -837,8 +840,8 @@ class VideoPage extends Component {
                     <div className='video-container' onWheel={(e) => this.handleWheel(e)}>
                         <ContextMenuTrigger id='video'>
                             {this.state.loaded.video && (
-                                <PlyrComponent
-                                    ref={(player) => (this.player = player)}
+                                <Plyr
+                                    ref={this.playerRef}
                                     options={{
                                         controls: ['play-large', 'play', 'current-time', 'progress', 'duration', 'fullscreen'],
                                         hideControls: false,
@@ -1322,17 +1325,19 @@ class VideoPage extends Component {
         if (this.state.loaded.video) {
             /* Events Handler */
             if (!this.state.loaded.videoEvents) {
+                const { player } = this.playerRef.current
+
                 if (Number(localStorage.video) !== this.state.video.id) {
                     localStorage.playing = 0
                 }
 
-                this.player.player.on('timeupdate', () => {
-                    if (this.player.player.currentTime) {
-                        localStorage.bookmark = Math.round(this.player.player.currentTime)
+                player.on('timeupdate', () => {
+                    if (player.currentTime) {
+                        localStorage.bookmark = Math.round(player.currentTime)
                     }
                 })
 
-                this.player.player.on('play', () => {
+                player.on('play', () => {
                     localStorage.playing = 1
 
                     if (this.state.newVideo) {
@@ -1341,7 +1346,7 @@ class VideoPage extends Component {
                     }
                 })
 
-                this.player.player.on('pause', () => {
+                player.on('pause', () => {
                     localStorage.playing = 0
                 })
 
@@ -1352,12 +1357,14 @@ class VideoPage extends Component {
                     return { loaded }
                 })
             }
+        }
 
-            /* HLS handler */
-            if (!this.state.loaded.hls && Hls.isSupported() && config.hls.enabled) {
+        // HLS handler
+        if (this.state.loaded.videoEvents && !this.state.loaded.hls && Hls.isSupported() && config.hls.enabled) {
+            const { player } = this.playerRef.current
                 const hls = new Hls({ autoStartLoad: false })
-                hls.loadSource(this.player.player.media.firstElementChild.getAttribute('src'))
-                hls.attachMedia(this.player.player.media)
+            hls.loadSource(player.media.firstElementChild.getAttribute('src'))
+            hls.attachMedia(player.media)
 
                 hls.on(Hls.Events.MANIFEST_PARSED, (e, data) => {
                     const dataLevels = data['levels'].length - 1
@@ -1402,7 +1409,6 @@ class VideoPage extends Component {
                     return { loaded }
                 })
             }
-        }
 
         /* Collision Check */
         const collisionCheck = (a, b) => {

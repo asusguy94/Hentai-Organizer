@@ -6,12 +6,12 @@ import './editor.scss'
 
 import config from '../config.json'
 
-export class EditorPage extends Component {
+export default class EditorPage extends Component {
     render() {
         return (
             <div id='editor-page' className='col-12 row'>
-                <AttributesPage className='col-3' />
-                <CategoriesPage className='col-3' />
+                <AttributesPage className='col-4' />
+                <CategoriesPage className='col-4' />
             </div>
         )
     }
@@ -52,9 +52,9 @@ class AttributesPage extends Component {
         return (
             <div className={this.props.className}>
                 <header className='row'>
-                    <h2 className='col-6'>Attributes Page</h2>
+                    <h2 className='col-5'>Attributes Page</h2>
 
-                    <div className='col-6 mt-1'>
+                    <div className='col-7 mt-1'>
                         <input
                             type='text'
                             className='col-6 pl-2'
@@ -111,6 +111,36 @@ class Attributes extends Component {
         const error = () => (checkbox.checked = !checkbox.checked)
     }
 
+    sortID(obj = null) {
+        this.setState((prevState) => {
+            let attributes = obj || prevState.attributes
+            attributes.sort(({ id: valA }, { id: valB }) => valA - valB)
+
+            return attributes
+        })
+    }
+    sortName(obj = null) {
+        this.setState((prevState) => {
+            let attributes = obj || prevState.attributes
+            attributes.sort(({ name: valA }, { name: valB }) => valA.localeCompare(valB))
+
+            return attributes
+        })
+    }
+
+    toggleSort(column) {
+        switch (column) {
+            case 'id':
+                this.sortID()
+                break
+            case 'name':
+                this.sortName()
+                break
+            default:
+                console.log(`${column} is not sortable`)
+        }
+    }
+
     render() {
         return (
             <table className='table table-striped'>
@@ -139,16 +169,16 @@ class Attributes extends Component {
 
     getData() {
         Axios.get(`${config.api}/attributes.php`).then(({ data: attributes }) => {
-            attributes.sort((a, b) => a.id - b.id)
+            this.sortID(attributes)
             this.setState({ attributes })
         })
     }
 }
 
 class Attribute extends Component {
-    constructor() {
-        super()
-        this.state = { edit: false, value: null }
+    constructor(props) {
+        super(props)
+        this.state = { edit: false, value: null, conditions: { videoOnly: props.data.videoOnly, starOnly: props.data.starOnly } }
     }
 
     saveAttribute() {
@@ -254,9 +284,9 @@ class CategoriesPage extends Component {
         return (
             <div className={this.props.className}>
                 <header className='row'>
-                    <h2 className='col-6'>Categories Page</h2>
+                    <h2 className='col-5'>Categories Page</h2>
 
-                    <div className='col-6 mt-1'>
+                    <div className='col-7 mt-1'>
                         <input
                             type='text'
                             className='col-6 pl-2'
@@ -301,13 +331,47 @@ class Categories extends Component {
         })
     }
 
+    sortID() {
+        this.setState((prevState) => {
+            let { categories } = prevState
+            categories.sort(({ id: valA }, { id: valB }) => valA - valB)
+
+            return categories
+        })
+    }
+    sortName() {
+        this.setState((prevState) => {
+            let { categories } = prevState
+            categories.sort(({ name: valA }, { name: valB }) => valA.localeCompare(valB))
+
+            return categories
+        })
+    }
+
+    toggleSort(column) {
+        switch (column) {
+            case 'id':
+                this.sortID()
+                break
+            case 'name':
+                this.sortName()
+                break
+            default:
+                console.log(`${column} is not sortable`)
+        }
+    }
+
     render() {
         return (
             <table className='table table-striped'>
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Category</th>
+                        <th className='sortable' onClick={() => this.toggleSort('id')}>
+                            ID
+                        </th>
+                        <th className='sortable' onClick={() => this.toggleSort('name')}>
+                            Category
+                        </th>
                     </tr>
                 </thead>
 
@@ -322,8 +386,8 @@ class Categories extends Component {
 
     getData() {
         Axios.get(`${config.api}/categories.php`).then(({ data: categories }) => {
-            categories.sort((a, b) => a.id - b.id)
             this.setState({ categories })
+            this.toggleSort('id')
         })
     }
 }

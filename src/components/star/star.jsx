@@ -400,7 +400,31 @@ class StarPage extends Component {
         modal: {
             visible: false,
             data: null,
+            filter: false,
         },
+        input: {
+            title: '',
+        },
+    }
+
+    handleInput(e, field) {
+        const inputValue = e.target.value
+
+        this.setState((prevState) => {
+            const { input } = prevState
+            input[field] = inputValue
+
+            return { input }
+        })
+    }
+
+    handleInput_reset(field) {
+        this.setState((prevState) => {
+            const { input } = prevState
+            input[field] = ''
+
+            return { input }
+        })
     }
 
     handleStar_updateInfo(value, label) {
@@ -449,7 +473,21 @@ class StarPage extends Component {
     }
 
     handleStar_rename() {
-        console.log('open modal with input form')
+        const starRef = this.state.star
+        const inputRef = this.state.input.title
+
+        Axios.get(`${config.api}/renamestar.php?starID=${starRef.id}&name=${inputRef}`).then(({ data }) => {
+            if (data.success) {
+                this.setState((prevState) => {
+                    const { star } = prevState
+                    star.name = inputRef
+
+                    return { star }
+                })
+    }
+        })
+
+        this.handleInput_reset('title')
     }
 
     handleStar_remove() {
@@ -510,7 +548,27 @@ class StarPage extends Component {
                             </ContextMenuTrigger>
 
                             <ContextMenu id='title'>
-                                <MenuItem disabled onClick={(e) => this.handleStar_rename(e)}>
+                                <MenuItem
+                                    onClick={() => {
+                                        this.handleModal(
+                                            'Rename',
+                                            <input
+                                                type='text'
+                                                defaultValue={this.state.star.name}
+                                                onChange={(e) => this.handleInput(e, 'title')}
+                                                ref={(inp) => inp && inp.focus()}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter') {
+                                                        e.preventDefault()
+
+                                                        this.handleModal()
+                                                        this.handleStar_rename()
+                                                    }
+                                                }}
+                                            />
+                                        )
+                                    }}
+                                >
                                     <i className={`${config.theme.fa} fa-edit`} /> Rename
                                 </MenuItem>
                             </ContextMenu>
@@ -538,7 +596,12 @@ class StarPage extends Component {
                     </div>
                 </aside>
 
-                <Modal visible={this.state.modal.visible} title={this.state.modal.title} onClose={() => this.handleModal()}>
+                <Modal
+                    visible={this.state.modal.visible}
+                    title={this.state.modal.title}
+                    filter={this.state.modal.filter}
+                    onClose={() => this.handleModal()}
+                >
                     {this.state.modal.data}
                 </Modal>
             </div>

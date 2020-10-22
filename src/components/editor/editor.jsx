@@ -57,7 +57,7 @@ class AttributesPage extends Component {
                     <div className='col-7 mt-1'>
                         <input
                             type='text'
-                            className='col-6 pl-2'
+                            className='col-6 px-1'
                             ref={(input) => (this.input = input)}
                             onChange={this.handleChange.bind(this)}
                             onKeyPress={this.handleKeyPress.bind(this)}
@@ -289,7 +289,7 @@ class CategoriesPage extends Component {
                     <div className='col-7 mt-1'>
                         <input
                             type='text'
-                            className='col-6 pl-2'
+                            className='col-6 px-1'
                             ref={(input) => (this.input = input)}
                             onChange={this.handleChange.bind(this)}
                             onKeyPress={this.handleKeyPress.bind(this)}

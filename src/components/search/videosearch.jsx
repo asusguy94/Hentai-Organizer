@@ -3,6 +3,7 @@ import React, { Component } from 'react'
 import Axios from 'axios'
 import ScrollToTop from 'react-scroll-to-top'
 
+import Indeterminate from '../indeterminate/indeterminate'
 import Ribbon from '../ribbon/ribbon'
 
 import './search.scss'
@@ -10,6 +11,11 @@ import './search.scss'
 import config from '../config.json'
 
 class VideoSearchPage extends Component {
+    constructor() {
+        super()
+        this.indeterminate = new Indeterminate()
+    }
+
     state = {
         videos: [
             {
@@ -25,9 +31,12 @@ class VideoSearchPage extends Component {
                 attribute: [],
                 hidden: {
                     category: [],
+                    notCategory: [],
                     attribute: [],
+                    notAttribute: [],
                     titleSearch: false,
                     noCategory: false,
+                    notNoCategory: false,
                 },
             },
         ],
@@ -104,21 +113,43 @@ class VideoSearchPage extends Component {
     handleCategoryFilter(e, target) {
         const videos = this.state.videos.map((video) => {
             if (target === null) {
-                video.hidden.noCategory = e.target.checked && video.categories.length
+                if (e.target.indeterminate) {
+                    video.hidden.noCategory = false
+                    video.hidden.notNoCategory = video.categories.length === 0
+                } else if (!e.target.checked) {
+                    video.hidden.notNoCategory = false
+            } else {
+                    video.hidden.noCategory = video.categories.length !== 0
+                }
             } else {
                 const targetLower = target.name.toLowerCase()
 
-                if (!e.target.checked) {
+                if (e.target.indeterminate) {
+                    const match = video.categories.some((category) => {
+                        return category.toLowerCase() === targetLower
+                    })
+
+                    // INDETERMINATE
+                    if (match) {
+                        video.hidden.notCategory.push(targetLower)
+                    } else {
+                        // Remove checked-status from filtering
+                        const index = video.hidden.category.indexOf(targetLower)
+                        video.hidden.category.splice(index, 1)
+                    }
+                } else if (!e.target.checked) {
                     video.hidden.noCategory = false
-                    const match = !video.categories
+                    const match = video.categories
                         .map((category) => {
                             return category.toLowerCase()
                         })
                         .includes(targetLower)
 
+                    // NOT-CHECKED
                     if (match) {
-                        const index = video.hidden.category.indexOf(targetLower)
-                        video.hidden.category.splice(index, 1)
+                        // Remove checked-status from filtering
+                        const index = video.hidden.notCategory.indexOf(targetLower)
+                        video.hidden.notCategory.splice(index, 1)
                     }
                 } else {
                     const match = !video.categories
@@ -127,7 +158,8 @@ class VideoSearchPage extends Component {
                         })
                         .includes(targetLower)
 
-                    if (match && !video.hidden.category.includes(targetLower)) {
+                    // CHECKED
+                    if (match) {
                         video.hidden.category.push(targetLower)
                     }
                 }
@@ -140,22 +172,34 @@ class VideoSearchPage extends Component {
     }
 
     handleAttributeFilter(e, target) {
-        const videos = this.state.videos.map((video) => {
-            if (target === null) {
-                video.hidden.noCategory = e.target.checked && video.attributes.length
-            } else {
                 const targetLower = target.name.toLowerCase()
 
-                if (!e.target.checked) {
-                    const match = !video.attributes
+        const videos = this.state.videos.map((video) => {
+            if (e.target.indeterminate) {
+                const match = video.attributes.some((attribute) => {
+                    return attribute.toLowerCase() === targetLower
+                })
+
+                // INDETERMINATE
+                if (match) {
+                    video.hidden.notAttribute.push(targetLower)
+                } else {
+                    // Remove checked-status from filtering
+                    const index = video.hidden.attribute.indexOf(targetLower)
+                    video.hidden.attribute.splice(index, 1)
+                }
+            } else if (!e.target.checked) {
+                const match = video.attributes
                         .map((attribute) => {
                             return attribute.toLowerCase()
                         })
                         .includes(targetLower)
 
+                // NOT-CHECKED
                     if (match) {
-                        const index = video.hidden.attribute.indexOf(targetLower)
-                        video.hidden.attribute.splice(index, 1)
+                    // Remove indeterminate-status from filtering
+                    const index = video.hidden.notAttribute.indexOf(targetLower)
+                    video.hidden.notAttribute.splice(index, 1)
                     }
                 } else {
                     const match = !video.attributes
@@ -164,11 +208,11 @@ class VideoSearchPage extends Component {
                         })
                         .includes(targetLower)
 
-                    if (match && !video.hidden.attribute.includes(targetLower)) {
+                // CHECKED
+                if (match) {
                         video.hidden.attribute.push(targetLower)
                     }
                 }
-            }
 
             return video
         })
@@ -330,7 +374,14 @@ class VideoSearchPage extends Component {
                     <h2>Categories</h2>
                     <div id='categories'>
                         <div className='input-wrapper'>
-                            <input type='checkbox' id='category_NULL' onChange={(e) => this.handleCategoryFilter(e, null)} />
+                            <input
+                                type='checkbox'
+                                id='category_NULL'
+                                onChange={(e) => {
+                                    this.indeterminate.handleIndeterminate(e)
+                                    this.handleCategoryFilter(e, null)
+                                }}
+                            />
                             <label htmlFor='category_NULL' className='global-category'>
                                 NULL
                             </label>
@@ -341,7 +392,10 @@ class VideoSearchPage extends Component {
                                     <input
                                         type='checkbox'
                                         id={`category-${category.name}`}
-                                        onChange={(e) => this.handleCategoryFilter(e, category)}
+                                        onChange={(e) => {
+                                            this.indeterminate.handleIndeterminate(e)
+                                            this.handleCategoryFilter(e, category)
+                                        }}
                                     />
                                     <label htmlFor={`category-${category.name}`}>{category.name}</label>
                                 </div>
@@ -356,7 +410,10 @@ class VideoSearchPage extends Component {
                                     <input
                                         type='checkbox'
                                         id={`attribute-${attribute.name}`}
-                                        onChange={(e) => this.handleAttributeFilter(e, attribute)}
+                                        onChange={(e) => {
+                                            this.indeterminate.handleIndeterminate(e)
+                                            this.handleAttributeFilter(e, attribute)
+                                        }}
                                     />
                                     <label htmlFor={`attribute-${attribute.name}`}>{attribute.name}</label>
                                 </div>
@@ -409,9 +466,12 @@ class VideoSearchPage extends Component {
                 videos = videos.map((item) => {
                     item.hidden = {
                         category: [],
+                        notCategory: [],
                         attribute: [],
+                        notAttribute: [],
                         titleSearch: false,
                         noCategory: false,
+                        notNoCategory: false,
                     }
 
                     return item

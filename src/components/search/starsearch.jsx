@@ -3,11 +3,18 @@ import React, { Component } from 'react'
 import Axios from 'axios'
 import ScrollToTop from 'react-scroll-to-top'
 
+import Indeterminate from '../indeterminate/indeterminate'
+
 import './search.scss'
 
 import config from '../config'
 
 class StarSearchPage extends Component {
+    constructor() {
+        super()
+        this.indeterminate = new Indeterminate()
+    }
+
     state = {
         stars: [
             {
@@ -24,7 +31,8 @@ class StarSearchPage extends Component {
                     eyecolor: false,
                     haircolor: false,
                     hairstyle: false,
-                    attributes: [],
+                    attribute: [],
+                    notAttribute: [],
                 },
             },
         ],
@@ -136,19 +144,34 @@ class StarSearchPage extends Component {
     }
 
     handleAttributeFilter(e, target) {
-        const stars = this.state.stars.map((star) => {
             const targetLower = target.toLowerCase()
 
-            if (!e.target.checked) {
-                const match = !star.attributes
+        const stars = this.state.stars.map((star) => {
+            if (e.target.indeterminate) {
+                const match = star.attributes.some((attribute) => {
+                    return attribute.toLowerCase() === targetLower
+                })
+
+                // INDETERMINATE
+                if (match) {
+                    star.hidden.notAttribute.push(targetLower)
+                } else {
+                    // Remove checked-status from filtering
+                    const index = star.hidden.attribute.indexOf(targetLower)
+                    star.hidden.attribute.splice(index, 1)
+                }
+            } else if (!e.target.checked) {
+                const match = star.attributes
                     .map((attribute) => {
                         return attribute.toLowerCase()
                     })
                     .includes(targetLower)
 
+                // NOT-CHECKED
                 if (match) {
-                    const index = star.hidden.attributes.indexOf(targetLower)
-                    star.hidden.attributes.splice(index, 1)
+                    // Remove indeterminate-status from filtering
+                    const index = star.hidden.notAttribute.indexOf(targetLower)
+                    star.hidden.notAttribute.splice(index, 1)
                 }
             } else {
                 const match = !star.attributes
@@ -157,8 +180,9 @@ class StarSearchPage extends Component {
                     })
                     .includes(targetLower)
 
-                if (match && !star.hidden.attributes.includes(targetLower)) {
-                    star.hidden.attributes.push(targetLower)
+                // CHECKED
+                if (match) {
+                    star.hidden.attribute.push(targetLower)
                 }
             }
 
@@ -280,7 +304,10 @@ class StarSearchPage extends Component {
                                     <input
                                         type='checkbox'
                                         id={`attribute-${attribute}`}
-                                        onChange={(e) => this.handleAttributeFilter(e, attribute)}
+                                        onChange={(e) => {
+                                            this.indeterminate.handleIndeterminate(e)
+                                            this.handleAttributeFilter(e, attribute)
+                                        }}
                                     />
                                     <label htmlFor={`attribute-${attribute}`}>{attribute}</label>
                                 </div>
@@ -336,7 +363,8 @@ class StarSearchPage extends Component {
                             eyecolor: false,
                             haircolor: false,
                             hairstyle: false,
-                            attributes: [],
+                        attribute: [],
+                        notAttribute: [],
                         }
 
                         return item

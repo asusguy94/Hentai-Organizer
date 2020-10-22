@@ -1,5 +1,18 @@
 #editor-page {
     table {
+        $theadColor: darkgrey;
+
+        thead {
+            background-color: $theadColor;
+
+            th {
+                position: sticky;
+                top: 0;
+                z-index: 1;
+                background-color: $theadColor;
+            }
+        }
+
         th {
             cursor: default;
         }

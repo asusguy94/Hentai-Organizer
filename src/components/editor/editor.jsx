@@ -203,7 +203,7 @@ class Attribute extends Component {
             <tr>
                 <th>{id}</th>
                 <td
-                    className='btn btn-link'
+                    className='btn-link'
                     onClick={() => {
                         this.setState({ edit: true })
                     }}
@@ -413,7 +413,7 @@ class Category extends Component {
             <tr>
                 <th>{id}</th>
                 <td
-                    className='btn btn-link'
+                    className='btn-link'
                     onClick={() => {
                         this.setState({ edit: true })
                     }}

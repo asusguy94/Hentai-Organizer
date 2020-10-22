@@ -1050,8 +1050,7 @@ class VideoPage extends Component {
                                                 }
                                             }}
                                         >
-                                            <i className={`${config.theme.fa} fa-plus`} />{' '}
-                                            {this.state.stars.length > 1 ? 'Change Star' : 'Add Star'}
+                                            <i className={`${config.theme.fa} fa-plus`} /> Add Star
                                         </MenuItem>
 
                                         <MenuItem

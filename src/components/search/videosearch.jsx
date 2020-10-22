@@ -118,7 +118,7 @@ class VideoSearchPage extends Component {
                     video.hidden.notNoCategory = video.categories.length === 0
                 } else if (!e.target.checked) {
                     video.hidden.notNoCategory = false
-            } else {
+                } else {
                     video.hidden.noCategory = video.categories.length !== 0
                 }
             } else {
@@ -172,7 +172,7 @@ class VideoSearchPage extends Component {
     }
 
     handleAttributeFilter(e, target) {
-                const targetLower = target.name.toLowerCase()
+        const targetLower = target.name.toLowerCase()
 
         const videos = this.state.videos.map((video) => {
             if (e.target.indeterminate) {
@@ -190,29 +190,29 @@ class VideoSearchPage extends Component {
                 }
             } else if (!e.target.checked) {
                 const match = video.attributes
-                        .map((attribute) => {
-                            return attribute.toLowerCase()
-                        })
-                        .includes(targetLower)
+                    .map((attribute) => {
+                        return attribute.toLowerCase()
+                    })
+                    .includes(targetLower)
 
                 // NOT-CHECKED
-                    if (match) {
+                if (match) {
                     // Remove indeterminate-status from filtering
                     const index = video.hidden.notAttribute.indexOf(targetLower)
                     video.hidden.notAttribute.splice(index, 1)
-                    }
-                } else {
-                    const match = !video.attributes
-                        .map((attribute) => {
-                            return attribute.toLowerCase()
-                        })
-                        .includes(targetLower)
+                }
+            } else {
+                const match = !video.attributes
+                    .map((attribute) => {
+                        return attribute.toLowerCase()
+                    })
+                    .includes(targetLower)
 
                 // CHECKED
                 if (match) {
-                        video.hidden.attribute.push(targetLower)
-                    }
+                    video.hidden.attribute.push(targetLower)
                 }
+            }
 
             return video
         })
@@ -433,7 +433,7 @@ class VideoSearchPage extends Component {
                             this.state.videos.map((video, i) => (
                                 <a
                                     key={i}
-                                    className={`video ribbon-container card ${this.isHidden(video) && 'd-none'}`}
+                                    className={`video ribbon-container card ${this.isHidden(video) ? 'd-none' : ''}`}
                                     href={`/video/${video.id}`}
                                 >
                                     <img className='card-img-top' src={`${config.source}/images/videos/${video.id}-290`} alt='video' />

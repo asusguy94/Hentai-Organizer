@@ -51,22 +51,23 @@ class NavBar extends Component {
                     </li>
 
                     <li>
-                        <a href={`${config.source}/video_generatethumbnails.php`} target='_blank' rel='noopener noreferrer'>
-                            Generate Thumbnails
-                        </a>
-                        <ul className='sub-menu'>
-                            <li>
-                                <a href={`${config.source}/vtt.php`} target='_blank' rel='noopener noreferrer'>
-                                    Generate WebVTT
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-
-                    <li>
                         <a href={`${config.db}/phpMyAdmin`} target='_blank' rel='noopener noreferrer'>
                             DB
                         </a>
+                    </li>
+
+                    <li>
+                        <a href={`${config.source}/video_generatethumbnails.php`} target='_blank' rel='noopener noreferrer'>
+                            Import Videos
+                        </a>
+
+                        <ul className='sub-menu'>
+                            <li>
+                                <a href={`${config.source}/vtt.php`} target='_blank' rel='noopener noreferrer'>
+                                    Build Previews
+                                </a>
+                            </li>
+                        </ul>
                     </li>
                 </ul>
             </nav>

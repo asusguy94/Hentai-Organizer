@@ -261,7 +261,9 @@ class StarAttributes extends Component {
                 </ContextMenuTrigger>
 
                 <ContextMenu id={`attribute-${i}`}>
-                    <MenuItem onClick={() => this.remove(attribute)}>Remove</MenuItem>
+                    <MenuItem onClick={() => this.remove(attribute)}>
+                        <i className={`${config.theme.fa} fa-trash-alt`} /> Remove
+                    </MenuItem>
                 </ContextMenu>
             </React.Fragment>
         ))

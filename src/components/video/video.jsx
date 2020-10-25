@@ -787,10 +787,12 @@ class VideoPage extends Component {
                                 </small>
                             </h1>
 
+                            <React.Fragment>
+                                <ContextMenuTrigger id='menu__date' renderTag='span'>
                             <div className='header__date btn btn-sm btn-outline-primary'>
-                                <ContextMenuTrigger id='menu__date'>
                                     <i className={`${config.theme.fa} fa-calendar-check`} />
                                     {this.state.video.date.published}
+                                    </div>
                                 </ContextMenuTrigger>
 
                                 <ContextMenu id='menu__date'>
@@ -818,7 +820,7 @@ class VideoPage extends Component {
                                         Edit Date
                                     </MenuItem>
                                 </ContextMenu>
-                            </div>
+                            </React.Fragment>
 
                             <div className='header__quality btn btn-sm btn-outline-primary'>
                                 <i className={`${config.theme.fa} fa-film`} />
@@ -977,6 +979,7 @@ class VideoPage extends Component {
                             this.state.loaded.video &&
                             this.state.bookmarks.map((bookmark, i) => (
                                 <React.Fragment key={i}>
+                                    <ContextMenuTrigger id={`bookmark-${i}`}>
                                     <div
                                         className={`btn btn-sm ${
                                             this.bookmark_isActive(bookmark)
@@ -992,11 +995,9 @@ class VideoPage extends Component {
                                         ref={(bookmark) => (this.bookmarks[i] = bookmark)}
                                         data-level={1}
                                     >
-                                        <ContextMenuTrigger id={`bookmark-${i}`}>
                                             <div data-tip={true} data-for={`bookmark-info-${i}`}>
                                                 {bookmark.name}
                                             </div>
-                                        </ContextMenuTrigger>
 
                                         {(bookmark.starID !== 0 || bookmark.attributes.length > 0) && (
                                             <ReactTooltip id={`bookmark-info-${i}`} effect='solid'>
@@ -1019,6 +1020,7 @@ class VideoPage extends Component {
                                             </ReactTooltip>
                                         )}
                                     </div>
+                                    </ContextMenuTrigger>
 
                                     <ContextMenu id={`bookmark-${i}`}>
                                         <MenuItem

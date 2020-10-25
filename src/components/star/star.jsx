@@ -253,7 +253,7 @@ class StarAttributes extends Component {
 
     render() {
         return this.props.data.map((attribute, i) => (
-            <span key={i}>
+            <React.Fragment key={i}>
                 <ContextMenuTrigger id={`attribute-${i}`} renderTag='span'>
                     <span className='attribute ml-2'>
                         <span className='btn btn-sm btn-outline-primary'>{attribute}</span>
@@ -263,7 +263,7 @@ class StarAttributes extends Component {
                 <ContextMenu id={`attribute-${i}`}>
                     <MenuItem onClick={() => this.remove(attribute)}>Remove</MenuItem>
                 </ContextMenu>
-            </span>
+            </React.Fragment>
         ))
     }
 }

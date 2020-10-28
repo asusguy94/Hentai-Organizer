@@ -15,12 +15,6 @@ class NavBar extends Component {
                     </li>
 
                     <li>
-                        <a href={`${config.source}/add_videos.php`} target='_blank' rel='noopener noreferrer'>
-                            Add Videos
-                        </a>
-                    </li>
-
-                    <li>
                         <Link to='/videos/search'>Video Search</Link>
                         <ul className='sub-menu'>
                             <li>

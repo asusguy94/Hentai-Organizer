@@ -159,6 +159,25 @@ class StarSearchPage extends Component {
         this.setState({ stars })
     }
 
+    handleHairstyleFilter(target) {
+        const stars = this.state.stars.map((star) => {
+            star.hidden.hairstyle = star.hairstyle.toLowerCase() !== target.toLowerCase()
+
+            return star
+        })
+        this.setState({ stars })
+    }
+
+    handleHairstyleFilter_ALL() {
+        const stars = this.state.stars.map((star) => {
+            star.hidden.hairstyle = false
+
+            return star
+        })
+
+        this.setState({ stars })
+    }
+
     handleAttributeFilter(e, target) {
             const targetLower = target.toLowerCase()
 
@@ -316,7 +335,39 @@ class StarSearchPage extends Component {
                                         <span className='divider'>|</span>
                                         {this.getPropCount('haircolor', hairColor)})
                                     </label>
-                                    <label htmlFor={`haircolor-${hairColor}`}>{hairColor}</label>
+                                </div>
+                            ))}
+                    </div>
+
+                    <h2>Hair Styles</h2>
+                    <div id='hairstyles'>
+                        <div className='input-wrapper'>
+                            <input
+                                type='radio'
+                                id='hairstyle_ALL'
+                                name='hairstyle'
+                                defaultChecked
+                                onChange={() => this.handleHairstyleFilter_ALL()}
+                            />
+                            <label htmlFor='hairstyle_ALL' className='global-category'>
+                                All
+                            </label>
+                        </div>
+
+                        {this.state.loaded.hairstyles &&
+                            this.state.hairstyles.map((hairStyle, i) => (
+                                <div className='input-wrapper' key={i}>
+                                    <input
+                                        type='radio'
+                                        name='hairstyle'
+                                        id={`hairstyle-${hairStyle}`}
+                                        onChange={() => this.handleHairstyleFilter(hairStyle)}
+                                    />
+                                    <label htmlFor={`hairstyle-${hairStyle}`}>
+                                        {hairStyle} ({this.getPropCount('hairstyle', hairStyle, true)}
+                                        <span className='divider'>|</span>
+                                        {this.getPropCount('hairstyle', hairStyle)})
+                                    </label>
                                 </div>
                             ))}
                     </div>

@@ -28,7 +28,7 @@ class VideoSearchPage extends Component {
                 published: '',
                 plays: 0,
                 categories: [],
-                attribute: [],
+                attributes: [],
                 hidden: {
                     category: [],
                     notCategory: [],

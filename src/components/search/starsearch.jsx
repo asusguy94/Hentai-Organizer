@@ -85,6 +85,22 @@ class StarSearchPage extends Component {
         return value
     }
 
+    getPropCount(prop, label, visibleOnly = false) {
+        const arr = this.state.stars.filter((item) => {
+            return item[prop] === label && !(this.isHidden(item) && visibleOnly)
+        })
+
+        return arr.length
+    }
+
+    getArrCount(prop, label, visibleOnly = false) {
+        const arr = this.state.stars.filter((item) => {
+            return item[prop].includes(label) && !(this.isHidden(item) && visibleOnly)
+        })
+
+        return arr.length
+    }
+
     handleTitleSearch(e) {
         const searchValue = e.target.value.toLowerCase()
 
@@ -262,7 +278,11 @@ class StarSearchPage extends Component {
                                         id={`category-${breast}`}
                                         onChange={(e) => this.handleBreastFilter(e, breast)}
                                     />
-                                    <label htmlFor={`category-${breast}`}>{breast}</label>
+                                    <label htmlFor={`category-${breast}`}>
+                                        {breast} ({this.getPropCount('breast', breast, true)}
+                                        <span className='divider'>|</span>
+                                        {this.getPropCount('breast', breast)})
+                                    </label>
                                 </div>
                             ))}
                     </div>
@@ -291,6 +311,11 @@ class StarSearchPage extends Component {
                                         id={`haircolor-${hairColor}`}
                                         onChange={() => this.handleHaircolorFilter(hairColor)}
                                     />
+                                    <label htmlFor={`haircolor-${hairColor}`}>
+                                        {hairColor} ({this.getPropCount('haircolor', hairColor, true)}
+                                        <span className='divider'>|</span>
+                                        {this.getPropCount('haircolor', hairColor)})
+                                    </label>
                                     <label htmlFor={`haircolor-${hairColor}`}>{hairColor}</label>
                                 </div>
                             ))}
@@ -309,7 +334,11 @@ class StarSearchPage extends Component {
                                             this.handleAttributeFilter(e, attribute)
                                         }}
                                     />
-                                    <label htmlFor={`attribute-${attribute}`}>{attribute}</label>
+                                    <label htmlFor={`attribute-${attribute}`}>
+                                        {attribute} ({this.getArrCount('attributes', attribute, true)}
+                                        <span className='divider'>|</span>
+                                        {this.getArrCount('attributes', attribute)})
+                                    </label>
                                 </div>
                             ))}
                     </div>

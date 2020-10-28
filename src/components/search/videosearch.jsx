@@ -94,6 +94,14 @@ class VideoSearchPage extends Component {
         return value
     }
 
+    getPropCount(prop, label, visibleOnly = false) {
+        const arr = this.state.videos.filter((item) => {
+            return item[prop].includes(label) && !(this.isHidden(item) && visibleOnly)
+        })
+
+        return arr.length
+    }
+
     isValidDate(date) {
         return !!(Object.prototype.toString.call(date) === '[object Date]' && +date)
     }
@@ -397,7 +405,11 @@ class VideoSearchPage extends Component {
                                             this.handleCategoryFilter(e, category)
                                         }}
                                     />
-                                    <label htmlFor={`category-${category.name}`}>{category.name}</label>
+                                    <label htmlFor={`category-${category.name}`}>
+                                        {category.name} ({this.getPropCount('categories', category.name, true)}
+                                        <span className='divider'>|</span>
+                                        {this.getPropCount('categories', category.name)})
+                                    </label>
                                 </div>
                             ))}
                     </div>
@@ -415,7 +427,11 @@ class VideoSearchPage extends Component {
                                             this.handleAttributeFilter(e, attribute)
                                         }}
                                     />
-                                    <label htmlFor={`attribute-${attribute.name}`}>{attribute.name}</label>
+                                    <label htmlFor={`attribute-${attribute.name}`}>
+                                        {attribute.name} ({this.getPropCount('attributes', attribute.name, true)}
+                                        <span className='divider'>|</span>
+                                        {this.getPropCount('attributes', attribute.name)})
+                                    </label>
                                 </div>
                             ))}
                     </div>

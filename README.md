@@ -1,4 +1,37 @@
-# hentai
+# Important Update
+For a couple of weeks now, I've been looking at a simpler solution for this. Just using 1 programming language, and no need for custom paths to ffmpeg, ffprobe etc.
+In the next couple of weeks, I will be pusing an update. The *master* branch will be changed to *legacy*, and *next* branch will be replaced and changed to *master*
+
+*You can use the same database as before, but there will be some requirements. These requirements might change, but should be easy enough to install*
+
+## Changes
+Both Frontent and Backend will now be using JavaScript, and it should be easier to have both running on the same computer.
+
+*FrontEnd and Backend will be using separate repositories, so Backend will be uploaded on a separate repository.*
+
+*API* and *SERVER* can be run on separate instances if required, or as a single instance
+
+## Frontend Requirements
+1. NodeJS
+2. Modern Web Browser
+3. Browser resolution set to 1920x1080 (not a hard requirement, but some stuff might be visually bugged otherwise)
+
+## Backend Requirements (API & SERVER)
+1. NodeJS
+2. Database (preferable mariaDB) with known *port*, *username*, *password*, *Database Name*
+3. FFMPEG and FFPROBE (one of the following) ([more info](https://github.com/fluent-ffmpeg/node-fluent-ffmpeg#prerequisites))
+    1. Installed to the server-computer and added to path
+    2. Installed to the server-computer and added to ENV
+    3. Installed to the server-computer in the root folder of the SERVER-project
+
+## FAQ
+### When will I publish the update?
+The update will go live over the next weeks
+
+## How can I easily create a database
+A creation script will be shared when I publish the update
+
+# Legacy
 A simple web management solution
 ## Getting started
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.

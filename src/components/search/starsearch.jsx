@@ -7,6 +7,7 @@ import capitalize from 'capitalize'
 import Indeterminate from '../indeterminate/indeterminate'
 import LabelCount from '../labelcount/labelcount'
 import { getCount, isHidden } from './helper'
+import Loader from '../loader/loader'
 
 import './search.scss'
 
@@ -116,7 +117,7 @@ const Stars = ({ stars }) => (
 					</a>
 				))
 			) : (
-				<div id='loader'></div>
+				<Loader />
 			)}
 		</div>
 	</section>

@@ -8,6 +8,7 @@ import Ribbon from '../ribbon/ribbon'
 import LabelCount from '../labelcount/labelcount'
 import Indeterminate from '../indeterminate/indeterminate'
 import { isHidden, getCount } from './helper'
+import Loader from '../loader/loader'
 
 import './search.scss'
 
@@ -203,7 +204,7 @@ const Videos = ({ videos }) => {
 						</a>
 					))
 				) : (
-					<div id='loader'></div>
+					<Loader />
 				)}
 			</div>
 		</section>

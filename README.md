@@ -1,6 +1,19 @@
-# Warning
+# HentaiJS
 
-This is early alpha version of the next version, only use this if you're interested to see how far the project is coming!
+## Frontend Requirements
+
+1. NodeJS
+2. Modern Web Browser
+3. Browser resolution set to 1920x1080 (not a hard requirement, but some stuff might be visually bugged otherwise)
+
+## Backend Requirements (API & SERVER)
+
+1. NodeJS
+2. Database (preferable mariaDB) with known _port_, _username_, _password_, _Database Name_
+3. FFMPEG and FFPROBE (one of the following) ([more info](https://github.com/fluent-ffmpeg/node-fluent-ffmpeg#prerequisites))
+    1. Installed to the server-computer and added to path
+    2. Installed to the server-computer and added to ENV
+    3. Installed to the server-computer in the root folder of the SERVER-project
 
 ## Installation
 
@@ -19,17 +32,9 @@ This is early alpha version of the next version, only use this if you're interes
 
 ## Backend scripts
 
-> Backend scripts can be found in the **_releases_** section. The backend script version needs to match the version of the app
-
-1. Run the backend scripts on a separate web-path. Using WAMP / LAMP / XAMP should work fine.
-2. Make sure the previous branch (@v2) of this app is running in the background
-
-3. The backend scripts uses uses the same database structure as the current version, and should work without issues.
+1. Navigate to the backend-scripts folder
+2. Start the backend script using `npm app.js`
 
 ## Features
 
 Status of functionality can be found at [features.md](FEATURES.md)
-
-## Special Requirements
-
--   video-thumbnails(WebVTT) to be generated, which can be done with the previous version.

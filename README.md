@@ -30,10 +30,18 @@
 4. Run `yarn start` within the project
 5. Open [http://localhost:3000](http://localhost:3000) on the browser, to open the app
 
-## Backend scripts
+## Backend START
 
-1. Navigate to the backend-scripts folder
-2. Start the backend script using `npm app.js`
+1. Navigate to the backend-scripts folder (where _app.js_ is located)
+2. Run `npm i` or `yarn` to install the packages
+3. Run `node app.js` to start the backend-scripts
+
+## Frontend START
+
+1. Navigate to the scripts folder (where _app.js_ is located)
+2. Run `npm i` or `yarn` to install the packages
+3. Run `npm run-script build` or `yarn start` to build the scripts
+4. Run `npm run scripts server` or `yarn server` to start the app
 
 ## Features
 

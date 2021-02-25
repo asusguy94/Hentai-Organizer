@@ -6,439 +6,439 @@ import './editor.scss'
 
 import config from '../config.json'
 
-export default class EditorPage extends Component {
-    render() {
-        return (
-            <div id='editor-page' className='col-12 row'>
-                <AttributesPage className='col-4' />
-                <CategoriesPage className='col-4' />
-            </div>
-        )
-    }
+class EditorPage extends Component {
+	render() {
+		return (
+			<div id='editor-page' className='col-12 row'>
+				<AttributesPage className='col-4' />
+				<CategoriesPage className='col-4' />
+			</div>
+		)
+	}
 }
 
 class AttributesPage extends Component {
-    state = {
-        input: '',
-    }
+	state = {
+		input: ''
+	}
 
-    handleChange(e) {
-        this.setState({ input: e.target.value })
-    }
+	handleChange(e) {
+		this.setState({ input: e.target.value })
+	}
 
-    handleSubmit() {
-        const { input } = this.state
+	handleSubmit() {
+		const { input } = this.state
 
-        if (input.length) {
-            // lower case is not allowed -- make red border and display notice
-            if (input.toLowerCase() === input) return false
+		if (input.length) {
+			// lower case is not allowed -- make red border and display notice
+			if (input.toLowerCase() === input) return false
 
-            Axios.get(`${config.api}/addattribute.php?name=${input}`).then(() => {
-                window.location.reload()
+			Axios.post(`${config.api}/attribute`, { name: input }).then(() => {
+				window.location.reload()
 
-                // TODO use stateObj instead
-            })
-        }
-    }
+				// TODO use stateObj instead
+			})
+		}
+	}
 
-    handleKeyPress(e) {
-        if (e.key === 'Enter') {
-            e.preventDefault()
-            this.handleSubmit()
-        }
-    }
+	handleKeyPress(e) {
+		if (e.key === 'Enter') {
+			e.preventDefault()
+			this.handleSubmit()
+		}
+	}
 
-    render() {
-        return (
-            <div className={this.props.className}>
-                <header className='row'>
-                    <h2 className='col-5'>Attributes Page</h2>
+	render() {
+		return (
+			<div className={this.props.className}>
+				<header className='row'>
+					<h2 className='col-5'>Attributes Page</h2>
 
-                    <div className='col-7 mt-1'>
-                        <input
-                            type='text'
-                            className='col-6 px-1'
-                            ref={(input) => (this.input = input)}
-                            onChange={this.handleChange.bind(this)}
-                            onKeyPress={this.handleKeyPress.bind(this)}
-                        />
-                        <div className='btn btn-sm btn-primary float-right' onClick={this.handleSubmit.bind(this)}>
-                            Add Attribute
-                        </div>
-                    </div>
-                </header>
+					<div className='col-7 mt-1'>
+						<input
+							type='text'
+							className='col-6 px-1'
+							ref={input => (this.input = input)}
+							onChange={this.handleChange.bind(this)}
+							onKeyPress={this.handleKeyPress.bind(this)}
+						/>
+						<div className='btn btn-sm btn-primary float-right' onClick={this.handleSubmit.bind(this)}>
+							Add Attribute
+						</div>
+					</div>
+				</header>
 
-                <Attributes />
-            </div>
-        )
-    }
+				<Attributes />
+			</div>
+		)
+	}
 }
 
 class Attributes extends Component {
-    state = {
-        attributes: [],
-    }
+	state = {
+		attributes: []
+	}
 
-    componentDidMount() {
-        this.getData()
-    }
+	componentDidMount() {
+		this.getData()
+	}
 
-    updateAttribute(ref, value) {
-        Axios.get(`${config.api}/editattribute.php?attributeID=${ref.id}&value=${value}`).then(({ data }) => {
-            if (data.success) {
-                this.setState(
-                    this.state.attributes.filter((attribute) => {
-                        if (ref.id === attribute.id) {
-                            attribute.name = value
-                        }
+	updateAttribute(ref, value) {
+		Axios.put(`${config.api}/attribute/${ref.id}`, { value }).then(() => {
+			this.setState(
+				this.state.attributes.filter(attribute => {
+					if (ref.id === attribute.id) {
+						attribute.name = value
+					}
 
-                        return attribute
-                    })
-                )
-            }
-        })
-    }
+					return attribute
+				})
+			)
+		})
+	}
 
-    setCondition(ref, prop, value, checkbox) {
-        Axios.get(`${config.api}/setattributelimit.php?attributeID=${ref.id}&prop=${prop}&value=${value}`)
-            .then(({ data }) => {
-                if (!data.success) error()
-            })
-            .catch(() => {
-                error()
-            })
+	setCondition(ref, prop, value, checkbox) {
+		Axios.put(`${config.api}/attribute/${ref.id}`, { label: prop, value }).catch(() => {
+			checkbox.checked = !checkbox.checked
+		})
+	}
 
-        const error = () => (checkbox.checked = !checkbox.checked)
-    }
+	sortID(obj = null) {
+		this.setState(prevState => {
+			let attributes = obj || prevState.attributes
+			attributes.sort(({ id: valA }, { id: valB }) => valA - valB)
 
-    sortID(obj = null) {
-        this.setState((prevState) => {
-            let attributes = obj || prevState.attributes
-            attributes.sort(({ id: valA }, { id: valB }) => valA - valB)
+			return attributes
+		})
+	}
+	sortName(obj = null) {
+		this.setState(prevState => {
+			let attributes = obj || prevState.attributes
+			attributes.sort(({ name: valA }, { name: valB }) => valA.localeCompare(valB))
 
-            return attributes
-        })
-    }
-    sortName(obj = null) {
-        this.setState((prevState) => {
-            let attributes = obj || prevState.attributes
-            attributes.sort(({ name: valA }, { name: valB }) => valA.localeCompare(valB))
+			return attributes
+		})
+	}
 
-            return attributes
-        })
-    }
+	toggleSort(column) {
+		switch (column) {
+			case 'id':
+				this.sortID()
+				break
+			case 'name':
+				this.sortName()
+				break
+			default:
+				console.log(`${column} is not sortable`)
+		}
+	}
 
-    toggleSort(column) {
-        switch (column) {
-            case 'id':
-                this.sortID()
-                break
-            case 'name':
-                this.sortName()
-                break
-            default:
-                console.log(`${column} is not sortable`)
-        }
-    }
+	render() {
+		return (
+			<table className='table table-striped'>
+				<thead>
+					<tr>
+						<th>ID</th>
+						<th>Attribute</th>
+						<th>starOnly</th>
+						<th>videoOnly</th>
+					</tr>
+				</thead>
 
-    render() {
-        return (
-            <table className='table table-striped'>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Attribute</th>
-                        <th>starOnly</th>
-                        <th>videoOnly</th>
-                    </tr>
-                </thead>
+				<tbody>
+					{this.state.attributes.map(attribute => (
+						<Attribute
+							key={attribute.id}
+							data={attribute}
+							updateAttribute={(ref, value) => this.updateAttribute(ref, value)}
+							setCondition={(ref, prop, value, element) => this.setCondition(ref, prop, value, element)}
+						/>
+					))}
+				</tbody>
+			</table>
+		)
+	}
 
-                <tbody>
-                    {this.state.attributes.map((attribute, i) => (
-                        <Attribute
-                            key={i}
-                            data={attribute}
-                            updateAttribute={(ref, value) => this.updateAttribute(ref, value)}
-                            setCondition={(ref, prop, value, element) => this.setCondition(ref, prop, value, element)}
-                        />
-                    ))}
-                </tbody>
-            </table>
-        )
-    }
-
-    getData() {
-        Axios.get(`${config.api}/attributes.php`).then(({ data: attributes }) => {
-            this.sortID(attributes)
-            this.setState({ attributes })
-        })
-    }
+	getData() {
+		Axios.get(`${config.api}/attribute`).then(({ data: attributes }) => {
+			this.sortID(attributes)
+			this.setState({ attributes })
+		})
+	}
 }
 
 class Attribute extends Component {
-    constructor(props) {
-        super(props)
-        this.state = { edit: false, value: null, conditions: { videoOnly: props.data.videoOnly, starOnly: props.data.starOnly } }
-    }
+	constructor(props) {
+		super(props)
+		this.state = {
+			edit: false,
+			value: null,
+			conditions: { videoOnly: props.data.videoOnly, starOnly: props.data.starOnly }
+		}
+	}
 
-    saveAttribute() {
-        this.setState({ edit: false })
+	saveAttribute() {
+		this.setState({ edit: false })
 
-        if (this.state.value) {
-            this.props.updateAttribute(this.props.data, this.state.value)
-        }
-    }
+		if (this.state.value) {
+			this.props.updateAttribute(this.props.data, this.state.value)
+		}
+	}
 
-    handleConditionChange(e, attribute, prop) {
-        const value = Number(e.target.checked)
+	handleConditionChange(e, attribute, prop) {
+		const value = Number(e.target.checked)
 
-        this.props.setCondition(attribute, prop, value, e.target)
-    }
+		this.props.setCondition(attribute, prop, value, e.target)
+	}
 
-    render() {
-        const attribute = this.props.data
-        const { id, name, starOnly, videoOnly } = attribute
+	render() {
+		const attribute = this.props.data
+		const { id, name, starOnly, videoOnly } = attribute
 
-        return (
-            <tr>
-                <th>{id}</th>
-                <td
-                    className='btn-link'
-                    onClick={() => {
-                        this.setState({ edit: true })
-                    }}
-                >
-                    {this.state.edit ? (
-                        <input
-                            type='text'
-                            defaultValue={name}
-                            ref={(input) => input && input.focus()}
-                            onBlur={this.saveAttribute.bind(this)}
-                            onKeyPress={(e) => {
-                                if (e.key === 'Enter') {
-                                    e.preventDefault()
-                                    this.saveAttribute()
-                                }
-                            }}
-                            onChange={(e) => {
-                                this.setState({ value: e.target.value })
-                            }}
-                        />
-                    ) : (
-                        <span>{name}</span>
-                    )}
-                </td>
+		return (
+			<tr>
+				<th>{id}</th>
+				<td
+					className='btn-link'
+					onClick={() => {
+						this.setState({ edit: true })
+					}}
+				>
+					{this.state.edit ? (
+						<input
+							type='text'
+							defaultValue={name}
+							ref={input => input && input.focus()}
+							onBlur={this.saveAttribute.bind(this)}
+							onKeyPress={e => {
+								if (e.key === 'Enter') {
+									e.preventDefault()
+									this.saveAttribute()
+								}
+							}}
+							onChange={e => {
+								this.setState({ value: e.target.value })
+							}}
+						/>
+					) : (
+						<span>{name}</span>
+					)}
+				</td>
 
-                <td>
-                    <input
-                        type='checkbox'
-                        defaultChecked={starOnly}
-                        onChange={(e) => this.handleConditionChange(e, attribute, 'starOnly')}
-                    />
-                </td>
+				<td>
+					<input
+						type='checkbox'
+						defaultChecked={starOnly}
+						onChange={e => this.handleConditionChange(e, attribute, 'starOnly')}
+					/>
+				</td>
 
-                <td>
-                    <input
-                        type='checkbox'
-                        defaultChecked={videoOnly}
-                        onChange={(e) => this.handleConditionChange(e, attribute, 'videoOnly')}
-                    />
-                </td>
-            </tr>
-        )
-    }
+				<td>
+					<input
+						type='checkbox'
+						defaultChecked={videoOnly}
+						onChange={e => this.handleConditionChange(e, attribute, 'videoOnly')}
+					/>
+				</td>
+			</tr>
+		)
+	}
 }
 
 class CategoriesPage extends Component {
-    state = {
-        input: '',
-    }
+	state = {
+		input: ''
+	}
 
-    handleChange(e) {
-        this.setState({ input: e.target.value })
-    }
+	handleChange(e) {
+		this.setState({ input: e.target.value })
+	}
 
-    handleSubmit() {
-        const { input } = this.state
+	handleSubmit() {
+		const { input } = this.state
 
-        if (input.length) {
-            // lower case is not allowed -- make red border and display notice
-            if (input.toLowerCase() === input) return false
+		if (input.length) {
+			// lower case is not allowed -- make red border and display notice
+			if (input.toLowerCase() === input) return false
 
-            Axios.get(`${config.api}/addcategory.php?name=${input}`).then(() => {
-                window.location.reload()
+			Axios.post(`${config.api}/category`, { name: input }).then(() => {
+				window.location.reload()
 
-                // TODO use stateObj instead
-            })
-        }
-    }
+				// TODO use stateObj instead
+			})
+		}
+	}
 
-    handleKeyPress(e) {
-        if (e.key === 'Enter') {
-            e.preventDefault()
-            this.handleSubmit()
-        }
-    }
+	handleKeyPress(e) {
+		if (e.key === 'Enter') {
+			e.preventDefault()
+			this.handleSubmit()
+		}
+	}
 
-    render() {
-        return (
-            <div className={this.props.className}>
-                <header className='row'>
-                    <h2 className='col-5'>Categories Page</h2>
+	render() {
+		return (
+			<div className={this.props.className}>
+				<header className='row'>
+					<h2 className='col-5'>Categories Page</h2>
 
-                    <div className='col-7 mt-1'>
-                        <input
-                            type='text'
-                            className='col-6 px-1'
-                            ref={(input) => (this.input = input)}
-                            onChange={this.handleChange.bind(this)}
-                            onKeyPress={this.handleKeyPress.bind(this)}
-                        />
-                        <div className='btn btn-sm btn-primary float-right' onClick={this.handleSubmit.bind(this)}>
-                            Add Category
-                        </div>
-                    </div>
-                </header>
+					<div className='col-7 mt-1'>
+						<input
+							type='text'
+							className='col-6 px-1'
+							ref={input => (this.input = input)}
+							onChange={this.handleChange.bind(this)}
+							onKeyPress={this.handleKeyPress.bind(this)}
+						/>
+						<div className='btn btn-sm btn-primary float-right' onClick={this.handleSubmit.bind(this)}>
+							Add Category
+						</div>
+					</div>
+				</header>
 
-                <Categories />
-            </div>
-        )
-    }
+				<Categories />
+			</div>
+		)
+	}
 }
 
 class Categories extends Component {
-    state = {
-        categories: [],
-    }
+	state = {
+		categories: []
+	}
 
-    componentDidMount() {
-        this.getData()
-    }
+	componentDidMount() {
+		this.getData()
+	}
 
-    updateCategory(ref, value) {
-        Axios.get(`${config.api}/editcategory.php?categoryID=${ref.id}&value=${value}`).then(({ data }) => {
-            if (data.success) {
-                this.setState(
-                    this.state.categories.filter((category) => {
-                        if (ref.id === category.id) {
-                            category.name = value
-                        }
+	updateCategory(ref, value) {
+		Axios.get(`${config.api}/category/${ref.id}`, { value }).then(() => {
+			this.setState(
+				this.state.categories.filter(category => {
+					if (ref.id === category.id) {
+						category.name = value
+					}
 
-                        return category
-                    })
-                )
-            }
-        })
-    }
+					return category
+				})
+			)
+		})
+	}
 
-    sortID() {
-        this.setState((prevState) => {
-            let { categories } = prevState
-            categories.sort(({ id: valA }, { id: valB }) => valA - valB)
+	sortID() {
+		this.setState(prevState => {
+			let { categories } = prevState
+			categories.sort(({ id: valA }, { id: valB }) => valA - valB)
 
-            return categories
-        })
-    }
-    sortName() {
-        this.setState((prevState) => {
-            let { categories } = prevState
-            categories.sort(({ name: valA }, { name: valB }) => valA.localeCompare(valB))
+			return categories
+		})
+	}
+	sortName() {
+		this.setState(prevState => {
+			let { categories } = prevState
+			categories.sort(({ name: valA }, { name: valB }) => valA.localeCompare(valB))
 
-            return categories
-        })
-    }
+			return categories
+		})
+	}
 
-    toggleSort(column) {
-        switch (column) {
-            case 'id':
-                this.sortID()
-                break
-            case 'name':
-                this.sortName()
-                break
-            default:
-                console.log(`${column} is not sortable`)
-        }
-    }
+	toggleSort(column) {
+		switch (column) {
+			case 'id':
+				this.sortID()
+				break
+			case 'name':
+				this.sortName()
+				break
+			default:
+				console.log(`${column} is not sortable`)
+		}
+	}
 
-    render() {
-        return (
-            <table className='table table-striped'>
-                <thead>
-                    <tr>
-                        <th className='sortable' onClick={() => this.toggleSort('id')}>
-                            ID
-                        </th>
-                        <th className='sortable' onClick={() => this.toggleSort('name')}>
-                            Category
-                        </th>
-                    </tr>
-                </thead>
+	render() {
+		return (
+			<table className='table table-striped'>
+				<thead>
+					<tr>
+						<th className='sortable' onClick={() => this.toggleSort('id')}>
+							ID
+						</th>
+						<th className='sortable' onClick={() => this.toggleSort('name')}>
+							Category
+						</th>
+					</tr>
+				</thead>
 
-                <tbody>
-                    {this.state.categories.map((category, i) => (
-                        <Category key={i} data={category} updateCategory={(ref, value) => this.updateCategory(ref, value)} />
-                    ))}
-                </tbody>
-            </table>
-        )
-    }
+				<tbody>
+					{this.state.categories.map(category => (
+						<Category
+							key={category.id}
+							data={category}
+							updateCategory={(ref, value) => this.updateCategory(ref, value)}
+						/>
+					))}
+				</tbody>
+			</table>
+		)
+	}
 
-    getData() {
-        Axios.get(`${config.api}/categories.php`).then(({ data: categories }) => {
-            this.setState({ categories })
-            this.toggleSort('id')
-        })
-    }
+	getData() {
+		Axios.get(`${config.api}/category`).then(({ data: categories }) => {
+			this.setState({ categories })
+			this.toggleSort('id')
+		})
+	}
 }
 
 class Category extends Component {
-    constructor() {
-        super()
-        this.state = { edit: false, value: null }
-    }
+	constructor() {
+		super()
+		this.state = { edit: false, value: null }
+	}
 
-    saveCategory() {
-        this.setState({ edit: false })
+	saveCategory() {
+		this.setState({ edit: false })
 
-        if (this.state.value) {
-            this.props.updateCategory(this.props.data, this.state.value)
-        }
-    }
+		if (this.state.value) {
+			this.props.updateCategory(this.props.data, this.state.value)
+		}
+	}
 
-    render() {
-        const { id, name } = this.props.data
+	render() {
+		const { id, name } = this.props.data
 
-        return (
-            <tr>
-                <th>{id}</th>
-                <td
-                    className='btn-link'
-                    onClick={() => {
-                        this.setState({ edit: true })
-                    }}
-                >
-                    {this.state.edit ? (
-                        <input
-                            type='text'
-                            defaultValue={name}
-                            ref={(input) => input && input.focus()}
-                            onBlur={this.saveCategory.bind(this)}
-                            onKeyPress={(e) => {
-                                if (e.key === 'Enter') {
-                                    e.preventDefault()
-                                    this.saveAttribute()
-                                }
-                            }}
-                            onChange={(e) => {
-                                this.setState({ value: e.target.value })
-                            }}
-                        />
-                    ) : (
-                        <span>{name}</span>
-                    )}
-                </td>
-            </tr>
-        )
-    }
+		return (
+			<tr>
+				<th>{id}</th>
+				<td
+					className='btn-link'
+					onClick={() => {
+						this.setState({ edit: true })
+					}}
+				>
+					{this.state.edit ? (
+						<input
+							type='text'
+							defaultValue={name}
+							ref={input => input && input.focus()}
+							onBlur={this.saveCategory.bind(this)}
+							onKeyPress={e => {
+								if (e.key === 'Enter') {
+									e.preventDefault()
+									this.saveAttribute()
+								}
+							}}
+							onChange={e => {
+								this.setState({ value: e.target.value })
+							}}
+						/>
+					) : (
+						<span>{name}</span>
+					)}
+				</td>
+			</tr>
+		)
+	}
 }
+
+export default EditorPage

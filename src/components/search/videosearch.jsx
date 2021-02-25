@@ -2,522 +2,460 @@ import React, { Component } from 'react'
 
 import Axios from 'axios'
 import ScrollToTop from 'react-scroll-to-top'
+import capitalize from 'capitalize'
 
-import Indeterminate from '../indeterminate/indeterminate'
 import Ribbon from '../ribbon/ribbon'
+import LabelCount from '../labelcount/labelcount'
+import Indeterminate from '../indeterminate/indeterminate'
+import { isHidden, getCount } from './helper'
 
 import './search.scss'
 
 import config from '../config.json'
 
 class VideoSearchPage extends Component {
-    constructor() {
-        super()
-        this.indeterminate = new Indeterminate()
-    }
-
-    state = {
-        videos: [
-            {
-                id: 0,
-                noStar: 0,
-                cen: 0,
-                quality: 360,
-                franchise: '',
-                name: '',
-                published: '',
-                plays: 0,
-                categories: [],
-                attributes: [],
-                hidden: {
-                    category: [],
-                    notCategory: [],
-                    attribute: [],
-                    notAttribute: [],
-                    titleSearch: false,
-                    noCategory: false,
-                    notNoCategory: false,
-                },
-            },
-        ],
-
-        categories: [
-            {
-                id: 0,
-                name: '',
-            },
-        ],
-
-        attributes: [
-            {
-                id: 0,
-                name: '',
-            },
-        ],
-
-        loaded: {
-            videos: false,
-
-            categories: false,
-            attributes: false,
-        },
-    }
-
-    getCount() {
-        const obj = this.state.videos
-        let count = obj.length
-
-        obj.forEach(({ hidden }) => {
-            let value = 0
-            for (const prop in hidden) {
-                if (typeof hidden[prop] !== 'object') {
-                    value += Number(hidden[prop])
-                } else {
-                    value += Number(hidden[prop].length > 0)
-                }
-            }
-            if (value) count--
-        })
-        return count
-    }
-
-    isHidden({ hidden }) {
-        let value = 0
-        for (const prop in hidden) {
-            if (typeof hidden[prop] !== 'object') {
-                value += Number(hidden[prop])
-            } else {
-                value += Number(hidden[prop].length > 0)
-            }
-        }
-
-        return value
-    }
-
-    getPropCount(prop, label, visibleOnly = false) {
-        const arr = this.state.videos.filter((item) => {
-            return item[prop].includes(label) && !(this.isHidden(item) && visibleOnly)
-        })
-
-        return arr.length
-    }
-
-    isValidDate(date) {
-        return !!(Object.prototype.toString.call(date) === '[object Date]' && +date)
-    }
-
-    handleTitleSearch(e) {
-        const searchValue = e.target.value.toLowerCase()
-
-        const videos = this.state.videos.map((item) => {
-            item.hidden.titleSearch = !item.name.toLowerCase().includes(searchValue)
-
-            return item
-        })
-
-        this.setState({ videos })
-    }
-
-    handleCategoryFilter(e, target) {
-        const videos = this.state.videos.map((video) => {
-            if (target === null) {
-                if (e.target.indeterminate) {
-                    video.hidden.noCategory = false
-                    video.hidden.notNoCategory = video.categories.length === 0
-                } else if (!e.target.checked) {
-                    video.hidden.notNoCategory = false
-                } else {
-                    video.hidden.noCategory = video.categories.length !== 0
-                }
-            } else {
-                const targetLower = target.name.toLowerCase()
-
-                if (e.target.indeterminate) {
-                    const match = video.categories.some((category) => {
-                        return category.toLowerCase() === targetLower
-                    })
-
-                    // INDETERMINATE
-                    if (match) {
-                        video.hidden.notCategory.push(targetLower)
-                    } else {
-                        // Remove checked-status from filtering
-                        const index = video.hidden.category.indexOf(targetLower)
-                        video.hidden.category.splice(index, 1)
-                    }
-                } else if (!e.target.checked) {
-                    video.hidden.noCategory = false
-                    const match = video.categories
-                        .map((category) => {
-                            return category.toLowerCase()
-                        })
-                        .includes(targetLower)
-
-                    // NOT-CHECKED
-                    if (match) {
-                        // Remove checked-status from filtering
-                        const index = video.hidden.notCategory.indexOf(targetLower)
-                        video.hidden.notCategory.splice(index, 1)
-                    }
-                } else {
-                    const match = !video.categories
-                        .map((category) => {
-                            return category.toLowerCase()
-                        })
-                        .includes(targetLower)
-
-                    // CHECKED
-                    if (match) {
-                        video.hidden.category.push(targetLower)
-                    }
-                }
-            }
-
-            return video
-        })
-
-        this.setState({ videos })
-    }
-
-    handleAttributeFilter(e, target) {
-        const targetLower = target.name.toLowerCase()
-
-        const videos = this.state.videos.map((video) => {
-            if (e.target.indeterminate) {
-                const match = video.attributes.some((attribute) => {
-                    return attribute.toLowerCase() === targetLower
-                })
-
-                // INDETERMINATE
-                if (match) {
-                    video.hidden.notAttribute.push(targetLower)
-                } else {
-                    // Remove checked-status from filtering
-                    const index = video.hidden.attribute.indexOf(targetLower)
-                    video.hidden.attribute.splice(index, 1)
-                }
-            } else if (!e.target.checked) {
-                const match = video.attributes
-                    .map((attribute) => {
-                        return attribute.toLowerCase()
-                    })
-                    .includes(targetLower)
-
-                // NOT-CHECKED
-                if (match) {
-                    // Remove indeterminate-status from filtering
-                    const index = video.hidden.notAttribute.indexOf(targetLower)
-                    video.hidden.notAttribute.splice(index, 1)
-                }
-            } else {
-                const match = !video.attributes
-                    .map((attribute) => {
-                        return attribute.toLowerCase()
-                    })
-                    .includes(targetLower)
-
-                // CHECKED
-                if (match) {
-                    video.hidden.attribute.push(targetLower)
-                }
-            }
-
-            return video
-        })
-
-        this.setState({ videos })
-    }
-
-    sort_default_asc() {
-        const { videos } = this.state
-        videos.sort((a, b) => {
-            let valA = a.name.toLowerCase()
-            let valB = b.name.toLowerCase()
-
-            return String(valA).localeCompare(valB)
-        })
-
-        this.setState({ videos })
-    }
-
-    sort_default_desc() {
-        const { videos } = this.state
-        videos.sort((b, a) => {
-            let valA = a.name.toLowerCase()
-            let valB = b.name.toLowerCase()
-
-            return String(valA).localeCompare(valB)
-        })
-
-        this.setState({ videos })
-    }
-
-    sort_added_asc() {
-        const { videos } = this.state
-        videos.sort((a, b) => {
-            let valA = a.id
-            let valB = b.id
-
-            return valA - valB
-        })
-
-        this.setState({ videos })
-    }
-
-    sort_added_desc() {
-        const { videos } = this.state
-        videos.sort((b, a) => {
-            let valA = a.id
-            let valB = b.id
-
-            return valA - valB
-        })
-
-        this.setState({ videos })
-    }
-
-    sort_date_asc() {
-        const { videos } = this.state
-        videos.sort((a, b) => {
-            let valA = new Date(a.published)
-            let valB = new Date(b.published)
-
-            if (!this.isValidDate(valA)) valA = new Date('2900-01-01')
-            if (!this.isValidDate(valB)) valB = new Date('2900-01-01')
-
-            return valA - valB
-        })
-
-        this.setState({ videos })
-    }
-
-    sort_date_desc() {
-        const { videos } = this.state
-        videos.sort((b, a) => {
-            let valA = new Date(a.published)
-            let valB = new Date(b.published)
-
-            if (!this.isValidDate(valA)) valA = new Date('1900-01-01')
-            if (!this.isValidDate(valB)) valB = new Date('1900-01-01')
-
-            return valA - valB
-        })
-
-        this.setState({ videos })
-    }
-
-    sort_popular_asc() {
-        const { videos } = this.state
-        videos.sort((a, b) => {
-            let valA = a.plays
-            let valB = b.plays
-
-            return valA - valB
-        })
-
-        this.setState({ videos })
-    }
-
-    sort_popular_desc() {
-        const { videos } = this.state
-        videos.sort((b, a) => {
-            let valA = a.plays
-            let valB = b.plays
-
-            return valA - valB
-        })
-
-        this.setState({ videos })
-    }
-
-    render() {
-        return (
-            <div className='search-page col-12 row'>
-                <aside className='col-2'>
-                    <div id='update' className='col btn btn-outline-primary d-none'>
-                        Update Data
-                    </div>
-
-                    <div className='input-wrapper'>
-                        <input type='text' placeholder='Title' autoFocus onChange={this.handleTitleSearch.bind(this)} />
-                    </div>
-
-                    <h2>Sort</h2>
-                    <div className='input-wrapper'>
-                        <input id='alphabetically' type='radio' name='sort' onChange={this.sort_default_asc.bind(this)} defaultChecked />
-                        <label htmlFor='alphabetically'>A-Z</label>
-                    </div>
-                    <div className='input-wrapper'>
-                        <input id='alphabetically_desc' type='radio' name='sort' onChange={this.sort_default_desc.bind(this)} />
-                        <label htmlFor='alphabetically_desc'>Z-A</label>
-                    </div>
-
-                    <div className='input-wrapper'>
-                        <input id='added_asc' type='radio' name='sort' onChange={this.sort_added_desc.bind(this)} />
-                        <label htmlFor='added_asc'>New Upload</label>
-                    </div>
-                    <div className='input-wrapper'>
-                        <input id='added_desc' type='radio' name='sort' onChange={this.sort_added_asc.bind(this)} />
-                        <label htmlFor='added_desc'>Old Upload</label>
-                    </div>
-
-                    <div className='input-wrapper'>
-                        <input id='date_asc' type='radio' name='sort' onChange={this.sort_date_desc.bind(this)} />
-                        <label htmlFor='date_asc'>Newest</label>
-                    </div>
-                    <div className='input-wrapper'>
-                        <input id='date_desc' type='radio' name='sort' onChange={this.sort_date_asc.bind(this)} />
-                        <label htmlFor='date_desc'>Oldest</label>
-                    </div>
-
-                    <div className='input-wrapper'>
-                        <input id='popularity_desc' type='radio' name='sort' onChange={this.sort_popular_desc.bind(this)} />
-                        <label htmlFor='popularity_desc'>Most Popular</label>
-                    </div>
-                    <div className='input-wrapper'>
-                        <input id='popularity_asc' type='radio' name='sort' onChange={this.sort_popular_asc.bind(this)} />
-                        <label htmlFor='popularity_asc'>Least Popular</label>
-                    </div>
-
-                    <h2>Categories</h2>
-                    <div id='categories'>
-                        <div className='input-wrapper'>
-                            <input
-                                type='checkbox'
-                                id='category_NULL'
-                                onChange={(e) => {
-                                    this.indeterminate.handleIndeterminate(e)
-                                    this.handleCategoryFilter(e, null)
-                                }}
-                            />
-                            <label htmlFor='category_NULL' className='global-category'>
-                                NULL
-                            </label>
-                        </div>
-                        {this.state.loaded.categories &&
-                            this.state.categories.map((category, i) => (
-                                <div className='input-wrapper' key={i}>
-                                    <input
-                                        type='checkbox'
-                                        id={`category-${category.name}`}
-                                        onChange={(e) => {
-                                            this.indeterminate.handleIndeterminate(e)
-                                            this.handleCategoryFilter(e, category)
-                                        }}
-                                    />
-                                    <label htmlFor={`category-${category.name}`}>
-                                        {category.name} ({this.getPropCount('categories', category.name, true)}
-                                        <span className='divider'>|</span>
-                                        {this.getPropCount('categories', category.name)})
-                                    </label>
-                                </div>
-                            ))}
-                    </div>
-
-                    <h2>Attributes</h2>
-                    <div id='attributes'>
-                        {this.state.loaded.attributes &&
-                            this.state.attributes.map((attribute, i) => (
-                                <div className='input-wrapper' key={i}>
-                                    <input
-                                        type='checkbox'
-                                        id={`attribute-${attribute.name}`}
-                                        onChange={(e) => {
-                                            this.indeterminate.handleIndeterminate(e)
-                                            this.handleAttributeFilter(e, attribute)
-                                        }}
-                                    />
-                                    <label htmlFor={`attribute-${attribute.name}`}>
-                                        {attribute.name} ({this.getPropCount('attributes', attribute.name, true)}
-                                        <span className='divider'>|</span>
-                                        {this.getPropCount('attributes', attribute.name)})
-                                    </label>
-                                </div>
-                            ))}
-                    </div>
-                </aside>
-
-                <section id='videos' className='col-10'>
-                    {this.state.loaded.videos && (
-                        <h2 className='text-center'>
-                            <span className='count'>{this.getCount()}</span> Videos
-                        </h2>
-                    )}
-
-                    <div className='row justify-content-center'>
-                        {this.state.loaded.videos ? (
-                            this.state.videos.map((video, i) => (
-                                <a
-                                    key={i}
-                                    className={`video ribbon-container card ${this.isHidden(video) ? 'd-none' : ''}`}
-                                    href={`/video/${video.id}`}
-                                >
-                                    <img className='card-img-top' src={`${config.source}/images/videos/${video.id}-290`} alt='video' />
-
-                                    <span className='title card-title text-center'>{video.name}</span>
-
-                                    <Ribbon label={video.quality} />
-                                </a>
-                            ))
-                        ) : (
-                            <div id='loader'></div>
-                        )}
-                    </div>
-                </section>
-
-                <ScrollToTop smooth />
-            </div>
-        )
-    }
-
-    componentDidMount() {
-        this.getData()
-
-        document.title = 'Video Search'
-    }
-
-    getData() {
-        Axios.get(`${config.api}/videosearch.php`).then(({ data: { videos } }) => {
-            this.setState((prevState) => {
-                videos = videos.map((item) => {
-                    item.hidden = {
-                        category: [],
-                        notCategory: [],
-                        attribute: [],
-                        notAttribute: [],
-                        titleSearch: false,
-                        noCategory: false,
-                        notNoCategory: false,
-                    }
-
-                    return item
-                })
-
-                const { loaded } = prevState
-                loaded.videos = true
-
-                return { videos, loaded }
-            })
-        })
-
-        Axios.get(`${config.api}/categories.php`).then(({ data: categories }) => {
-            this.setState((prevState) => {
-                const { loaded } = prevState
-                loaded.categories = true
-
-                return { categories, loaded }
-            })
-        })
-
-        Axios.get(`${config.api}/attributes.php`).then(({ data: attributes }) => {
-            this.setState((prevState) => {
-                const { loaded } = prevState
-                loaded.attributes = true
-
-                return { attributes, loaded }
-            })
-        })
-    }
+	state = {
+		videos: [],
+
+		categories: [],
+		attributes: []
+	}
+
+	handleCategoryFilter(e, target) {
+		const videos = this.state.videos.map(video => {
+			if (target === null) {
+				if (e.target.indeterminate) {
+					video.hidden.noCategory = false
+					video.hidden.notNoCategory = video.categories.length === 0
+				} else if (!e.target.checked) {
+					video.hidden.notNoCategory = false
+				} else {
+					video.hidden.noCategory = video.categories.length !== 0
+				}
+			} else {
+				const targetLower = target.name.toLowerCase()
+
+				if (e.target.indeterminate) {
+					const match = video.categories.some(category => {
+						return category.toLowerCase() === targetLower
+					})
+
+					// INDETERMINATE
+					if (match) {
+						video.hidden.notCategory.push(targetLower)
+					} else {
+						// Remove checked-status from filtering
+						const index = video.hidden.category.indexOf(targetLower)
+						video.hidden.category.splice(index, 1)
+					}
+				} else if (!e.target.checked) {
+					video.hidden.noCategory = false
+					const match = video.categories
+						.map(category => {
+							return category.toLowerCase()
+						})
+						.includes(targetLower)
+
+					// NOT-CHECKED
+					if (match) {
+						// Remove checked-status from filtering
+						const index = video.hidden.notCategory.indexOf(targetLower)
+						video.hidden.notCategory.splice(index, 1)
+					}
+				} else {
+					const match = !video.categories
+						.map(category => {
+							return category.toLowerCase()
+						})
+						.includes(targetLower)
+
+					// CHECKED
+					if (match) {
+						video.hidden.category.push(targetLower)
+					}
+				}
+			}
+
+			return video
+		})
+
+		this.setState({ videos })
+	}
+
+	handleAttributeFilter(e, target) {
+		const targetLower = target.name.toLowerCase()
+
+		const videos = this.state.videos.map(video => {
+			if (e.target.indeterminate) {
+				const match = video.attributes.some(attribute => {
+					return attribute.toLowerCase() === targetLower
+				})
+
+				// INDETERMINATE
+				if (match) {
+					video.hidden.notAttribute.push(targetLower)
+				} else {
+					// Remove checked-status from filtering
+					const index = video.hidden.attribute.indexOf(targetLower)
+					video.hidden.attribute.splice(index, 1)
+				}
+			} else if (!e.target.checked) {
+				const match = video.attributes
+					.map(attribute => {
+						return attribute.toLowerCase()
+					})
+					.includes(targetLower)
+
+				// NOT-CHECKED
+				if (match) {
+					// Remove indeterminate-status from filtering
+					const index = video.hidden.notAttribute.indexOf(targetLower)
+					video.hidden.notAttribute.splice(index, 1)
+				}
+			} else {
+				const match = !video.attributes
+					.map(attribute => {
+						return attribute.toLowerCase()
+					})
+					.includes(targetLower)
+
+				// CHECKED
+				if (match) {
+					video.hidden.attribute.push(targetLower)
+				}
+			}
+
+			return video
+		})
+
+		this.setState({ videos })
+	}
+
+	render() {
+		return (
+			<div className='search-page col-12 row'>
+				<Sidebar
+					videoData={{ categories: this.state.categories, attributes: this.state.attributes }}
+					videos={this.state.videos}
+					update={videos => this.setState({ videos })}
+				/>
+
+				<Videos videos={this.state.videos} />
+
+				<ScrollToTop smooth />
+			</div>
+		)
+	}
+
+	componentDidMount() {
+		Axios.get(`${config.api}/search/video`).then(({ data: videos }) => {
+			this.setState(() => {
+				videos = videos.map(item => {
+					item.hidden = {
+						category: [],
+						notCategory: [],
+						attribute: [],
+						notAttribute: [],
+						titleSearch: false,
+						noCategory: false,
+						notNoCategory: false
+					}
+
+					return item
+				})
+
+				return { videos }
+			})
+		})
+
+		Axios.get(`${config.api}/category`).then(({ data: categories }) => this.setState({ categories }))
+		Axios.get(`${config.api}/attribute`).then(({ data: attributes }) => this.setState({ attributes }))
+	}
+}
+
+// Wrapper
+const Videos = ({ videos }) => {
+	return (
+		<section id='videos' className='col-10'>
+			{videos.length ? (
+				<h2 className='text-center'>
+					<span className='count'>{getCount(videos)}</span> Videos
+				</h2>
+			) : null}
+
+			<div className='row justify-content-center'>
+				{videos.length ? (
+					videos.map(video => (
+						<a
+							key={video.id}
+							className={`video ribbon-container card ${isHidden(video) ? 'd-none' : ''}`}
+							href={`/video/${video.id}`}
+						>
+							<img
+								className='card-img-top'
+								src={`${config.source}/images/videos/${video.id}-290.jpg`}
+								alt='video'
+							/>
+
+							<span className='title card-title text-center'>{video.name}</span>
+
+							<Ribbon label={video.quality} />
+						</a>
+					))
+				) : (
+					<div id='loader'></div>
+				)}
+			</div>
+		</section>
+	)
+}
+
+const Sidebar = ({ videos, update, videoData }) => {
+	return (
+		<aside className='col-2'>
+			<TitleSearch videos={videos} update={update} />
+
+			<Sort videos={videos} update={update} />
+
+			<Filter videos={videos} update={update} videoData={videoData} />
+		</aside>
+	)
+}
+
+// Container
+const Sort = ({ videos, update }) => {
+	const sortDefault = (reverse = false) => {
+		videos.sort((a, b) => {
+			let valA = a.name.toLowerCase()
+			let valB = b.name.toLowerCase()
+
+			return valA.localeCompare(valB, 'en')
+		})
+
+		if (reverse) videos.reverse()
+		update(videos)
+	}
+
+	const sortAdded = (reverse = false) => {
+		videos.sort((a, b) => a.id - b.id)
+
+		if (reverse) videos.reverse()
+		update(videos)
+	}
+
+	const sortDate = (reverse = false) => {
+		videos.sort((a, b) => new Date(a.date) - new Date(b.date))
+
+		if (reverse) videos.reverse()
+		update(videos)
+	}
+
+	const sortPlays = (reverse = false) => {
+		videos.sort((a, b) => a.plays - b.plays)
+
+		if (reverse) videos.reverse()
+		update(videos)
+	}
+
+	return (
+		<>
+			<h2>Sort</h2>
+
+			<SortItem name='A-Z' label='alphabetically' callback={() => sortDefault()} checked={true} />
+			<SortItem name='Z-A' label='alphabetically_desc' callback={() => sortDefault(true)} />
+
+			<SortItem name='Recent Upload' label='added_desc' callback={() => sortAdded(true)} />
+			<SortItem name='Old Upload' label='added' callback={() => sortAdded()} />
+
+			<SortItem name='Newest' label='date_desc' callback={() => sortDate(true)} />
+			<SortItem name='Oldest' label='date' callback={() => sortDate()} />
+
+			<SortItem name='Most Popular' label='plays' callback={() => sortPlays(true)} />
+			<SortItem name='Least Popular' label='plays_desc' callback={() => sortPlays()} />
+		</>
+	)
+}
+
+const Filter = ({ videoData, videos, update }) => {
+	const category = (e, target) => {
+		const targetLower = target.name.toLowerCase()
+
+		videos = videos.map(video => {
+			if (e.target.indeterminate) {
+				const match = video.categories.some(category => category.toLowerCase() === targetLower)
+
+				if (match) {
+					video.hidden.notCategory.push(targetLower)
+				} else {
+					// Remove checked-status from filtering
+					video.hidden.category.splice(video.hidden.category.indexOf(targetLower), 1)
+				}
+			} else if (!e.target.checked) {
+				video.hidden.noCategory = false
+
+				const match = video.categories.map(category => category.toLowerCase()).includes(targetLower)
+
+				if (match) {
+					// Remove indeterminate-status from filtering
+					video.hidden.notCategory.splice(video.hidden.notCategory.indexOf(targetLower), 1)
+				}
+			} else {
+				const match = !video.categories.map(category => category.toLowerCase()).includes(targetLower)
+
+				if (match) video.hidden.category.push(targetLower)
+			}
+
+			return video
+		})
+
+		update(videos)
+	}
+
+	const attribute = (e, target) => {
+		const targetLower = target.name.toLowerCase()
+
+		videos = videos.map(video => {
+			if (e.target.indeterminate) {
+				const match = video.attributes.some(location => location.toLowerCase() === targetLower)
+
+				if (match) {
+					video.hidden.notAttribute.push(targetLower)
+				} else {
+					// Remove checked-status from filtering
+					video.hidden.attribute.splice(video.hidden.attribute.indexOf(targetLower), 1)
+				}
+			} else if (!e.target.checked) {
+				const match = video.attributes.map(attribute => attribute.toLowerCase()).includes(targetLower)
+
+				if (match) {
+					// Remove indeterminate-status from filtering
+					video.hidden.notAttribute.splice(video.hidden.notAttribute.indexOf(targetLower), 1)
+				}
+			} else {
+				const match = !video.attributes.map(attribute => attribute.toLowerCase()).includes(targetLower)
+
+				if (match) video.hidden.attribute.push(targetLower)
+			}
+
+			return video
+		})
+
+		update(videos)
+	}
+
+	const category_NULL = e => {
+		videos = videos.map(video => {
+			if (e.target.indeterminate) {
+				video.hidden.noCategory = false
+				video.hidden.notNoCategory = video.categories.length === 0
+			} else if (!e.target.checked) {
+				video.hidden.notNoCategory = false
+			} else {
+				video.hidden.noCategory = video.categories.length !== 0
+			}
+
+			return video
+		})
+
+		update(videos)
+	}
+
+	return (
+		<>
+			<FilterObj
+				data={videoData.categories}
+				obj={videos}
+				label='category'
+				labelPlural='categories'
+				callback={category}
+				nullCallback={category_NULL}
+			/>
+
+			<FilterObj
+				data={videoData.attributes}
+				obj={videos}
+				label='attribute'
+				labelPlural='attributes'
+				callback={attribute}
+			/>
+		</>
+	)
+}
+
+// ContainerItem
+const TitleSearch = ({ update, videos }) => {
+	const callback = e => {
+		const searchValue = e.target.value.toLowerCase()
+
+		videos = videos.map(video => {
+			video.hidden.titleSearch = !video.name.toLowerCase().includes(searchValue)
+
+			return video
+		})
+
+		update(videos)
+	}
+
+	return (
+		<div className='input-wrapper'>
+			<input type='text' placeholder='Name' autoFocus onChange={callback} />
+		</div>
+	)
+}
+
+const SortItem = ({ callback, label, name, checked = false, disabled = false }) => {
+	return (
+		<div className={`input-wrapper ${disabled ? 'disabled' : ''}`}>
+			<input type='radio' name='sort' id={label} onChange={callback} defaultChecked={checked} />
+			<label htmlFor={label}>{name}</label>
+		</div>
+	)
+}
+
+const FilterObj = ({ data, label, labelPlural, obj, callback, nullCallback = null }) => {
+	const indeterminate = new Indeterminate()
+
+	return (
+		<>
+			<h2>{capitalize(label, true)}</h2>
+
+			<div id={label}>
+				{nullCallback !== null ? (
+					<div className='input-wrapper'>
+						<input
+							type='checkbox'
+							name={label}
+							id={`${label}_NULL`}
+							onChange={e => {
+								indeterminate.handleIndeterminate(e)
+								nullCallback(e)
+							}}
+						/>
+						<label className='global-category' htmlFor={`${label}_NULL`}>
+							NULL
+						</label>
+					</div>
+				) : null}
+
+				{data.map(item => (
+					<div className='input-wrapper' key={item.id}>
+						<input
+							type='checkbox'
+							name={label}
+							id={`${label}-${item.name}`}
+							onChange={e => {
+								indeterminate.handleIndeterminate(e)
+								callback(e, item)
+							}}
+						/>
+						<label htmlFor={`${label}-${item.name}`}>
+							{item.name} <LabelCount prop={labelPlural} label={item.name} obj={obj} />
+						</label>
+					</div>
+				))}
+			</div>
+		</>
+	)
 }
 
 export default VideoSearchPage

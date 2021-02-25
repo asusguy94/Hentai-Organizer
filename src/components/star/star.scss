@@ -1,66 +1,66 @@
 @import '../styles/functions';
 
 #star-page {
-    aside {
-        #relations {
-            text-align: center;
+	aside {
+		#relations {
+			text-align: center;
 
-            a.relation {
-                display: inline-block;
-                width: 200px;
+			a.relation {
+				display: inline-block;
+				width: 200px;
 
-                margin: 10px;
-                text-decoration: none;
-                color: inherit;
+				margin: 10px;
+				text-decoration: none;
+				color: inherit;
 
-                &:hover {
-                    text-decoration: underline;
-                }
+				&:hover {
+					text-decoration: underline;
+				}
 
-                img {
-                    width: inherit;
-                }
-            }
-        }
-    }
+				img {
+					width: inherit;
+				}
+			}
+		}
+	}
 
-    #star {
-        #dropbox {
-            width: 200px;
-            height: 275px;
-            border: 2px dashed rgba(255, 0, 0, 0.3);
+	#star {
+		#dropbox {
+			width: 200px;
+			height: 275px;
+			border: 2px dashed rgba(255, 0, 0, 0.3);
 
-            &.hover {
-                border-color: red;
-            }
+			&.hover {
+				border-color: red;
+			}
 
-            .label {
-                position: relative;
-                text-align: center;
-                top: 50%;
-            }
-        }
+			.label {
+				position: relative;
+				text-align: center;
+				top: 50%;
+			}
+		}
 
-        label {
-            margin-right: 9px;
+		label {
+			margin-right: 9px;
 
-            &.bold {
-                font-weight: bold;
-                margin-right: 7px;
-            }
-        }
+			&.bold {
+				font-weight: bold;
+				margin-right: 7px;
+			}
+		}
 
-        input {
-            text-transform: capitalize;
-        }
-    }
+		input {
+			text-transform: capitalize;
+		}
+	}
 
-    .video {
-        margin: 0 10px 10px 5px;
-        width: $thumbnailWidth + px;
+	.video {
+		margin: 0 10px 10px 5px;
+		width: $thumbnailWidth + px;
 
-        span {
-            text-align: center;
-        }
-    }
+		span {
+			text-align: center;
+		}
+	}
 }

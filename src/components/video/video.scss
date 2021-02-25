@@ -1,118 +1,118 @@
 @import '../styles/functions';
 
 #video-page {
-    .header {
-        margin-bottom: 15px;
+	.header {
+		margin-bottom: 15px;
 
-        &__title {
-            display: inline-block;
-        }
+		&__title {
+			display: inline-block;
+		}
 
-        &__censored {
-            .label {
-                color: red;
+		&__censored {
+			.label {
+				color: red;
 
-                &:before {
-                    content: ' - ';
-                    color: black;
-                }
-            }
-        }
+				&:before {
+					content: ' - ';
+					color: black;
+				}
+			}
+		}
 
-        &__next {
-            margin-top: 0.6em;
-        }
+		&__next {
+			margin-top: 0.6em;
+		}
 
-        .btn {
-            margin-left: 15px;
-            color: black;
+		.btn {
+			margin-left: 15px;
+			color: black;
 
-            &:hover {
-                color: white;
-            }
+			&:hover {
+				color: white;
+			}
 
-            i {
-                margin-right: 5px;
-            }
+			i {
+				margin-right: 5px;
+			}
 
-            font-weight: 600;
-        }
-    }
+			font-weight: 600;
+		}
+	}
 
-    #timeline {
-        position: relative;
-        left: 95px;
-        margin-top: 5px;
+	#timeline {
+		position: relative;
+		left: 95px;
+		margin-top: 5px;
 
-        .bookmark {
-            position: absolute;
-            white-space: nowrap;
+		.bookmark {
+			position: absolute;
+			white-space: nowrap;
 
-            @include bookmarkPosition();
+			@include bookmarkPosition();
 
-            [id^='bookmark-info-'] {
-                .btn {
-                    display: block;
-                    margin-top: 3px;
+			[id^='bookmark-info-'] {
+				.btn {
+					display: block;
+					margin-top: 3px;
 
-                    &:first-of-type {
-                        margin-top: 6px;
-                    }
-                }
-            }
-        }
-    }
+					&:first-of-type {
+						margin-top: 6px;
+					}
+				}
+			}
+		}
+	}
 
-    aside {
-        margin-top: 4.25em;
+	aside {
+		margin-top: 4.25em;
 
-        #stars {
-            text-align: center;
+		#stars {
+			text-align: center;
 
-            .star {
-                &--active {
-                    .card {
-                        border-width: 4px;
-                        border-color: green;
-                    }
-                }
-            }
-        }
+			.star {
+				&--active {
+					.card {
+						border-width: 4px;
+						border-color: green;
+					}
+				}
+			}
+		}
 
-        #franchise {
-            margin-bottom: 3%;
+		#franchise {
+			margin-bottom: 3%;
 
-            .episode {
-                display: block;
-                background-color: grey;
-                color: white;
-                text-decoration: none;
+			.episode {
+				display: block;
+				background-color: grey;
+				color: white;
+				text-decoration: none;
 
-                border-radius: 4px;
-                margin-bottom: 10px;
+				border-radius: 4px;
+				margin-bottom: 10px;
 
-                height: 60px;
+				height: 60px;
 
-                &:hover {
-                    background-color: darkgrey;
-                }
+				&:hover {
+					background-color: darkgrey;
+				}
 
-                &__thumbnail {
-                    padding: 3px 0;
-                    height: inherit;
-                }
-            }
-        }
+				&__thumbnail {
+					padding: 3px 0;
+					height: inherit;
+				}
+			}
+		}
 
-        hr {
-            width: 60%;
-        }
-    }
+		hr {
+			width: 60%;
+		}
+	}
 
-    .separator {
-        &:before,
-        &:after {
-            content: ' ';
-        }
-    }
+	.separator {
+		&:before,
+		&:after {
+			content: ' ';
+		}
+	}
 }

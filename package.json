@@ -1,43 +1,45 @@
 {
-    "name": "hentaijs",
-    "version": "0.2.0",
-    "license": "MIT",
-    "dependencies": {
-        "axios": "^0.21.0",
-        "hls.js": "^0.14.16",
-        "node-sass": "^4.14.1",
-        "plyr-react": "2.2.1-0",
-        "react": "^17.0.1",
-        "react-contextmenu": "^2.14.0",
-        "react-dom": "^17.0.1",
-        "react-helmet-async": "^1.0.7",
-        "react-input-autosize": "^2.2.2",
-        "react-keyboard-event-handler": "^1.5.4",
-        "react-lazy-load-image-component": "^1.5.0",
-        "react-router-dom": "^5.2.0",
-        "react-scripts": "4.0.0",
-        "react-scroll-to-top": "^1.0.5",
-        "react-tooltip": "^4.2.10",
-        "react-transition-group": "^4.4.1"
-    },
-    "scripts": {
-        "start": "npx cross-env PORT=3002 react-scripts start",
-        "build": "react-scripts build",
-        "server": "npx serve -l 5002 -s build"
-    },
-    "eslintConfig": {
-        "extends": "react-app"
-    },
-    "browserslist": {
-        "production": [
-            ">0.2%",
-            "not dead",
-            "not op_mini all"
-        ],
-        "development": [
-            "last 1 chrome version",
-            "last 1 firefox version",
-            "last 1 safari version"
-        ]
-    }
+	"name": "hentaijs",
+	"version": "0.2.0",
+	"license": "MIT",
+	"dependencies": {
+		"axios": "^0.21.1",
+		"capitalize": "^2.0.3",
+		"hls.js": "^0.14.17",
+		"node-sass": "^4.14.1",
+		"plyr-react": "2.2.1-0",
+		"react": "^17.0.1",
+		"react-contextmenu": "^2.14.0",
+		"react-dom": "^17.0.1",
+		"react-helmet-async": "^1.0.7",
+		"react-input-autosize": "^3.0.0",
+		"react-keyboard-event-handler": "^1.5.4",
+		"react-lazy-load-image-component": "^1.5.1",
+		"react-router-dom": "^5.2.0",
+		"react-scripts": "4.0.2",
+		"react-scroll-to-top": "^1.0.5",
+		"react-tooltip": "^4.2.13",
+		"react-transition-group": "^4.4.1"
+	},
+	"scripts": {
+		"start": "npx cross-env BROWSER=none PORT=3002 react-scripts start",
+		"start:browser": "npx cross-env PORT=3002 react-scripts start",
+		"build": "react-scripts build",
+		"server": "serve -l 5002 -s build"
+	},
+	"eslintConfig": {
+		"extends": "react-app"
+	},
+	"browserslist": {
+		"production": [
+			">0.2%",
+			"not dead",
+			"not op_mini all"
+		],
+		"development": [
+			"last 1 chrome version",
+			"last 1 firefox version",
+			"last 1 safari version"
+		]
+	}
 }

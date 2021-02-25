@@ -1,32 +1,32 @@
 {
-    "api": "http://api.hentai.ds1517",
-    "source": "https://hentai.ds1517",
-    "db": "https://ds1517",
-    "timeline": {
-        "offset": 0.88,
-        "spacing": 2
-    },
-    "hls": {
-        "enabled": false,
-        "levels": { "1080": 3, "720": 2, "480": 1, "360": 0 },
-        "maxLevel": 1080,
-        "maxStartLevel": 720
-    },
-    "franchise": {
-        "title": {
-            "maxLength": 43
-        }
-    },
-    "theme": {
-        "fa": "far"
-    },
-    "overlay": {
-        "success": "checkbox.png"
-    },
-    "modal": {
-    "filter": {
-        "search": true,
-        "startsWithOnTop": true
-    }
-}
+	"api": "http://192.168.1.200:8080/api",
+	"source": "http://192.168.1.200:8080",
+	"db": "http://192.168.1.100:8080",
+	"timeline": {
+		"offset": 0.88,
+		"spacing": 2
+	},
+	"hls": {
+		"enabled": false,
+		"levels": { "1080": 3, "720": 2, "480": 1, "360": 0 },
+		"maxLevel": 1080,
+		"maxStartLevel": 720
+	},
+	"franchise": {
+		"title": {
+			"maxLength": 43
+		}
+	},
+	"theme": {
+		"fa": "far"
+	},
+	"overlay": {
+		"success": "checkbox.png"
+	},
+	"modal": {
+		"filter": {
+			"search": true,
+			"startsWithOnTop": true
+		}
+	}
 }

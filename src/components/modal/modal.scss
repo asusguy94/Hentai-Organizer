@@ -1,45 +1,45 @@
 #modal {
-    position: absolute;
-    left: 40%;
-    top: 0;
+	position: absolute;
+	left: 40%;
+	top: 0;
 
-    .card-header {
-        padding-bottom: 0;
+	.card-header {
+		padding-bottom: 0;
 
-        .query {
-            display: inline-block;
-            padding: 0 3px;
-        }
-    }
+		.query {
+			display: inline-block;
+			padding: 0 3px;
+		}
+	}
 
-    .card-body {
-        padding: 10px;
+	.card-body {
+		padding: 10px;
 
-        .content {
-            .btn {
-                margin-bottom: 3px;
-                font-size: 1em;
+		.content {
+			.btn {
+				margin-bottom: 3px;
+				font-size: 1em;
 
-                padding: 3px 10px;
-            }
-        }
+				padding: 3px 10px;
+			}
+		}
 
-        .input__container--autosize {
-            width: 100%;
-            text-align: center;
+		.input__container--autosize {
+			width: 100%;
+			text-align: center;
 
-            .input--autosize {
-                min-width: 100%;
-            }
-        }
+			.input--autosize {
+				min-width: 100%;
+			}
+		}
 
-        input {
-            text-align: center;
-        }
-    }
+		input {
+			text-align: center;
+		}
+	}
 
-    .actions {
-        margin-top: 10px;
-        text-align: center;
-    }
+	.actions {
+		margin-top: 10px;
+		text-align: center;
+	}
 }

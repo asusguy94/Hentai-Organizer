@@ -7,11 +7,11 @@ import './overlay.scss'
 const duration = { start: 300, delay: 400, stop: 300 }
 
 function getCount(obj) {
-    const val = Object.values(obj).reduce((a, b) => {
-        return a + b
-    }, 0)
+	const val = Object.values(obj).reduce((a, b) => {
+		return a + b
+	}, 0)
 
-    return val
+	return val
 }
 
 // TODO overlay methods for long-operations
@@ -45,42 +45,42 @@ export function handleOverlay_stop() {
 }*/
 
 export function handleOverlay(data = null) {
-    this.setState((prevState) => {
-        const { overlay } = prevState
+	this.setState(prevState => {
+		const { overlay } = prevState
 
-        overlay.data = data
-        overlay.visible = !overlay.visible
+		overlay.data = data
+		overlay.visible = !overlay.visible
 
-        return { overlay }
-    })
+		return { overlay }
+	})
 
-    // TODO this only works for quick-actions, actions that takes little time
-    // TODO evaluate if a slow action is needed, action that takes some time
-    if (data !== null) {
-        setTimeout(() => {
-            this.handleOverlay()
-        }, getCount(duration))
-    }
+	// TODO this only works for quick-actions, actions that takes little time
+	// TODO evaluate if a slow action is needed, action that takes some time
+	if (data !== null) {
+		setTimeout(() => {
+			this.handleOverlay()
+		}, getCount(duration))
+	}
 }
 
 class Overlay extends Component {
-    isVisible() {
-        return this.props.visible
-    }
+	isVisible() {
+		return this.props.visible
+	}
 
-    render() {
-        return (
-            <React.Fragment>
-                {this.isVisible() && (
-                    <CSSTransition appear={true} in={true} timeout={duration['delay']} classNames='overlay'>
-                        <div className='overlay mx-auto'>
-                            <img src={`../img/${this.props.children}`} alt='overlay' />
-                        </div>
-                    </CSSTransition>
-                )}
-            </React.Fragment>
-        )
-    }
+	render() {
+		return (
+			<React.Fragment>
+				{this.isVisible() && (
+					<CSSTransition appear={true} in={true} timeout={duration['delay']} classNames='overlay'>
+						<div className='overlay mx-auto'>
+							<img src={`../img/${this.props.children}`} alt='overlay' />
+						</div>
+					</CSSTransition>
+				)}
+			</React.Fragment>
+		)
+	}
 }
 
 export default Overlay

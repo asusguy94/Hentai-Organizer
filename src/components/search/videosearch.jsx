@@ -108,9 +108,28 @@ const Sidebar = ({ videos, update, videoData }) => (
 			<Filter videos={videos} update={update} videoData={videoData} />
 		</aside>
 	)
-}
 
 // Container
+const TitleSearch = ({ update, videos }) => {
+	const callback = e => {
+		const searchValue = e.target.value.toLowerCase()
+
+		videos = videos.map(video => {
+			video.hidden.titleSearch = !video.name.toLowerCase().includes(searchValue)
+
+			return video
+		})
+
+		update(videos)
+}
+
+	return (
+		<div className='input-wrapper'>
+			<input type='text' placeholder='Name' autoFocus onChange={callback} />
+		</div>
+	)
+}
+
 const Sort = ({ videos, update }) => {
 	const sortDefault = (reverse = false) => {
 		videos.sort((a, b) => {
@@ -271,25 +290,6 @@ const Filter = ({ videoData, videos, update }) => {
 }
 
 // ContainerItem
-const TitleSearch = ({ update, videos }) => {
-	const callback = e => {
-		const searchValue = e.target.value.toLowerCase()
-
-		videos = videos.map(video => {
-			video.hidden.titleSearch = !video.name.toLowerCase().includes(searchValue)
-
-			return video
-		})
-
-		update(videos)
-	}
-
-	return (
-		<div className='input-wrapper'>
-			<input type='text' placeholder='Name' autoFocus onChange={callback} />
-		</div>
-	)
-}
 
 const SortItem = ({ callback, label, name, checked = false, disabled = false }) => (
 		<div className={`input-wrapper ${disabled ? 'disabled' : ''}`}>

@@ -1,4 +1,4 @@
-import { Component, Fragment, useState } from 'react'
+import { Component, Fragment, useState, useRef } from 'react'
 
 import Axios from 'axios'
 import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu'
@@ -346,106 +346,84 @@ const StarImageDropbox = ({ removeStar, removeImage, addImage, star }) => {
 }
 
 // ContainerItem
-class StarVideo extends Component {
-	constructor(props) {
-		super(props)
-		this.state = {
-			dataSrc: `${config.source}/videos/${props.video.fname}`,
-			src: ''
-		}
+const StarVideo = ({ video }) => {
+	const [src, setSrc] = useState('')
+	const [dataSrc, setDataSrc] = useState(`${config.source}/videos/${video.fname}`)
+
+	const thumbnail = useRef()
+
+	const reload = async () => {
+		setSrc(dataSrc)
+		setDataSrc('')
 	}
 
-	async reloadVideo() {
-		this.setState(prevState => {
-			const state = prevState
-			state.src = prevState.dataSrc
-			state.dataSrc = ''
-
-			return state
-		})
+	const unload = () => {
+		setDataSrc(src)
+		setSrc('')
 	}
 
-	async unloadVideo() {
-		this.setState(prevState => {
-			const state = prevState
-			state.dataSrc = prevState.src
-			state.src = ''
+	const playFrom = (video, time = 0) => {
+		if (time) video.currentTime = time
 
-			return state
-		})
-	}
-
-	playFrom(video, time = 0) {
-		if (time) video.currentTime = Number(time)
 		video.play()
 	}
 
-	stopFrom(video, time) {
-		if (time) video.currentTime = Number(time)
+	const stopFrom = (video, time = 0) => {
+		if (time) video.currentTime = time
+
 		video.pause()
 	}
 
-	async startThumbnailPlayback(video) {
+	const startThumbnailPlayback = async video => {
 		let time = 100
 		const offset = 60
 		const duration = 1.5
 
-		this.playFrom(video, time)
-		this.thumbnail = setInterval(() => {
+		playFrom(video)
+		thumbnail.current = setInterval(() => {
 			time += offset
 			if (time > video.duration) {
-				this.stopThumbnailPlayback(video)
-				this.startThumbnailPlayback(video)
+				stopThumbnailPlayback(video).then(() => startThumbnailPlayback(video))
 			}
-			this.playFrom(video, (time += offset))
+			playFrom(video, (time += offset))
 		}, duration * 1000)
 	}
 
-	async stopThumbnailPlayback(video) {
-		this.stopFrom(video)
-		clearInterval(this.thumbnail)
+	const stopThumbnailPlayback = async video => {
+		stopFrom(video)
+
+		clearInterval(thumbnail.current)
 	}
 
-	handleMouseEnter(e) {
-		const { target } = e
-
-		if (this.state.dataSrc.length && !this.state.src.length) {
-			this.reloadVideo().then(() => {
-				this.startThumbnailPlayback(target)
-			})
+	const handleMouseEnter = ({ target }) => {
+		if (dataSrc.length && !src.length) {
+			reload().then(() => startThumbnailPlayback(target))
 		}
 	}
 
-	handleMouseLeave(e) {
-		const { target } = e
-
-		if (!this.state.dataSrc.length && this.state.src.length) {
-			this.stopThumbnailPlayback(target).then(() => {
-				this.unloadVideo()
-			})
+	const handleMouseLeave = ({ target }) => {
+		if (!dataSrc.length && src.length) {
+			stopThumbnailPlayback(target).then(() => unload())
 		}
 	}
 
-	render() {
-		const { video } = this.props
+	return (
+		<a className='video  card' href={`/video/${video.id}`}>
+			<video
+				className='card-img-top'
+				src={src}
+				data-src={dataSrc}
+				//TODO change video.id-290.jpg >> video.image
+				poster={`${config.source}/images/videos/${video.id}-290.jpg`}
+				preload='metadata'
+				muted
+				onMouseEnter={handleMouseEnter}
+				onMouseLeave={handleMouseLeave}
+			/>
 
-		return (
-			<a className='video card' href={`/video/${video.id}`}>
-				<video
-					className='card-img-top'
-					src={this.state.src}
-					data-src={this.state.dataSrc}
-					poster={`${config.source}/images/videos/${video.id}-290.jpg`}
-					preload='metadata'
-					muted
-					onMouseEnter={this.handleMouseEnter.bind(this)}
-					onMouseLeave={this.handleMouseLeave.bind(this)}
-				/>
-
-				<span className='title card-title'>{video.name}</span>
-			</a>
-		)
-	}
+			<span className='title card-title'>{video.name}</span>
+		</a>
+	)
 }
 
 const StarInputForm = ({ value, emptyByDefault, update, name, type, list, children }) => {

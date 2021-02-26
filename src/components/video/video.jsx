@@ -618,7 +618,7 @@ class VideoPage extends Component {
 
 					<div className='video-container' onWheel={e => this.handleWheel(e)}>
 						<ContextMenuTrigger id='video' holdToDisplay={-1}>
-							{this.state.loaded.video && (
+							{this.state.video.id !== 0 && (
 								<Plyr
 									ref={this.playerRef}
 									options={{
@@ -747,9 +747,8 @@ class VideoPage extends Component {
 					</div>
 
 					<div className='col-12' id='timeline'>
-						{this.state.loaded.bookmarks &&
-							this.state.loaded.video &&
-							this.state.bookmarks.map((bookmark, i) => (
+						{this.state.video.id !== 0
+							? this.state.bookmarks.map((bookmark, i) => (
 								<Fragment key={bookmark.id}>
 									<ContextMenuTrigger id={`bookmark-${i}`}>
 										<div
@@ -928,7 +927,8 @@ class VideoPage extends Component {
 										</MenuItem>
 									</ContextMenu>
 								</Fragment>
-							))}
+							  ))
+							: null}
 					</div>
 				</section>
 
@@ -959,8 +959,6 @@ class VideoPage extends Component {
 					</div>
 
 					<Attributes
-						video={this.state.video}
-						stars={this.state.stars}
 						bookmarks={this.state.bookmarks}
 						attribute_setActive={attribute => this.attribute_setActive(attribute)}
 						bookmark_clearActive={() => this.bookmark_clearActive()}
@@ -1369,7 +1367,7 @@ const Franchise = ({ video }) => {
 	)
 }
 
-const Attributes = ({ video, stars, bookmarks, attribute_setActive, bookmark_clearActive }) => {
+const Attributes = ({ bookmarks, attribute_setActive, bookmark_clearActive }) => {
 	const getAttributes = () => {
 		const attributeArr = []
 
@@ -1384,8 +1382,7 @@ const Attributes = ({ video, stars, bookmarks, attribute_setActive, bookmark_cle
 
 	return (
 		<div id='attributes' className='row col-12 justify-content-center'>
-			{video.id !== 0 && stars.length
-				? getAttributes().map(attribute => (
+			{getAttributes().map(attribute => (
 						<div
 							key={attribute.id}
 							className='btn btn-outline-primary m-2 attribute'
@@ -1394,8 +1391,7 @@ const Attributes = ({ video, stars, bookmarks, attribute_setActive, bookmark_cle
 						>
 							{attribute.name}
 						</div>
-				  ))
-				: null}
+			))}
 		</div>
 	)
 }

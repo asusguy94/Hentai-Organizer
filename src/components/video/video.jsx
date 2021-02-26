@@ -182,13 +182,6 @@ class VideoPage extends Component {
 		})
 	}
 
-	//simple
-	handleRibbon(star) {
-		const hasBookmark = this.state.bookmarks.some(bookmark => bookmark.starID === star.id)
-
-		if (!hasBookmark) return <Ribbon label='NEW' />
-	}
-
 	//useState
 	handleBookmark_add(category, star = null) {
 		const { player } = this.playerRef.current
@@ -943,142 +936,26 @@ class VideoPage extends Component {
 					<Franchise video={this.state.video} />
 
 					<div id='stars' className='row justify-content-center'>
-						{this.state.stars.length
-							? this.state.stars.map((starItem, i) => (
-									<div
-										key={starItem.id}
-										className='star col-4'
-										onMouseEnter={() => this.bookmark_setActive(starItem)}
-										onMouseLeave={() => this.bookmark_clearActive()}
-									>
-										<div className='card mb-2 ribbon-container'>
-											<ContextMenuTrigger id={`star-${i}`}>
-												<img
-													className='star__image card-img-top'
-													alt='star'
-													src={`${config.source}/images/stars/${starItem.id}.jpg`}
+						<Stars
+							stars={this.state.stars}
+							bookmarks={this.state.bookmarks}
+							attributes={this.state.bookmarks}
+							categories={this.state.categories}
+							handleModal={(title, data, filter) => this.handleModal(title, data, filter)}
+							setActive={star => this.bookmark_setActive(star)}
+							clearActive={() => this.bookmark_clearActive()}
+							addAttribute={(star, attribute) => this.handleStar_addAttribute(star, attribute)}
+							removeStar={starID => this.handleStar_remove(starID)}
+							addBookmark={(category, star) => this.handleBookmark_add(category, star)}
 												/>
 
-												<Link to={`/star/${starItem.id}`} className='star__name d-block'>
-													{starItem.name}
-												</Link>
-
-												{this.handleRibbon(starItem)}
-											</ContextMenuTrigger>
-										</div>
-
-										<ContextMenu id={`star-${i}`}>
-											<MenuItem
-												onClick={() => {
-													this.handleModal(
-														'Add Bookmark',
-														this.state.categories.map((categoryItem, category_i) => {
-															return (
-																<div
-																	key={category_i}
-																	className='btn btn-sm btn-outline-primary d-block w-auto'
-																	onClick={() => {
-																		this.handleModal()
-																		this.handleBookmark_add(categoryItem, starItem)
-																	}}
-																>
-																	{categoryItem.name}
-																</div>
-															)
-														}),
-														true
-													)
-												}}
-											>
-												<i className={`${config.theme.fa} fa-plus`} /> Add Bookmark
-											</MenuItem>
-
-											<MenuItem
-												onClick={() => {
-													// TODO disabled->if no bookmarks from star
-													this.handleModal(
-														'Add Global Attribute',
-														this.state.attributes.map((attributeItem, attribute_i) => {
-															return (
-																<div
-																	key={attribute_i}
-																	className='btn btn-sm btn-outline-primary d-block w-auto'
-																	onClick={() => {
-																		this.handleModal()
-																		this.handleStar_addAttribute(
-																			starItem,
-																			attributeItem
-																		)
-																	}}
-																>
-																	{attributeItem.name}
-																</div>
-															)
-														}),
-														true
-													)
-												}}
-											>
-												<i className={`${config.theme.fa} fa-plus`} /> Add Global Attribute
-											</MenuItem>
-
-											<MenuItem
-												disabled={this.state.bookmarks.some(
-													bookmark => bookmark.starID === starItem.id
-												)}
-												onClick={() => this.handleStar_remove(starItem.id)}
-											>
-												<i className={`${config.theme.fa} fa-trash-alt`} /> Remove
-											</MenuItem>
-										</ContextMenu>
-									</div>
-							  ))
-							: null}
-						<div className='col-12 mt-2'>
-							<hr />
-
-							{this.state.loaded.video ? (
-								<div className='form-inline justify-content-center'>
-									<div className='form-group mr-2'>
-										<label htmlFor='add-star' className='mr-1'>
-											Star
-										</label>
-										<input
-											type='text'
-											id='add-star'
-											className='form-control'
-											value={this.state.input.star}
-											onChange={e => this.handleInput(e, 'star')}
-											onKeyDown={e => {
-												if (e.key === 'Enter') {
-													e.preventDefault()
-
-													this.handleStar_add(e.target.value)
-												}
-											}}
-											disabled={this.state.video.noStar === 1}
+						<StarInput
+							video={this.state.video}
+							stars={this.state.stars}
+							bookmarks={this.state.bookmarks}
+							handleNoStar={e => this.handleNoStar(e)}
+							addStar={name => this.handleStar_add(name)}
 										/>
-									</div>
-
-									<div className='form-check'>
-										<input
-											type='checkbox'
-											name='no-star'
-											id='no-star'
-											className='form-check-input mr-1'
-											onChange={e => this.handleNoStar(e)}
-											defaultChecked={this.state.video.noStar === 1}
-											disabled={this.state.bookmarks.length || this.state.stars.length}
-										/>
-										<label htmlFor='no-star' className='form-check-label'>
-											No Star
-										</label>
-									</div>
-								</div>
-							) : null}
-
-							<hr className='pt-2' />
-						</div>
 					</div>
 
 					<Attributes
@@ -1311,6 +1188,158 @@ class VideoPage extends Component {
 			})
 		}
 	}
+}
+
+const Stars = ({
+	stars,
+	bookmarks,
+	attributes,
+	categories,
+	handleModal,
+	setActive,
+	clearActive,
+	addAttribute,
+	removeStar,
+	addBookmark
+}) => {
+	const handleRibbon = star => {
+		const hasBookmark = bookmarks.some(bookmark => bookmark.starID === star.id)
+
+		if (!hasBookmark) return <Ribbon label='NEW' />
+	}
+
+	return stars.map((starItem, i) => (
+		<div
+			key={starItem.id}
+			className='star col-4'
+			onMouseEnter={() => setActive(starItem)}
+			onMouseLeave={() => clearActive()}
+		>
+			<div className='card mb-2 ribbon-container'>
+				<ContextMenuTrigger id={`star-${i}`}>
+					<img
+						className='star__image card-img-top'
+						alt='star'
+						src={`${config.source}/images/stars/${starItem.id}.jpg`}
+					/>
+
+					<Link to={`/star/${starItem.id}`} className='star__name d-block'>
+						{starItem.name}
+					</Link>
+
+					{handleRibbon(starItem)}
+				</ContextMenuTrigger>
+			</div>
+
+			<ContextMenu id={`star-${i}`}>
+				<MenuItem
+					onClick={() => {
+						handleModal(
+							'Add Bookmark',
+							categories.map((categoryItem, category_i) => {
+								return (
+									<div
+										key={category_i}
+										className='btn btn-sm btn-outline-primary d-block w-auto'
+										onClick={() => {
+											handleModal()
+											addBookmark(categoryItem, starItem)
+										}}
+									>
+										{categoryItem.name}
+									</div>
+								)
+							}),
+							true
+						)
+					}}
+				>
+					<i className={`${config.theme.fa} fa-plus`} /> Add Bookmark
+				</MenuItem>
+
+				<MenuItem
+					onClick={() => {
+						// TODO disabled->if no bookmarks from star
+						handleModal(
+							'Add Global Attribute',
+							attributes.map((attributeItem, attribute_i) => {
+								return (
+									<div
+										key={attribute_i}
+										className='btn btn-sm btn-outline-primary d-block w-auto'
+										onClick={() => {
+											handleModal()
+											addAttribute(starItem, attributeItem)
+										}}
+									>
+										{attributeItem.name}
+									</div>
+								)
+							}),
+							true
+						)
+					}}
+				>
+					<i className={`${config.theme.fa} fa-plus`} /> Add Global Attribute
+				</MenuItem>
+
+				<MenuItem
+					disabled={bookmarks.some(bookmark => bookmark.starID === starItem.id)}
+					onClick={() => removeStar(starItem.id)}
+				>
+					<i className={`${config.theme.fa} fa-trash-alt`} /> Remove
+				</MenuItem>
+			</ContextMenu>
+		</div>
+	))
+}
+
+const StarInput = ({ video, stars, bookmarks, handleNoStar, addStar }) => {
+	return (
+		<div className='col-12 mt-2'>
+			{stars.length ? <hr /> : null}
+
+			<div className='form-inline justify-content-center'>
+				<div className='form-group mr-2'>
+					<label htmlFor='add-star' className='mr-1'>
+						Star
+					</label>
+					<input
+						type='text'
+						id='add-star'
+						className='form-control'
+						onKeyDown={e => {
+							if (e.key === 'Enter') {
+								e.preventDefault()
+
+								addStar(e.target.value)
+
+								e.target.value = ''
+							}
+						}}
+						disabled={video.noStar === 1}
+					/>
+				</div>
+
+				<div className='form-check'>
+					<input
+						type='checkbox'
+						name='no-star'
+						id='no-star'
+						className='form-check-input mr-1'
+						onChange={e => handleNoStar(e)}
+						defaultChecked={video.noStar === 1}
+						disabled={bookmarks.length || stars.length}
+					/>
+					<label htmlFor='no-star' className='form-check-label'>
+						No Star
+					</label>
+				</div>
+			</div>
+
+			{bookmarks.length ? <hr className='pt-2' /> : null}
+		</div>
+	)
 }
 
 const Franchise = ({ video }) => {

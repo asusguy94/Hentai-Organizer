@@ -99,15 +99,8 @@ class VideoPage extends Component {
 			visible: false,
 			data: null
 		},
-		newVideo: false,
-		input: {
-			star: '',
-			date: '',
-			franchise: '',
-			title: '',
-			video: ''
+		newVideo: false
 		}
-	}
 
 	//useRef
 	handleWheel(e) {
@@ -176,8 +169,8 @@ class VideoPage extends Component {
 	}
 
 	//simple
-	handleVideo_rename() {
-		Axios.put(`${config.source}/video/${this.state.video.id}`, { path: this.state.input.video }).then(() => {
+	handleVideo_rename(path) {
+		Axios.put(`${config.source}/video/${this.state.video.id}`, { path }).then(() => {
 			window.location.reload()
 		})
 	}
@@ -461,28 +454,6 @@ class VideoPage extends Component {
 		})
 	}
 
-	//useState, deprecated
-	handleInput(e, field) {
-		const inputValue = e.target.value
-
-		this.setState(prevState => {
-			const { input } = prevState
-			input[field] = inputValue
-
-			return { input }
-		})
-	}
-
-	//useState, deprecated
-	handleInput_reset(field) {
-		this.setState(prevState => {
-			const { input } = prevState
-			input[field] = ''
-
-			return { input }
-		})
-	}
-
 	// useState
 	handleNoStar(e) {
 		Axios.put(`${config.api}/video/${this.state.video.id}`, { noStar: e.target.checked }).then(({ data }) => {
@@ -504,8 +475,6 @@ class VideoPage extends Component {
 
 				return { stars }
 			})
-
-			this.handleInput_reset('star')
 		})
 	}
 
@@ -741,14 +710,13 @@ class VideoPage extends Component {
 											className='input__container--autosize'
 											inputClassName='input--autosize'
 											defaultValue={this.state.video.path.file}
-											onChange={e => this.handleInput(e, 'video')}
 											ref={input => input && input.focus()}
 											onKeyDown={e => {
 												if (e.key === 'Enter') {
 													e.preventDefault()
 
 													this.handleModal()
-													this.handleVideo_rename()
+													this.handleVideo_rename(e.target.value)
 												}
 											}}
 										/>

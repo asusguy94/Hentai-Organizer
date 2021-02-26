@@ -22,116 +22,6 @@ class VideoSearchPage extends Component {
 		attributes: []
 	}
 
-	handleCategoryFilter(e, target) {
-		const videos = this.state.videos.map(video => {
-			if (target === null) {
-				if (e.target.indeterminate) {
-					video.hidden.noCategory = false
-					video.hidden.notNoCategory = video.categories.length === 0
-				} else if (!e.target.checked) {
-					video.hidden.notNoCategory = false
-				} else {
-					video.hidden.noCategory = video.categories.length !== 0
-				}
-			} else {
-				const targetLower = target.name.toLowerCase()
-
-				if (e.target.indeterminate) {
-					const match = video.categories.some(category => {
-						return category.toLowerCase() === targetLower
-					})
-
-					// INDETERMINATE
-					if (match) {
-						video.hidden.notCategory.push(targetLower)
-					} else {
-						// Remove checked-status from filtering
-						const index = video.hidden.category.indexOf(targetLower)
-						video.hidden.category.splice(index, 1)
-					}
-				} else if (!e.target.checked) {
-					video.hidden.noCategory = false
-					const match = video.categories
-						.map(category => {
-							return category.toLowerCase()
-						})
-						.includes(targetLower)
-
-					// NOT-CHECKED
-					if (match) {
-						// Remove checked-status from filtering
-						const index = video.hidden.notCategory.indexOf(targetLower)
-						video.hidden.notCategory.splice(index, 1)
-					}
-				} else {
-					const match = !video.categories
-						.map(category => {
-							return category.toLowerCase()
-						})
-						.includes(targetLower)
-
-					// CHECKED
-					if (match) {
-						video.hidden.category.push(targetLower)
-					}
-				}
-			}
-
-			return video
-		})
-
-		this.setState({ videos })
-	}
-
-	handleAttributeFilter(e, target) {
-		const targetLower = target.name.toLowerCase()
-
-		const videos = this.state.videos.map(video => {
-			if (e.target.indeterminate) {
-				const match = video.attributes.some(attribute => {
-					return attribute.toLowerCase() === targetLower
-				})
-
-				// INDETERMINATE
-				if (match) {
-					video.hidden.notAttribute.push(targetLower)
-				} else {
-					// Remove checked-status from filtering
-					const index = video.hidden.attribute.indexOf(targetLower)
-					video.hidden.attribute.splice(index, 1)
-				}
-			} else if (!e.target.checked) {
-				const match = video.attributes
-					.map(attribute => {
-						return attribute.toLowerCase()
-					})
-					.includes(targetLower)
-
-				// NOT-CHECKED
-				if (match) {
-					// Remove indeterminate-status from filtering
-					const index = video.hidden.notAttribute.indexOf(targetLower)
-					video.hidden.notAttribute.splice(index, 1)
-				}
-			} else {
-				const match = !video.attributes
-					.map(attribute => {
-						return attribute.toLowerCase()
-					})
-					.includes(targetLower)
-
-				// CHECKED
-				if (match) {
-					video.hidden.attribute.push(targetLower)
-				}
-			}
-
-			return video
-		})
-
-		this.setState({ videos })
-	}
-
 	render() {
 		return (
 			<div className='search-page col-12 row'>
@@ -175,8 +65,7 @@ class VideoSearchPage extends Component {
 }
 
 // Wrapper
-const Videos = ({ videos }) => {
-	return (
+const Videos = ({ videos }) => (
 		<section id='videos' className='col-10'>
 			{videos.length ? (
 				<h2 className='text-center'>
@@ -209,10 +98,8 @@ const Videos = ({ videos }) => {
 			</div>
 		</section>
 	)
-}
 
-const Sidebar = ({ videos, update, videoData }) => {
-	return (
+const Sidebar = ({ videos, update, videoData }) => (
 		<aside className='col-2'>
 			<TitleSearch videos={videos} update={update} />
 
@@ -404,14 +291,12 @@ const TitleSearch = ({ update, videos }) => {
 	)
 }
 
-const SortItem = ({ callback, label, name, checked = false, disabled = false }) => {
-	return (
+const SortItem = ({ callback, label, name, checked = false, disabled = false }) => (
 		<div className={`input-wrapper ${disabled ? 'disabled' : ''}`}>
 			<input type='radio' name='sort' id={label} onChange={callback} defaultChecked={checked} />
 			<label htmlFor={label}>{name}</label>
 		</div>
 	)
-}
 
 const FilterObj = ({ data, label, labelPlural, obj, callback, nullCallback = null }) => {
 	const indeterminate = new Indeterminate()

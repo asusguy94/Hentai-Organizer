@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import { Component } from 'react'
 
 import KeyboardEventHandler from 'react-keyboard-event-handler'
 
@@ -55,7 +55,7 @@ class Modal extends Component {
 		this.setState({ query: '' })
 	}
 
-	componentDidUpdate(prevProps, prevState) {
+	componentDidUpdate(prevProps) {
 		if (this.props.filter !== prevProps.filter) {
 			this.resetData()
 		}
@@ -88,7 +88,7 @@ class Modal extends Component {
 		}
 
 		return (
-			<React.Fragment>
+			<>
 				{props.visible && (
 					<div id='modal' className='card'>
 						<div className='card-header text-center'>
@@ -117,7 +117,7 @@ class Modal extends Component {
 					handleFocusableElements={true}
 					isDisabled={!props.visible}
 				/>
-			</React.Fragment>
+			</>
 		)
 	}
 }

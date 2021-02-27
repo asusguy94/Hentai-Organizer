@@ -1,5 +1,3 @@
-//TODO class >> const
-
 class Indeterminate {
 	isIndeterminate(state) {
 		return Number(state) === -1

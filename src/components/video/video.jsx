@@ -10,7 +10,6 @@ import KeyboardEventHandler from 'react-keyboard-event-handler'
 import Autosizeinput from 'react-input-autosize'
 
 import Modal, { handleModal } from '../modal/modal'
-import Overlay, { handleOverlay } from '../overlay/overlay'
 import Ribbon from '../ribbon/ribbon'
 import { setFocus } from '../../hooks'
 
@@ -203,8 +202,6 @@ class VideoPage extends Component {
 		}
 
 		const success = (data, starID = 0) => {
-			this.handleOverlay(config.overlay.success)
-
 			let attributes = data.attributes
 			if (typeof data.attributes === 'undefined') attributes = []
 

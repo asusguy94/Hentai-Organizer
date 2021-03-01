@@ -9,7 +9,7 @@ import ReactTooltip from 'react-tooltip'
 import KeyboardEventHandler from 'react-keyboard-event-handler'
 import Autosizeinput from 'react-input-autosize'
 
-import Modal, { handleModal } from '../modal/modal'
+import Modal from '../modal/modal'
 import Ribbon from '../ribbon/ribbon'
 import { setFocus } from '../../hooks'
 

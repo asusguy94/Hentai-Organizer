@@ -1,4 +1,5 @@
-import { Component } from 'react'
+import { useState, useEffect } from 'react'
+import ReactDOM from 'react-dom'
 
 import KeyboardEventHandler from 'react-keyboard-event-handler'
 
@@ -6,120 +7,77 @@ import config from '../config.json'
 
 import './modal.scss'
 
-export function handleModal(title = null, data = null, filter = false) {
-	if (title !== null && data !== null && this.state.modal.visible) this.handleModal()
+//TODO improve children, props.children, pros.filter, children=chilren.filter
 
-	this.setState(prevState => {
-		const { modal } = prevState
-		modal.title = title
-		modal.data = data
-		modal.visible = !modal.visible
-		modal.filter = filter
+const Modal = props => {
+	const [query, setQuery] = useState('')
 
-		return { modal }
-	})
-}
-
-class Modal extends Component {
-	state = {
-		query: ''
-	}
-
-	handleKeyPress(key, e) {
+	const handleKeyPress = (key, e) => {
 		e.preventDefault()
 
 		switch (key) {
 			case 'esc':
-				this.resetData()
-				this.props.onClose()
+				setQuery('')
+				props.onClose()
 				break
 			case 'backspace':
-				this.setState(prevState => {
-					let { query } = prevState
-					query = query.slice(0, -1)
-
-					return { query }
-				})
+				setQuery(query.slice(0, -1))
 				break
 			default:
-				this.setState(prevState => {
-					let { query } = prevState
-					query += key
-
-					return { query }
-				})
+				setQuery(query + key)
 		}
 	}
 
-	resetData() {
-		this.setState({ query: '' })
+	useEffect(() => setQuery(''), [props.filter])
+
+	let children = props.children
+	if (props.filter) {
+		children = children
+			.filter(item => item.props.children.toLowerCase().includes(query))
+			.sort((a, b) => {
+				let valA = a.props.children.toLowerCase()
+				let valB = b.props.children.toLowerCase()
+
+				if (query.length && config.modal.filter.startsWithOnTop) {
+					if (valA.startsWith(query) && valB.startsWith(query)) return 0
+					else if (valA.startsWith(query)) return -1
+					else if (valB.startsWith(query)) return 1
+				}
+
+				return valA.localeCompare(valB)
+			})
 	}
+	return ReactDOM.createPortal(
+		<>
+			{props.visible ? (
+				<div id='modal' className='card'>
+					<div className='card-header text-center'>
+						<h3>{props.title}</h3>
+						{query ? <h4 className='query bg-warning'>{query}</h4> : null}
+					</div>
 
-	componentDidUpdate(prevProps) {
-		if (this.props.filter !== prevProps.filter) {
-			this.resetData()
-		}
-	}
-
-	render() {
-		const { props, state } = this
-
-		let children = props.children
-		if (props.filter) {
-			children = children
-				.filter(item => {
-					if (item.props.children.toLowerCase().includes(state.query)) return item
-					else return null
-				})
-				.sort((a, b) => {
-					const { query } = state
-
-					let valA = a.props.children.toLowerCase()
-					let valB = b.props.children.toLowerCase()
-
-					if (query.length && config.modal.filter.startsWithOnTop) {
-						if (valA.startsWith(query) && valB.startsWith(query)) return 0
-						else if (valA.startsWith(query)) return -1
-						else if (valB.startsWith(query)) return 1
-					}
-
-					return valA.localeCompare(valB)
-				})
-		}
-
-		return (
-			<>
-				{props.visible && (
-					<div id='modal' className='card'>
-						<div className='card-header text-center'>
-							<h3>{props.title}</h3>
-							{state.query && <h4 className='query bg-warning'>{state.query}</h4>}
-						</div>
-
-						<div className='card-body'>
-							<div className='content'>{children}</div>
-							<div className='actions'>
-								<div className='btn btn-sm btn-secondary' onClick={props.onClose}>
-									Close
-								</div>
+					<div className='card-body'>
+						<div className='content'>{children}</div>
+						<div className='actions'>
+							<div className='btn btn-sm btn-secondary' onClick={props.onClose}>
+								Close
 							</div>
 						</div>
 					</div>
-				)}
+				</div>
+			) : null}
 
-				<KeyboardEventHandler
-					handleKeys={
-						props.filter && config.modal.filter.search
-							? ['alphabetic', 'space', 'backspace', 'esc']
-							: ['esc']
-					}
-					onKeyEvent={(key, e) => this.handleKeyPress(key, e)}
-					handleFocusableElements={true}
-					isDisabled={!props.visible}
-				/>
-			</>
-		)
-	}
+			<KeyboardEventHandler
+				handleKeys={
+					props.filter && config.modal.filter.search ? ['alphabetic', 'space', 'backspace', 'esc'] : ['esc']
+				}
+				onKeyEvent={(key, e) => handleKeyPress(key, e)}
+				handleFocusableElements={true}
+				isDisabled={!props.visible}
+			/>
+		</>,
+		document.getElementById('portal')
+	)
 }
 
 export default Modal

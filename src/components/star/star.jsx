@@ -3,7 +3,7 @@ import { Component, Fragment, useState, useRef } from 'react'
 import Axios from 'axios'
 import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu'
 
-import Modal, { handleModal } from '../modal/modal'
+import Modal from '../modal/modal'
 
 import './star.scss'
 

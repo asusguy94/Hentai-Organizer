@@ -12,6 +12,7 @@ import Autosizeinput from 'react-input-autosize'
 import Modal, { handleModal } from '../modal/modal'
 import Overlay, { handleOverlay } from '../overlay/overlay'
 import Ribbon from '../ribbon/ribbon'
+import { setFocus } from '../../hooks'
 
 import './video.scss'
 

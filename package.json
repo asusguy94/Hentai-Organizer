@@ -1,6 +1,6 @@
 {
 	"name": "hentaijs",
-	"version": "0.2.0",
+	"version": "0.2.1",
 	"license": "MIT",
 	"dependencies": {
 		"axios": "^0.21.1",
@@ -15,10 +15,15 @@
 		"react-keyboard-event-handler": "^1.5.4",
 		"react-lazy-load-image-component": "^1.5.1",
 		"react-router-dom": "^5.2.0",
-		"react-scripts": "4.0.2",
+		"react-scripts": "4.0.3",
 		"react-scroll-to-top": "^1.0.5",
-		"react-tooltip": "^4.2.13",
-		"react-transition-group": "^4.4.1"
+		"react-tooltip": "^4.2.15",
+		"web-vitals": "^1.0.1"
+	},
+	"devDependencies": {
+		"@testing-library/jest-dom": "^5.11.4",
+		"@testing-library/react": "^11.1.0",
+		"@testing-library/user-event": "^12.1.10"
 	},
 	"scripts": {
 		"start": "npx cross-env BROWSER=none PORT=3002 react-scripts start",
@@ -27,7 +32,10 @@
 		"server": "serve -l 5002 -s build"
 	},
 	"eslintConfig": {
-		"extends": "react-app"
+		"extends": [
+			"react-app",
+			"react-app/jest"
+		]
 	},
 	"browserslist": {
 		"production": [

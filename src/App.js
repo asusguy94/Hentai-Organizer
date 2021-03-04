@@ -18,31 +18,29 @@ import ErrorPage from './components/404/404'
 /* Style */
 import './components/styles/main.scss'
 
-const App = () => {
-	return (
-		<Router>
-			<NavBar />
+const App = () => (
+	<Router>
+		<NavBar />
 
-			<main className='container-fluid'>
-				<div className='row'>
-					<Switch>
-						<Route path='/video/search' component={VideoSearchPage} />
-						<Route path='/video/add' component={AddVideoPage} />
-						<Route path='/video/:id' component={VideoPage} />
-						<Route path='/video' component={VideosPage} />
+		<main className='container-fluid'>
+			<div className='row'>
+				<Switch>
+					<Route path='/video/search' component={VideoSearchPage} />
+					<Route path='/video/add' component={AddVideoPage} />
+					<Route path='/video/:id' component={VideoPage} />
+					<Route path='/video' component={VideosPage} />
 
-						<Route path='/star/search' component={StarSearchPage} />
-						<Route path='/star/:id' component={StarPage} />
+					<Route path='/star/search' component={StarSearchPage} />
+					<Route path='/star/:id' component={StarPage} />
 
-						<Route path='/editor' component={EditorPage} />
+					<Route path='/editor' component={EditorPage} />
 
-						<Route path='/' exact component={HomePage} />
-						<Route path='*' component={ErrorPage} />
-					</Switch>
-				</div>
-			</main>
-		</Router>
-	)
-}
+					<Route path='/' exact component={HomePage} />
+					<Route path='*' component={ErrorPage} />
+				</Switch>
+			</div>
+		</main>
+	</Router>
+)
 
 export default App

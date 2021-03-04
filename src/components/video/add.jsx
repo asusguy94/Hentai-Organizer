@@ -69,8 +69,6 @@ const CustomInput = ({ label, item }) => {
 	const lowerLabel = label.toLowerCase()
 	const data = item[lowerLabel]
 
-	const [length, setLength] = useState(data.length)
-
 	return (
 		<div className='form-group'>
 			<label htmlFor={lowerLabel}>{label}: </label>
@@ -78,7 +76,7 @@ const CustomInput = ({ label, item }) => {
 				id={lowerLabel}
 				className='form-control'
 				defaultValue={data}
-				style={{ width: `${length < 4 ? 4 : length}ch` }}
+				style={{ width: `${data.length < 4 ? 4 : data.length}ch` }}
 			/>
 		</div>
 	)

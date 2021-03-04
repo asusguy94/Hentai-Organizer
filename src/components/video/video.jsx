@@ -1,4 +1,4 @@
-import { Component, Fragment, forwardRef, useEffect, useState, useRef, useContext, createContext } from 'react'
+import { Component, Fragment, useEffect, useState, useRef, useContext, createContext } from 'react'
 import { Link } from 'react-router-dom'
 
 import Axios from 'axios'
@@ -523,7 +523,7 @@ const VideoPlayer = ({ video, bookmarks, categories, stars, playVideo, updateBoo
 const Timeline = ({ video, bookmarks, stars, attributes, categories, playVideo, setTime, update }) => {
 	const handleModal = useContext(ModalContext)
 
-	let bookmarksArr = []
+	const bookmarksArr = []
 
 	const isActive = bookmark => Boolean(bookmark.active)
 	const hasStar = bookmark => Boolean(bookmark.starID)

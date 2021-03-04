@@ -127,6 +127,8 @@ const StarForm = ({ star, starData, update }) => {
 		Axios.put(`${config.api}/star/${star.id}/attribute`, { name, delete: true }).then(() => {
 			star.info.attribute = star.info.attribute.filter(attribute => {
 				if (attribute.toLowerCase() === name.toLowerCase()) return null
+
+				return attribute
 			})
 
 			update(star)

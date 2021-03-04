@@ -85,17 +85,15 @@ class StarSearchPage extends Component {
 }
 
 // Wrapper
-const Sidebar = ({ starData, stars, update }) => {
-	return (
-		<aside className='col-2'>
-			<TitleSearch stars={stars} update={update} />
+const Sidebar = ({ starData, stars, update }) => (
+	<aside className='col-2'>
+		<TitleSearch stars={stars} update={update} />
 
-			<Sort stars={stars} update={update} />
+		<Sort stars={stars} update={update} />
 
-			<Filter stars={stars} update={update} starData={starData} />
-		</aside>
-	)
-}
+		<Filter stars={stars} update={update} starData={starData} />
+	</aside>
+)
 
 const Stars = ({ stars }) => (
 	<section id='stars' className='col-10'>
@@ -299,48 +297,46 @@ const TitleSearch = ({ stars, update }) => {
 }
 
 // ContainerItem
-const FilterItem = ({ data, label, obj, callback, globalCallback = null, nullCallback = null }) => {
-	return (
-		<>
-			<h2>{capitalize(label, true)}</h2>
+const FilterItem = ({ data, label, obj, callback, globalCallback = null, nullCallback = null }) => (
+	<>
+		<h2>{capitalize(label, true)}</h2>
 
-			<div id={label}>
-				{globalCallback !== null ? (
-					<div className='input-wrapper'>
-						<input
-							type='radio'
-							name={label}
-							id={`${label}_ALL`}
-							onChange={() => globalCallback()}
-							defaultChecked
-						/>
-						<label className='global-category' htmlFor={`${label}_ALL`}>
-							ALL
-						</label>
-					</div>
-				) : null}
+		<div id={label}>
+			{globalCallback !== null ? (
+				<div className='input-wrapper'>
+					<input
+						type='radio'
+						name={label}
+						id={`${label}_ALL`}
+						onChange={() => globalCallback()}
+						defaultChecked
+					/>
+					<label className='global-category' htmlFor={`${label}_ALL`}>
+						ALL
+					</label>
+				</div>
+			) : null}
 
-				{nullCallback !== null ? (
-					<div className='input-wrapper'>
-						<input type='radio' name={label} id={`${label}_NULL`} onChange={e => nullCallback(e)} />
-						<label className='global-category' htmlFor={`${label}_NULL`}>
-							NULL
-						</label>
-					</div>
-				) : null}
+			{nullCallback !== null ? (
+				<div className='input-wrapper'>
+					<input type='radio' name={label} id={`${label}_NULL`} onChange={e => nullCallback(e)} />
+					<label className='global-category' htmlFor={`${label}_NULL`}>
+						NULL
+					</label>
+				</div>
+			) : null}
 
-				{data.map(item => (
-					<div className='input-wrapper' key={item}>
-						<input type='radio' name={label} id={`${label}-${item}`} onChange={() => callback(item)} />
-						<label htmlFor={`${label}-${item}`}>
-							{item} <LabelCount prop={label} label={item} obj={obj} isArr={true} />
-						</label>
-					</div>
-				))}
-			</div>
-		</>
-	)
-}
+			{data.map(item => (
+				<div className='input-wrapper' key={item}>
+					<input type='radio' name={label} id={`${label}-${item}`} onChange={() => callback(item)} />
+					<label htmlFor={`${label}-${item}`}>
+						{item} <LabelCount prop={label} label={item} obj={obj} isArr={true} />
+					</label>
+				</div>
+			))}
+		</div>
+	</>
+)
 
 const FilterObj = ({ data, label, labelPlural, obj, callback, nullCallback = null }) => {
 	const indeterminate = new Indeterminate()
@@ -388,13 +384,11 @@ const FilterObj = ({ data, label, labelPlural, obj, callback, nullCallback = nul
 	)
 }
 
-const SortItem = ({ callback, label, name, checked = false, disabled = false }) => {
-	return (
-		<div className={`input-wrapper ${disabled ? 'disabled' : ''}`}>
-			<input type='radio' name='sort' id={label} onChange={callback} defaultChecked={checked} />
-			<label htmlFor={label}>{name}</label>
-		</div>
-	)
-}
+const SortItem = ({ callback, label, name, checked = false, disabled = false }) => (
+	<div className={`input-wrapper ${disabled ? 'disabled' : ''}`}>
+		<input type='radio' name='sort' id={label} onChange={callback} defaultChecked={checked} />
+		<label htmlFor={label}>{name}</label>
+	</div>
+)
 
 export default StarSearchPage

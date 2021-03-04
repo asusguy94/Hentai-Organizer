@@ -51,6 +51,8 @@
 			@include bookmarkPosition();
 
 			[id^='bookmark-info-'] {
+				opacity: 1;
+
 				.btn {
 					display: block;
 					margin-top: 3px;

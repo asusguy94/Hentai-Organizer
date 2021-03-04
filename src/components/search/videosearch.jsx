@@ -66,48 +66,48 @@ class VideoSearchPage extends Component {
 
 // Wrapper
 const Videos = ({ videos }) => (
-		<section id='videos' className='col-10'>
+	<section id='videos' className='col-10'>
+		{videos.length ? (
+			<h2 className='text-center'>
+				<span className='count'>{getCount(videos)}</span> Videos
+			</h2>
+		) : null}
+
+		<div className='row justify-content-center'>
 			{videos.length ? (
-				<h2 className='text-center'>
-					<span className='count'>{getCount(videos)}</span> Videos
-				</h2>
-			) : null}
+				videos.map(video => (
+					<a
+						key={video.id}
+						className={`video ribbon-container card ${isHidden(video) ? 'd-none' : ''}`}
+						href={`/video/${video.id}`}
+					>
+						<img
+							className='card-img-top'
+							src={`${config.source}/images/videos/${video.id}-290.jpg`}
+							alt='video'
+						/>
 
-			<div className='row justify-content-center'>
-				{videos.length ? (
-					videos.map(video => (
-						<a
-							key={video.id}
-							className={`video ribbon-container card ${isHidden(video) ? 'd-none' : ''}`}
-							href={`/video/${video.id}`}
-						>
-							<img
-								className='card-img-top'
-								src={`${config.source}/images/videos/${video.id}-290.jpg`}
-								alt='video'
-							/>
+						<span className='title card-title text-center'>{video.name}</span>
 
-							<span className='title card-title text-center'>{video.name}</span>
-
-							<Ribbon label={video.quality} />
-						</a>
-					))
-				) : (
-					<Loader />
-				)}
-			</div>
-		</section>
-	)
+						<Ribbon label={video.quality} />
+					</a>
+				))
+			) : (
+				<Loader />
+			)}
+		</div>
+	</section>
+)
 
 const Sidebar = ({ videos, update, videoData }) => (
-		<aside className='col-2'>
-			<TitleSearch videos={videos} update={update} />
+	<aside className='col-2'>
+		<TitleSearch videos={videos} update={update} />
 
-			<Sort videos={videos} update={update} />
+		<Sort videos={videos} update={update} />
 
-			<Filter videos={videos} update={update} videoData={videoData} />
-		</aside>
-	)
+		<Filter videos={videos} update={update} videoData={videoData} />
+	</aside>
+)
 
 // Container
 const TitleSearch = ({ update, videos }) => {
@@ -121,7 +121,7 @@ const TitleSearch = ({ update, videos }) => {
 		})
 
 		update(videos)
-}
+	}
 
 	return (
 		<div className='input-wrapper'>
@@ -290,13 +290,12 @@ const Filter = ({ videoData, videos, update }) => {
 }
 
 // ContainerItem
-
 const SortItem = ({ callback, label, name, checked = false, disabled = false }) => (
-		<div className={`input-wrapper ${disabled ? 'disabled' : ''}`}>
-			<input type='radio' name='sort' id={label} onChange={callback} defaultChecked={checked} />
-			<label htmlFor={label}>{name}</label>
-		</div>
-	)
+	<div className={`input-wrapper ${disabled ? 'disabled' : ''}`}>
+		<input type='radio' name='sort' id={label} onChange={callback} defaultChecked={checked} />
+		<label htmlFor={label}>{name}</label>
+	</div>
+)
 
 const FilterObj = ({ data, label, labelPlural, obj, callback, nullCallback = null }) => {
 	const indeterminate = new Indeterminate()

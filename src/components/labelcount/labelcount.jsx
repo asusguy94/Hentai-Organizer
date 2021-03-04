@@ -2,17 +2,13 @@ import { isHidden } from '../search/helper'
 
 const LabelCount = ({ obj, isArr = false, label, prop }) => {
 	const getPropCount = (prop, label, visibleOnly = false) => {
-		const arr = obj.filter(item => {
-			return item[prop].includes(label) && !(isHidden(item) && visibleOnly)
-		})
+		const arr = obj.filter(item => item[prop].includes(label) && !(isHidden(item) && visibleOnly))
 
 		return arr.length
 	}
 
 	const getArrCount = (prop, label, visibleOnly = false) => {
-		const arr = obj.filter(item => {
-			return item[prop].includes(label) && !(isHidden(item) && visibleOnly)
-		})
+		const arr = obj.filter(item => item[prop].includes(label) && !(isHidden(item) && visibleOnly))
 
 		return arr.length
 	}

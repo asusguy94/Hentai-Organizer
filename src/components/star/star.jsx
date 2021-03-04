@@ -9,13 +9,7 @@ import './star.scss'
 
 import config from '../config.json'
 
-// Wrapper
 class StarPage extends Component {
-	constructor(props) {
-		super(props)
-		this.handleModal = handleModal
-	}
-
 	state = {
 		star: {
 			id: 0,
@@ -39,181 +33,58 @@ class StarPage extends Component {
 		videos: [],
 		modal: {
 			visible: false,
+			title: null,
 			data: null,
 			filter: false
-		},
-		input: {
-			title: ''
 		}
 	}
 
-	handleInput(e, field) {
-		const inputValue = e.target.value
-
-		this.setState(prevState => {
-			const { input } = prevState
-			input[field] = inputValue
-
-			return { input }
-		})
-	}
-
-	handleInput_reset(field) {
-		this.setState(prevState => {
-			const { input } = prevState
-			input[field] = ''
-
-			return { input }
-		})
-	}
-
-	handleStar_updateInfo(value, label) {
-		Axios.put(`${config.api}/star/${this.state.star.id}`, { label, value }).then(() => {
-			this.setState(prevState => {
-				const { star } = prevState
-				star.info[label] = value
-
-				return { star }
-			})
-		})
-	}
-
-	handleStar_addAttribute(value) {
-		Axios.put(`${config.api}/star/${this.state.star.id}/attribute`, { name: value }).then(() => {
-			this.setState(prevState => {
-				const { star } = prevState
-				star.info.attribute.push(value)
-
-				return { star }
-			})
-		})
-	}
-
-	//TODO change .put() to .delete()
-	handleStar_removeAttribute(value) {
-		Axios.put(`${config.api}/star/${this.state.star.id}/attribute`, { name: value, delete: true }).then(() => {
-			this.setState(prevState => {
-				const { star } = prevState
-				const { attribute: attributes } = prevState.star.info
-
-				star.info.attribute = attributes.filter(attribute => {
-					if (attribute.toLowerCase() === value.toLowerCase()) return null
-
-					return attribute
-				})
-
-				return { star }
-			})
-		})
-	}
-
-	handleStar_rename() {
-		const starRef = this.state.star
-		const inputRef = this.state.input.title
-
-		Axios.put(`${config.api}/star/${starRef.id}`, { name: inputRef }).then(() => {
-			this.setState(prevState => {
-				const { star } = prevState
-				star.name = inputRef
-
-				return { star }
-			})
-		})
-
-		this.handleInput_reset('title')
-	}
-
-	handleStar_remove() {
-		const { star } = this.state
-
-		Axios.delete(`${config.api}/star/${star.id}`).then(() => {
-			window.location.href = '/star'
-		})
-	}
-
-	handleStar_removeImage() {
-		Axios.delete(`${config.source}/star/${this.state.star.id}/image`).then(() => {
-			this.setState(prevState => {
-				const { star } = prevState
-				star.image = null
-
-				return { star }
-			})
-		})
-	}
-
-	handleStar_addImage(image) {
-		Axios.post(`${config.source}/star/${this.state.star.id}/image`, { url: image }).then(() => {
-			this.setState(prevState => {
-				let star = prevState.star
-				star.image = `${this.state.star.id}.jpg?${Date.now()}`
-
-				return { star }
-			})
-		})
-	}
-
 	render() {
+		const modal = (title = null, data = null, filter = false) => {
+			if (title !== null && data !== null && this.state.modal.visible) modal()
+
+			this.setState(({ modal }) => {
+				modal.title = title
+				modal.data = data
+				modal.visible = !modal.visible
+				modal.filter = filter
+
+				return { modal }
+			})
+		}
+
+		// middleware to use modal functions
+		const handleModal = (title, data, filter) => modal(title, data, filter)
+
 		return (
 			<div id='star-page' className='col-12 row'>
 				<section className='col-7'>
 					{this.state.star.id !== 0 ? (
 						<div id='star'>
-							<StarImageDropbox
+							<StarImageDropbox star={this.state.star} update={star => this.setState({ star })} />
+
+							<StarTitle
 								star={this.state.star}
-								removeStar={() => this.handleStar_remove()}
-								removeImage={() => this.handleStar_removeImage()}
-								addImage={image => this.handleStar_addImage(image)}
+								handleModal={handleModal}
+								update={star => this.setState({ star })}
 							/>
 
-							<ContextMenuTrigger id='title'>
-								<h2>{this.state.star.name}</h2>
-							</ContextMenuTrigger>
-
-							<ContextMenu id='title'>
-								<MenuItem
-									onClick={() => {
-										this.handleModal(
-											'Rename',
-											<input
-												type='text'
-												defaultValue={this.state.star.name}
-												onChange={e => this.handleInput(e, 'title')}
-												ref={inp => inp && inp.focus()}
-												onKeyDown={e => {
-													if (e.key === 'Enter') {
-														e.preventDefault()
-
-														this.handleModal()
-														this.handleStar_rename()
-													}
-												}}
-											/>
-										)
-									}}
-								>
-									<i className={`${config.theme.fa} fa-edit`} /> Rename
-								</MenuItem>
-							</ContextMenu>
-
 							<StarForm
-								update={(label, value) => this.handleStar_updateInfo(label, value)}
-								addAttribute={value => this.handleStar_addAttribute(value)}
-								removeAttribute={value => this.handleStar_removeAttribute(value)}
-								data={this.state.star.info}
+								star={this.state.star}
 								starData={this.state.starData}
+								update={star => this.setState({ star })}
 							/>
 						</div>
 					) : null}
 
-					{this.state.videos.length && <StarVideos videos={this.state.videos} />}
+					{this.state.videos.length ? <StarVideos videos={this.state.videos} /> : null}
 				</section>
 
 				<Modal
 					visible={this.state.modal.visible}
 					title={this.state.modal.title}
 					filter={this.state.modal.filter}
-					onClose={() => this.handleModal()}
+					onClose={() => handleModal()}
 				>
 					{this.state.modal.data}
 				</Modal>
@@ -222,33 +93,15 @@ class StarPage extends Component {
 	}
 
 	componentDidMount() {
-		this.getData()
-	}
-
-	getData() {
 		const { id } = this.props.match.params
 
-		Axios.get(`${config.api}/star/${id}`).then(({ data: star }) => {
-			this.setState(() => {
-				return { star }
-			})
-		})
-
-		Axios.get(`${config.api}/star/${id}/video`).then(({ data: videos }) => {
-			this.setState(() => {
-				return { videos }
-			})
-		})
-
-		Axios.get(`${config.api}/star`).then(({ data: starData }) => {
-			this.setState(() => {
-				return { starData }
-			})
-		})
+		Axios.get(`${config.api}/star/${id}`).then(({ data: star }) => this.setState({ star }))
+		Axios.get(`${config.api}/star/${id}/video`).then(({ data: videos }) => this.setState({ videos }))
+		Axios.get(`${config.api}/star`).then(({ data: starData }) => this.setState({ starData }))
 	}
 }
 
-// Container
+// Wrapper
 const StarVideos = ({ videos }) => (
 	<>
 		<h3>Videos</h3>
@@ -261,26 +114,76 @@ const StarVideos = ({ videos }) => (
 	</>
 )
 
-const StarForm = ({ update, addAttribute, removeAttribute, data, starData }) => (
-	<>
-		<StarInputForm update={update} name='Breast' value={data.breast} list={starData.breast} />
-		<StarInputForm update={update} name='EyeColor' value={data.eyecolor} list={starData.eyecolor} />
-		<StarInputForm update={update} name='HairColor' value={data.haircolor} list={starData.haircolor} />
-		<StarInputForm update={update} name='HairStyle' value={data.hairstyle} list={starData.hairstyle} />
-		<StarInputForm
-			update={addAttribute}
-			name='Attribute'
-			emptyByDefault
-			value={data.attribute}
-			list={starData.attribute}
-		>
-			<StarAttributes data={data.attribute} remove={removeAttribute} />
-		</StarInputForm>
-	</>
-)
+const StarForm = ({ star, starData, update }) => {
+	const addAttribute = name => {
+		Axios.put(`${config.api}/star/${star.id}/attribute`, { name }).then(() => {
+			star.info.attribute.push(name)
 
-const StarImageDropbox = ({ removeStar, removeImage, addImage, star }) => {
+			update(star)
+		})
+	}
+
+	const removeAttribute = name => {
+		Axios.put(`${config.api}/star/${star.id}/attribute`, { name, delete: true }).then(() => {
+			star.info.attribute = star.info.attribute.filter(attribute => {
+				if (attribute.toLowerCase() === name.toLowerCase()) return null
+			})
+
+			update(star)
+		})
+	}
+
+	const updateInfo = (value, label) => {
+		Axios.put(`${config.api}/star/${star.id}`, { label, value }).then(() => {
+			star.info[label] = value
+
+			update(star)
+		})
+	}
+
+	return (
+		<>
+			<StarInputForm update={updateInfo} name='Breast' value={star.info.breast} list={starData.breast} />
+			<StarInputForm update={updateInfo} name='EyeColor' value={star.info.eyecolor} list={starData.eyecolor} />
+			<StarInputForm update={updateInfo} name='HairColor' value={star.info.haircolor} list={starData.haircolor} />
+			<StarInputForm update={updateInfo} name='HairStyle' value={star.info.hairstyle} list={starData.hairstyle} />
+			<StarInputForm
+				update={addAttribute}
+				name='Attribute'
+				emptyByDefault
+				value={star.info.attribute}
+				list={starData.attribute}
+			>
+				<StarAttributes data={star.info.attribute} remove={removeAttribute} />
+			</StarInputForm>
+		</>
+	)
+}
+
+const StarImageDropbox = ({ star, update }) => {
 	const [hover, setHover] = useState(false)
+
+	const addImage = image => {
+		Axios.post(`${config.source}/star/${star.id}/image`, { url: image }).then(() => {
+			star.image = `${star.id}.jpg?${Date.now()}`
+
+			update(star)
+		})
+	}
+
+	const removeImage = () => {
+		Axios.delete(`${config.source}/star/${star.id}/image`).then(() => {
+			star.image = null
+
+			update(star)
+		})
+	}
+
+	const removeStar = () => {
+		Axios.delete(`${config.api}/star/${star.id}`).then(() => {
+			window.location.href = '/star'
+		})
+	}
 
 	const handleDefault = e => {
 		e.stopPropagation()
@@ -345,7 +248,7 @@ const StarImageDropbox = ({ removeStar, removeImage, addImage, star }) => {
 	}
 }
 
-// ContainerItem
+// Container
 const StarVideo = ({ video }) => {
 	const [src, setSrc] = useState('')
 	const [dataSrc, setDataSrc] = useState(`${config.source}/videos/${video.fname}`)
@@ -499,6 +402,49 @@ const StarAttributes = ({ remove, data }) => {
 			</ContextMenu>
 		</Fragment>
 	))
+}
+
+const StarTitle = ({ star, handleModal, update }) => {
+	const renameStar = name => {
+		Axios.put(`${config.api}/star/${star.id}`, { name }).then(() => {
+			star.name = name
+
+			update(star)
+		})
+	}
+
+	return (
+		<>
+			<ContextMenuTrigger id='title'>
+				<h2>{star.name}</h2>
+			</ContextMenuTrigger>
+
+			<ContextMenu id='title'>
+				<MenuItem
+					onClick={() => {
+						handleModal(
+							'Rename',
+							<input
+								type='text'
+								defaultValue={star.name}
+								ref={input => input && input.focus()}
+								onKeyDown={e => {
+									if (e.key === 'Enter') {
+										e.preventDefault()
+
+										handleModal()
+										renameStar(e.target.value)
+									}
+								}}
+							/>
+						)
+					}}
+				>
+					<i className={`${config.theme.fa} fa-edit`} /> Rename
+				</MenuItem>
+			</ContextMenu>
+		</>
+	)
 }
 
 export default StarPage

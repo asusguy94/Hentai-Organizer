@@ -39,23 +39,20 @@ class StarPage extends Component {
 		}
 	}
 
+	handleModal(title = null, data = null, filter = false) {
+		if (title !== null && data !== null && this.state.modal.visible) this.handleModal()
+
+		this.setState(({ modal }) => {
+			modal.title = title
+			modal.data = data
+			modal.visible = !modal.visible
+			modal.filter = filter
+
+			return { modal }
+		})
+	}
+
 	render() {
-		const modal = (title = null, data = null, filter = false) => {
-			if (title !== null && data !== null && this.state.modal.visible) modal()
-
-			this.setState(({ modal }) => {
-				modal.title = title
-				modal.data = data
-				modal.visible = !modal.visible
-				modal.filter = filter
-
-				return { modal }
-			})
-		}
-
-		// middleware to use modal functions
-		const handleModal = (title, data, filter) => modal(title, data, filter)
-
 		return (
 			<div id='star-page' className='col-12 row'>
 				<section className='col-7'>
@@ -65,7 +62,7 @@ class StarPage extends Component {
 
 							<StarTitle
 								star={this.state.star}
-								handleModal={handleModal}
+								handleModal={(title, data, filter) => this.handleModal(title, data, filter)}
 								update={star => this.setState({ star })}
 							/>
 
@@ -84,7 +81,7 @@ class StarPage extends Component {
 					visible={this.state.modal.visible}
 					title={this.state.modal.title}
 					filter={this.state.modal.filter}
-					onClose={() => handleModal()}
+					onClose={() => this.handleModal()}
 				>
 					{this.state.modal.data}
 				</Modal>

@@ -49,6 +49,7 @@ class VideoPage extends Component {
 		attributes: [],
 		modal: {
 			visible: false,
+			title: null,
 			data: null,
 			filter: false
 		}
@@ -68,23 +69,23 @@ class VideoPage extends Component {
 		}
 	}
 
+	handleModal(title = null, data = null, filter = false) {
+		if (title !== null && data !== null && this.state.modal.visible) this.handleModal()
+
+		this.setState(({ modal }) => {
+			modal.title = title
+			modal.data = data
+			modal.visible = !modal.visible
+			modal.filter = filter
+
+			return { modal }
+		})
+	}
+
 	render() {
-		const modal = (title = null, data = null, filter = false) => {
-			if (title !== null && data !== null && this.state.modal.visible) modal()
-
-			this.setState(({ modal }) => {
-				modal.title = title
-				modal.data = data
-				modal.visible = !modal.visible
-				modal.filter = filter
-
-				return { modal }
-			})
-		}
-
 		return (
 			<div id='video-page' className='col-12 row'>
-				<ModalContext.Provider value={modal}>
+				<ModalContext.Provider value={(title, data, filter) => this.handleModal(title, data, filter)}>
 					<UpdateContext.Provider
 						value={{
 							bookmarks: bookmarks => this.setState({ bookmarks }),
@@ -114,7 +115,7 @@ class VideoPage extends Component {
 							visible={this.state.modal.visible}
 							title={this.state.modal.title}
 							filter={this.state.modal.filter}
-							onClose={() => modal()}
+							onClose={() => this.handleModal()}
 						>
 							{this.state.modal.data}
 						</Modal>

@@ -789,7 +789,7 @@ const Timeline = ({ video, bookmarks, stars, attributes, categories, playVideo, 
 									disabled={bookmark.attributes.length === 0}
 									onClick={() => clearAttributes(bookmark)}
 								>
-									<i className={`${config.theme.fa} fa-trash-alt`} /> Remove Attributes
+									<i className={`${config.theme.fa} fa-trash-alt`} /> Clear Attributes
 								</MenuItem>
 
 								<MenuItem

@@ -947,8 +947,8 @@ const Stars = ({ video, stars, bookmarks, attributes, categories, clearActive, u
 				</MenuItem>
 
 				<MenuItem
+					disabled={!bookmarks.some(bookmark => bookmark.starID === star.id)}
 					onClick={() => {
-						// TODO disabled->if no bookmarks from star
 						handleModal(
 							'Add Attribute',
 							attributes.map(attribute => (

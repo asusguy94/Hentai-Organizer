@@ -242,8 +242,10 @@ const Sidebar = ({ video, stars, bookmarks, attributes, categories, updateBookma
 
 // Container
 const VideoPlayer = ({ video, bookmarks, categories, stars, updateBookmarks, playerRef }) => {
-	const [newVideo, setNewVideo] = useState(false)
-	const [loaded, setLoaded] = useState(null)
+	const [newVideo, setNewVideo] = useState(null)
+	let playAdded = false
+
+	const [loaded, setLoaded] = useState(false)
 
 	const handleModal = useContext(ModalContext)
 	const update = useContext(UpdateContext).video
@@ -251,30 +253,38 @@ const VideoPlayer = ({ video, bookmarks, categories, stars, updateBookmarks, pla
 	const player = playerRef.current?.player
 
 	useEffect(() => {
-		if (loaded === null && playerRef.current !== undefined) {
+		if (!loaded && playerRef.current !== undefined) {
 			// force reload to reset .player-property
-			setLoaded(false)
-		} else if (loaded === false) {
+			setLoaded(true)
+		} else if (loaded) {
+			if (Number(localStorage.video) === video.id) {
+				setNewVideo(false)
+			} else {
+				setNewVideo(true)
+			}
+		}
+	})
+
+	useEffect(() => {
+		if (newVideo !== null) {
 			player.on('timeupdate', () => {
 				if (player.currentTime) localStorage.bookmark = Math.round(player.currentTime)
 			})
 
 			player.on('play', () => {
-				if (newVideo) {
+				if (newVideo && !playAdded) {
 					Axios.put(`${config.api}/video/${video.id}`, { plays: 1 }).then(() => {
 						console.log('Play Added')
-					})
 
-					setNewVideo(false)
+						playAdded = true
+					})
 				}
 			})
-
-			setLoaded(true)
 		}
-	})
+	}, [newVideo])
 
 	useEffect(() => {
-		if (loaded) {
+		if (newVideo !== null) {
 			if (Hls.isSupported() && config.hls.enabled) {
 				const hls = new Hls({ autoStartLoad: false })
 				hls.loadSource(`${config.source}/videos/${video.path.stream}`)
@@ -299,23 +309,19 @@ const VideoPlayer = ({ video, bookmarks, categories, stars, updateBookmarks, pla
 					hls.startLevel = desiredStartLevel
 					hls.autoLevelCapping = maxLevel
 
-					if (Number(localStorage.video) === video.id) {
+					if (!newVideo) {
 						hls.startLoad(Number(localStorage.bookmark))
-
-						setNewVideo(true)
 					} else {
 						localStorage.video = video.id
 						localStorage.bookmark = 0
 
 						hls.startLoad()
 						player.pause()
-
-						setNewVideo(false)
 					}
 				})
 			}
 		}
-	}, [loaded])
+	}, [newVideo])
 
 	const handleWheel = e => (player.currentTime += 10 * Math.sign(e.deltaY) * -1)
 	const copy = async () => await navigator.clipboard.writeText(video.path.file)

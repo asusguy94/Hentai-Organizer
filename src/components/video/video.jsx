@@ -243,8 +243,6 @@ const Sidebar = ({ video, stars, bookmarks, attributes, categories, updateBookma
 // Container
 const VideoPlayer = ({ video, bookmarks, categories, stars, updateBookmarks, playerRef }) => {
 	const [newVideo, setNewVideo] = useState(null)
-	let playAdded = false
-
 	const [loaded, setLoaded] = useState(false)
 
 	const handleModal = useContext(ModalContext)
@@ -253,10 +251,12 @@ const VideoPlayer = ({ video, bookmarks, categories, stars, updateBookmarks, pla
 	const player = playerRef.current?.player
 
 	useEffect(() => {
-		if (!loaded && playerRef.current !== undefined) {
+		if (!loaded) {
+			if (playerRef.current !== undefined) {
 			// force reload to reset .player-property
 			setLoaded(true)
-		} else if (loaded && newVideo === null) {
+			}
+		} else {
 			if (Number(localStorage.video) === video.id) {
 				setNewVideo(false)
 			} else {
@@ -267,19 +267,21 @@ const VideoPlayer = ({ video, bookmarks, categories, stars, updateBookmarks, pla
 
 	useEffect(() => {
 		if (newVideo !== null) {
+			const handler = () => {
+				if (newVideo) {
+					Axios.put(`${config.api}/video/${video.id}`, { plays: 1 }).then(() => {
+						console.log('Play Added')
+
+						player.off('play', handler)
+					})
+				}
+			}
+
 			player.on('timeupdate', () => {
 				if (player.currentTime) localStorage.bookmark = Math.round(player.currentTime)
 			})
 
-			player.on('play', () => {
-				if (newVideo && !playAdded) {
-					Axios.put(`${config.api}/video/${video.id}`, { plays: 1 }).then(() => {
-						console.log('Play Added')
-
-						playAdded = true
-					})
-				}
-			})
+			player.on('play', handler)
 		}
 	}, [newVideo])
 

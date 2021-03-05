@@ -14,6 +14,8 @@
 | ------------------ | ------------------------------------------------------------------------ |
 | VideoFileRename    | Solution breaks the VideoPlayer, so reloading is still the best solution |
 | FranchiseVideoLink | Should use native link-tag instead of browser link-tag                   |
+| ImportVideos       | Changes are not sent to the server, always uses the parsed data          |
+| StarVideosHover    | Throws an error when hovering, still works though                        |
 
 ## :heavy_check_mark: Home Page
 
@@ -25,6 +27,12 @@
 | Random Videos  | :heavy_check_mark: |
 
 ## :x: Add Videos
+
+| Name                | Status                                        |  Priority  |
+| ------------------- | --------------------------------------------- | :--------: |
+| Import Videos       | :heavy_check_mark: [Info](#issue-explanation) | FUNCTIONAL |
+| Generate Thumbnails | :heavy_check_mark:                            |            |
+| Generate WebVTT     | :x:                                           |    LOW     |
 
 ## :x: Video Search
 
@@ -44,12 +52,11 @@
 | Star _TOGGLE_        | :x:                |   HIGH   |
 | Quality _TOGGLE_     | :x:                |   HIGH   |
 | Title Search _INPUT_ | :heavy_check_mark: |          |
-| Existing _TOGGLE_    | :x:                |   LOW    |
 | Sort                 | :heavy_check_mark: |          |
 | Category _CHECKBOX_  | :heavy_check_mark: |          |
 | Attribute _CHECKBOX_ | :heavy_check_mark: |          |
 
-## :x: Star Search
+## :heavy_check_mark: Star Search
 
 ### :heavy_check_mark: Main Section
 
@@ -58,22 +65,15 @@
 | Star         | :heavy_check_mark: |
 | Star Counter | :heavy_check_mark: |
 
-### :x: Sidebar
+### :heavy_check_mark: Sidebar
 
-| Name                  | Status             | Priority |
-| --------------------- | ------------------ | :------: |
-| Star Search _INPUT_   | :heavy_check_mark: |          |
-| Breast _RADIO_        | :heavy_check_mark: |          |
-| Eyecolor _RADIO_      | :x:                |   LOW    |
-| Haircolor _RADIO_     | :heavy_check_mark: |          |
-| Hairstyle _RADIO_     | :x:                |   HIGH   |
-| Attributes _CHECKBOX_ | :heavy_check_mark: |          |
-
-## :x: Stars
-
-## :x:Generate Thumbnails
-
-## :x:Generate WebVTT
+| Name                  | Status             |
+| --------------------- | ------------------ |
+| Star Search _INPUT_   | :heavy_check_mark: |
+| Breast _RADIO_        | :heavy_check_mark: |
+| Haircolor _RADIO_     | :heavy_check_mark: |
+| Hairstyle _RADIO_     | :heavy_check_mark: |
+| Attributes _CHECKBOX_ | :heavy_check_mark: |
 
 ## :x: Video Page
 
@@ -87,31 +87,31 @@
 | Edit Date        | :heavy_check_mark: |
 | Next ID          | :heavy_check_mark: |
 
-### :x: Video
+### :heavy_check_mark: Video
 
-| Name             | Status                                        |  Priority  |
-| ---------------- | --------------------------------------------- | :--------: |
-| Add Bookmark     | :heavy_check_mark:                            |            |
-| UnCensor/Censor  | :heavy_check_mark:                            |            |
-| Remove Plays     | :heavy_check_mark:                            |            |
-| Rename File      | :heavy_check_mark: [Info](#issue-explanation) | FUNCTIONAL |
-| Copy Filename    | :heavy_check_mark:                            |            |
-| Update Video     | :x: replace existing data in database         |    HIGH    |
-| Update Bookmarks | :x: offset bookmarks by 6 seconds             |    HIGH    |
-| Delete Video     | :heavy_check_mark:                            |            |
+| Name            | Status                                        |  Priority  |
+| --------------- | --------------------------------------------- | :--------: |
+| Add Bookmark    | :heavy_check_mark:                            |            |
+| UnCensor/Censor | :heavy_check_mark:                            |            |
+| Remove Plays    | :heavy_check_mark:                            |            |
+| Rename File     | :heavy_check_mark: [Info](#issue-explanation) | FUNCTIONAL |
+| Copy Filename   | :heavy_check_mark:                            |            |
+| Update Video    | :heavy_check_mark:                            |            |
+| Delete Video    | :heavy_check_mark:                            |            |
 
-### :heavy_check_mark: Bookmark
+### :x: Bookmark
 
-| Name              | Status             |
-| ----------------- | ------------------ |
-| Add Star          | :heavy_check_mark: |
-| Remove Star       | :heavy_check_mark: |
-| Add Attribute     | :heavy_check_mark: |
-| Remove Attributes | :heavy_check_mark: |
-| Change Category   | :heavy_check_mark: |
-| Change Time       | :heavy_check_mark: |
-| Delete Bookmark   | :heavy_check_mark: |
-| [Hover]           | :heavy_check_mark: |
+| Name             | Status                 | Priority |
+| ---------------- | ---------------------- | :------: |
+| Add Star         | :heavy_check_mark:     |          |
+| Remove Star      | :heavy_check_mark:     |          |
+| Add Attribute    | :heavy_check_mark:     |          |
+| Remove Attribute | :x: Remove 1 attribute |   HIGH   |
+| Clear Attributes | :heavy_check_mark:     |          |
+| Change Category  | :heavy_check_mark:     |          |
+| Change Time      | :heavy_check_mark:     |          |
+| Delete Bookmark  | :heavy_check_mark:     |          |
+| [Hover]          | :heavy_check_mark:     |          |
 
 ### :heavy_check_mark: Other videos from same franchise
 
@@ -124,12 +124,12 @@
 
 ### :heavy_check_mark: Stars
 
-| Name                 | Status             |
-| -------------------- | ------------------ |
-| Add Bookmark         | :heavy_check_mark: |
-| Add Global Attribute | :heavy_check_mark: |
-| Remove Star          | :heavy_check_mark: |
-| [Hover]              | :heavy_check_mark: |
+| Name          | Status             |
+| ------------- | ------------------ |
+| Add Bookmark  | :heavy_check_mark: |
+| Add Attribute | :heavy_check_mark: |
+| Remove Star   | :heavy_check_mark: |
+| [Hover]       | :heavy_check_mark: |
 
 ## :heavy_check_mark: Form
 
@@ -186,8 +186,8 @@
 
 ### :heavy_check_mark: Video list
 
-| Name            | Status             |
-| --------------- | ------------------ |
-| Video Thumbnail | :heavy_check_mark: |
-| Video Title     | :heavy_check_mark: |
-| [Hover]         | :heavy_check_mark: |
+| Name            | Status                                        |  Priority  |
+| --------------- | --------------------------------------------- | :--------: |
+| Video Thumbnail | :heavy_check_mark:                            |            |
+| Video Title     | :heavy_check_mark:                            |            |
+| [Hover]         | :heavy_check_mark: [Info](#issue-explanation) | FUNCTIONAL |

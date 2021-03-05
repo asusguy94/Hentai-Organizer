@@ -152,8 +152,11 @@ class VideoPage extends Component {
 const Section = ({ video, bookmarks, categories, attributes, stars, updateBookmarks }) => {
 	const playerRef = useRef()
 
+	// Helper script for getting the player
+	const getPlayer = () => playerRef.current.player
+
 	const playVideo = (time = null) => {
-		const { player } = playerRef.current
+		const player = getPlayer()
 
 		if (time === null) time = player.currentTime
 		player.currentTime = Number(time)
@@ -161,8 +164,7 @@ const Section = ({ video, bookmarks, categories, attributes, stars, updateBookma
 	}
 
 	const setTime = bookmarkID => {
-		const { player } = playerRef.current
-		const time = Math.round(player.currentTime)
+		const time = Math.round(getPlayer().currentTime)
 
 		Axios.put(`${config.api}/bookmark/${bookmarkID}`, { time }).then(() => {
 			bookmarks = bookmarks
@@ -187,7 +189,6 @@ const Section = ({ video, bookmarks, categories, attributes, stars, updateBookma
 				bookmarks={bookmarks}
 				categories={categories}
 				stars={stars}
-				playVideo={playVideo}
 				updateBookmarks={updateBookmarks}
 			/>
 
@@ -240,7 +241,7 @@ const Sidebar = ({ video, stars, bookmarks, attributes, categories, updateBookma
 }
 
 // Container
-const VideoPlayer = ({ video, bookmarks, categories, stars, playVideo, updateBookmarks, playerRef }) => {
+const VideoPlayer = ({ video, bookmarks, categories, stars, updateBookmarks, playerRef }) => {
 	const [newVideo, setNewVideo] = useState(false)
 	const [loaded, setLoaded] = useState(null)
 
@@ -254,15 +255,11 @@ const VideoPlayer = ({ video, bookmarks, categories, stars, playVideo, updateBoo
 			// force reload to reset .player-property
 			setLoaded(false)
 		} else if (loaded === false) {
-			if (Number(localStorage.video) !== video.id) localStorage.playing = 0
-
 			player.on('timeupdate', () => {
 				if (player.currentTime) localStorage.bookmark = Math.round(player.currentTime)
 			})
 
 			player.on('play', () => {
-				localStorage.playing = 1
-
 				if (newVideo) {
 					Axios.put(`${config.api}/video/${video.id}`, { plays: 1 }).then(() => {
 						console.log('Play Added')
@@ -271,8 +268,6 @@ const VideoPlayer = ({ video, bookmarks, categories, stars, playVideo, updateBoo
 					setNewVideo(false)
 				}
 			})
-
-			player.on('pause', (localStorage.playing = 0))
 
 			setLoaded(true)
 		}
@@ -306,7 +301,6 @@ const VideoPlayer = ({ video, bookmarks, categories, stars, playVideo, updateBoo
 
 					if (Number(localStorage.video) === video.id) {
 						hls.startLoad(Number(localStorage.bookmark))
-						if (Number(localStorage.playing)) playVideo(localStorage.bookmark)
 
 						setNewVideo(true)
 					} else {

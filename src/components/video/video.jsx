@@ -256,7 +256,7 @@ const VideoPlayer = ({ video, bookmarks, categories, stars, updateBookmarks, pla
 		if (!loaded && playerRef.current !== undefined) {
 			// force reload to reset .player-property
 			setLoaded(true)
-		} else if (loaded) {
+		} else if (loaded && newVideo === null) {
 			if (Number(localStorage.video) === video.id) {
 				setNewVideo(false)
 			} else {

@@ -1,4 +1,4 @@
-import { Component, Fragment, useEffect, useState, useRef, useContext, createContext } from 'react'
+import { Component, Fragment, useEffect, useState, useContext, createContext } from 'react'
 import { Link } from 'react-router-dom'
 
 import Axios from 'axios'
@@ -11,7 +11,7 @@ import Autosizeinput from 'react-input-autosize'
 
 import Modal from '../modal/modal'
 import Ribbon from '../ribbon/ribbon'
-import { setFocus } from '../../hooks'
+import { setFocus, useRefWithEffect } from '../../hooks'
 
 import './video.scss'
 
@@ -150,10 +150,10 @@ class VideoPage extends Component {
 
 // Wrapper
 const Section = ({ video, bookmarks, categories, attributes, stars, updateBookmarks }) => {
-	const playerRef = useRef()
+	const [playerRef, ref] = useRefWithEffect()
 
 	// Helper script for getting the player
-	const getPlayer = () => playerRef.current.player
+	const getPlayer = () => ref.player
 
 	const playVideo = (time = null) => {
 		const player = getPlayer()
@@ -185,6 +185,7 @@ const Section = ({ video, bookmarks, categories, attributes, stars, updateBookma
 
 			<VideoPlayer
 				playerRef={playerRef}
+				playerValue={ref}
 				video={video}
 				bookmarks={bookmarks}
 				categories={categories}
@@ -241,32 +242,30 @@ const Sidebar = ({ video, stars, bookmarks, attributes, categories, updateBookma
 }
 
 // Container
-const VideoPlayer = ({ video, bookmarks, categories, stars, updateBookmarks, playerRef }) => {
-	const [newVideo, setNewVideo] = useState(null)
-	const [loaded, setLoaded] = useState(false)
+const VideoPlayer = ({ video, bookmarks, categories, stars, updateBookmarks, playerRef, playerValue }) => {
+	const [newVideo, setNewVideo] = useState()
+	const [events, setEvents] = useState(false)
 
 	const handleModal = useContext(ModalContext)
 	const update = useContext(UpdateContext).video
 
-	const player = playerRef.current?.player
+	const getPlayer = () => playerValue?.player
 
 	useEffect(() => {
-		if (!loaded) {
-			if (playerRef.current !== undefined) {
-			// force reload to reset .player-property
-			setLoaded(true)
-			}
-		} else {
+		if (playerValue !== undefined) {
 			if (Number(localStorage.video) === video.id) {
 				setNewVideo(false)
 			} else {
 				setNewVideo(true)
 			}
+			setEvents(true)
 		}
-	})
+	}, [playerValue])
 
 	useEffect(() => {
-		if (newVideo !== null) {
+		if (events) {
+			const player = getPlayer()
+
 			if (Number(localStorage.video) !== video.id) localStorage.playing = 0
 
 			player.on('timeupdate', () => {
@@ -283,10 +282,12 @@ const VideoPlayer = ({ video, bookmarks, categories, stars, updateBookmarks, pla
 			})
 			player.on('pause', () => (localStorage.playing = 0))
 		}
-	}, [newVideo])
+	}, [events])
 
 	useEffect(() => {
-		if (newVideo !== null) {
+		if (events) {
+			const player = getPlayer()
+
 			if (Hls.isSupported() && config.hls.enabled) {
 				const hls = new Hls({ autoStartLoad: false })
 				hls.loadSource(`${config.source}/videos/${video.path.stream}`)
@@ -325,9 +326,9 @@ const VideoPlayer = ({ video, bookmarks, categories, stars, updateBookmarks, pla
 				})
 			}
 		}
-	}, [newVideo])
+	}, [events])
 
-	const handleWheel = e => (player.currentTime += 10 * Math.sign(e.deltaY) * -1)
+	const handleWheel = e => (getPlayer().currentTime += 10 * Math.sign(e.deltaY) * -1)
 	const copy = async () => await navigator.clipboard.writeText(video.path.file)
 
 	const resetPlays = () => {
@@ -357,7 +358,7 @@ const VideoPlayer = ({ video, bookmarks, categories, stars, updateBookmarks, pla
 	}
 
 	const addBookmark = category => {
-		const time = Math.round(player.currentTime)
+		const time = Math.round(getPlayer().currentTime)
 		if (time) {
 			Axios.post(`${config.api}/video/${video.id}/bookmark`, {
 				categoryID: category.id,
@@ -384,6 +385,8 @@ const VideoPlayer = ({ video, bookmarks, categories, stars, updateBookmarks, pla
 	const handleKeyPress = (key, e) => {
 		if (e.target.tagName === 'INPUT') return
 		e.preventDefault()
+
+		const player = getPlayer()
 
 		switch (key) {
 			case 'left':

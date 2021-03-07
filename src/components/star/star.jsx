@@ -328,7 +328,7 @@ const StarVideo = ({ video }) => {
 	)
 }
 
-const StarInputForm = ({ value, emptyByDefault, update, name, type, list, children }) => {
+const StarInputForm = ({ value, emptyByDefault = false, update, name, type, list, children }) => {
 	const [inputID, setInputID] = useState('')
 	const [inputValue, setInputValue] = useState(emptyByDefault ? '' : value)
 
@@ -374,7 +374,15 @@ const StarInputForm = ({ value, emptyByDefault, update, name, type, list, childr
 
 			{list ? (
 				<datalist id={`${name.toLowerCase()}s`}>
-					{list.map(item => (
+					{list
+						.filter(listItem => {
+							if (emptyByDefault) {
+								if (value.includes(listItem)) return null
+							}
+
+							return listItem
+						})
+						.map(item => (
 						<option key={item} value={item} />
 					))}
 				</datalist>

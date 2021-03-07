@@ -267,21 +267,21 @@ const VideoPlayer = ({ video, bookmarks, categories, stars, updateBookmarks, pla
 
 	useEffect(() => {
 		if (newVideo !== null) {
-			const handler = () => {
-				if (newVideo) {
-					Axios.put(`${config.api}/video/${video.id}`, { plays: 1 }).then(() => {
-						console.log('Play Added')
-
-						player.off('play', handler)
-					})
-				}
-			}
+			if (Number(localStorage.video) !== video.id) localStorage.playing = 0
 
 			player.on('timeupdate', () => {
 				if (player.currentTime) localStorage.bookmark = Math.round(player.currentTime)
 			})
+			player.on('play', () => {
+				localStorage.playing = 1
 
-			player.on('play', handler)
+				if (newVideo) {
+					Axios.put(`${config.api}/video/${video.id}`, { plays: 1 }).then(() => {
+						console.log('Play Added')
+					})
+				}
+			})
+			player.on('pause', () => (localStorage.playing = 0))
 		}
 	}, [newVideo])
 
@@ -313,6 +313,8 @@ const VideoPlayer = ({ video, bookmarks, categories, stars, updateBookmarks, pla
 
 					if (!newVideo) {
 						hls.startLoad(Number(localStorage.bookmark))
+
+						if (Number(localStorage.playing)) player.play()
 					} else {
 						localStorage.video = video.id
 						localStorage.bookmark = 0

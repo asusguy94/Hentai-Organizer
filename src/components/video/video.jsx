@@ -846,6 +846,8 @@ const Stars = ({ video, stars, bookmarks, attributes, categories, clearActive, u
 	const handleModal = useContext(ModalContext)
 	const update = useContext(UpdateContext).stars
 
+	const attributesFromStar = starID => stars.filter(star => (star.id === starID ? star : null))[0].attributes
+
 	const handleRibbon = star => {
 		const hasBookmark = bookmarks.some(bookmark => bookmark.starID === star.id)
 
@@ -953,7 +955,13 @@ const Stars = ({ video, stars, bookmarks, attributes, categories, clearActive, u
 					onClick={() => {
 						handleModal(
 							'Add Attribute',
-							attributes.map(attribute => (
+							attributes
+								.filter(attribute => {
+									const match = attributesFromStar(star.id).some(attr => attr.id === attribute.id)
+
+									return !match ? attribute : null
+								})
+								.map(attribute => (
 								<div
 									key={attribute.id}
 									className='btn btn-sm btn-outline-primary d-block w-auto'

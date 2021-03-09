@@ -53,11 +53,12 @@
 		}
 
 		.ribbon-green {
-			background-color: green !important;
+			$color: green;
+			background-color: $color !important;
 
 			&:before,
 			&:after {
-				background-color: green !important;
+				background-color: $color !important;
 			}
 		}
 	}

@@ -536,6 +536,7 @@ const Timeline = ({ video, bookmarks, stars, attributes, categories, playVideo, 
 	const isActive = bookmark => Boolean(bookmark.active)
 	const hasStar = bookmark => Boolean(bookmark.starID)
 	const attributesFromStar = starID => stars.filter(star => (star.id === starID ? star : null))[0].attributes
+	const isStarAttribute = (starID, attributeID) => attributesFromStar(starID).some(attr => attr.id === attributeID)
 
 	const addStar = (bookmark, star) => {
 		Axios.post(`${config.api}/bookmark/${bookmark.id}/star`, { starID: star.id }).then(() => {
@@ -721,7 +722,14 @@ const Timeline = ({ video, bookmarks, stars, attributes, categories, playVideo, 
 												/>
 											) : null}
 
-											{bookmark.attributes.map(attribute => (
+											{bookmark.attributes
+												.sort((a, b) => {
+													if (isStarAttribute(bookmark.starID, a.id)) return -1
+													else if (isStarAttribute(bookmark.starID, b.id)) return 1
+
+													return a.name.localeCompare(b.name)
+												})
+												.map(attribute => (
 												<div key={attribute.id} className='attribute btn btn-sm btn-light'>
 													{attribute.name}
 												</div>

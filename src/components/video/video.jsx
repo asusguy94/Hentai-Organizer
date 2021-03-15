@@ -782,8 +782,7 @@ const Timeline = ({ video, bookmarks, stars, attributes, categories, playVideo, 
 														bookmarkAttribute => attribute.name === bookmarkAttribute.name
 													)
 
-													if (!match) return attribute
-													return null
+													return !match ? attribute : null
 												})
 												.map(attribute => (
 													<div
@@ -1098,7 +1097,7 @@ const Attributes = ({ bookmarks, clearActive, update }) => {
 
 		bookmarks.forEach(({ attributes }) => {
 			attributes.forEach(attribute => {
-				if (!attributeArr.some(e => e.id === attribute.id)) attributeArr.push(attribute)
+				if (!attributeArr.some(attr => attr.id === attribute.id)) attributeArr.push(attribute)
 			})
 		})
 

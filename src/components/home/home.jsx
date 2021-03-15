@@ -8,8 +8,6 @@ import './home.scss'
 
 import config from '../config.json'
 
-//TODO add CSS spacing using bootstrap OR home.scss
-
 const HomeColumn = ({ enabled = true, label, limit = 12 }) => {
 	const [data, setData] = useState([])
 

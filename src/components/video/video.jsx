@@ -656,8 +656,6 @@ const Timeline = ({ video, bookmarks, stars, attributes, categories, playVideo, 
 	}
 
 	useEffect(() => {
-		//DEBUG console.log('#timeline UPDATED')
-
 		for (let i = 1, items = bookmarksArr, LEVEL_MIN = 1, LEVEL_MAX = 10, level = LEVEL_MIN; i < items.length; i++) {
 			let collision = false
 

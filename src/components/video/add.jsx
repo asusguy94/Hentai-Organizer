@@ -45,22 +45,36 @@ const AddVideoPage = () => {
 								Submit
 							</div>
 						) : (
-							<div>
-								<div
-									className='btn btn-info'
-									onClick={e => {
-										e.target.classList.add('disabled')
+							<>
+								<Button
+									label='Generate Thumbnails'
+									callback={() => Axios.post(`${config.source}/generate/thumb`)}
+								/>
 
-										Axios.post(`${config.source}/generate/thumb`)
-									}}
-								>
-									Generate Thumbnails
-								</div>
-							</div>
+								<Button label='Generate WebVTT' disabled={true} />
+							</>
 						)}
 					</form>
 				) : null}
 			</div>
+		</div>
+	)
+}
+
+const Button = ({ label, callback, disabled = false }) => {
+	const [isDisabled, setIsDisabled] = useState(disabled)
+
+	const clickHandler = () => {
+		if (!isDisabled) {
+			setIsDisabled(true)
+
+			callback()
+		}
+	}
+
+	return (
+		<div className={`btn btn-info ${isDisabled ? 'disabled' : ''}`} onClick={clickHandler}>
+			{label}
 		</div>
 	)
 }

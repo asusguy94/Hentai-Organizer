@@ -24,7 +24,7 @@ const HomeColumn = ({ enabled = true, label, limit = 12 }) => {
 
 				<div className='row'>
 					{data.map(video => (
-						<div key={video.id} className='row mx-0 px-2 col-1'>
+						<div key={video.id} className='row mb-2 mx-0 px-2 col-1'>
 							<Link className='video px-0 col-12 ribbon-container' to={`/video/${video.id}`}>
 								<img
 									className='mx-auto img-thumbnail'

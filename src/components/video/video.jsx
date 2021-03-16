@@ -1122,7 +1122,7 @@ const Attributes = ({ bookmarks, clearActive, update }) => {
 			{getAttributes().map(attribute => (
 				<div
 					key={attribute.id}
-					className='btn btn-outline-primary m-2 attribute'
+					className='btn btn-outline-primary m-2 attribute w-auto'
 					onMouseEnter={() => attribute_setActive(attribute)}
 					onMouseLeave={clearActive}
 				>

@@ -357,7 +357,7 @@ const StarInputForm = ({ value, emptyByDefault = false, update, name, type, list
 	}
 
 	return (
-		<div className='input-wrapper'>
+		<div className='input-wrapper mb-1'>
 			<label className={isChanged() ? 'bold' : ''} htmlFor={name.toLowerCase()}>
 				{name}
 			</label>

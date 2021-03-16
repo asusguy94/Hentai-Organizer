@@ -1024,8 +1024,8 @@ const StarInput = ({ video, stars, bookmarks }) => {
 			{stars.length ? <hr /> : null}
 
 			<div className='form-inline justify-content-center'>
-				<div className='form-group mr-2'>
-					<label htmlFor='add-star' className='mr-1'>
+				<div className='form-group me-2'>
+					<label htmlFor='add-star' className='me-1'>
 						Star
 					</label>
 					<input
@@ -1050,7 +1050,7 @@ const StarInput = ({ video, stars, bookmarks }) => {
 						type='checkbox'
 						name='no-star'
 						id='no-star'
-						className='form-check-input mr-1'
+						className='form-check-input me-1'
 						onChange={handleNoStar}
 						checked={video.noStar === 1}
 						disabled={bookmarks.length || stars.length}

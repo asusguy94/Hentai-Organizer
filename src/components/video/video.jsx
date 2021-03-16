@@ -1096,7 +1096,9 @@ const Attributes = ({ bookmarks, clearActive, update }) => {
 		const attributeArr = []
 
 		bookmarks.forEach(({ attributes }) => {
-			attributes.forEach(attribute => {
+			attributes
+				.sort((a, b) => a.name.localeCompare(b.name))
+				.forEach(attribute => {
 				if (!attributeArr.some(attr => attr.id === attribute.id)) attributeArr.push(attribute)
 			})
 		})

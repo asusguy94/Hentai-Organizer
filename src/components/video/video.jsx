@@ -1021,7 +1021,7 @@ const StarInput = ({ video, stars, bookmarks }) => {
 
 	return (
 		<div className='col-12 mt-2'>
-			{stars.length ? <hr /> : null}
+			{stars.length ? <hr className='mx-auto' /> : null}
 
 			<div className='row justify-content-center align-items-center'>
 				<label htmlFor='add-star' className='col-1 col-form-label'>
@@ -1062,7 +1062,7 @@ const StarInput = ({ video, stars, bookmarks }) => {
 				</div>
 			</div>
 
-			{bookmarks.length ? <hr className='pt-2' /> : null}
+			{bookmarks.length ? <hr className='mx-auto' /> : null}
 		</div>
 	)
 }

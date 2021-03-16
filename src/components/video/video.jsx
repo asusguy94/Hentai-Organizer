@@ -1021,13 +1021,13 @@ const StarInput = ({ video, stars, bookmarks }) => {
 
 	return (
 		<div className='col-12 mt-2'>
-			{stars.length ? <hr /> : null}
+			{stars.length ? <hr className='mx-auto' /> : null}
 
-			<div className='form-inline justify-content-center'>
-				<div className='form-group mr-2'>
-					<label htmlFor='add-star' className='mr-1'>
-						Star
-					</label>
+			<div className='row justify-content-center align-items-center'>
+				<label htmlFor='add-star' className='col-1 col-form-label'>
+					Star
+				</label>
+				<div className='col-5'>
 					<input
 						type='text'
 						id='add-star'
@@ -1045,23 +1045,24 @@ const StarInput = ({ video, stars, bookmarks }) => {
 					/>
 				</div>
 
-				<div className='form-check'>
+				<div className='form-check col-2'>
+					<label htmlFor='no-star' className='form-check-label'>
+						No Star
+					</label>
+
 					<input
 						type='checkbox'
 						name='no-star'
 						id='no-star'
-						className='form-check-input mr-1'
+						className='form-check-input'
 						onChange={handleNoStar}
 						checked={video.noStar === 1}
 						disabled={bookmarks.length || stars.length}
 					/>
-					<label htmlFor='no-star' className='form-check-label'>
-						No Star
-					</label>
 				</div>
 			</div>
 
-			{bookmarks.length ? <hr className='pt-2' /> : null}
+			{bookmarks.length ? <hr className='mx-auto' /> : null}
 		</div>
 	)
 }
@@ -1075,7 +1076,7 @@ const Franchise = ({ video }) => (
 						<span className='episode__plays col-2'>{item.plays} Plays</span>
 
 						<img
-							className='episode__thumbnail'
+							className='episode__thumbnail col-2'
 							src={`${config.source}/images/videos/${item.id}-290.jpg`}
 							alt='thumbnail'
 						/>
@@ -1121,7 +1122,7 @@ const Attributes = ({ bookmarks, clearActive, update }) => {
 			{getAttributes().map(attribute => (
 				<div
 					key={attribute.id}
-					className='btn btn-outline-primary m-2 attribute'
+					className='btn btn-outline-primary m-2 attribute w-auto'
 					onMouseEnter={() => attribute_setActive(attribute)}
 					onMouseLeave={clearActive}
 				>
@@ -1270,7 +1271,7 @@ const HeaderDate = ({ video, handleModal, handleKeyPress, update }) => {
 
 const HeaderNext = ({ video }) => (
 	<div className='col-1 header__next'>
-		<a className='btn btn-sm btn-outline-primary float-right' id='next' href={`/video/${video.nextID}`}>
+		<a className='btn btn-sm btn-outline-primary float-end' id='next' href={`/video/${video.nextID}`}>
 			Next
 		</a>
 	</div>

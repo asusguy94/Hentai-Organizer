@@ -357,7 +357,7 @@ const StarInputForm = ({ value, emptyByDefault = false, update, name, type, list
 	}
 
 	return (
-		<div className='input-wrapper'>
+		<div className='input-wrapper mb-1'>
 			<label className={isChanged() ? 'bold' : ''} htmlFor={name.toLowerCase()}>
 				{name}
 			</label>
@@ -396,7 +396,7 @@ const StarAttributes = ({ remove, data }) => {
 	return data.map((attribute, i) => (
 		<Fragment key={attribute}>
 			<ContextMenuTrigger id={`attribute-${i}`} renderTag='span'>
-				<span className='attribute ml-2'>
+				<span className='attribute ms-2'>
 					<span className='btn btn-sm btn-outline-primary'>{attribute}</span>
 				</span>
 			</ContextMenuTrigger>

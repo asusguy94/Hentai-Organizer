@@ -1270,7 +1270,7 @@ const HeaderDate = ({ video, handleModal, handleKeyPress, update }) => {
 
 const HeaderNext = ({ video }) => (
 	<div className='col-1 header__next'>
-		<a className='btn btn-sm btn-outline-primary float-right' id='next' href={`/video/${video.nextID}`}>
+		<a className='btn btn-sm btn-outline-primary float-end' id='next' href={`/video/${video.nextID}`}>
 			Next
 		</a>
 	</div>

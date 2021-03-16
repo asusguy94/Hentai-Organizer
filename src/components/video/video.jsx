@@ -1075,7 +1075,7 @@ const Franchise = ({ video }) => (
 						<span className='episode__plays col-2'>{item.plays} Plays</span>
 
 						<img
-							className='episode__thumbnail'
+							className='episode__thumbnail col-2'
 							src={`${config.source}/images/videos/${item.id}-290.jpg`}
 							alt='thumbnail'
 						/>

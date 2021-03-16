@@ -1,6 +1,6 @@
 {
 	"name": "hentaijs",
-	"version": "0.2.3",
+	"version": "0.2.4",
 	"license": "MIT",
 	"dependencies": {
 		"axios": "^0.21.1",
@@ -35,7 +35,10 @@
 		"extends": [
 			"react-app",
 			"react-app/jest"
-		]
+		],
+		"rules": {
+			"react-hooks/exhaustive-deps": "off"
+		}
 	},
 	"browserslist": {
 		"production": [

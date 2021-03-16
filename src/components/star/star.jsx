@@ -315,8 +315,7 @@ const StarVideo = ({ video }) => {
 				className='card-img-top'
 				src={src}
 				data-src={dataSrc}
-				//TODO change video.id-290.jpg >> video.image
-				poster={`${config.source}/images/videos/${video.id}-290.jpg`}
+				poster={`${config.source}/images/videos/${video.image}`}
 				preload='metadata'
 				muted
 				onMouseEnter={handleMouseEnter}
@@ -383,8 +382,8 @@ const StarInputForm = ({ value, emptyByDefault = false, update, name, type, list
 							return listItem
 						})
 						.map(item => (
-						<option key={item} value={item} />
-					))}
+							<option key={item} value={item} />
+						))}
 				</datalist>
 			) : null}
 

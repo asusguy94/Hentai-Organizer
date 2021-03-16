@@ -728,10 +728,10 @@ const Timeline = ({ video, bookmarks, stars, attributes, categories, playVideo, 
 													return a.name.localeCompare(b.name)
 												})
 												.map(attribute => (
-												<div key={attribute.id} className='attribute btn btn-sm btn-light'>
-													{attribute.name}
-												</div>
-											))}
+													<div key={attribute.id} className='attribute btn btn-sm btn-light'>
+														{attribute.name}
+													</div>
+												))}
 										</ReactTooltip>
 									) : null}
 								</div>
@@ -970,17 +970,17 @@ const Stars = ({ video, stars, bookmarks, attributes, categories, clearActive, u
 									return !match ? attribute : null
 								})
 								.map(attribute => (
-								<div
-									key={attribute.id}
-									className='btn btn-sm btn-outline-primary d-block w-auto'
-									onClick={() => {
-										handleModal()
-										addAttribute(star, attribute)
-									}}
-								>
-									{attribute.name}
-								</div>
-							)),
+									<div
+										key={attribute.id}
+										className='btn btn-sm btn-outline-primary d-block w-auto'
+										onClick={() => {
+											handleModal()
+											addAttribute(star, attribute)
+										}}
+									>
+										{attribute.name}
+									</div>
+								)),
 							true
 						)
 					}}
@@ -1094,13 +1094,12 @@ const Franchise = ({ video }) => (
 const Attributes = ({ bookmarks, clearActive, update }) => {
 	const getAttributes = () => {
 		const attributeArr = []
-
 		bookmarks.forEach(({ attributes }) => {
 			attributes
 				.sort((a, b) => a.name.localeCompare(b.name))
 				.forEach(attribute => {
-				if (!attributeArr.some(attr => attr.id === attribute.id)) attributeArr.push(attribute)
-			})
+					if (!attributeArr.some(attr => attr.id === attribute.id)) attributeArr.push(attribute)
+				})
 		})
 
 		return attributeArr

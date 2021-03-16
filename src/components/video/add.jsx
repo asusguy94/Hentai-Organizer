@@ -18,9 +18,9 @@ const AddVideoPage = () => {
 
 	return (
 		<div className='row col justify-content-center'>
-			<div>
-				<h1>Add Videos</h1>
-				{loaded ? (
+			<h1 className='text-center'>Add Videos</h1>
+			{loaded ? (
+				<>
 					<form>
 						{videos.map((video, key) => (
 							<div key={key}>
@@ -32,31 +32,30 @@ const AddVideoPage = () => {
 								<hr />
 							</div>
 						))}
-
-						{videos.length ? (
-							<div
-								className='btn btn-primary'
-								onClick={e => {
-									Axios.post(`${config.source}/video/add`, { videos }).then(() => {
-										window.location.reload()
-									})
-								}}
-							>
-								Submit
-							</div>
-						) : (
-							<>
-								<Button
-									label='Generate Thumbnails'
-									callback={() => Axios.post(`${config.source}/generate/thumb`)}
-								/>
-
-								<Button label='Generate WebVTT' disabled={true} />
-							</>
-						)}
 					</form>
-				) : null}
-			</div>
+
+					{videos.length ? (
+						<div
+							className='btn btn-primary'
+							onClick={e => {
+								Axios.post(`${config.source}/video/add`, { videos }).then(() => {
+									window.location.reload()
+								})
+							}}
+						>
+							Submit
+						</div>
+					) : (
+						<>
+							<Button
+								label='Generate Thumbnails'
+								callback={() => Axios.post(`${config.source}/generate/thumb`)}
+							/>
+							<Button label='Generate WebVTT' disabled={true} />
+						</>
+					)}
+				</>
+			) : null}
 		</div>
 	)
 }
@@ -73,7 +72,7 @@ const Button = ({ label, callback, disabled = false }) => {
 	}
 
 	return (
-		<div className={`btn btn-info ${isDisabled ? 'disabled' : ''}`} onClick={clickHandler}>
+		<div className={`btn btn-info w-auto ${isDisabled ? 'disabled' : ''}`} onClick={clickHandler}>
 			{label}
 		</div>
 	)

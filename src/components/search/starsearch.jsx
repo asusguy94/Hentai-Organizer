@@ -291,7 +291,7 @@ const TitleSearch = ({ stars, update }) => {
 
 	return (
 		<div className='input-wrapper'>
-			<input type='text' placeholder='Name' autoFocus onChange={callback} />
+			<input type='text' className='form-control' placeholder='Name' autoFocus onChange={callback} />
 		</div>
 	)
 }

@@ -471,17 +471,17 @@ const VideoPlayer = ({ video, bookmarks, categories, stars, updateBookmarks, pla
 						)
 					}}
 				>
-					<i className={`${config.theme.fa} fa-plus`} /> Add Bookmark
+					<i className={config.theme.icons.add} /> Add Bookmark
 				</MenuItem>
 
 				<MenuItem onClick={censorToggle}>
 					{video.censored ? (
 						<>
-							<i className={`${config.theme.fa} fa-check-circle`} /> UnCensor
+							<i className={config.theme.icons['toggle-yes']} /> UnCensor
 						</>
 					) : (
 						<>
-							<i className={`${config.theme.fa} fa-exclamation-circle`} /> Censor
+							<i className={config.theme.icons['toggle-no']} /> Censor
 						</>
 					)}
 				</MenuItem>
@@ -779,7 +779,7 @@ const Timeline = ({ video, bookmarks, stars, attributes, categories, playVideo, 
 										}
 									}}
 								>
-									<i className={`${config.theme.fa} fa-plus`} /> Add Star
+									<i className={config.theme.icons.add} /> Add Star
 								</MenuItem>
 
 								<MenuItem disabled={bookmark.starID === 0} onClick={() => removeStar(bookmark)}>
@@ -817,7 +817,7 @@ const Timeline = ({ video, bookmarks, stars, attributes, categories, playVideo, 
 										)
 									}}
 								>
-									<i className={`${config.theme.fa} fa-plus`} /> Add Attribute
+									<i className={config.theme.icons.add} /> Add Attribute
 								</MenuItem>
 
 								<MenuItem
@@ -853,7 +853,7 @@ const Timeline = ({ video, bookmarks, stars, attributes, categories, playVideo, 
 								</MenuItem>
 
 								<MenuItem onClick={() => setTime(bookmark.id)}>
-									<i className={`${config.theme.fa} fa-clock`} /> Change Time
+									<i className={config.theme.icons.clock} /> Change Time
 								</MenuItem>
 
 								<MenuItem onClick={() => removeBookmark(bookmark.id)}>
@@ -973,7 +973,7 @@ const Stars = ({ video, stars, bookmarks, attributes, categories, clearActive, u
 						)
 					}}
 				>
-					<i className={`${config.theme.fa} fa-plus`} /> Add Bookmark
+					<i className={config.theme.icons.add} /> Add Bookmark
 				</MenuItem>
 
 				<MenuItem
@@ -1005,7 +1005,7 @@ const Stars = ({ video, stars, bookmarks, attributes, categories, clearActive, u
 						)
 					}}
 				>
-					<i className={`${config.theme.fa} fa-plus`} /> Add Attribute
+					<i className={config.theme.icons.add} /> Add Attribute
 				</MenuItem>
 
 				<MenuItem
@@ -1267,7 +1267,7 @@ const HeaderDate = ({ video, handleModal, handleKeyPress, update }: any) => {
 		<>
 			<ContextMenuTrigger id='menu__date' renderTag='span'>
 				<div className='header__date btn btn-sm btn-outline-primary'>
-					<i className={`${config.theme.fa} fa-calendar-check`} />
+					<i className={config.theme.icons.calendar} />
 					{video.date.published}
 				</div>
 			</ContextMenuTrigger>
@@ -1299,7 +1299,7 @@ const HeaderNext = ({ video }: any) => (
 
 const HeaderQuality = ({ video }: any) => (
 	<div className='header__quality btn btn-sm btn-outline-primary'>
-		<i className={`${config.theme.fa} fa-film`} />
+		<i className={config.theme.icons.film} />
 		{video.quality}
 	</div>
 )

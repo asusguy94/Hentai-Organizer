@@ -18,7 +18,12 @@
 		}
 	},
 	"theme": {
-		"fa": "far"
+		"fa": "far",
+		"icons": {
+			"trash": "far fa-trash-alt",
+			"edit": "far fa-edit",
+			"copy": "far fa-copy"
+		}
 	},
 	"overlay": {
 		"success": "checkbox.png"

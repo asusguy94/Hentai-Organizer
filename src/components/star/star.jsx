@@ -216,7 +216,7 @@ const StarImageDropbox = ({ star, update }) => {
 
 				<ContextMenu id='star__image'>
 					<MenuItem onClick={removeImage}>
-						<i className={`${config.theme.fa} fa-trash-alt`} /> Delete Image
+						<i className={config.theme.icons.trash} /> Delete Image
 					</MenuItem>
 				</ContextMenu>
 			</>
@@ -239,7 +239,7 @@ const StarImageDropbox = ({ star, update }) => {
 
 				<ContextMenu id='star__dropbox'>
 					<MenuItem onClick={removeStar}>
-						<i className={`${config.theme.fa} fa-trash-alt`} /> Remove Star
+						<i className={config.theme.icons.trash} /> Remove Star
 					</MenuItem>
 				</ContextMenu>
 			</>
@@ -403,7 +403,7 @@ const StarAttributes = ({ remove, data }) => {
 
 			<ContextMenu id={`attribute-${i}`}>
 				<MenuItem onClick={() => remove(attribute)}>
-					<i className={`${config.theme.fa} fa-trash-alt`} /> Remove
+					<i className={config.theme.icons.trash} /> Remove
 				</MenuItem>
 			</ContextMenu>
 		</Fragment>
@@ -446,7 +446,7 @@ const StarTitle = ({ star, handleModal, update }) => {
 						)
 					}}
 				>
-					<i className={`${config.theme.fa} fa-edit`} /> Rename
+					<i className={config.theme.icons.edit} /> Rename
 				</MenuItem>
 			</ContextMenu>
 		</>

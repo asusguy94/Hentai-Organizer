@@ -472,7 +472,7 @@ const VideoPlayer = ({ video, bookmarks, categories, stars, updateBookmarks, pla
 					)}
 				</MenuItem>
 				<MenuItem onClick={resetPlays}>
-					<i className={`${config.theme.fa} fa-trash-alt`} /> Remove Plays
+					<i className={config.theme.icons.trash} /> Remove Plays
 				</MenuItem>
 
 				<MenuItem
@@ -497,25 +497,25 @@ const VideoPlayer = ({ video, bookmarks, categories, stars, updateBookmarks, pla
 						)
 					}}
 				>
-					<i className={`${config.theme.fa} fa-edit`} /> Rename Video
+					<i className={config.theme.icons.edit} /> Rename Video
 				</MenuItem>
 
 				<MenuItem divider />
 
 				<MenuItem onClick={copy}>
-					<i className={`${config.theme.fa} fa-copy`} /> Copy Filename
+					<i className={config.theme.icons.copy} /> Copy Filename
 				</MenuItem>
 
 				<MenuItem divider />
 
 				<MenuItem onClick={updateVideo}>
-					<i className={`${config.theme.fa} fa-edit`} /> Update Video
+					<i className={config.theme.icons.edit} /> Update Video
 				</MenuItem>
 
 				<MenuItem divider />
 
 				<MenuItem disabled={stars.length !== 0} onClick={deleteVideo}>
-					<i className={`${config.theme.fa} fa-trash-alt`} /> Delete Video
+					<i className={config.theme.icons.trash} /> Delete Video
 				</MenuItem>
 			</ContextMenu>
 
@@ -767,7 +767,7 @@ const Timeline = ({ video, bookmarks, stars, attributes, categories, playVideo, 
 								</MenuItem>
 
 								<MenuItem disabled={bookmark.starID === 0} onClick={() => removeStar(bookmark)}>
-									<i className={`${config.theme.fa} fa-trash-alt`} /> Remove Star
+									<i className={config.theme.icons.trash} /> Remove Star
 								</MenuItem>
 
 								<MenuItem divider />
@@ -807,7 +807,7 @@ const Timeline = ({ video, bookmarks, stars, attributes, categories, playVideo, 
 									disabled={bookmark.attributes.length === 0}
 									onClick={() => clearAttributes(bookmark)}
 								>
-									<i className={`${config.theme.fa} fa-trash-alt`} /> Clear Attributes
+									<i className={config.theme.icons.trash} /> Clear Attributes
 								</MenuItem>
 
 								<MenuItem
@@ -832,7 +832,7 @@ const Timeline = ({ video, bookmarks, stars, attributes, categories, playVideo, 
 										)
 									}}
 								>
-									<i className={`${config.theme.fa} fa-edit`} /> Change Category
+									<i className={config.theme.icons.edit} /> Change Category
 								</MenuItem>
 
 								<MenuItem onClick={() => setTime(bookmark.id)}>
@@ -840,7 +840,7 @@ const Timeline = ({ video, bookmarks, stars, attributes, categories, playVideo, 
 								</MenuItem>
 
 								<MenuItem onClick={() => removeBookmark(bookmark.id)}>
-									<i className={`${config.theme.fa} fa-trash-alt`} /> Delete
+									<i className={config.theme.icons.trash} /> Delete
 								</MenuItem>
 							</ContextMenu>
 						</Fragment>
@@ -992,7 +992,7 @@ const Stars = ({ video, stars, bookmarks, attributes, categories, clearActive, u
 					disabled={bookmarks.some(bookmark => bookmark.starID === star.id)}
 					onClick={() => removeStar(star.id)}
 				>
-					<i className={`${config.theme.fa} fa-trash-alt`} /> Remove
+					<i className={config.theme.icons.trash} /> Remove
 				</MenuItem>
 			</ContextMenu>
 		</div>
@@ -1199,7 +1199,7 @@ const HeaderTitle = ({ video, handleModal, handleKeyPress }) => {
 						)
 					}}
 				>
-					<i className={`${config.theme.fa} fa-edit`} /> Rename Title
+					<i className={config.theme.icons.edit} /> Rename Title
 				</MenuItem>
 
 				<MenuItem
@@ -1217,13 +1217,13 @@ const HeaderTitle = ({ video, handleModal, handleKeyPress }) => {
 						)
 					}}
 				>
-					<i className={`${config.theme.fa} fa-edit`} /> Rename Franchise
+					<i className={config.theme.icons.edit} /> Rename Franchise
 				</MenuItem>
 
 				<MenuItem divider />
 
 				<MenuItem onClick={copyFranchise}>
-					<i className={`${config.theme.fa} fa-copy`} /> Copy Franchise
+					<i className={config.theme.icons.copy} /> Copy Franchise
 				</MenuItem>
 			</ContextMenu>
 
@@ -1261,7 +1261,7 @@ const HeaderDate = ({ video, handleModal, handleKeyPress, update }) => {
 						)
 					}}
 				>
-					<i className={`${config.theme.fa} fa-edit`} />
+					<i className={config.theme.icons.edit} />
 					Edit Date
 				</MenuItem>
 			</ContextMenu>

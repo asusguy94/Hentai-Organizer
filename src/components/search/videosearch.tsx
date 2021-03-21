@@ -228,7 +228,7 @@ const Filter = ({ videoData, videos, update }: any) => {
 
 		videos = videos.map((video: any) => {
 			if (e.target.indeterminate) {
-				const match = video.attributes.some((location: any) => location.toLowerCase() === targetLower)
+				const match = video.attributes.some((attribute: any) => attribute.toLowerCase() === targetLower)
 
 				if (match) {
 					video.hidden.notAttribute.push(targetLower)

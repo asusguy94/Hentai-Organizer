@@ -181,7 +181,7 @@ const Filter = ({ stars, starData, update }: any) => {
 
 		stars = stars.map((star: any) => {
 			if (e.target.indeterminate) {
-				const match = star.attributes.some((location: any) => location.toLowerCase() === targetLower)
+				const match = star.attributes.some((attribute: any) => attribute.toLowerCase() === targetLower)
 
 				if (match) {
 					star.hidden.notAttribute.push(targetLower)

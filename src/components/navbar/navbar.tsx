@@ -23,7 +23,7 @@ const NavBar = () => (
 	</nav>
 )
 
-const NavBarItem = ({ name, path, children, disabled = false, remote = false }) => {
+const NavBarItem = ({ name, path, children, disabled = false, remote = false }: any) => {
 	if (!disabled) {
 		return (
 			<li>

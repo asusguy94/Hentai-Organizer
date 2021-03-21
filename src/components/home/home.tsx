@@ -8,7 +8,7 @@ import './home.scss'
 
 import config from '../config.json'
 
-const HomeColumn = ({ enabled = true, label, limit = 12 }) => {
+const HomeColumn = ({ enabled = true, label, limit = 12 }: any) => {
 	const [data, setData] = useState([])
 
 	useEffect(() => {
@@ -23,7 +23,7 @@ const HomeColumn = ({ enabled = true, label, limit = 12 }) => {
 				</h2>
 
 				<div className='row'>
-					{data.map(video => (
+					{data.map((video: any) => (
 						<div key={video.id} className='row mb-2 mx-0 px-2 col-1'>
 							<Link className='video px-0 col-12 ribbon-container' to={`/video/${video.id}`}>
 								<img

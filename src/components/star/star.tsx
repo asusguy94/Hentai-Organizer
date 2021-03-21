@@ -42,7 +42,7 @@ class StarPage extends Component {
 	handleModal(title = null, data = null, filter = false) {
 		if (title !== null && data !== null && this.state.modal.visible) this.handleModal()
 
-		this.setState(({ modal }) => {
+		this.setState(({ modal }: any) => {
 			modal.title = title
 			modal.data = data
 			modal.visible = !modal.visible
@@ -58,18 +58,20 @@ class StarPage extends Component {
 				<section className='col-7'>
 					{this.state.star.id !== 0 ? (
 						<div id='star'>
-							<StarImageDropbox star={this.state.star} update={star => this.setState({ star })} />
+							<StarImageDropbox star={this.state.star} update={(star: any) => this.setState({ star })} />
 
 							<StarTitle
 								star={this.state.star}
-								handleModal={(title, data, filter) => this.handleModal(title, data, filter)}
-								update={star => this.setState({ star })}
+								handleModal={(title: any, data: any, filter: any) =>
+									this.handleModal(title, data, filter)
+								}
+								update={(star: any) => this.setState({ star })}
 							/>
 
 							<StarForm
 								star={this.state.star}
 								starData={this.state.starData}
-								update={star => this.setState({ star })}
+								update={(star: any) => this.setState({ star })}
 							/>
 						</div>
 					) : null}
@@ -90,7 +92,8 @@ class StarPage extends Component {
 	}
 
 	componentDidMount() {
-		const { id } = this.props.match.params
+		const props: any = this.props
+		const { id } = props.match.params
 
 		Axios.get(`${config.api}/star/${id}`).then(({ data: star }) => this.setState({ star }))
 		Axios.get(`${config.api}/star/${id}/video`).then(({ data: videos }) => this.setState({ videos }))
@@ -99,20 +102,20 @@ class StarPage extends Component {
 }
 
 // Wrapper
-const StarVideos = ({ videos }) => (
+const StarVideos = ({ videos }: any) => (
 	<>
 		<h3>Videos</h3>
 
 		<div id='videos' className='row'>
-			{videos.map(video => (
+			{videos.map((video: any) => (
 				<StarVideo key={video.id} video={video} />
 			))}
 		</div>
 	</>
 )
 
-const StarForm = ({ star, starData, update }) => {
-	const addAttribute = name => {
+const StarForm = ({ star, starData, update }: any) => {
+	const addAttribute = (name: any) => {
 		Axios.put(`${config.api}/star/${star.id}/attribute`, { name }).then(() => {
 			star.info.attribute.push(name)
 
@@ -120,9 +123,9 @@ const StarForm = ({ star, starData, update }) => {
 		})
 	}
 
-	const removeAttribute = name => {
+	const removeAttribute = (name: any) => {
 		Axios.put(`${config.api}/star/${star.id}/attribute`, { name, delete: true }).then(() => {
-			star.info.attribute = star.info.attribute.filter(attribute => {
+			star.info.attribute = star.info.attribute.filter((attribute: any) => {
 				if (attribute.toLowerCase() === name.toLowerCase()) return null
 
 				return attribute
@@ -132,7 +135,7 @@ const StarForm = ({ star, starData, update }) => {
 		})
 	}
 
-	const updateInfo = (value, label) => {
+	const updateInfo = (value: any, label: any) => {
 		Axios.put(`${config.api}/star/${star.id}`, { label, value }).then(() => {
 			star.info[label] = value
 
@@ -159,10 +162,10 @@ const StarForm = ({ star, starData, update }) => {
 	)
 }
 
-const StarImageDropbox = ({ star, update }) => {
+const StarImageDropbox = ({ star, update }: any) => {
 	const [hover, setHover] = useState(false)
 
-	const addImage = image => {
+	const addImage = (image: any) => {
 		Axios.post(`${config.source}/star/${star.id}/image`, { url: image }).then(() => {
 			star.image = `${star.id}.jpg?${Date.now()}`
 
@@ -184,24 +187,24 @@ const StarImageDropbox = ({ star, update }) => {
 		})
 	}
 
-	const handleDefault = e => {
+	const handleDefault = (e: any) => {
 		e.stopPropagation()
 		e.preventDefault()
 	}
 
-	const handleEnter = e => {
+	const handleEnter = (e: any) => {
 		handleDefault(e)
 
 		setHover(true)
 	}
 
-	const handleLeave = e => {
+	const handleLeave = (e: any) => {
 		handleDefault(e)
 
 		setHover(false)
 	}
 
-	const handleDrop = e => {
+	const handleDrop = (e: any) => {
 		handleDefault(e)
 
 		addImage(e.dataTransfer.getData('text'))
@@ -248,11 +251,11 @@ const StarImageDropbox = ({ star, update }) => {
 }
 
 // Container
-const StarVideo = ({ video }) => {
+const StarVideo = ({ video }: any) => {
 	const [src, setSrc] = useState('')
 	const [dataSrc, setDataSrc] = useState(`${config.source}/videos/${video.fname}`)
 
-	const thumbnail = useRef()
+	const thumbnail: any = useRef()
 
 	const reload = async () => {
 		setSrc(dataSrc)
@@ -264,19 +267,19 @@ const StarVideo = ({ video }) => {
 		setSrc('')
 	}
 
-	const playFrom = (video, time = 0) => {
+	const playFrom = (video: any, time = 0) => {
 		if (time) video.currentTime = time
 
 		video.play()
 	}
 
-	const stopFrom = (video, time = 0) => {
+	const stopFrom = (video: any, time = 0) => {
 		if (time) video.currentTime = time
 
 		video.pause()
 	}
 
-	const startThumbnailPlayback = async video => {
+	const startThumbnailPlayback = async (video: any) => {
 		let time = 100
 		const offset = 60
 		const duration = 1.5
@@ -291,19 +294,19 @@ const StarVideo = ({ video }) => {
 		}, duration * 1000)
 	}
 
-	const stopThumbnailPlayback = async video => {
+	const stopThumbnailPlayback = async (video: any) => {
 		stopFrom(video)
 
 		clearInterval(thumbnail.current)
 	}
 
-	const handleMouseEnter = ({ target }) => {
+	const handleMouseEnter = ({ target }: any) => {
 		if (dataSrc.length && !src.length) {
 			reload().then(() => startThumbnailPlayback(target))
 		}
 	}
 
-	const handleMouseLeave = ({ target }) => {
+	const handleMouseLeave = ({ target }: any) => {
 		if (!dataSrc.length && src.length) {
 			stopThumbnailPlayback(target).then(() => unload())
 		}
@@ -327,16 +330,16 @@ const StarVideo = ({ video }) => {
 	)
 }
 
-const StarInputForm = ({ value, emptyByDefault = false, update, name, type, list, children }) => {
+const StarInputForm = ({ value, emptyByDefault = false, update, name, type, list, children }: any) => {
 	const [inputID, setInputID] = useState('')
 	const [inputValue, setInputValue] = useState(emptyByDefault ? '' : value)
 
-	const updateValue = e => {
+	const updateValue = (e: any) => {
 		setInputID(e.target.id)
 		setInputValue(e.target.value)
 	}
 
-	const handleKeyPress = e => {
+	const handleKeyPress = (e: any) => {
 		if (e.key === 'Enter') {
 			if (inputID.length) update(inputValue, inputID)
 
@@ -366,22 +369,22 @@ const StarInputForm = ({ value, emptyByDefault = false, update, name, type, list
 				type={type}
 				id={name.toLowerCase()}
 				defaultValue={emptyByDefault ? '' : value}
-				onChange={e => updateValue(e)}
-				onKeyDown={e => handleKeyPress(e)}
+				onChange={(e) => updateValue(e)}
+				onKeyDown={(e) => handleKeyPress(e)}
 				list={`${name.toLowerCase()}s`}
 			/>
 
 			{list ? (
 				<datalist id={`${name.toLowerCase()}s`}>
 					{list
-						.filter(listItem => {
+						.filter((listItem: any) => {
 							if (emptyByDefault) {
 								if (value.includes(listItem)) return null
 							}
 
 							return listItem
 						})
-						.map(item => (
+						.map((item: any) => (
 							<option key={item} value={item} />
 						))}
 				</datalist>
@@ -392,8 +395,8 @@ const StarInputForm = ({ value, emptyByDefault = false, update, name, type, list
 	)
 }
 
-const StarAttributes = ({ remove, data }) => {
-	return data.map((attribute, i) => (
+const StarAttributes = ({ remove, data }: any) => {
+	return data.map((attribute: any, i: any) => (
 		<Fragment key={attribute}>
 			<ContextMenuTrigger id={`attribute-${i}`} renderTag='span'>
 				<span className='attribute ms-2'>
@@ -410,8 +413,8 @@ const StarAttributes = ({ remove, data }) => {
 	))
 }
 
-const StarTitle = ({ star, handleModal, update }) => {
-	const renameStar = name => {
+const StarTitle = ({ star, handleModal, update }: any) => {
+	const renameStar = (name: any) => {
 		Axios.put(`${config.api}/star/${star.id}`, { name }).then(() => {
 			star.name = name
 
@@ -433,8 +436,8 @@ const StarTitle = ({ star, handleModal, update }) => {
 							<input
 								type='text'
 								defaultValue={star.name}
-								ref={input => input && input.focus()}
-								onKeyDown={e => {
+								ref={(input) => input && input.focus()}
+								onKeyDown={(e: any) => {
 									if (e.key === 'Enter') {
 										e.preventDefault()
 

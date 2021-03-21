@@ -30,7 +30,7 @@ class StarSearchPage extends Component {
 		// Stars
 		Axios.get(`${config.api}/search/star`).then(({ data: stars }) => {
 			this.setState(() => {
-				stars = stars.map(star => {
+				stars = stars.map((star: any) => {
 					star.hidden = {
 						titleSearch: false,
 
@@ -73,7 +73,7 @@ class StarSearchPage extends Component {
 						attributes: this.state.attributes
 					}}
 					stars={this.state.stars}
-					update={stars => this.setState({ stars })}
+					update={(stars: any) => this.setState({ stars })}
 				/>
 
 				<Stars stars={this.state.stars} />
@@ -85,7 +85,7 @@ class StarSearchPage extends Component {
 }
 
 // Wrapper
-const Sidebar = ({ starData, stars, update }) => (
+const Sidebar = ({ starData, stars, update }: any) => (
 	<aside className='col-2'>
 		<TitleSearch stars={stars} update={update} />
 
@@ -95,7 +95,7 @@ const Sidebar = ({ starData, stars, update }) => (
 	</aside>
 )
 
-const Stars = ({ stars }) => (
+const Stars = ({ stars }: any) => (
 	<section id='stars' className='col-10'>
 		<h2 className='text-center'>
 			<span className='count'>{getCount(stars)}</span> Stars
@@ -103,7 +103,7 @@ const Stars = ({ stars }) => (
 
 		<div className='row justify-content-center'>
 			{stars.length ? (
-				stars.map(star => (
+				stars.map((star: any) => (
 					<a
 						key={star.id}
 						href={`/star/${star.id}`}
@@ -122,9 +122,9 @@ const Stars = ({ stars }) => (
 )
 
 // Container
-const Sort = ({ stars, update }) => {
+const Sort = ({ stars, update }: any) => {
 	const sortDefault = (reverse = false) => {
-		stars.sort((a, b) => {
+		stars.sort((a: any, b: any) => {
 			let valA = a.name.toLowerCase()
 			let valB = b.name.toLowerCase()
 
@@ -144,9 +144,9 @@ const Sort = ({ stars, update }) => {
 	)
 }
 
-const Filter = ({ stars, starData, update }) => {
-	const breast = target => {
-		stars = stars.map(star => {
+const Filter = ({ stars, starData, update }: any) => {
+	const breast = (target: any) => {
+		stars = stars.map((star: any) => {
 			star.hidden.noBreast = false
 			star.hidden.breast = star.breast.toLowerCase() !== target.toLowerCase()
 
@@ -156,8 +156,8 @@ const Filter = ({ stars, starData, update }) => {
 		update(stars)
 	}
 
-	const haircolor = target => {
-		stars = stars.map(star => {
+	const haircolor = (target: any) => {
+		stars = stars.map((star: any) => {
 			star.hidden.haircolor = star.haircolor.toLowerCase() !== target.toLowerCase()
 
 			return star
@@ -166,8 +166,8 @@ const Filter = ({ stars, starData, update }) => {
 		update(stars)
 	}
 
-	const hairstyle = target => {
-		stars = stars.map(star => {
+	const hairstyle = (target: any) => {
+		stars = stars.map((star: any) => {
 			star.hidden.hairstyle = star.hairstyle.toLowerCase() !== target.toLowerCase()
 
 			return star
@@ -176,12 +176,12 @@ const Filter = ({ stars, starData, update }) => {
 		update(stars)
 	}
 
-	const attribute = (e, target) => {
+	const attribute = (e: any, target: any) => {
 		const targetLower = target.toLowerCase()
 
-		stars = stars.map(star => {
+		stars = stars.map((star: any) => {
 			if (e.target.indeterminate) {
-				const match = star.attributes.some(location => location.toLowerCase() === targetLower)
+				const match = star.attributes.some((location: any) => location.toLowerCase() === targetLower)
 
 				if (match) {
 					star.hidden.notAttribute.push(targetLower)
@@ -190,14 +190,14 @@ const Filter = ({ stars, starData, update }) => {
 					star.hidden.attribute.splice(star.hidden.attribute.indexOf(targetLower), 1)
 				}
 			} else if (!e.target.checked) {
-				const match = star.attributes.map(attribute => attribute.toLowerCase()).includes(targetLower)
+				const match = star.attributes.map((attribute: any) => attribute.toLowerCase()).includes(targetLower)
 
 				if (match) {
 					// Remove indeterminate-status from filtering
 					star.hidden.notAttribute.splice(star.hidden.notAttribute.indexOf(targetLower), 1)
 				}
 			} else {
-				const match = !star.attributes.map(attribute => attribute.toLowerCase()).includes(targetLower)
+				const match = !star.attributes.map((attribute: any) => attribute.toLowerCase()).includes(targetLower)
 
 				if (match) star.hidden.attribute.push(targetLower)
 			}
@@ -209,7 +209,7 @@ const Filter = ({ stars, starData, update }) => {
 	}
 
 	const breast_ALL = () => {
-		stars = stars.map(star => {
+		stars = stars.map((star: any) => {
 			star.hidden.breast = false
 			star.hidden.noBreast = false
 
@@ -220,7 +220,7 @@ const Filter = ({ stars, starData, update }) => {
 	}
 
 	const haircolor_ALL = () => {
-		stars = stars.map(star => {
+		stars = stars.map((star: any) => {
 			star.hidden.haircolor = false
 
 			return star
@@ -230,7 +230,7 @@ const Filter = ({ stars, starData, update }) => {
 	}
 
 	const hairstyle_ALL = () => {
-		stars = stars.map(star => {
+		stars = stars.map((star: any) => {
 			star.hidden.hairstyle = false
 
 			return star
@@ -276,11 +276,11 @@ const Filter = ({ stars, starData, update }) => {
 	)
 }
 
-const TitleSearch = ({ stars, update }) => {
-	const callback = e => {
+const TitleSearch = ({ stars, update }: any) => {
+	const callback = (e: any) => {
 		const searchValue = e.target.value.toLowerCase()
 
-		stars = stars.map(star => {
+		stars = stars.map((star: any) => {
 			star.hidden.titleSearch = !star.name.toLowerCase().includes(searchValue)
 
 			return star
@@ -297,7 +297,7 @@ const TitleSearch = ({ stars, update }) => {
 }
 
 // ContainerItem
-const FilterItem = ({ data, label, obj, callback, globalCallback = null, nullCallback = null }) => (
+const FilterItem = ({ data, label, obj, callback, globalCallback = null, nullCallback = null }: any) => (
 	<>
 		<h2>{capitalize(label, true)}</h2>
 
@@ -319,14 +319,14 @@ const FilterItem = ({ data, label, obj, callback, globalCallback = null, nullCal
 
 			{nullCallback !== null ? (
 				<div className='input-wrapper'>
-					<input type='radio' name={label} id={`${label}_NULL`} onChange={e => nullCallback(e)} />
+					<input type='radio' name={label} id={`${label}_NULL`} onChange={(e) => nullCallback(e)} />
 					<label className='global-category' htmlFor={`${label}_NULL`}>
 						NULL
 					</label>
 				</div>
 			) : null}
 
-			{data.map(item => (
+			{data.map((item: any) => (
 				<div className='input-wrapper' key={item}>
 					<input type='radio' name={label} id={`${label}-${item}`} onChange={() => callback(item)} />
 					<label htmlFor={`${label}-${item}`}>
@@ -338,7 +338,7 @@ const FilterItem = ({ data, label, obj, callback, globalCallback = null, nullCal
 	</>
 )
 
-const FilterObj = ({ data, label, labelPlural, obj, callback, nullCallback = null }) => {
+const FilterObj = ({ data, label, labelPlural, obj, callback, nullCallback = null }: any) => {
 	const indeterminate = new Indeterminate()
 
 	return (
@@ -352,7 +352,7 @@ const FilterObj = ({ data, label, labelPlural, obj, callback, nullCallback = nul
 							type='checkbox'
 							name={label}
 							id={`${label}_NULL`}
-							onChange={e => {
+							onChange={(e) => {
 								indeterminate.handleIndeterminate(e)
 								nullCallback(e)
 							}}
@@ -363,13 +363,13 @@ const FilterObj = ({ data, label, labelPlural, obj, callback, nullCallback = nul
 					</div>
 				) : null}
 
-				{data.map(item => (
+				{data.map((item: any) => (
 					<div className='input-wrapper' key={item}>
 						<input
 							type='checkbox'
 							name={label}
 							id={`${label}-${item}`}
-							onChange={e => {
+							onChange={(e) => {
 								indeterminate.handleIndeterminate(e)
 								callback(e, item)
 							}}
@@ -384,7 +384,7 @@ const FilterObj = ({ data, label, labelPlural, obj, callback, nullCallback = nul
 	)
 }
 
-const SortItem = ({ callback, label, name, checked = false, disabled = false }) => (
+const SortItem = ({ callback, label, name, checked = false, disabled = false }: any) => (
 	<div className={`input-wrapper ${disabled ? 'disabled' : ''}`}>
 		<input type='radio' name='sort' id={label} onChange={callback} defaultChecked={checked} />
 		<label htmlFor={label}>{name}</label>

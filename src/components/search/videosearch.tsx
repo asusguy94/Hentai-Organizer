@@ -28,7 +28,7 @@ class VideoSearchPage extends Component {
 				<Sidebar
 					videoData={{ categories: this.state.categories, attributes: this.state.attributes }}
 					videos={this.state.videos}
-					update={videos => this.setState({ videos })}
+					update={(videos: any) => this.setState({ videos })}
 				/>
 
 				<Videos videos={this.state.videos} />
@@ -41,7 +41,7 @@ class VideoSearchPage extends Component {
 	componentDidMount() {
 		Axios.get(`${config.api}/search/video`).then(({ data: videos }) => {
 			this.setState(() => {
-				videos = videos.map(item => {
+				videos = videos.map((item: any) => {
 					item.hidden = {
 						category: [],
 						notCategory: [],
@@ -65,7 +65,7 @@ class VideoSearchPage extends Component {
 }
 
 // Wrapper
-const Videos = ({ videos }) => (
+const Videos = ({ videos }: any) => (
 	<section id='videos' className='col-10'>
 		{videos.length ? (
 			<h2 className='text-center'>
@@ -75,7 +75,7 @@ const Videos = ({ videos }) => (
 
 		<div className='row justify-content-center'>
 			{videos.length ? (
-				videos.map(video => (
+				videos.map((video: any) => (
 					<a
 						key={video.id}
 						className={`video ribbon-container card ${isHidden(video) ? 'd-none' : ''}`}
@@ -99,7 +99,7 @@ const Videos = ({ videos }) => (
 	</section>
 )
 
-const Sidebar = ({ videos, update, videoData }) => (
+const Sidebar = ({ videos, update, videoData }: any) => (
 	<aside className='col-2'>
 		<TitleSearch videos={videos} update={update} />
 
@@ -110,11 +110,11 @@ const Sidebar = ({ videos, update, videoData }) => (
 )
 
 // Container
-const TitleSearch = ({ update, videos }) => {
-	const callback = e => {
+const TitleSearch = ({ update, videos }: any) => {
+	const callback = (e: any) => {
 		const searchValue = e.target.value.toLowerCase()
 
-		videos = videos.map(video => {
+		videos = videos.map((video: any) => {
 			video.hidden.titleSearch = !video.name.toLowerCase().includes(searchValue)
 
 			return video
@@ -130,9 +130,9 @@ const TitleSearch = ({ update, videos }) => {
 	)
 }
 
-const Sort = ({ videos, update }) => {
+const Sort = ({ videos, update }: any) => {
 	const sortDefault = (reverse = false) => {
-		videos.sort((a, b) => {
+		videos.sort((a: any, b: any) => {
 			let valA = a.name.toLowerCase()
 			let valB = b.name.toLowerCase()
 
@@ -144,21 +144,26 @@ const Sort = ({ videos, update }) => {
 	}
 
 	const sortAdded = (reverse = false) => {
-		videos.sort((a, b) => a.id - b.id)
+		videos.sort((a: any, b: any) => a.id - b.id)
 
 		if (reverse) videos.reverse()
 		update(videos)
 	}
 
 	const sortDate = (reverse = false) => {
-		videos.sort((a, b) => new Date(a.date) - new Date(b.date))
+		videos.sort((a: any, b: any) => {
+			const dateA: any = new Date(a.date)
+			const dateB: any = new Date(b.date)
+
+			return dateA - dateB
+		})
 
 		if (reverse) videos.reverse()
 		update(videos)
 	}
 
 	const sortPlays = (reverse = false) => {
-		videos.sort((a, b) => a.plays - b.plays)
+		videos.sort((a: any, b: any) => a.plays - b.plays)
 
 		if (reverse) videos.reverse()
 		update(videos)
@@ -183,13 +188,13 @@ const Sort = ({ videos, update }) => {
 	)
 }
 
-const Filter = ({ videoData, videos, update }) => {
-	const category = (e, target) => {
+const Filter = ({ videoData, videos, update }: any) => {
+	const category = (e: any, target: any) => {
 		const targetLower = target.name.toLowerCase()
 
-		videos = videos.map(video => {
+		videos = videos.map((video: any) => {
 			if (e.target.indeterminate) {
-				const match = video.categories.some(category => category.toLowerCase() === targetLower)
+				const match = video.categories.some((category: any) => category.toLowerCase() === targetLower)
 
 				if (match) {
 					video.hidden.notCategory.push(targetLower)
@@ -200,14 +205,14 @@ const Filter = ({ videoData, videos, update }) => {
 			} else if (!e.target.checked) {
 				video.hidden.noCategory = false
 
-				const match = video.categories.map(category => category.toLowerCase()).includes(targetLower)
+				const match = video.categories.map((category: any) => category.toLowerCase()).includes(targetLower)
 
 				if (match) {
 					// Remove indeterminate-status from filtering
 					video.hidden.notCategory.splice(video.hidden.notCategory.indexOf(targetLower), 1)
 				}
 			} else {
-				const match = !video.categories.map(category => category.toLowerCase()).includes(targetLower)
+				const match = !video.categories.map((category: any) => category.toLowerCase()).includes(targetLower)
 
 				if (match) video.hidden.category.push(targetLower)
 			}
@@ -218,12 +223,12 @@ const Filter = ({ videoData, videos, update }) => {
 		update(videos)
 	}
 
-	const attribute = (e, target) => {
+	const attribute = (e: any, target: any) => {
 		const targetLower = target.name.toLowerCase()
 
-		videos = videos.map(video => {
+		videos = videos.map((video: any) => {
 			if (e.target.indeterminate) {
-				const match = video.attributes.some(location => location.toLowerCase() === targetLower)
+				const match = video.attributes.some((location: any) => location.toLowerCase() === targetLower)
 
 				if (match) {
 					video.hidden.notAttribute.push(targetLower)
@@ -232,14 +237,14 @@ const Filter = ({ videoData, videos, update }) => {
 					video.hidden.attribute.splice(video.hidden.attribute.indexOf(targetLower), 1)
 				}
 			} else if (!e.target.checked) {
-				const match = video.attributes.map(attribute => attribute.toLowerCase()).includes(targetLower)
+				const match = video.attributes.map((attribute: any) => attribute.toLowerCase()).includes(targetLower)
 
 				if (match) {
 					// Remove indeterminate-status from filtering
 					video.hidden.notAttribute.splice(video.hidden.notAttribute.indexOf(targetLower), 1)
 				}
 			} else {
-				const match = !video.attributes.map(attribute => attribute.toLowerCase()).includes(targetLower)
+				const match = !video.attributes.map((attribute: any) => attribute.toLowerCase()).includes(targetLower)
 
 				if (match) video.hidden.attribute.push(targetLower)
 			}
@@ -250,8 +255,8 @@ const Filter = ({ videoData, videos, update }) => {
 		update(videos)
 	}
 
-	const category_NULL = e => {
-		videos = videos.map(video => {
+	const category_NULL = (e: any) => {
+		videos = videos.map((video: any) => {
 			if (e.target.indeterminate) {
 				video.hidden.noCategory = false
 				video.hidden.notNoCategory = video.categories.length === 0
@@ -290,14 +295,14 @@ const Filter = ({ videoData, videos, update }) => {
 }
 
 // ContainerItem
-const SortItem = ({ callback, label, name, checked = false, disabled = false }) => (
+const SortItem = ({ callback, label, name, checked = false, disabled = false }: any) => (
 	<div className={`input-wrapper ${disabled ? 'disabled' : ''}`}>
 		<input type='radio' name='sort' id={label} onChange={callback} defaultChecked={checked} />
 		<label htmlFor={label}>{name}</label>
 	</div>
 )
 
-const FilterObj = ({ data, label, labelPlural, obj, callback, nullCallback = null }) => {
+const FilterObj = ({ data, label, labelPlural, obj, callback, nullCallback = null }: any) => {
 	const indeterminate = new Indeterminate()
 
 	return (
@@ -311,7 +316,7 @@ const FilterObj = ({ data, label, labelPlural, obj, callback, nullCallback = nul
 							type='checkbox'
 							name={label}
 							id={`${label}_NULL`}
-							onChange={e => {
+							onChange={(e) => {
 								indeterminate.handleIndeterminate(e)
 								nullCallback(e)
 							}}
@@ -322,13 +327,13 @@ const FilterObj = ({ data, label, labelPlural, obj, callback, nullCallback = nul
 					</div>
 				) : null}
 
-				{data.map(item => (
+				{data.map((item: any) => (
 					<div className='input-wrapper' key={item.id}>
 						<input
 							type='checkbox'
 							name={label}
 							id={`${label}-${item.name}`}
-							onChange={e => {
+							onChange={(e) => {
 								indeterminate.handleIndeterminate(e)
 								callback(e, item)
 							}}

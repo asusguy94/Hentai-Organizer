@@ -37,7 +37,7 @@ const AddVideoPage = () => {
 					{videos.length ? (
 						<div
 							className='btn btn-primary'
-							onClick={e => {
+							onClick={(e) => {
 								Axios.post(`${config.source}/video/add`, { videos }).then(() => {
 									window.location.reload()
 								})
@@ -60,7 +60,7 @@ const AddVideoPage = () => {
 	)
 }
 
-const Button = ({ label, callback, disabled = false }) => {
+const Button = ({ label, callback, disabled = false }: any) => {
 	const [isDisabled, setIsDisabled] = useState(disabled)
 
 	const clickHandler = () => {
@@ -78,7 +78,7 @@ const Button = ({ label, callback, disabled = false }) => {
 	)
 }
 
-const CustomInput = ({ label, item }) => {
+const CustomInput = ({ label, item }: any) => {
 	const lowerLabel = label.toLowerCase()
 	const data = item[lowerLabel]
 

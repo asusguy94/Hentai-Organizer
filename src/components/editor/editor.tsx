@@ -14,10 +14,10 @@ const EditorPage = () => (
 	</div>
 )
 
-const Wrapper = ({ label, name, children, obj = [] }) => {
+const Wrapper = ({ label, name, children, obj = [] }: any) => {
 	const [input, setInput] = useState('')
 
-	const handleChange = e => setInput(e.target.value)
+	const handleChange = (e: any) => setInput(e.target.value)
 
 	const handleSubmit = () => {
 		if (input.length) {
@@ -31,7 +31,7 @@ const Wrapper = ({ label, name, children, obj = [] }) => {
 		}
 	}
 
-	const handleKeyPress = e => {
+	const handleKeyPress = (e: any) => {
 		if (e.key === 'Enter') {
 			e.preventDefault()
 			handleSubmit()
@@ -56,21 +56,21 @@ const Wrapper = ({ label, name, children, obj = [] }) => {
 	)
 }
 
-const WrapperItem = ({ label, obj = [] }) => {
+const WrapperItem = ({ label, obj = [] }: any) => {
 	const [data, setData] = useState([])
 
 	useEffect(() => {
 		Axios.get(`${config.api}/${label}`).then(({ data }) => {
-			data.sort((a, b) => a.id - b.id)
+			data.sort((a: any, b: any) => a.id - b.id)
 
 			setData(data)
 		})
 	}, [])
 
-	const updateItem = (ref, value) => {
+	const updateItem = (ref: any, value: any) => {
 		Axios.put(`${config.api}/${label}/${ref.id}`, { value }).then(() => {
 			setData(
-				data.filter(item => {
+				data.filter((item: any) => {
 					if (ref.id === item.id) item.name = value
 
 					return item
@@ -86,22 +86,27 @@ const WrapperItem = ({ label, obj = [] }) => {
 					<th>ID</th>
 					<th>{capitalize(label)}</th>
 
-					{obj.map(label => (
+					{obj.map((label: any) => (
 						<th key={label}>{label}</th>
 					))}
 				</tr>
 			</thead>
 
 			<tbody>
-				{data.map(item => (
-					<Item key={item.id} obj={obj} data={item} update={(ref, value) => updateItem(ref, value)} />
+				{data.map((item: any) => (
+					<Item
+						key={item.id}
+						obj={obj}
+						data={item}
+						update={(ref: any, value: any) => updateItem(ref, value)}
+					/>
 				))}
 			</tbody>
 		</table>
 	)
 }
 
-const Item = ({ update, data, obj }) => {
+const Item = ({ update, data, obj }: any) => {
 	const [edit, setEdit] = useState(false)
 	const [value, setValue] = useState(null)
 
@@ -111,22 +116,23 @@ const Item = ({ update, data, obj }) => {
 		if (value) update(data, value)
 	}
 
-	const setCondition = (ref, prop, value, checkbox) => {
+	const setCondition = (ref: any, prop: any, value: any, checkbox: any) => {
 		Axios.put(`${config.api}/attribute/${ref.id}`, { label: prop, value }).catch(() => {
 			checkbox.checked = !checkbox.checked
 		})
 	}
 
-	const handleKeyPress = e => {
+	const handleKeyPress = (e: any) => {
 		if (e.key === 'Enter') {
 			e.preventDefault()
 			save()
 		}
 	}
 
-	const handleConditionChange = (e, data, prop) => setCondition(data, prop, Number(e.target.checked), e.target)
+	const handleConditionChange = (e: any, data: any, prop: any) =>
+		setCondition(data, prop, Number(e.target.checked), e.target)
 	const clickHandler = () => setEdit(true)
-	const changeHandler = e => setValue(e.target.value)
+	const changeHandler = (e: any) => setValue(e.target.value)
 
 	return (
 		<tr>
@@ -146,12 +152,12 @@ const Item = ({ update, data, obj }) => {
 				)}
 			</td>
 
-			{obj.map(item => (
+			{obj.map((item: any) => (
 				<td key={item}>
 					<input
 						type='checkbox'
 						defaultChecked={data[item]}
-						onChange={e => handleConditionChange(e, data, item)}
+						onChange={(e) => handleConditionChange(e, data, item)}
 					/>
 				</td>
 			))}

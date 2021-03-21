@@ -253,11 +253,13 @@ const Sidebar = ({ video, stars, bookmarks, attributes, categories, updateBookma
 
 // Container
 const VideoPlayer = ({ video, bookmarks, categories, stars, updateBookmarks, playerRef, playerValue }: any) => {
+	const handleModal = useContext(ModalContext)
+	const update = useContext(UpdateContext).video
+
 	const [newVideo, setNewVideo] = useState<boolean>()
 	const [events, setEvents] = useState(false)
 
-	const handleModal = useContext(ModalContext)
-	const update = useContext(UpdateContext).video
+	let playAdded = false
 
 	const getPlayer = () => playerValue?.player
 
@@ -284,10 +286,12 @@ const VideoPlayer = ({ video, bookmarks, categories, stars, updateBookmarks, pla
 			player.on('play', () => {
 				localStorage.playing = 1
 
-				if (newVideo) {
+				if (newVideo && !playAdded) {
 					Axios.put(`${config.api}/video/${video.id}`, { plays: 1 }).then(() => {
 						console.log('Play Added')
 					})
+
+					playAdded = true
 				}
 			})
 			player.on('pause', () => (localStorage.playing = 0))

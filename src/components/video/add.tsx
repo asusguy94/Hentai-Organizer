@@ -69,7 +69,7 @@ interface IButton {
 	callback?: () => void
 	disabled?: boolean
 }
-const Button = ({ label, callback, disabled = false }: any) => {
+const Button = ({ label, callback = () => {}, disabled = false }: IButton) => {
 	const [isDisabled, setIsDisabled] = useState(disabled)
 
 	const clickHandler = () => {
@@ -81,7 +81,7 @@ const Button = ({ label, callback, disabled = false }: any) => {
 	}
 
 	return (
-		<div className={`btn btn-info w-auto ${isDisabled ? 'disabled' : ''}`} onClick={clickHandler}>
+		<div className={`btn btn-info mx-1 ${isDisabled ? 'disabled' : ''}`} onClick={clickHandler}>
 			{label}
 		</div>
 	)

@@ -152,8 +152,8 @@ const Sort = ({ videos, update }: any) => {
 
 	const sortDate = (reverse = false) => {
 		videos.sort((a: any, b: any) => {
-			const dateA: any = new Date(a.date)
-			const dateB: any = new Date(b.date)
+			const dateA: any = new Date(a.published)
+			const dateB: any = new Date(b.published)
 
 			return dateA - dateB
 		})

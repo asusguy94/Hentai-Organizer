@@ -82,8 +82,7 @@ class VideoPage extends Component {
 
 		switch (key) {
 			case 'tab':
-				//@ts-ignore
-				window.location.href = this.state.video.nextID ? this.state.video.nextID : '/video'
+				window.location.href = this.state.video.nextID ? `${this.state.video.nextID}` : '/video'
 				break
 			default:
 				console.log(`${key} was pressed`)
@@ -791,12 +790,6 @@ const Timeline = ({
 
 			if (collisionCheck(first, second)) {
 				collision = true
-			} else {
-				collision = false
-
-				for (let j = 1; j < i; j++) {
-					if (collisionCheck(items[j], second)) collision = true
-				}
 			}
 
 			if (collision && level < LEVEL_MAX) {

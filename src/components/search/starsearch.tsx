@@ -241,7 +241,7 @@ const Filter = ({ stars, starData, update }: any) => {
 
 	return (
 		<>
-			<FilterItem
+			<FilterRadio
 				data={starData.breasts}
 				obj={stars}
 				label='breast'
@@ -249,7 +249,7 @@ const Filter = ({ stars, starData, update }: any) => {
 				globalCallback={breast_ALL}
 			/>
 
-			<FilterItem
+			<FilterRadio
 				data={starData.haircolors}
 				obj={stars}
 				label='haircolor'
@@ -257,7 +257,7 @@ const Filter = ({ stars, starData, update }: any) => {
 				globalCallback={haircolor_ALL}
 			/>
 
-			<FilterItem
+			<FilterRadio
 				data={starData.hairstyles}
 				obj={stars}
 				label='hairstyle'
@@ -265,7 +265,7 @@ const Filter = ({ stars, starData, update }: any) => {
 				globalCallback={hairstyle_ALL}
 			/>
 
-			<FilterObj
+			<FilterCheckBox
 				data={starData.attributes}
 				obj={stars}
 				label='attribute'
@@ -297,7 +297,7 @@ const TitleSearch = ({ stars, update }: any) => {
 }
 
 // ContainerItem
-const FilterItem = ({ data, label, obj, callback, globalCallback = null, nullCallback = null }: any) => (
+const FilterRadio = ({ data, label, obj, callback, globalCallback = null, nullCallback = null, count = true }: any) => (
 	<>
 		<h2>{capitalize(label, true)}</h2>
 
@@ -330,7 +330,7 @@ const FilterItem = ({ data, label, obj, callback, globalCallback = null, nullCal
 				<div className='input-wrapper' key={item}>
 					<input type='radio' name={label} id={`${label}-${item}`} onChange={() => callback(item)} />
 					<label htmlFor={`${label}-${item}`}>
-						{item} <LabelCount prop={label} label={item} obj={obj} isArr={true} />
+						{item} {count ? <LabelCount prop={label} label={item} obj={obj} isArr={true} /> : null}
 					</label>
 				</div>
 			))}
@@ -338,7 +338,7 @@ const FilterItem = ({ data, label, obj, callback, globalCallback = null, nullCal
 	</>
 )
 
-const FilterObj = ({ data, label, labelPlural, obj, callback, nullCallback = null }: any) => {
+const FilterCheckBox = ({ data, label, labelPlural, obj, callback, nullCallback = null }: any) => {
 	const indeterminate = new Indeterminate()
 
 	return (

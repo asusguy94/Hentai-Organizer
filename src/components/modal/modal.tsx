@@ -84,8 +84,7 @@ const Modal = (props: any) => {
 				isDisabled={!props.visible}
 			/>
 		</>,
-		//@ts-ignore
-		document.getElementById('portal')
+		document.getElementById('portal')!
 	)
 }
 

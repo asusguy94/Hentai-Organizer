@@ -369,7 +369,7 @@ const StarInputForm = ({ value, emptyByDefault = false, update, name, type, list
 				type={type}
 				id={name.toLowerCase()}
 				defaultValue={emptyByDefault ? '' : value}
-				onChange={(e) => updateValue(e)}
+				onChange={updateValue}
 				onKeyDown={(e) => handleKeyPress(e)}
 				list={`${name.toLowerCase()}s`}
 			/>

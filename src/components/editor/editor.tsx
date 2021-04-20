@@ -1,3 +1,4 @@
+import React, { FC } from 'react'
 import { useState, useEffect, cloneElement } from 'react'
 
 import Axios from 'axios'
@@ -14,10 +15,10 @@ const EditorPage = () => (
 	</div>
 )
 
-const Wrapper = ({ label, name, children, obj = [] }: any) => {
+const Wrapper: FC<any> = ({ label, name, children, obj = [] }) => {
 	const [input, setInput] = useState('')
 
-	const handleChange = (e: any) => setInput(e.target.value)
+	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => setInput(e.target.value)
 
 	const handleSubmit = () => {
 		if (input.length) {
@@ -31,7 +32,7 @@ const Wrapper = ({ label, name, children, obj = [] }: any) => {
 		}
 	}
 
-	const handleKeyPress = (e: any) => {
+	const handleKeyPress = (e: React.KeyboardEvent) => {
 		if (e.key === 'Enter') {
 			e.preventDefault()
 			handleSubmit()
@@ -108,7 +109,7 @@ const WrapperItem = ({ label, obj = [] }: any) => {
 
 const Item = ({ update, data, obj }: any) => {
 	const [edit, setEdit] = useState(false)
-	const [value, setValue] = useState(null)
+	const [value, setValue] = useState<null | string>(null)
 
 	const save = () => {
 		setEdit(false)
@@ -122,7 +123,7 @@ const Item = ({ update, data, obj }: any) => {
 		})
 	}
 
-	const handleKeyPress = (e: any) => {
+	const handleKeyPress = (e: React.KeyboardEvent) => {
 		if (e.key === 'Enter') {
 			e.preventDefault()
 			save()
@@ -132,7 +133,7 @@ const Item = ({ update, data, obj }: any) => {
 	const handleConditionChange = (e: any, data: any, prop: any) =>
 		setCondition(data, prop, Number(e.target.checked), e.target)
 	const clickHandler = () => setEdit(true)
-	const changeHandler = (e: any) => setValue(e.target.value)
+	const changeHandler = (e: React.ChangeEvent<HTMLInputElement>) => setValue(e.currentTarget.value)
 
 	return (
 		<tr>

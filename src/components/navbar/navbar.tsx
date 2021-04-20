@@ -1,3 +1,4 @@
+import { FC } from 'react'
 import { Link } from 'react-router-dom'
 
 import './navbar.scss'
@@ -23,7 +24,13 @@ const NavBar = () => (
 	</nav>
 )
 
-const NavBarItem = ({ name, path, children, disabled = false, remote = false }: any) => {
+interface INavBarItem {
+	name: string
+	path: string
+	disabled?: boolean
+	remote?: boolean
+}
+const NavBarItem: FC<INavBarItem> = ({ name, path, children, disabled = false, remote = false }) => {
 	if (!disabled) {
 		return (
 			<li>

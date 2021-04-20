@@ -4,10 +4,14 @@ import Axios from 'axios'
 
 import config from '../config.json'
 
-//TODO needs work
-
+interface IVideo {
+	path: string
+	franchise: string
+	episode: string
+	name: string
+}
 const AddVideoPage = () => {
-	const [videos, setVideos] = useState([])
+	const [videos, setVideos] = useState<IVideo[]>([])
 	const [loaded, setLoaded] = useState(false)
 
 	useEffect(() => {
@@ -60,6 +64,11 @@ const AddVideoPage = () => {
 	)
 }
 
+interface IButton {
+	label: string
+	callback?: () => void
+	disabled?: boolean
+}
 const Button = ({ label, callback, disabled = false }: any) => {
 	const [isDisabled, setIsDisabled] = useState(disabled)
 

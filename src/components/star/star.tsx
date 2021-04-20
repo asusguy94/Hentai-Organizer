@@ -1,4 +1,4 @@
-import { Component, Fragment, useState, useRef } from 'react'
+import React, { Component, Fragment, useState, useRef } from 'react'
 
 import Axios from 'axios'
 import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu'
@@ -187,24 +187,24 @@ const StarImageDropbox = ({ star, update }: any) => {
 		})
 	}
 
-	const handleDefault = (e: any) => {
+	const handleDefault = (e: React.DragEvent) => {
 		e.stopPropagation()
 		e.preventDefault()
 	}
 
-	const handleEnter = (e: any) => {
+	const handleEnter = (e: React.DragEvent) => {
 		handleDefault(e)
 
 		setHover(true)
 	}
 
-	const handleLeave = (e: any) => {
+	const handleLeave = (e: React.DragEvent) => {
 		handleDefault(e)
 
 		setHover(false)
 	}
 
-	const handleDrop = (e: any) => {
+	const handleDrop = (e: React.DragEvent) => {
 		handleDefault(e)
 
 		addImage(e.dataTransfer.getData('text'))
@@ -334,12 +334,12 @@ const StarInputForm = ({ value, emptyByDefault = false, update, name, type, list
 	const [inputID, setInputID] = useState('')
 	const [inputValue, setInputValue] = useState(emptyByDefault ? '' : value)
 
-	const updateValue = (e: any) => {
-		setInputID(e.target.id)
-		setInputValue(e.target.value)
+	const updateValue = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setInputID(e.currentTarget.id)
+		setInputValue(e.currentTarget.value)
 	}
 
-	const handleKeyPress = (e: any) => {
+	const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
 		if (e.key === 'Enter') {
 			if (inputID.length) update(inputValue, inputID)
 
@@ -347,7 +347,7 @@ const StarInputForm = ({ value, emptyByDefault = false, update, name, type, list
 				setInputValue('')
 
 				// Reset input-field
-				e.target.value = ''
+				e.currentTarget.value = ''
 			}
 		}
 	}
@@ -437,12 +437,12 @@ const StarTitle = ({ star, handleModal, update }: any) => {
 								type='text'
 								defaultValue={star.name}
 								ref={(input) => input && input.focus()}
-								onKeyDown={(e: any) => {
+								onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
 									if (e.key === 'Enter') {
 										e.preventDefault()
 
 										handleModal()
-										renameStar(e.target.value)
+										renameStar(e.currentTarget.value)
 									}
 								}}
 							/>

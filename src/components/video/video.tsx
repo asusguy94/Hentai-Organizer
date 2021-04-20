@@ -1,4 +1,4 @@
-import { Component, Fragment, useEffect, useState, useContext, createContext } from 'react'
+import React, { Component, Fragment, useEffect, useState, useContext, createContext } from 'react'
 import { Link } from 'react-router-dom'
 
 import Axios from 'axios'
@@ -11,7 +11,7 @@ import ReactTooltip from 'react-tooltip'
 import KeyboardEventHandler from 'react-keyboard-event-handler'
 import Autosizeinput from 'react-input-autosize'
 
-import Modal from '../modal/modal'
+import Modal, { IModal } from '../modal/modal'
 import Ribbon from '../ribbon/ribbon'
 import { setFocus, useRefWithEffect } from '../../hooks'
 
@@ -19,7 +19,12 @@ import './video.scss'
 
 import config from '../config.json'
 
-const ModalContext = createContext((...args: any): void => {})
+import { IVideo, IAttribute, ICategory, IVideoStar as IStar, IBookmark, IKeyPress } from '../../interfaces'
+
+const ModalContext = createContext({
+	method: (...args: any): void => {},
+	data: { visible: false, title: null, data: null, filter: false }
+})
 const UpdateContext = createContext({
 	video: (video: any): void => {},
 	stars: (stars: any[]): void => {},
@@ -72,8 +77,7 @@ class VideoPage extends Component {
 		}
 	}
 
-	handleKeyPress(key: any, e: any) {
-		if (e.target.tagName === 'INPUT') return
+	handleKeyPress(key: string, e: IKeyPress) {
 		e.preventDefault()
 
 		switch (key) {
@@ -89,7 +93,7 @@ class VideoPage extends Component {
 	handleModal(title = null, data = null, filter = false) {
 		if (title !== null && data !== null && this.state.modal.visible) this.handleModal()
 
-		this.setState(({ modal }: any) => {
+		this.setState(({ modal }: { modal: IModal }) => {
 			modal.title = title
 			modal.data = data
 			modal.visible = !modal.visible
@@ -111,13 +115,16 @@ class VideoPage extends Component {
 		return (
 			<div id='video-page' className='col-12 row'>
 				<ModalContext.Provider
-					value={(title: any, data: any, filter: any) => this.handleModal(title, data, filter)}
+					value={{
+						method: (title: any, data: any, filter: boolean) => this.handleModal(title, data, filter),
+						data: this.state.modal
+					}}
 				>
 					<UpdateContext.Provider
 						value={{
-							bookmarks: (bookmarks: any) => this.setState({ bookmarks }),
-							video: (video: any) => this.setState({ video }),
-							stars: (stars: any) => this.setState({ stars })
+							bookmarks: (bookmarks: IBookmark[]) => this.setState({ bookmarks }),
+							video: (video: IVideo[]) => this.setState({ video }),
+							stars: (stars: IStars[]) => this.setState({ stars })
 						}}
 					>
 						<SetStarEventContext.Provider
@@ -132,7 +139,7 @@ class VideoPage extends Component {
 							categories={this.state.categories}
 							attributes={this.state.attributes}
 							stars={this.state.stars}
-							updateBookmarks={(bookmarks: any) => this.setState({ bookmarks })}
+									updateBookmarks={(bookmarks: IBookmark[]) => this.setState({ bookmarks })}
 						/>
 
 						<Sidebar
@@ -141,7 +148,7 @@ class VideoPage extends Component {
 							bookmarks={this.state.bookmarks}
 							attributes={this.state.attributes}
 							categories={this.state.categories}
-							updateBookmarks={(bookmarks: any) => this.setState({ bookmarks })}
+									updateBookmarks={(bookmarks: IBookmark[]) => this.setState({ bookmarks })}
 						/>
 							</GetStarEventContext.Provider>
 						</SetStarEventContext.Provider>
@@ -157,7 +164,7 @@ class VideoPage extends Component {
 
 						<KeyboardEventHandler
 							handleKeys={['tab']}
-							onKeyEvent={(key: any, e: any) => this.handleKeyPress(key, e)}
+							onKeyEvent={(key: string, e: IKeyPress) => this.handleKeyPress(key, e)}
 							handleFocusableElements={true}
 						/>
 					</UpdateContext.Provider>
@@ -173,7 +180,7 @@ class VideoPage extends Component {
 		Axios.get(`${config.api}/video/${id}`).then(({ data: video }) => this.setState({ video }))
 
 		Axios.get(`${config.api}/video/${id}/bookmark`).then(({ data: bookmarks }) => {
-			bookmarks.map((bookmark: any) => (bookmark.active = false))
+			bookmarks.map((bookmark: IBookmark) => (bookmark.active = false))
 
 			this.setState({ bookmarks })
 		})
@@ -185,7 +192,15 @@ class VideoPage extends Component {
 }
 
 // Wrapper
-const Section = ({ video, bookmarks, categories, attributes, stars, updateBookmarks }: any) => {
+interface ISection {
+	video: IVideo
+	bookmarks: IBookmark[]
+	categories: ICategory[]
+	attributes: IAttribute[]
+	stars: IStar[]
+	updateBookmarks: (bookmarks: IBookmark[]) => void
+}
+const Section = ({ video, bookmarks, categories, attributes, stars, updateBookmarks }: ISection) => {
 	const [playerRef, ref] = useRefWithEffect()
 	const [duration, setDuration] = useState(0)
 
@@ -201,17 +216,17 @@ const Section = ({ video, bookmarks, categories, attributes, stars, updateBookma
 		player.play()
 	}
 
-	const setTime = (bookmarkID: any) => {
+	const setTime = (bookmarkID: number) => {
 		const time = Math.round(getPlayer().currentTime)
 
 		Axios.put(`${config.api}/bookmark/${bookmarkID}`, { time }).then(() => {
 			bookmarks = bookmarks
-				.map((bookmark: any) => {
+				.map((bookmark) => {
 					if (bookmark.id === bookmarkID) bookmark.start = time
 
 					return bookmark
 				})
-				.sort((a: any, b: any) => a.start - b.start)
+				.sort((a, b) => a.start - b.start)
 
 			updateBookmarks(bookmarks)
 		})
@@ -247,9 +262,17 @@ const Section = ({ video, bookmarks, categories, attributes, stars, updateBookma
 	)
 }
 
-const Sidebar = ({ video, stars, bookmarks, attributes, categories, updateBookmarks }: any) => {
+interface ISidebar {
+	video: IVideo
+	stars: IStar[]
+	bookmarks: IBookmark[]
+	attributes: IAttribute[]
+	categories: ICategory[]
+	updateBookmarks: (bookmarks: IBookmark[]) => void
+}
+const Sidebar = ({ video, stars, bookmarks, attributes, categories, updateBookmarks }: ISidebar) => {
 	const clearActive = () => {
-		bookmarks = bookmarks.map((bookmark: any) => {
+		bookmarks = bookmarks.map((bookmark) => {
 			bookmark.active = false
 
 			return bookmark
@@ -367,7 +390,7 @@ const VideoPlayer = ({
 				hls.on(Hls.Events.MANIFEST_PARSED, (e, data) => {
 					const dataLevels = data['levels'].length - 1
 
-					const levels: any = config.hls.levels
+					const levels: { [key: string]: number } = config.hls.levels
 					const maxLevel = levels[config.hls.maxLevel]
 					const maxStartLevel = levels[config.hls.maxStartLevel]
 
@@ -402,7 +425,7 @@ const VideoPlayer = ({
 		}
 	}, [events])
 
-	const handleWheel = (e: any) => (getPlayer().currentTime += 10 * Math.sign(e.deltaY) * -1)
+	const handleWheel = (e: React.WheelEvent) => (getPlayer().currentTime += 10 * Math.sign(e.deltaY) * -1)
 	const copy = async () => await navigator.clipboard.writeText(video.path.file)
 
 	const resetPlays = () => {
@@ -415,7 +438,7 @@ const VideoPlayer = ({
 		})
 	}
 
-	const renameVideo = (path: any) => {
+	const renameVideo = (path: string) => {
 		Axios.put(`${config.source}/video/${video.id}`, { path }).then(() => window.location.reload())
 	}
 
@@ -431,7 +454,7 @@ const VideoPlayer = ({
 		Axios.put(`${config.source}/video/${video.id}`).then(() => window.location.reload())
 	}
 
-	const addBookmark = (category: any) => {
+	const addBookmark = (category: ICategory) => {
 		const time = Math.round(getPlayer().currentTime)
 		if (time) {
 			Axios.post(`${config.api}/video/${video.id}/bookmark`, {
@@ -449,14 +472,14 @@ const VideoPlayer = ({
 					attributes,
 					active: false
 				})
-				bookmarks.sort((a: any, b: any) => a.start - b.start)
+				bookmarks.sort((a, b) => a.start - b.start)
 
 				updateBookmarks(bookmarks)
 			})
 		}
 	}
 
-	const handleKeyPress = (key: any, e: any) => {
+	const handleKeyPress = (key: string, e: IKeyPress) => {
 		if (e.target.tagName === 'INPUT') return
 		e.preventDefault()
 
@@ -513,7 +536,7 @@ const VideoPlayer = ({
 					onClick={() => {
 						handleModal(
 							'Add Bookmark',
-							categories.map((category: any) => {
+							categories.map((category) => {
 								return (
 									<div
 										key={category.id}
@@ -559,12 +582,12 @@ const VideoPlayer = ({
 								inputClassName='input--autosize'
 								defaultValue={video.path.file}
 								ref={setFocus}
-								onKeyDown={(e: any) => {
+								onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
 									if (e.key === 'Enter') {
 										e.preventDefault()
 
 										handleModal()
-										renameVideo(e.target.value)
+										renameVideo(e.currentTarget.value)
 									}
 								}}
 							/>
@@ -638,15 +661,24 @@ const Timeline = ({
 		}
 	}
 
-	const removeBookmark = (id: any) => {
+	const bookmarksArr: HTMLElement[] = []
+
+	const isActive = (bookmark: IBookmark) => Boolean(bookmark.active)
+	const hasStar = (bookmark: IBookmark) => Boolean(bookmark.starID)
+	const attributesFromStar = (starID: number) =>
+		stars.filter((star) => (star.id === starID ? star : null))[0]?.attributes
+	const isStarAttribute = (starID: number, attributeID: number) =>
+		attributesFromStar(starID)?.some((attr) => attr.id === attributeID)
+
+	const removeBookmark = (id: number) => {
 		Axios.delete(`${config.api}/bookmark/${id}`).then(() => {
-			update(bookmarks.filter((bookmark: any) => bookmark.id !== id))
+			update(bookmarks.filter((bookmark) => bookmark.id !== id))
 		})
 	}
 
-	const setCategory = (category: any, bookmark: any) => {
+	const setCategory = (category: ICategory, bookmark: IBookmark) => {
 		Axios.put(`${config.api}/bookmark/${bookmark.id}`, { categoryID: category.id }).then(() => {
-			bookmarks = bookmarks.map((bookmarkItem: any) => {
+			bookmarks = bookmarks.map((bookmarkItem) => {
 				if (bookmarkItem.id === bookmark.id) {
 					bookmarkItem.name = category.name
 				}
@@ -658,11 +690,11 @@ const Timeline = ({
 		})
 	}
 
-	const addAttribute = (attribute: any, bookmark: any) => {
+	const addAttribute = (attribute: IAttribute, bookmark: IBookmark) => {
 		Axios.post(`${config.api}/bookmark/attribute/`, { bookmarkID: bookmark.id, attributeID: attribute.id }).then(
 			() => {
 				update(
-					bookmarks.map((bookmarkItem: any) => {
+					bookmarks.map((bookmarkItem) => {
 						if (bookmarkItem.id === bookmark.id) {
 							bookmarkItem.attributes.push({
 								id: attribute.id,
@@ -677,9 +709,9 @@ const Timeline = ({
 		)
 	}
 
-	const clearAttributes = (bookmark: any) => {
+	const clearAttributes = (bookmark: IBookmark) => {
 		Axios.delete(`${config.api}/bookmark/${bookmark.id}/attribute`).then(() => {
-			bookmarks = bookmarks.map((item: any) => {
+			bookmarks = bookmarks.map((item) => {
 				if (item.id === bookmark.id) {
 					const starID = bookmark.starID
 
@@ -687,9 +719,9 @@ const Timeline = ({
 						const attributes = attributesFromStar(starID)
 
 						if (item.attributes.length > attributes.length) {
-							item.attributes = item.attributes.filter((attribute: any) => {
+							item.attributes = item.attributes.filter((attribute) => {
 								const match = attributes.some(
-									(bookmarkAttribute: any) => bookmarkAttribute.name === attribute.name
+									(bookmarkAttribute) => bookmarkAttribute.name === attribute.name
 								)
 
 								return match ? attribute : null
@@ -708,18 +740,16 @@ const Timeline = ({
 		})
 	}
 
-	const removeStar = (bookmark: any) => {
+	const removeStar = (bookmark: IBookmark) => {
 		Axios.delete(`${config.api}/bookmark/${bookmark.id}/star`).then(() => {
-			bookmarks = bookmarks.map((item: any) => {
+			bookmarks = bookmarks.map((item) => {
 				if (item.id === bookmark.id) {
-					const starID = bookmark.starID
-
-					const attributes = attributesFromStar(starID)
+					const attributes = attributesFromStar(bookmark.starID)
 
 					if (item.attributes.length > attributes.length) {
 						// Bookmark have at least 1 attribute not from star
-						item.attributes = item.attributes.filter((attribute: any) => {
-							const match = attributes.some((starAttribute: any) => starAttribute.name === attribute.name)
+						item.attributes = item.attributes.filter((attribute) => {
+							const match = attributes.some((starAttribute) => starAttribute.name === attribute.name)
 
 							if (!match) return attribute
 							return null
@@ -729,6 +759,7 @@ const Timeline = ({
 						item.attributes = []
 					}
 
+					// RESET starID
 					item.starID = 0
 				}
 
@@ -781,7 +812,7 @@ const Timeline = ({
 	return (
 		<div className='col-12' id='timeline'>
 			{video.id !== 0
-				? bookmarks.map((bookmark: any, i: any) => (
+				? bookmarks.map((bookmark, i) => (
 						<Fragment key={bookmark.id}>
 							<ContextMenuTrigger id={`bookmark-${bookmark.id}`}>
 								<div
@@ -796,7 +827,7 @@ const Timeline = ({
 										left: `${((bookmark.start * 100) / duration) * config.timeline.offset}%`
 									}}
 									onClick={() => playVideo(bookmark.start)}
-									ref={(item) => (bookmarksArr[i] = item)}
+									ref={(item: HTMLDivElement) => (bookmarksArr[i] = item)}
 									data-level={1}
 								>
 									<div data-tip={true} data-for={`bookmark-info-${bookmark.id}`}>
@@ -815,13 +846,13 @@ const Timeline = ({
 											) : null}
 
 											{bookmark.attributes
-												.sort((a: any, b: any) => {
+												.sort((a, b) => {
 													if (isStarAttribute(bookmark.starID, a.id)) return -1
 													else if (isStarAttribute(bookmark.starID, b.id)) return 1
 
 													return a.name.localeCompare(b.name)
 												})
-												.map((attribute: any) => (
+												.map((attribute) => (
 													<div key={attribute.id} className='attribute btn btn-sm btn-light'>
 														{attribute.name}
 													</div>
@@ -834,28 +865,7 @@ const Timeline = ({
 							<ContextMenu id={`bookmark-${bookmark.id}`}>
 								<MenuItem
 									disabled={bookmark.starID !== 0 || (bookmark.starID === 0 && !stars.length)}
-									onClick={() => {
-										if (stars.length > 1) {
-											const starEl = document.getElementsByClassName('star')
-
-											// Define arrays for listeners
-											for (let i = 0; i < starEl.length; i++) {
-												const star = starEl[i]
-
-												// Define Listeners
-												const listenerEnter = () => star.classList.add('star--active')
-												const listenerLeave = () => star.classList.remove('star--active')
-												const listenerClick = () => addStar(bookmark, stars[i])
-
-												// Mount Listeners
-												star.addEventListener('mouseenter', listenerEnter)
-												star.addEventListener('mouseleave', listenerLeave)
-												star.addEventListener('click', listenerClick)
-											}
-										} else {
-											addStar(bookmark, stars[0])
-										}
-									}}
+									onClick={() => setStarEvent(true, bookmark)}
 								>
 									<i className={config.theme.icons.add} /> Add Star
 								</MenuItem>
@@ -871,15 +881,14 @@ const Timeline = ({
 										handleModal(
 											'Add Attribute',
 											attributes
-												.filter((attribute: any) => {
+												.filter((attribute) => {
 													const match = bookmark.attributes.some(
-														(bookmarkAttribute: any) =>
-															attribute.name === bookmarkAttribute.name
+														(bookmarkAttribute) => attribute.name === bookmarkAttribute.name
 													)
 
 													return !match ? attribute : null
 												})
-												.map((attribute: any) => (
+												.map((attribute) => (
 													<div
 														key={attribute.id}
 														className='btn btn-sm btn-outline-primary d-block w-auto'
@@ -910,8 +919,8 @@ const Timeline = ({
 										handleModal(
 											'Change Category',
 											categories
-												.filter((category: any) => category.name !== bookmark.name)
-												.map((category: any) => (
+												.filter((category) => category.name !== bookmark.name)
+												.map((category) => (
 													<div
 														key={category.id}
 														className='btn btn-outline-primary d-block w-auto'
@@ -1182,7 +1191,7 @@ const StarInput = ({ video, stars, bookmarks }: any) => {
 	const updateVideo = useContext(UpdateContext).video
 	const update = useContext(UpdateContext).stars
 
-	const handleNoStar = (e: any) => {
+	const handleNoStar = (e: React.ChangeEvent<HTMLInputElement>) => {
 		Axios.put(`${config.api}/video/${video.id}`, { noStar: e.target.checked }).then(({ data }) => {
 			video.noStar = data.noStar
 
@@ -1190,7 +1199,7 @@ const StarInput = ({ video, stars, bookmarks }: any) => {
 		})
 	}
 
-	const addStar = (name: any) => {
+	const addStar = (name: string) => {
 		Axios.post(`${config.api}/video/${video.id}/star`, { name }).then(({ data }) => {
 			stars.push({ id: data.id, name, attributes: data.attributes })
 
@@ -1211,13 +1220,13 @@ const StarInput = ({ video, stars, bookmarks }: any) => {
 						type='text'
 						id='add-star'
 						className='form-control'
-						onKeyDown={(e: any) => {
+						onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
 							if (e.key === 'Enter') {
 								e.preventDefault()
 
-								addStar(e.target.value)
+								addStar(e.currentTarget.value)
 
-								e.target.value = ''
+								e.currentTarget.value = ''
 							}
 						}}
 						disabled={video.noStar === 1}
@@ -1236,7 +1245,7 @@ const StarInput = ({ video, stars, bookmarks }: any) => {
 						className='form-check-input'
 						onChange={handleNoStar}
 						checked={video.noStar === 1}
-						disabled={bookmarks.length || stars.length}
+						disabled={bookmarks.length > 0 || stars.length > 0}
 					/>
 				</div>
 			</div>
@@ -1246,11 +1255,11 @@ const StarInput = ({ video, stars, bookmarks }: any) => {
 	)
 }
 
-const Franchise = ({ video }: any) => (
+const Franchise = ({ video }: { video: IVideo }) => (
 	<div id='franchise'>
 		{video.related.length > 1
 			? <h2>Episodes</h2> &&
-			  video.related.map((item: any) => (
+			  video.related.map((item) => (
 					<a className='episode row' href={`/video/${item.id}`} key={item.id}>
 						<span className='episode__plays col-2'>{item.plays} Plays</span>
 
@@ -1312,16 +1321,16 @@ const Attributes = ({ bookmarks, clearActive, update }: any) => {
 	)
 }
 
-const Header = ({ video }: any) => {
-	const handleModal = useContext(ModalContext)
+const Header = ({ video }: { video: IVideo }) => {
+	const handleModal = useContext(ModalContext).method
 	const update = useContext(UpdateContext).video
 
-	const handleKeyPress = (e: any, callback: any) => {
+	const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>, callback: (value: string) => void) => {
 		if (e.key === 'Enter') {
 			e.preventDefault()
 
 			handleModal()
-			callback(e.target.value)
+			callback(e.currentTarget.value)
 		}
 	}
 
@@ -1341,16 +1350,21 @@ const Header = ({ video }: any) => {
 }
 
 // ContainerItem
-const HeaderTitle = ({ video, handleModal, handleKeyPress }: any) => {
+interface IHeaderTitle {
+	video: IVideo
+	handleModal: (title: any, data: any, filter?: any) => void
+	handleKeyPress: (e: React.KeyboardEvent<HTMLInputElement>, callback: (value: string) => void) => void
+}
+const HeaderTitle = ({ video, handleModal, handleKeyPress }: IHeaderTitle) => {
 	const copyFranchise = async () => await navigator.clipboard.writeText(video.franchise)
 
-	const renameFranchise = (value: any) => {
+	const renameFranchise = (value: string) => {
 		Axios.put(`${config.api}/video/${video.id}`, { franchise: value }).then(() => {
 			window.location.reload()
 		})
 	}
 
-	const renameTitle = (value: any) => {
+	const renameTitle = (value: string) => {
 		Axios.put(`${config.api}/video/${video.id}`, { title: value }).then(() => {
 			window.location.reload()
 		})
@@ -1413,8 +1427,14 @@ const HeaderTitle = ({ video, handleModal, handleKeyPress }: any) => {
 	)
 }
 
-const HeaderDate = ({ video, handleModal, handleKeyPress, update }: any) => {
-	const handleDate = (value: any) => {
+interface IHeaderDate {
+	video: IVideo
+	handleModal: (title: string, data: React.ReactNode, filter?: boolean) => void
+	handleKeyPress: (e: React.KeyboardEvent<HTMLInputElement>, callback: (value: string) => void) => void
+	update: (video: IVideo) => void
+}
+const HeaderDate = ({ video, handleModal, handleKeyPress, update }: IHeaderDate) => {
+	const handleDate = (value: string) => {
 		Axios.put(`${config.api}/video/${video.id}`, { date: value }).then(({ data }) => {
 			video.date.published = data.date_published
 
@@ -1448,7 +1468,7 @@ const HeaderDate = ({ video, handleModal, handleKeyPress, update }: any) => {
 	)
 }
 
-const HeaderNext = ({ video }: any) => (
+const HeaderNext = ({ video }: { video: IVideo }) => (
 	<div className='col-1 header__next'>
 		<a className='btn btn-sm btn-outline-primary float-end' id='next' href={`/video/${video.nextID}`}>
 			Next
@@ -1456,7 +1476,7 @@ const HeaderNext = ({ video }: any) => (
 	</div>
 )
 
-const HeaderQuality = ({ video }: any) => (
+const HeaderQuality = ({ video }: { video: IVideo }) => (
 	<div className='header__quality btn btn-sm btn-outline-primary'>
 		<i className={config.theme.icons.film} />
 		{video.quality}

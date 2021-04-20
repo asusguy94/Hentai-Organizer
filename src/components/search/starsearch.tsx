@@ -1,4 +1,4 @@
-import { Component } from 'react'
+import React, { Component } from 'react'
 
 import Axios from 'axios'
 import ScrollToTop from 'react-scroll-to-top'
@@ -277,8 +277,8 @@ const Filter = ({ stars, starData, update }: any) => {
 }
 
 const TitleSearch = ({ stars, update }: any) => {
-	const callback = (e: any) => {
-		const searchValue = e.target.value.toLowerCase()
+	const callback = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const searchValue = e.currentTarget.value.toLowerCase()
 
 		stars = stars.map((star: any) => {
 			star.hidden.titleSearch = !star.name.toLowerCase().includes(searchValue)

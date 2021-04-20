@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import ReactDOM from 'react-dom'
 
 //@ts-ignore
@@ -8,12 +8,19 @@ import config from '../config.json'
 
 import './modal.scss'
 
-//TODO improve children, props.children, pros.filter, children=chilren.filter
+export interface IModal {
+	title: string | null
+	data: React.ReactNode
+	visible: boolean
+	filter: boolean
+}
+
+//TODO improve children, props.children, pros.filter, children=children.filter
 
 const Modal = (props: any) => {
 	const [query, setQuery] = useState('')
 
-	const handleKeyPress = (key: any, e: any) => {
+	const handleKeyPress = (key: string, e: any) => {
 		e.preventDefault()
 
 		switch (key) {
@@ -72,7 +79,7 @@ const Modal = (props: any) => {
 				handleKeys={
 					props.filter && config.modal.filter.search ? ['alphabetic', 'space', 'backspace', 'esc'] : ['esc']
 				}
-				onKeyEvent={(key: any, e: any) => handleKeyPress(key, e)}
+				onKeyEvent={(key: string, e: any) => handleKeyPress(key, e)}
 				handleFocusableElements={true}
 				isDisabled={!props.visible}
 			/>

@@ -5,6 +5,11 @@ import Axios from 'axios'
 
 import config from '../config.json'
 
+interface IVideo {
+	id: number
+	name: string
+}
+
 const VideosPage = () => {
 	const [videos, setVideos] = useState([])
 
@@ -15,7 +20,7 @@ const VideosPage = () => {
 	return (
 		<div className='col-12'>
 			<div className='list-group'>
-				{videos.map((video: any) => (
+				{videos.map((video: IVideo) => (
 					<li key={video.id} className='list-group-item list-group-item-action'>
 						<Link to={`video/${video.id}`}>{video.name}</Link>
 					</li>

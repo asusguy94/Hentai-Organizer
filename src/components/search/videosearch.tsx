@@ -1,4 +1,4 @@
-import { Component } from 'react'
+import React, { Component } from 'react'
 
 import Axios from 'axios'
 import ScrollToTop from 'react-scroll-to-top'
@@ -111,7 +111,7 @@ const Sidebar = ({ videos, update, videoData }: any) => (
 
 // Container
 const TitleSearch = ({ update, videos }: any) => {
-	const callback = (e: any) => {
+	const callback = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const searchValue = e.target.value.toLowerCase()
 
 		videos = videos.map((video: any) => {
@@ -255,12 +255,12 @@ const Filter = ({ videoData, videos, update }: any) => {
 		update(videos)
 	}
 
-	const category_NULL = (e: any) => {
+	const category_NULL = (e: React.ChangeEvent<HTMLInputElement>) => {
 		videos = videos.map((video: any) => {
-			if (e.target.indeterminate) {
+			if (e.currentTarget.indeterminate) {
 				video.hidden.noCategory = false
 				video.hidden.notNoCategory = video.categories.length === 0
-			} else if (!e.target.checked) {
+			} else if (!e.currentTarget.checked) {
 				video.hidden.notNoCategory = false
 			} else {
 				video.hidden.noCategory = video.categories.length !== 0

@@ -8,8 +8,20 @@ import './home.scss'
 
 import config from '../config.json'
 
-const HomeColumn = ({ enabled = true, label, limit = 12 }: any) => {
-	const [data, setData] = useState([])
+interface IVideo {
+	id: number
+	name: string
+	total: number
+}
+
+interface IHomeColumn {
+	enabled?: boolean
+	label: string
+	limit?: number
+}
+
+const HomeColumn = ({ enabled = true, label, limit = 12 }: IHomeColumn) => {
+	const [data, setData] = useState<IVideo[]>([])
 
 	useEffect(() => {
 		Axios.get(`${config.api}/home/${label}/${limit}`).then(({ data }) => setData(data))
@@ -23,7 +35,7 @@ const HomeColumn = ({ enabled = true, label, limit = 12 }: any) => {
 				</h2>
 
 				<div className='row'>
-					{data.map((video: any) => (
+					{data.map((video) => (
 						<div key={video.id} className='row mb-2 mx-0 px-2 col-1'>
 							<Link className='video px-0 col-12 ribbon-container' to={`/video/${video.id}`}>
 								<img

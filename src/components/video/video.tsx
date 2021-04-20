@@ -22,8 +22,15 @@ import config from '../config.json'
 const ModalContext = createContext((...args: any): void => {})
 const UpdateContext = createContext({
 	video: (video: any): void => {},
-	stars: (stars: any): void => {},
-	bookmarks: (bookmarks: any): void => {}
+	stars: (stars: any[]): void => {},
+	bookmarks: (bookmarks: any[]): void => {}
+})
+
+const starEventData = { id: 0, name: '', starID: 0, start: 0, active: false, attributes: [] }
+const SetStarEventContext = createContext((...args: any): void => {})
+const GetStarEventContext = createContext({
+	event: false,
+	data: starEventData
 })
 
 class VideoPage extends Component {
@@ -58,6 +65,10 @@ class VideoPage extends Component {
 			title: null,
 			data: null,
 			filter: false
+		},
+		addStarEvent: {
+			event: false,
+			data: starEventData
 		}
 	}
 
@@ -88,6 +99,14 @@ class VideoPage extends Component {
 		})
 	}
 
+	handleAddStarEvent(event: boolean, data: any = this.state.addStarEvent.data) {
+		const preEvent = this.state.addStarEvent
+		preEvent.event = event
+		preEvent.data = data
+
+		this.setState({ addStarEvent: preEvent })
+	}
+
 	render() {
 		return (
 			<div id='video-page' className='col-12 row'>
@@ -101,6 +120,12 @@ class VideoPage extends Component {
 							stars: (stars: any) => this.setState({ stars })
 						}}
 					>
+						<SetStarEventContext.Provider
+							value={(event: boolean, data: any = this.state.addStarEvent.data) =>
+								this.handleAddStarEvent(event, data)
+							}
+						>
+							<GetStarEventContext.Provider value={this.state.addStarEvent}>
 						<Section
 							video={this.state.video}
 							bookmarks={this.state.bookmarks}
@@ -118,6 +143,8 @@ class VideoPage extends Component {
 							categories={this.state.categories}
 							updateBookmarks={(bookmarks: any) => this.setState({ bookmarks })}
 						/>
+							</GetStarEventContext.Provider>
+						</SetStarEventContext.Provider>
 
 						<Modal
 							visible={this.state.modal.visible}
@@ -547,8 +574,30 @@ const VideoPlayer = ({ video, bookmarks, categories, stars, updateBookmarks, pla
 	)
 }
 
-const Timeline = ({ video, bookmarks, stars, attributes, categories, playVideo, setTime, update }: any) => {
-	const handleModal = useContext(ModalContext)
+interface ITimeline {
+	video: IVideo
+	bookmarks: IBookmark[]
+	stars: IStar[]
+	attributes: IAttribute[]
+	categories: ICategory[]
+	playVideo: (time?: any) => void
+	setTime: (bookmarkID: number) => void
+	update: (bookmarks: IBookmark[]) => void
+	duration: number
+}
+const Timeline = ({
+	video,
+	bookmarks,
+	stars,
+	attributes,
+	categories,
+	playVideo,
+	setTime,
+	update,
+	duration
+}: ITimeline) => {
+	const setStarEvent = useContext(SetStarEventContext)
+	const handleModal = useContext(ModalContext).method
 
 	const bookmarksArr: any[] = []
 
@@ -872,20 +921,76 @@ const Timeline = ({ video, bookmarks, stars, attributes, categories, playVideo, 
 	)
 }
 
-const Stars = ({ video, stars, bookmarks, attributes, categories, clearActive, updateBookmarks }: any) => {
-	const handleModal = useContext(ModalContext)
+interface IStars {
+	video: IVideo
+	stars: IStar[]
+	bookmarks: IBookmark[]
+	attributes: IAttribute[]
+	categories: ICategory[]
+	clearActive: () => void
+	updateBookmarks: (bookmarks: IBookmark[]) => void
+}
+const Stars = ({ video, stars, bookmarks, attributes, categories, clearActive, updateBookmarks }: IStars) => {
 	const update = useContext(UpdateContext).stars
 
-	const attributesFromStar = (starID: any) =>
-		stars.filter((star: any) => (star.id === starID ? star : null))[0].attributes
+	const removeStar = (id: number) => {
+		Axios.delete(`${config.api}/video/${video.id}/star/${id}`).then(() => {
+			update(stars.filter((star) => star.id !== id))
+		})
+	}
 
-	const handleRibbon = (star: any) => {
-		const hasBookmark = bookmarks.some((bookmark: any) => bookmark.starID === star.id)
+	return (
+		<>
+			{stars.map((star) => (
+				<Star
+					key={star.id}
+					video={video}
+					star={star}
+					bookmarks={bookmarks}
+					attributes={attributes}
+					categories={categories}
+					clearActive={clearActive}
+					updateBookmarks={updateBookmarks}
+					removeStar={removeStar}
+				/>
+			))}
+		</>
+	)
+}
+
+const Star = ({
+	video,
+	star,
+	bookmarks,
+	attributes,
+	categories,
+	clearActive,
+	updateBookmarks,
+	removeStar
+}: {
+	video: IVideo
+	star: IStar
+	bookmarks: IBookmark[]
+	attributes: IAttribute[]
+	categories: ICategory[]
+	clearActive: () => void
+	updateBookmarks: (bookmarks: IBookmark[]) => void
+	removeStar: any
+}) => {
+	const getStarEvent = useContext(GetStarEventContext)
+	const setStarEvent = useContext(SetStarEventContext)
+
+	const handleModal = useContext(ModalContext).method
+
+	const [border, setBorder] = useState(false)
+
+	const handleRibbon = (star: IStar) => {
+		const hasBookmark = bookmarks.some((bookmark) => bookmark.starID === star.id)
 
 		if (!hasBookmark) return <Ribbon label='NEW' />
 	}
 
-	const addBookmark = (category: any, star: any) => {
+	const addBookmark = (category: ICategory, star: IStar) => {
 		const player = document.getElementsByTagName('video')[0]
 
 		const time = Math.round(player.currentTime)
@@ -907,13 +1012,13 @@ const Stars = ({ video, stars, bookmarks, attributes, categories, clearActive, u
 					active: false
 				})
 
-				bookmarks.sort((a: any, b: any) => a.start - b.start)
+				bookmarks.sort((a, b) => a.start - b.start)
 				updateBookmarks(bookmarks)
 			})
 		}
 	}
 
-	const addAttribute = (star: any, attribute: any) => {
+	const addAttribute = (star: IStar, attribute: IAttribute) => {
 		Axios.post(`${config.api}/bookmark/attribute`, {
 			videoID: video.id,
 			starID: star.id,
@@ -923,15 +1028,9 @@ const Stars = ({ video, stars, bookmarks, attributes, categories, clearActive, u
 		})
 	}
 
-	const removeStar = (id: any) => {
-		Axios.delete(`${config.api}/video/${video.id}/star/${id}`).then(() => {
-			update(stars.filter((star: any) => star.id !== id))
-		})
-	}
-
-	const setActive = (star: any) => {
+	const setActive = (star: IStar) => {
 		updateBookmarks(
-			bookmarks.map((bookmark: any) => {
+			bookmarks.map((bookmark) => {
 				if (bookmark.starID === star.id) bookmark.active = true
 
 				return bookmark
@@ -939,8 +1038,41 @@ const Stars = ({ video, stars, bookmarks, attributes, categories, clearActive, u
 		)
 	}
 
-	return stars.map((star: any) => (
-		<div key={star.id} className='star col-4' onMouseEnter={() => setActive(star)} onMouseLeave={clearActive}>
+	// TODO auto-run if only 1 star
+	const addStar = (star: IStar) => {
+		const bookmark = getStarEvent.data
+
+		// Remove Border
+		setBorder(false)
+		setStarEvent(false, starEventData)
+
+		// Request Bookmark Update
+		Axios.post(`${config.api}/bookmark/${bookmark.id}/star`, {
+			starID: star.id
+		}).then(() => {
+			bookmarks.map((item) => {
+				if (item.id === bookmark.id) {
+					// MERGE bookmark-attributes with star-attributes
+					item.attributes = item.attributes.concat(star.attributes)
+
+					// SET starID
+					item.starID = star.id
+				}
+
+				return item
+			})
+
+			updateBookmarks(bookmarks)
+		})
+	}
+
+	return (
+		<div
+			className={`star col-4 ${border ? 'star--active' : ''}`}
+			onClick={getStarEvent.event ? () => addStar(star) : () => {}}
+			onMouseEnter={getStarEvent.event ? () => setBorder(true) : () => setActive(star)}
+			onMouseLeave={getStarEvent.event ? () => setBorder(false) : clearActive}
+		>
 			<div className='card mb-2 ribbon-container'>
 				<ContextMenuTrigger id={`star-${star.id}`}>
 					<img
@@ -962,7 +1094,7 @@ const Stars = ({ video, stars, bookmarks, attributes, categories, clearActive, u
 					onClick={() => {
 						handleModal(
 							'Add Bookmark',
-							categories.map((category: any) => (
+							categories.map((category) => (
 								<div
 									key={category.id}
 									className='btn btn-sm btn-outline-primary d-block w-auto'
@@ -982,19 +1114,17 @@ const Stars = ({ video, stars, bookmarks, attributes, categories, clearActive, u
 				</MenuItem>
 
 				<MenuItem
-					disabled={!bookmarks.some((bookmark: any) => bookmark.starID === star.id)}
+					disabled={!bookmarks.some((bookmark) => bookmark.starID === star.id)}
 					onClick={() => {
 						handleModal(
 							'Add Attribute',
 							attributes
-								.filter((attribute: any) => {
-									const match = attributesFromStar(star.id).some(
-										(attr: any) => attr.id === attribute.id
-									)
+								.filter((attribute) => {
+									const match = star.attributes.some((attr) => attr.id === attribute.id)
 
 									return !match ? attribute : null
 								})
-								.map((attribute: any) => (
+								.map((attribute) => (
 									<div
 										key={attribute.id}
 										className='btn btn-sm btn-outline-primary d-block w-auto'
@@ -1014,14 +1144,14 @@ const Stars = ({ video, stars, bookmarks, attributes, categories, clearActive, u
 				</MenuItem>
 
 				<MenuItem
-					disabled={bookmarks.some((bookmark: any) => bookmark.starID === star.id)}
+					disabled={bookmarks.some((bookmark) => bookmark.starID === star.id)}
 					onClick={() => removeStar(star.id)}
 				>
 					<i className={config.theme.icons.trash} /> Remove
 				</MenuItem>
 			</ContextMenu>
 		</div>
-	))
+	)
 }
 
 const StarInput = ({ video, stars, bookmarks }: any) => {

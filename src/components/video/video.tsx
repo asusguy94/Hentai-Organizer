@@ -495,6 +495,15 @@ const VideoPlayer = ({
 				if (player.playing) player.pause()
 				else player.play()
 				break
+			case 'm':
+				player.muted = !player.muted
+				break
+			case 'up':
+				player.volume = Math.ceil((player.volume + 0.1) * 10) / 10
+				break
+			case 'down':
+				player.volume = Math.floor((player.volume - 0.1) * 10) / 10
+				break
 			default:
 				console.log(`${key} was pressed`)
 		}
@@ -507,10 +516,12 @@ const VideoPlayer = ({
 					<Plyr
 						ref={playerRef}
 						options={{
-							controls: ['play-large', 'play', 'current-time', 'progress', 'duration', 'fullscreen'],
+							controls: ['play-large', 'play', 'current-time', 'progress', 'duration', 'settings'],
+							fullscreen: { enabled: false },
+							settings: ['speed'],
 							hideControls: false,
 							ratio: '21:9',
-							keyboard: { focused: false }
+							keyboard: { focused: false, global: false }
 						}}
 						sources={{
 							type: 'video',
@@ -616,9 +627,10 @@ const VideoPlayer = ({
 			</ContextMenu>
 
 			<KeyboardEventHandler
-				handleKeys={['left', 'right', 'space']}
-				onKeyEvent={(key: any, e: any) => handleKeyPress(key, e)}
+				handleKeys={['left', 'right', 'space', 'm', 'up', 'down']}
+				onKeyEvent={handleKeyPress}
 				handleFocusableElements={true}
+				isDisabled={modalData.visible}
 			/>
 		</div>
 	)

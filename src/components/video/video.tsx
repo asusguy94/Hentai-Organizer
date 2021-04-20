@@ -810,15 +810,15 @@ const Timeline = ({
 	}
 
 	useEffect(() => {
-		for (let i = 1, items = bookmarksArr, LEVEL_MIN = 1, LEVEL_MAX = 10, level = LEVEL_MIN; i < items.length; i++) {
+		const LEVEL_MIN = 1
+		const LEVEL_MAX = 10
+		for (let i = 0, items = bookmarksArr, level = LEVEL_MIN; i < items.length; i++) {
 			let collision = false
 
-			const first = items[i - 1]
-			const second = items[i]
+			const prev = items[i - 1]
+			const current = items[i]
 
-			if (first === null || second === null) continue // skip if error
-
-			if (collisionCheck(first, second)) {
+			if (collisionCheck(prev, current)) {
 				collision = true
 			}
 
@@ -828,7 +828,7 @@ const Timeline = ({
 				level = LEVEL_MIN
 			}
 
-			second.setAttribute('data-level', level)
+			current.setAttribute('data-level', `${level}`)
 		}
 	}, [bookmarksArr])
 

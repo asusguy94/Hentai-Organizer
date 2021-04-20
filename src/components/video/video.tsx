@@ -280,6 +280,19 @@ const Sidebar = ({ video, stars, bookmarks, attributes, categories, updateBookma
 		updateBookmarks(bookmarks)
 	}
 
+	const getAttributes = () => {
+		const attributeArr: IAttribute[] = []
+		bookmarks.forEach(({ attributes }) => {
+			attributes
+				.sort((a, b) => a.name.localeCompare(b.name))
+				.forEach((attribute) => {
+					if (!attributeArr.some((attr) => attr.id === attribute.id)) attributeArr.push(attribute)
+				})
+		})
+
+		return attributeArr
+	}
+
 	return (
 		<aside className='col-3'>
 			<Franchise video={video} />
@@ -295,10 +308,15 @@ const Sidebar = ({ video, stars, bookmarks, attributes, categories, updateBookma
 					updateBookmarks={updateBookmarks}
 				/>
 
-				<StarInput video={video} stars={stars} bookmarks={bookmarks} />
+				<StarInput video={video} stars={stars} bookmarks={bookmarks} getAttributes={getAttributes} />
 			</div>
 
-			<Attributes bookmarks={bookmarks} clearActive={clearActive} update={updateBookmarks} />
+			<Attributes
+				bookmarks={bookmarks}
+				clearActive={clearActive}
+				update={updateBookmarks}
+				getAttributes={getAttributes}
+			/>
 		</aside>
 	)
 }
@@ -1192,7 +1210,13 @@ const Star = ({
 	)
 }
 
-const StarInput = ({ video, stars, bookmarks }: any) => {
+interface IStarInput {
+	video: IVideo
+	stars: IStar[]
+	bookmarks: IBookmark[]
+	getAttributes: () => IAttribute[]
+}
+const StarInput = ({ video, stars, bookmarks, getAttributes }: IStarInput) => {
 	const updateVideo = useContext(UpdateContext).video
 	const update = useContext(UpdateContext).stars
 
@@ -1255,7 +1279,7 @@ const StarInput = ({ video, stars, bookmarks }: any) => {
 				</div>
 			</div>
 
-			{bookmarks.length ? <hr className='mx-auto' /> : null}
+			{getAttributes().length ? <hr className='mx-auto' /> : null}
 		</div>
 	)
 }
@@ -1285,23 +1309,16 @@ const Franchise = ({ video }: { video: IVideo }) => (
 	</div>
 )
 
-const Attributes = ({ bookmarks, clearActive, update }: any) => {
-	const getAttributes = () => {
-		const attributeArr: any[] = []
-		bookmarks.forEach(({ attributes }: any) => {
-			attributes
-				.sort((a: any, b: any) => a.name.localeCompare(b.name))
-				.forEach((attribute: any) => {
-					if (!attributeArr.some((attr) => attr.id === attribute.id)) attributeArr.push(attribute)
-				})
-		})
-
-		return attributeArr
+interface IAttributes {
+	bookmarks: IBookmark[]
+	clearActive: () => void
+	update: (bookmarks: IBookmark[]) => void
+	getAttributes: () => IAttribute[]
 	}
-
-	const attribute_setActive = (attribute: any) => {
-		bookmarks = bookmarks.map((bookmark: any) => {
-			if (bookmark.attributes.some((bookmarkAttribute: any) => bookmarkAttribute.id === attribute.id))
+const Attributes = ({ bookmarks, clearActive, update, getAttributes }: IAttributes) => {
+	const attribute_setActive = (attribute: IAttribute) => {
+		bookmarks = bookmarks.map((bookmark) => {
+			if (bookmark.attributes.some((bookmarkAttribute) => bookmarkAttribute.id === attribute.id))
 				bookmark.active = true
 
 			return bookmark

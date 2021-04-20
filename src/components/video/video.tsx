@@ -187,6 +187,7 @@ class VideoPage extends Component {
 // Wrapper
 const Section = ({ video, bookmarks, categories, attributes, stars, updateBookmarks }: any) => {
 	const [playerRef, ref] = useRefWithEffect()
+	const [duration, setDuration] = useState(0)
 
 	// Helper script for getting the player
 	//@ts-ignore
@@ -228,6 +229,7 @@ const Section = ({ video, bookmarks, categories, attributes, stars, updateBookma
 				categories={categories}
 				stars={stars}
 				updateBookmarks={updateBookmarks}
+				updateDuration={setDuration}
 			/>
 
 			<Timeline
@@ -239,6 +241,7 @@ const Section = ({ video, bookmarks, categories, attributes, stars, updateBookma
 				playVideo={playVideo}
 				setTime={setTime}
 				update={updateBookmarks}
+				duration={duration}
 			/>
 		</section>
 	)
@@ -279,8 +282,30 @@ const Sidebar = ({ video, stars, bookmarks, attributes, categories, updateBookma
 }
 
 // Container
-const VideoPlayer = ({ video, bookmarks, categories, stars, updateBookmarks, playerRef, playerValue }: any) => {
-	const handleModal = useContext(ModalContext)
+
+interface IVideoPlayer {
+	video: IVideo
+	bookmarks: IBookmark[]
+	categories: ICategory[]
+	stars: IStar[]
+	updateBookmarks: (bookmarks: IBookmark[]) => void
+	updateDuration: (duration: number) => void
+	playerRef: any
+	playerValue: any
+}
+const VideoPlayer = ({
+	video,
+	bookmarks,
+	categories,
+	stars,
+	updateBookmarks,
+	updateDuration,
+	playerRef,
+	playerValue
+}: IVideoPlayer) => {
+	const handleModal = useContext(ModalContext).method
+	const modalData = useContext(ModalContext).data
+
 	const update = useContext(UpdateContext).video
 
 	const [newVideo, setNewVideo] = useState<boolean>()
@@ -370,6 +395,9 @@ const VideoPlayer = ({ video, bookmarks, categories, stars, updateBookmarks, pla
 						player.pause()
 					}
 				})
+				hls.on(Hls.Events.LEVEL_LOADED, (e, data) => updateDuration(data.details.totalduration))
+			} else {
+				player.media.ondurationchange = (e: any) => updateDuration(e.target.duration)
 			}
 		}
 	}, [events])
@@ -599,19 +627,15 @@ const Timeline = ({
 	const setStarEvent = useContext(SetStarEventContext)
 	const handleModal = useContext(ModalContext).method
 
-	const bookmarksArr: any[] = []
+	if (duration && video.duration) {
+		if (Math.abs(duration - video.duration) > 3) {
+			alert('invalid video-duration')
 
-	const isActive = (bookmark: any) => Boolean(bookmark.active)
-	const hasStar = (bookmark: any) => Boolean(bookmark.starID)
-	const attributesFromStar = (starID: any) =>
-		stars.filter((star: any) => (star.id === starID ? star : null))[0]?.attributes
-	const isStarAttribute = (starID: any, attributeID: any) =>
-		attributesFromStar(starID)?.some((attr: any) => attr.id === attributeID)
+			console.log('dur', duration)
+			console.log('vDur', video.duration)
 
-	const addStar = (bookmark: any, star: any) => {
-		Axios.post(`${config.api}/bookmark/${bookmark.id}/star`, { starID: star.id }).then(() => {
-			window.location.reload()
-		})
+			console.log('Re-Transcode to fix this issue')
+		}
 	}
 
 	const removeBookmark = (id: any) => {
@@ -769,7 +793,7 @@ const Timeline = ({
 											: 'btn-outline-secondary'
 									} bookmark`}
 									style={{
-										left: `${((bookmark.start * 100) / video.duration) * config.timeline.offset}%`
+										left: `${((bookmark.start * 100) / duration) * config.timeline.offset}%`
 									}}
 									onClick={() => playVideo(bookmark.start)}
 									ref={(item) => (bookmarksArr[i] = item)}

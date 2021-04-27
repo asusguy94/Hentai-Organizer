@@ -1080,7 +1080,15 @@ const Star = ({
 			starID: star.id,
 			attributeID: attribute.id
 		}).then(() => {
-			window.location.reload()
+			updateBookmarks(
+				bookmarks.map((bookmark) => {
+					if (!bookmark.attributes.some((attr) => attr.id === attribute.id)) {
+						bookmark.attributes.push(attribute)
+					}
+
+					return bookmark
+				})
+			)
 		})
 	}
 

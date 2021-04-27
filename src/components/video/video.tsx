@@ -219,15 +219,15 @@ const Section = ({ video, bookmarks, categories, attributes, stars, updateBookma
 		const time = Math.round(getPlayer().currentTime)
 
 		Axios.put(`${config.api}/bookmark/${bookmarkID}`, { time }).then(() => {
-			bookmarks = bookmarks
+			updateBookmarks(
+				bookmarks
 				.map((bookmark) => {
 					if (bookmark.id === bookmarkID) bookmark.start = time
 
 					return bookmark
 				})
 				.sort((a, b) => a.start - b.start)
-
-			updateBookmarks(bookmarks)
+			)
 		})
 	}
 
@@ -271,13 +271,13 @@ interface ISidebar {
 }
 const Sidebar = ({ video, stars, bookmarks, attributes, categories, updateBookmarks }: ISidebar) => {
 	const clearActive = () => {
-		bookmarks = bookmarks.map((bookmark) => {
+		updateBookmarks(
+			bookmarks.map((bookmark) => {
 			bookmark.active = false
 
 			return bookmark
 		})
-
-		updateBookmarks(bookmarks)
+		)
 	}
 
 	const getAttributes = () => {
@@ -707,15 +707,15 @@ const Timeline = ({
 
 	const setCategory = (category: ICategory, bookmark: IBookmark) => {
 		Axios.put(`${config.api}/bookmark/${bookmark.id}`, { categoryID: category.id }).then(() => {
-			bookmarks = bookmarks.map((bookmarkItem) => {
+			update(
+				bookmarks.map((bookmarkItem) => {
 				if (bookmarkItem.id === bookmark.id) {
 					bookmarkItem.name = category.name
 				}
 
 				return bookmarkItem
 			})
-
-			update(bookmarks)
+			)
 		})
 	}
 
@@ -740,7 +740,8 @@ const Timeline = ({
 
 	const clearAttributes = (bookmark: IBookmark) => {
 		Axios.delete(`${config.api}/bookmark/${bookmark.id}/attribute`).then(() => {
-			bookmarks = bookmarks.map((item) => {
+			update(
+				bookmarks.map((item) => {
 				if (item.id === bookmark.id) {
 					const starID = bookmark.starID
 
@@ -764,14 +765,14 @@ const Timeline = ({
 
 				return item
 			})
-
-			update(bookmarks)
+			)
 		})
 	}
 
 	const removeStar = (bookmark: IBookmark) => {
 		Axios.delete(`${config.api}/bookmark/${bookmark.id}/star`).then(() => {
-			bookmarks = bookmarks.map((item) => {
+			update(
+				bookmarks.map((item) => {
 				if (item.id === bookmark.id) {
 					const attributes = attributesFromStar(bookmark.starID)
 
@@ -794,8 +795,7 @@ const Timeline = ({
 
 				return item
 			})
-
-			update(bookmarks)
+			)
 		})
 	}
 
@@ -1329,14 +1329,14 @@ interface IAttributes {
 	}
 const Attributes = ({ bookmarks, clearActive, update, getAttributes }: IAttributes) => {
 	const attribute_setActive = (attribute: IAttribute) => {
-		bookmarks = bookmarks.map((bookmark) => {
+		update(
+			bookmarks.map((bookmark) => {
 			if (bookmark.attributes.some((bookmarkAttribute) => bookmarkAttribute.id === attribute.id))
 				bookmark.active = true
 
 			return bookmark
 		})
-
-		update(bookmarks)
+		)
 	}
 
 	return (

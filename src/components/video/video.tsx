@@ -1102,10 +1102,20 @@ const Star = ({
 		setBorder(false)
 		setStarEvent(false, starEventData)
 
+		// Check if bookmark already contains one of the attributes from the star
+		bookmarks.forEach((item) => {
+			if (item.id === bookmark.id) {
+				const overlappingAttributes = item.attributes.some((bookmarkAttr) =>
+					star.attributes.some((starAttr) => starAttr.id === bookmarkAttr.id)
+				)
+
+				// Bookmark has ZERO Overlapping Attributes
+				if (!overlappingAttributes) {
 		// Request Bookmark Update
 		Axios.post(`${config.api}/bookmark/${bookmark.id}/star`, {
 			starID: star.id
 		}).then(() => {
+						updateBookmarks(
 			bookmarks.map((item) => {
 				if (item.id === bookmark.id) {
 					// MERGE bookmark-attributes with star-attributes
@@ -1117,8 +1127,10 @@ const Star = ({
 
 				return item
 			})
-
-			updateBookmarks(bookmarks)
+						)
+					})
+				}
+			}
 		})
 	}
 

@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 
+import { Grid, List, ListItem, ListItemText } from '@material-ui/core'
+
 import Axios from 'axios'
 
 import config from '../config.json'
@@ -11,22 +13,24 @@ interface IVideo {
 }
 
 const VideosPage = () => {
-	const [videos, setVideos] = useState([])
+	const [videos, setVideos] = useState<IVideo[]>([])
 
 	useEffect(() => {
 		Axios.get(`${config.api}/video`).then(({ data }) => setVideos(data))
 	}, [])
 
 	return (
-		<div className='col-12'>
-			<div className='list-group'>
-				{videos.map((video: IVideo) => (
-					<li key={video.id} className='list-group-item list-group-item-action'>
-						<Link to={`video/${video.id}`}>{video.name}</Link>
-					</li>
+		<Grid item id='videos-page'>
+			<List>
+				{videos.map((video) => (
+					<Link to={`video/${video.id}`}>
+						<ListItem button divider>
+							<ListItemText>{video.name}</ListItemText>
+						</ListItem>
+					</Link>
 				))}
-			</div>
-		</div>
+			</List>
+		</Grid>
 	)
 }
 

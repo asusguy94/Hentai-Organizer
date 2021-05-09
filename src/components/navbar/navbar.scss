@@ -1,8 +1,14 @@
 @import '../styles/variables';
 
 nav {
-	li {
-		list-style-type: none;
+	margin-bottom: 1em;
+
+	ul {
+		margin: 0;
+
+		li {
+			list-style-type: none;
+		}
 	}
 
 	.main-menu {

@@ -1,10 +1,25 @@
-import React, { Component } from 'react'
+import React, { Component, useState } from 'react'
+
+import {
+	Grid,
+	Card,
+	CardMedia,
+	CardActionArea,
+	Box,
+	Typography,
+	TextField,
+	FormControl,
+	RadioGroup,
+	FormControlLabel,
+	Radio,
+	Checkbox
+} from '@material-ui/core'
 
 import Axios from 'axios'
 import ScrollToTop from 'react-scroll-to-top'
 import capitalize from 'capitalize'
 
-import Indeterminate from '../indeterminate/indeterminate'
+import { handler as indeterminateHandler } from '../indeterminate/indeterminate'
 import LabelCount from '../labelcount/labelcount'
 import { getCount, isHidden } from './helper'
 import Loader from '../loader/loader'
@@ -14,7 +29,6 @@ import './search.scss'
 import config from '../config.json'
 
 //TODO use children-prop instead of coded-children inside component
-
 class StarSearchPage extends Component {
 	state = {
 		stars: [],
@@ -63,7 +77,8 @@ class StarSearchPage extends Component {
 
 	render() {
 		return (
-			<div className='search-page col-12 row'>
+			<Grid container id='search-page'>
+				<Grid item xs={2}>
 				<Sidebar
 					starData={{
 						breasts: this.state.breasts,
@@ -75,61 +90,70 @@ class StarSearchPage extends Component {
 					stars={this.state.stars}
 					update={(stars: any) => this.setState({ stars })}
 				/>
+				</Grid>
 
+				<Grid item container xs={10} justify='center'>
 				<Stars stars={this.state.stars} />
+				</Grid>
 
 				<ScrollToTop smooth />
-			</div>
+			</Grid>
 		)
 	}
 }
 
 // Wrapper
 const Sidebar = ({ starData, stars, update }: any) => (
-	<aside className='col-2'>
+	<>
 		<TitleSearch stars={stars} update={update} />
 
 		<Sort stars={stars} update={update} />
 
 		<Filter stars={stars} update={update} starData={starData} />
-	</aside>
+	</>
 )
 
 const Stars = ({ stars }: any) => (
-	<section id='stars' className='col-10'>
-		<h2 className='text-center'>
+	<Box id='stars'>
+		<Typography variant='h6' className='text-center'>
 			<span className='count'>{getCount(stars)}</span> Stars
-		</h2>
+		</Typography>
 
-		<div className='row justify-content-center'>
+		<Grid container>
 			{stars.length ? (
-				stars.map((star: any) => (
-					<a
-						key={star.id}
-						href={`/star/${star.id}`}
-						className={`star ribbon-container card ${isHidden(star) ? 'd-none' : ''}`}
-					>
-						<img className='card-img-top' src={`${config.source}/images/stars/${star.id}.jpg`} alt='star' />
+				stars.map((star: any) => {
+					if (isHidden(star)) return null
 
-						<span className='title card-title text-center'>{star.name}</span>
-					</a>
-				))
+					return <StarCard key={star.id} star={star} />
+				})
 			) : (
 				<Loader />
 			)}
-		</div>
-	</section>
+		</Grid>
+	</Box>
+)
+
+const StarCard = ({ star }: any) => (
+	<a href={`/star/${star.id}`}>
+						<Card className='star ribbon-container'>
+							<CardActionArea>
+								<CardMedia component='img' src={`${config.source}/images/stars/${star.id}.jpg`} />
+
+								<Typography className='text-center'>{star.name}</Typography>
+							</CardActionArea>
+						</Card>
+					</a>
 )
 
 // Container
-const Sort = ({ stars, update }: any) => {
-	const sortDefault = (reverse = false) => {
-		stars.sort((a: any, b: any) => {
-			let valA = a.name.toLowerCase()
-			let valB = b.name.toLowerCase()
+interface ISort {
+	stars: any[]
+	update: any
+}
 
-			return valA.localeCompare(valB, 'en')
-		})
+const Sort = ({ stars, update }: ISort) => {
+	const sortDefault = (reverse = false) => {
+		stars.sort((a: any, b: any) => a.name.toLowerCase().localeCompare(b.name.toLowerCase(), 'en'))
 
 		if (reverse) stars.reverse()
 		update(stars)
@@ -138,8 +162,24 @@ const Sort = ({ stars, update }: any) => {
 	return (
 		<>
 			<h2>Sort</h2>
-			<SortItem name='A-Z' label='alphabetically' callback={() => sortDefault()} checked={true} />
-			<SortItem name='Z-A' label='alphabetically_desc' callback={() => sortDefault(true)} />
+
+			<FormControl>
+				<RadioGroup name='sort' defaultValue='alphabetically'>
+					<FormControlLabel
+						label='A-Z'
+						value='alphabetically'
+						control={<Radio />}
+						onChange={() => sortDefault()}
+					/>
+
+					<FormControlLabel
+						label='Z-A'
+						value='alphabetically_desc'
+						control={<Radio />}
+						onChange={() => sortDefault(true)}
+					/>
+				</RadioGroup>
+			</FormControl>
 		</>
 	)
 }
@@ -176,11 +216,11 @@ const Filter = ({ stars, starData, update }: any) => {
 		update(stars)
 	}
 
-	const attribute = (e: any, target: any) => {
+	const attribute = (ref: any, target: any) => {
 		const targetLower = target.toLowerCase()
 
 		stars = stars.map((star: any) => {
-			if (e.target.indeterminate) {
+			if (ref.indeterminate) {
 				const match = star.attributes.some((attribute: any) => attribute.toLowerCase() === targetLower)
 
 				if (match) {
@@ -189,7 +229,7 @@ const Filter = ({ stars, starData, update }: any) => {
 					// Remove checked-status from filtering
 					star.hidden.attribute.splice(star.hidden.attribute.indexOf(targetLower), 1)
 				}
-			} else if (!e.target.checked) {
+			} else if (!ref.checked) {
 				const match = star.attributes.map((attribute: any) => attribute.toLowerCase()).includes(targetLower)
 
 				if (match) {
@@ -280,20 +320,16 @@ const TitleSearch = ({ stars, update }: any) => {
 	const callback = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const searchValue = e.currentTarget.value.toLowerCase()
 
-		stars = stars.map((star: any) => {
+		update(
+			stars.map((star: any) => {
 			star.hidden.titleSearch = !star.name.toLowerCase().includes(searchValue)
 
 			return star
 		})
-
-		update(stars)
+		)
 	}
 
-	return (
-		<div className='input-wrapper'>
-			<input type='text' className='form-control' placeholder='Name' autoFocus onChange={callback} />
-		</div>
-	)
+	return <TextField autoFocus placeholder='Name' onChange={callback} />
 }
 
 // ContainerItem
@@ -301,94 +337,84 @@ const FilterRadio = ({ data, label, obj, callback, globalCallback = null, nullCa
 	<>
 		<h2>{capitalize(label, true)}</h2>
 
-		<div id={label}>
+		<FormControl>
+			<RadioGroup name={label} defaultValue='ALL'>
 			{globalCallback !== null ? (
-				<div className='input-wrapper'>
-					<input
-						type='radio'
-						name={label}
-						id={`${label}_ALL`}
-						onChange={() => globalCallback()}
-						defaultChecked
-					/>
-					<label className='global-category' htmlFor={`${label}_ALL`}>
-						ALL
-					</label>
-				</div>
+					<FormControlLabel value='ALL' label='ALL' onChange={globalCallback} control={<Radio />} />
 			) : null}
 
 			{nullCallback !== null ? (
-				<div className='input-wrapper'>
-					<input type='radio' name={label} id={`${label}_NULL`} onChange={(e) => nullCallback(e)} />
-					<label className='global-category' htmlFor={`${label}_NULL`}>
-						NULL
-					</label>
-				</div>
+					<FormControlLabel value='NULL' label='NULL' onChange={nullCallback} control={<Radio />} />
 			) : null}
 
 			{data.map((item: any) => (
-				<div className='input-wrapper' key={item}>
-					<input type='radio' name={label} id={`${label}-${item}`} onChange={() => callback(item)} />
-					<label htmlFor={`${label}-${item}`}>
-						{item} {count ? <LabelCount prop={label} label={item} obj={obj} isArr={true} /> : null}
-					</label>
-				</div>
+					<FormControlLabel
+						key={item}
+						value={item}
+						onChange={() => callback(item)}
+						label={
+							<>
+								{item} {count ? <LabelCount prop={label} label={item} obj={obj} isArr /> : null}
+							</>
+						}
+						control={<Radio />}
+					/>
 			))}
-		</div>
+			</RadioGroup>
+		</FormControl>
 	</>
 )
 
-const FilterCheckBox = ({ data, label, labelPlural, obj, callback, nullCallback = null }: any) => {
-	const indeterminate = new Indeterminate()
-
-	return (
+const FilterCheckBox = ({ data, label, labelPlural, obj, callback, nullCallback = null }: any) => (
 		<>
 			<h2>{capitalize(label, true)}</h2>
 
-			<div id={label}>
+		<FormControl>
 				{nullCallback !== null ? (
-					<div className='input-wrapper'>
-						<input
-							type='checkbox'
-							name={label}
-							id={`${label}_NULL`}
-							onChange={(e) => {
-								indeterminate.handleIndeterminate(e)
-								nullCallback(e)
-							}}
-						/>
-						<label className='global-category' htmlFor={`${label}_NULL`}>
-							NULL
-						</label>
-					</div>
+				<IndeterminateItem label='NULL' value='NULL' callback={(ref: any) => nullCallback(ref)} />
 				) : null}
 
 				{data.map((item: any) => (
-					<div className='input-wrapper' key={item}>
-						<input
-							type='checkbox'
-							name={label}
-							id={`${label}-${item}`}
-							onChange={(e) => {
-								indeterminate.handleIndeterminate(e)
-								callback(e, item)
-							}}
-						/>
-						<label htmlFor={`${label}-${item}`}>
+				<IndeterminateItem
+					key={item}
+					label={
+						<>
 							{item} <LabelCount prop={labelPlural} label={item} obj={obj} />
-						</label>
-					</div>
+						</>
+					}
+					value={item}
+					item={item}
+					callback={(ref: any, item: any) => callback(ref, item)}
+				/>
 				))}
-			</div>
+		</FormControl>
 		</>
 	)
-}
 
-const SortItem = ({ callback, label, name, checked = false, disabled = false }: any) => (
-	<div className={`input-wrapper ${disabled ? 'disabled' : ''}`}>
-		<input type='radio' name='sort' id={label} onChange={callback} defaultChecked={checked} />
-		<label htmlFor={label}>{name}</label>
-	</div>
+const IndeterminateItem = ({ label, value, item = null, callback }: any) => {
+	const [indeterminate, setIndeterminate] = useState(false)
+	const [checked, setChecked] = useState(false)
+
+	return (
+		<FormControlLabel
+			label={label}
+			value={value}
+			control={
+				<Checkbox
+					checked={checked}
+					indeterminate={indeterminate}
+					onChange={() => {
+						const result = indeterminateHandler({ checked, indeterminate })
+
+						setIndeterminate(result.indeterminate)
+						setChecked(result.checked)
+
+						callback(result, item)
+					}}
+				/>
+}
+		/>
 )
+}
 
 export default StarSearchPage

@@ -1,4 +1,19 @@
-import React, { Component } from 'react'
+import React, { Component, useState } from 'react'
+
+import {
+	Box,
+	Card,
+	CardActionArea,
+	CardMedia,
+	Checkbox,
+	FormControl,
+	FormControlLabel,
+	Grid,
+	Radio,
+	RadioGroup,
+	TextField,
+	Typography
+} from '@material-ui/core'
 
 import Axios from 'axios'
 import ScrollToTop from 'react-scroll-to-top'
@@ -6,7 +21,7 @@ import capitalize from 'capitalize'
 
 import Ribbon from '../ribbon/ribbon'
 import LabelCount from '../labelcount/labelcount'
-import Indeterminate from '../indeterminate/indeterminate'
+import { handler as indeterminateHandler } from '../indeterminate/indeterminate'
 import { isHidden, getCount } from './helper'
 import Loader from '../loader/loader'
 
@@ -24,25 +39,29 @@ class VideoSearchPage extends Component {
 
 	render() {
 		return (
-			<div className='search-page col-12 row'>
+			<Grid container id='search-page'>
+				<Grid item xs={2}>
 				<Sidebar
 					videoData={{ categories: this.state.categories, attributes: this.state.attributes }}
 					videos={this.state.videos}
 					update={(videos: any) => this.setState({ videos })}
 				/>
+				</Grid>
 
+				<Grid item container xs={10} justify='center'>
 				<Videos videos={this.state.videos} />
+				</Grid>
 
 				<ScrollToTop smooth />
-			</div>
+			</Grid>
 		)
 	}
 
 	componentDidMount() {
 		Axios.get(`${config.api}/search/video`).then(({ data: videos }) => {
 			this.setState(() => {
-				videos = videos.map((item: any) => {
-					item.hidden = {
+				videos = videos.filter((video: any) => {
+					video.hidden = {
 						category: [],
 						notCategory: [],
 						attribute: [],
@@ -66,47 +85,49 @@ class VideoSearchPage extends Component {
 
 // Wrapper
 const Videos = ({ videos }: any) => (
-	<section id='videos' className='col-10'>
+	<Box id='videos'>
 		{videos.length ? (
-			<h2 className='text-center'>
+			<Typography variant='h6' className='text-center'>
 				<span className='count'>{getCount(videos)}</span> Videos
-			</h2>
+			</Typography>
 		) : null}
 
-		<div className='row justify-content-center'>
+		<Grid container>
 			{videos.length ? (
-				videos.map((video: any) => (
-					<a
-						key={video.id}
-						className={`video ribbon-container card ${isHidden(video) ? 'd-none' : ''}`}
-						href={`/video/${video.id}`}
-					>
-						<img
-							className='card-img-top'
-							src={`${config.source}/images/videos/${video.id}-290.jpg`}
-							alt='video'
-						/>
+				videos.map((video: any) => {
+					if (isHidden(video)) return null
 
-						<span className='title card-title text-center'>{video.name}</span>
-
-						<Ribbon label={video.quality} />
-					</a>
-				))
+					return <VideoCard key={video.id} video={video} />
+				})
 			) : (
 				<Loader />
 			)}
-		</div>
-	</section>
+		</Grid>
+	</Box>
+)
+
+const VideoCard = ({ video }: any) => (
+	<a href={`/video/${video.id}`}>
+						<Card className='video ribbon-container'>
+							<CardActionArea>
+								<CardMedia component='img' src={`${config.source}/images/videos/${video.id}-290.jpg`} />
+
+								<Typography className='text-center'>{video.name}</Typography>
+
+						<Ribbon label={video.quality} />
+							</CardActionArea>
+						</Card>
+					</a>
 )
 
 const Sidebar = ({ videos, update, videoData }: any) => (
-	<aside className='col-2'>
+	<>
 		<TitleSearch videos={videos} update={update} />
 
 		<Sort videos={videos} update={update} />
 
 		<Filter videos={videos} update={update} videoData={videoData} />
-	</aside>
+	</>
 )
 
 // Container
@@ -114,30 +135,21 @@ const TitleSearch = ({ update, videos }: any) => {
 	const callback = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const searchValue = e.target.value.toLowerCase()
 
-		videos = videos.map((video: any) => {
+		update(
+			videos.map((video: any) => {
 			video.hidden.titleSearch = !video.name.toLowerCase().includes(searchValue)
 
 			return video
 		})
-
-		update(videos)
+		)
 	}
 
-	return (
-		<div className='input-wrapper'>
-			<input type='text' placeholder='Name' autoFocus onChange={callback} />
-		</div>
-	)
+	return <TextField autoFocus placeholder='Name' onChange={callback} />
 }
 
 const Sort = ({ videos, update }: any) => {
 	const sortDefault = (reverse = false) => {
-		videos.sort((a: any, b: any) => {
-			let valA = a.name.toLowerCase()
-			let valB = b.name.toLowerCase()
-
-			return valA.localeCompare(valB, 'en')
-		})
+		videos.sort((a: any, b: any) => a.name.toLowerCase().localeCompare(b.name.toLowerCase(), 'en'))
 
 		if (reverse) videos.reverse()
 		update(videos)
@@ -173,27 +185,66 @@ const Sort = ({ videos, update }: any) => {
 		<>
 			<h2>Sort</h2>
 
-			<SortItem name='A-Z' label='alphabetically' callback={() => sortDefault()} checked={true} />
-			<SortItem name='Z-A' label='alphabetically_desc' callback={() => sortDefault(true)} />
+			<FormControl>
+				<RadioGroup name='sort' defaultValue='alphabetically'>
+					<FormControlLabel
+						label='A-Z'
+						value='alphabetically'
+						control={<Radio />}
+						onChange={() => sortDefault()}
+					/>
+					<FormControlLabel
+						label='Z-A'
+						value='alphabetically_desc'
+						control={<Radio />}
+						onChange={() => sortDefault(true)}
+					/>
 
-			<SortItem name='Recent Upload' label='added_desc' callback={() => sortAdded(true)} />
-			<SortItem name='Old Upload' label='added' callback={() => sortAdded()} />
+					<FormControlLabel
+						label='Recent Upload'
+						value='added_desc'
+						control={<Radio />}
+						onChange={() => sortAdded(true)}
+					/>
+					<FormControlLabel
+						label='Old Upload'
+						value='added'
+						control={<Radio />}
+						onChange={() => sortAdded()}
+					/>
 
-			<SortItem name='Newest' label='date_desc' callback={() => sortDate(true)} />
-			<SortItem name='Oldest' label='date' callback={() => sortDate()} />
+					<FormControlLabel
+						label='Newest'
+						value='date_desc'
+						control={<Radio />}
+						onChange={() => sortDate(true)}
+					/>
+					<FormControlLabel label='Oldest' value='date' control={<Radio />} onChange={() => sortDate()} />
 
-			<SortItem name='Most Popular' label='plays' callback={() => sortPlays(true)} />
-			<SortItem name='Least Popular' label='plays_desc' callback={() => sortPlays()} />
+					<FormControlLabel
+						label='Most Popular'
+						value='plays'
+						control={<Radio />}
+						onChange={() => sortPlays(true)}
+					/>
+					<FormControlLabel
+						label='Least Popular'
+						value='plays_desc'
+						control={<Radio />}
+						onChange={() => sortPlays()}
+					/>
+				</RadioGroup>
+			</FormControl>
 		</>
 	)
 }
 
 const Filter = ({ videoData, videos, update }: any) => {
-	const category = (e: any, target: any) => {
+	const category = (ref: any, target: any) => {
 		const targetLower = target.name.toLowerCase()
 
 		videos = videos.map((video: any) => {
-			if (e.target.indeterminate) {
+			if (ref.indeterminate) {
 				const match = video.categories.some((category: any) => category.toLowerCase() === targetLower)
 
 				if (match) {
@@ -202,7 +253,7 @@ const Filter = ({ videoData, videos, update }: any) => {
 					// Remove checked-status from filtering
 					video.hidden.category.splice(video.hidden.category.indexOf(targetLower), 1)
 				}
-			} else if (!e.target.checked) {
+			} else if (!ref.checked) {
 				video.hidden.noCategory = false
 
 				const match = video.categories.map((category: any) => category.toLowerCase()).includes(targetLower)
@@ -223,11 +274,11 @@ const Filter = ({ videoData, videos, update }: any) => {
 		update(videos)
 	}
 
-	const attribute = (e: any, target: any) => {
+	const attribute = (ref: any, target: any) => {
 		const targetLower = target.name.toLowerCase()
 
 		videos = videos.map((video: any) => {
-			if (e.target.indeterminate) {
+			if (ref.indeterminate) {
 				const match = video.attributes.some((attribute: any) => attribute.toLowerCase() === targetLower)
 
 				if (match) {
@@ -236,7 +287,7 @@ const Filter = ({ videoData, videos, update }: any) => {
 					// Remove checked-status from filtering
 					video.hidden.attribute.splice(video.hidden.attribute.indexOf(targetLower), 1)
 				}
-			} else if (!e.target.checked) {
+			} else if (!ref.checked) {
 				const match = video.attributes.map((attribute: any) => attribute.toLowerCase()).includes(targetLower)
 
 				if (match) {
@@ -255,12 +306,12 @@ const Filter = ({ videoData, videos, update }: any) => {
 		update(videos)
 	}
 
-	const category_NULL = (e: React.ChangeEvent<HTMLInputElement>) => {
+	const category_NULL = (ref: any) => {
 		videos = videos.map((video: any) => {
-			if (e.currentTarget.indeterminate) {
+			if (ref.indeterminate) {
 				video.hidden.noCategory = false
 				video.hidden.notNoCategory = video.categories.length === 0
-			} else if (!e.currentTarget.checked) {
+			} else if (!ref.checked) {
 				video.hidden.notNoCategory = false
 			} else {
 				video.hidden.noCategory = video.categories.length !== 0
@@ -274,7 +325,7 @@ const Filter = ({ videoData, videos, update }: any) => {
 
 	return (
 		<>
-			<FilterObj
+			<FilterCheckBox
 				data={videoData.categories}
 				obj={videos}
 				label='category'
@@ -283,7 +334,7 @@ const Filter = ({ videoData, videos, update }: any) => {
 				nullCallback={category_NULL}
 			/>
 
-			<FilterObj
+			<FilterCheckBox
 				data={videoData.attributes}
 				obj={videos}
 				label='attribute'
@@ -295,56 +346,55 @@ const Filter = ({ videoData, videos, update }: any) => {
 }
 
 // ContainerItem
-const SortItem = ({ callback, label, name, checked = false, disabled = false }: any) => (
-	<div className={`input-wrapper ${disabled ? 'disabled' : ''}`}>
-		<input type='radio' name='sort' id={label} onChange={callback} defaultChecked={checked} />
-		<label htmlFor={label}>{name}</label>
-	</div>
-)
-
-const FilterObj = ({ data, label, labelPlural, obj, callback, nullCallback = null }: any) => {
-	const indeterminate = new Indeterminate()
-
-	return (
+const FilterCheckBox = ({ data, label, labelPlural, obj, callback, nullCallback = null }: any) => (
 		<>
 			<h2>{capitalize(label, true)}</h2>
 
-			<div id={label}>
+		<FormControl>
 				{nullCallback !== null ? (
-					<div className='input-wrapper'>
-						<input
-							type='checkbox'
-							name={label}
-							id={`${label}_NULL`}
-							onChange={(e) => {
-								indeterminate.handleIndeterminate(e)
-								nullCallback(e)
-							}}
-						/>
-						<label className='global-category' htmlFor={`${label}_NULL`}>
-							NULL
-						</label>
-					</div>
+				<IndeterminateItem label='NULL' value='NULL' callback={(ref: any) => nullCallback(ref)} />
 				) : null}
 
 				{data.map((item: any) => (
-					<div className='input-wrapper' key={item.id}>
-						<input
-							type='checkbox'
-							name={label}
-							id={`${label}-${item.name}`}
-							onChange={(e) => {
-								indeterminate.handleIndeterminate(e)
-								callback(e, item)
-							}}
-						/>
-						<label htmlFor={`${label}-${item.name}`}>
+				<IndeterminateItem
+					key={item.id}
+					label={
+						<>
 							{item.name} <LabelCount prop={labelPlural} label={item.name} obj={obj} />
-						</label>
-					</div>
+						</>
+					}
+					value={item.name}
+					item={item}
+					callback={(ref: any, item: any) => callback(ref, item)}
+				/>
 				))}
-			</div>
+		</FormControl>
 		</>
+	)
+
+const IndeterminateItem = ({ label, value, item = null, callback }: any) => {
+	const [indeterminate, setIndeterminate] = useState(false)
+	const [checked, setChecked] = useState(false)
+
+	return (
+		<FormControlLabel
+			label={label}
+			value={value}
+			control={
+				<Checkbox
+					checked={checked}
+					indeterminate={indeterminate}
+					onChange={() => {
+						const result = indeterminateHandler({ checked, indeterminate })
+
+						setIndeterminate(result.indeterminate)
+						setChecked(result.checked)
+
+						callback(result, item)
+					}}
+				/>
+			}
+		/>
 	)
 }
 

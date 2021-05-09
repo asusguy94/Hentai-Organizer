@@ -41,26 +41,26 @@
 			}
 		}
 
-		label {
-			margin-right: 9px;
+		label.Mui-error {
+			font-weight: bold;
+			color: black;
+		}
 
-			&.bold {
-				font-weight: bold;
-				margin-right: 7px;
-			}
+		.MuiInput-underline.Mui-error::after {
+			border-bottom-color: black;
 		}
 
 		input {
 			text-transform: capitalize;
+		}
+
+		.attribute {
+			margin-right: 0.5em;
 		}
 	}
 
 	.video {
 		margin: 0 10px 10px 5px;
 		width: $thumbnailWidth + px;
-
-		span {
-			text-align: center;
-		}
 	}
 }

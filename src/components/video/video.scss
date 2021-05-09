@@ -1,41 +1,47 @@
 @import '../styles/functions';
 
 #video-page {
-	.header {
+	#header {
 		margin-bottom: 15px;
 
 		&__title {
+			vertical-align: middle;
+		}
+
+		&__title,
+		&__date,
+		&__quality {
 			display: inline-block;
 		}
 
 		&__censored {
-			.label {
-				color: red;
+			#divider {
+				color: black;
+				margin-left: 0.2em;
+				margin-right: 0.3em;
+			}
 
-				&:before {
-					content: ' - ';
-					color: black;
-				}
+			.label {
+				font-size: 0.6em;
+				color: red;
+				vertical-align: middle;
 			}
 		}
 
 		&__next {
 			margin-top: 0.6em;
+			float: right;
 		}
 
-		.btn {
+		button {
+			min-width: 0;
+
 			margin-left: 15px;
 			color: black;
 
-			&:hover {
-				color: white;
-			}
-
-			i {
+			i:not(.no-label) {
 				margin-right: 5px;
 			}
-
-			font-weight: 600;
 		}
 	}
 
@@ -65,44 +71,59 @@
 		}
 	}
 
-	aside {
+	#sidebar {
 		margin-top: 4.25em;
 
 		#stars {
+			margin-bottom: 3%;
 			text-align: center;
 
 			.star {
+				margin: 0.5em;
+
 				&--active {
-					.card {
-						border-width: 4px;
-						border-color: green;
-					}
+					border: 4px solid green;
 				}
+			}
+		}
+
+		#stars-input {
+			margin-top: 3%;
+			margin-bottom: 3%;
+
+			.form-group__item {
+				margin: 0;
 			}
 		}
 
 		#franchise {
 			margin-bottom: 3%;
+			margin-left: 3%;
 
 			.episode {
-				display: block;
-				background-color: grey;
-				color: white;
-				text-decoration: none;
-
-				border-radius: 4px;
-				margin-bottom: 10px;
-
-				height: 60px;
+				align-items: center;
+				margin-bottom: 6px;
 
 				&:hover {
-					background-color: darkgrey;
+					background-color: lightgray;
 				}
 
-				&__thumbnail {
-					padding: 3px 0;
-					height: inherit;
+				.episode__plays {
 				}
+
+				.episode__thumbnail {
+					padding: 3px 0;
+				}
+
+				.episode__title {
+					padding: 12px;
+				}
+			}
+		}
+
+		#attributes {
+			.attribute {
+				margin: 1em 0.5em;
 			}
 		}
 

@@ -1,6 +1,21 @@
 import React, { Component, Fragment, useEffect, useState, useContext, createContext } from 'react'
 import { Link } from 'react-router-dom'
 
+import {
+	Grid,
+	Button,
+	Card,
+	CardMedia,
+	CardContent,
+	Box,
+	Typography,
+	TextField,
+	Checkbox,
+	Divider,
+	FormGroup,
+	FormControlLabel
+} from '@material-ui/core'
+
 import Axios from 'axios'
 //@ts-ignore
 import { PlyrComponent as Plyr } from 'plyr-react'
@@ -9,11 +24,10 @@ import { ContextMenu, ContextMenuTrigger, MenuItem } from 'react-contextmenu'
 import ReactTooltip from 'react-tooltip'
 //@ts-ignore
 import KeyboardEventHandler from 'react-keyboard-event-handler'
-import Autosizeinput from 'react-input-autosize'
 
 import Modal, { IModal } from '../modal/modal'
 import Ribbon from '../ribbon/ribbon'
-import { setFocus, useRefWithEffect } from '../../hooks'
+import { useRefWithEffect } from '../../hooks'
 
 import './video.scss'
 
@@ -112,7 +126,7 @@ class VideoPage extends Component {
 
 	render() {
 		return (
-			<div id='video-page' className='col-12 row'>
+			<Grid container id='video-page'>
 				<ModalContext.Provider
 					value={{
 						method: (title: any, data: any, filter: boolean) => this.handleModal(title, data, filter),
@@ -168,7 +182,7 @@ class VideoPage extends Component {
 						/>
 					</UpdateContext.Provider>
 				</ModalContext.Provider>
-			</div>
+			</Grid>
 		)
 	}
 
@@ -232,7 +246,7 @@ const Section = ({ video, bookmarks, categories, attributes, stars, updateBookma
 	}
 
 	return (
-		<section className='col-9'>
+		<Grid item xs={9}>
 			<Header video={video} />
 
 			<VideoPlayer
@@ -257,7 +271,7 @@ const Section = ({ video, bookmarks, categories, attributes, stars, updateBookma
 				update={updateBookmarks}
 				duration={duration}
 			/>
-		</section>
+		</Grid>
 	)
 }
 
@@ -294,10 +308,10 @@ const Sidebar = ({ video, stars, bookmarks, attributes, categories, updateBookma
 	}
 
 	return (
-		<aside className='col-3'>
+		<Grid item xs={3} id='sidebar'>
 			<Franchise video={video} />
 
-			<div id='stars' className='row justify-content-center'>
+			<Grid container justify='center' id='stars_section'>
 				<Stars
 					video={video}
 					stars={stars}
@@ -309,7 +323,7 @@ const Sidebar = ({ video, stars, bookmarks, attributes, categories, updateBookma
 				/>
 
 				<StarInput video={video} stars={stars} bookmarks={bookmarks} getAttributes={getAttributes} />
-			</div>
+			</Grid>
 
 			<Attributes
 				bookmarks={bookmarks}
@@ -317,12 +331,11 @@ const Sidebar = ({ video, stars, bookmarks, attributes, categories, updateBookma
 				update={updateBookmarks}
 				getAttributes={getAttributes}
 			/>
-		</aside>
+		</Grid>
 	)
 }
 
 // Container
-
 interface IVideoPlayer {
 	video: IVideo
 	bookmarks: IBookmark[]
@@ -566,16 +579,17 @@ const VideoPlayer = ({
 							'Add Bookmark',
 							categories.map((category) => {
 								return (
-									<div
+									<Button
+										variant='outlined'
+										color='primary'
 										key={category.id}
-										className='btn btn-sm btn-outline-primary d-block'
 										onClick={() => {
 											handleModal()
 											addBookmark(category)
 										}}
 									>
 										{category.name}
-									</div>
+									</Button>
 								)
 							}),
 							true
@@ -604,18 +618,15 @@ const VideoPlayer = ({
 					onClick={() => {
 						handleModal(
 							'Rename Video',
-							<Autosizeinput
-								type='text'
-								className='input__container--autosize'
-								inputClassName='input--autosize'
+							<TextField
 								defaultValue={video.path.file}
-								ref={setFocus}
+								autoFocus
 								onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
 									if (e.key === 'Enter') {
-										e.preventDefault()
-
 										handleModal()
-										renameVideo(e.currentTarget.value)
+
+										//@ts-ignore
+										renameVideo(e.target.value)
 									}
 								}}
 							/>
@@ -835,29 +846,29 @@ const Timeline = ({
 	return (
 		<div className='col-12' id='timeline'>
 			{video.id !== 0
-				? bookmarks.map((bookmark, i) => (
+				? bookmarks.map((bookmark, i) => {
+						const tooltip = bookmark.starID !== 0 || bookmark.attributes.length > 0
+
+						return (
 						<Fragment key={bookmark.id}>
-							<ContextMenuTrigger id={`bookmark-${bookmark.id}`}>
-								<div
-									className={`btn btn-sm ${
-										isActive(bookmark)
-											? 'btn-info'
-											: hasStar(bookmark)
-											? 'btn-outline-primary'
-											: 'btn-outline-secondary'
-									} bookmark`}
+								<ContextMenuTrigger id={`bookmark-${bookmark.id}`} holdToDisplay={-1}>
+									<Button
+										size='small'
+										variant={isActive(bookmark) ? 'contained' : 'outlined'}
+										color={hasStar(bookmark) ? 'primary' : 'default'}
+										className='bookmark'
 									style={{
 										left: `${((bookmark.start * 100) / duration) * config.timeline.offset}%`
 									}}
 									onClick={() => playVideo(bookmark.start)}
-									ref={(item: HTMLDivElement) => (bookmarksArr[i] = item)}
+										ref={(item: HTMLButtonElement) => (bookmarksArr[i] = item)}
 									data-level={1}
 								>
-									<div data-tip={true} data-for={`bookmark-info-${bookmark.id}`}>
+										<div data-tip={tooltip} data-for={`bookmark-info-${bookmark.id}`}>
 										{bookmark.name}
 									</div>
 
-									{bookmark.starID !== 0 || bookmark.attributes.length > 0 ? (
+										{tooltip ? (
 										<ReactTooltip id={`bookmark-info-${bookmark.id}`} effect='solid'>
 											{bookmark.starID !== 0 ? (
 												<img
@@ -876,13 +887,19 @@ const Timeline = ({
 													return a.name.localeCompare(b.name)
 												})
 												.map((attribute) => (
-													<div key={attribute.id} className='attribute btn btn-sm btn-light'>
+														<Button
+															key={attribute.id}
+															size='small'
+															variant='contained'
+															component='div'
+															className='attribute btn'
+														>
 														{attribute.name}
-													</div>
+														</Button>
 												))}
 										</ReactTooltip>
 									) : null}
-								</div>
+									</Button>
 							</ContextMenuTrigger>
 
 							<ContextMenu id={`bookmark-${bookmark.id}`}>
@@ -906,22 +923,24 @@ const Timeline = ({
 											attributes
 												.filter((attribute) => {
 													const match = bookmark.attributes.some(
-														(bookmarkAttribute) => attribute.name === bookmarkAttribute.name
+															(bookmarkAttribute) =>
+																attribute.name === bookmarkAttribute.name
 													)
 
 													return !match ? attribute : null
 												})
 												.map((attribute) => (
-													<div
+														<Button
 														key={attribute.id}
-														className='btn btn-sm btn-outline-primary d-block w-auto'
+															variant='outlined'
+															color='primary'
 														onClick={() => {
 															handleModal()
 															addAttribute(attribute, bookmark)
 														}}
 													>
 														{attribute.name}
-													</div>
+														</Button>
 												)),
 											true
 										)
@@ -944,16 +963,17 @@ const Timeline = ({
 											categories
 												.filter((category) => category.name !== bookmark.name)
 												.map((category) => (
-													<div
+														<Button
 														key={category.id}
-														className='btn btn-outline-primary d-block w-auto'
+															variant='outlined'
+															color='primary'
 														onClick={() => {
 															handleModal()
 															setCategory(category, bookmark)
 														}}
 													>
 														{category.name}
-													</div>
+														</Button>
 												)),
 											true
 										)
@@ -971,7 +991,8 @@ const Timeline = ({
 								</MenuItem>
 							</ContextMenu>
 						</Fragment>
-				  ))
+						)
+				  })
 				: null}
 		</div>
 	)
@@ -996,7 +1017,7 @@ const Stars = ({ video, stars, bookmarks, attributes, categories, clearActive, u
 	}
 
 	return (
-		<>
+		<Grid container justify='center' id='stars'>
 			{stars.map((star) => (
 				<Star
 					key={star.id}
@@ -1010,7 +1031,7 @@ const Stars = ({ video, stars, bookmarks, attributes, categories, clearActive, u
 					removeStar={removeStar}
 				/>
 			))}
-		</>
+		</Grid>
 	)
 }
 
@@ -1082,8 +1103,10 @@ const Star = ({
 		}).then(() => {
 			updateBookmarks(
 				bookmarks.map((bookmark) => {
+					if (bookmark.starID === star.id) {
 					if (!bookmark.attributes.some((attr) => attr.id === attribute.id)) {
 						bookmark.attributes.push(attribute)
+					}
 					}
 
 					return bookmark
@@ -1143,18 +1166,20 @@ const Star = ({
 	}
 
 	return (
-		<div
-			className={`star col-4 ${border ? 'star--active' : ''}`}
+		<Grid
+			item
+			xs={4}
 			onClick={getStarEvent.event ? () => addStar(star) : () => {}}
 			onMouseEnter={getStarEvent.event ? () => setBorder(true) : () => setActive(star)}
 			onMouseLeave={getStarEvent.event ? () => setBorder(false) : clearActive}
 		>
-			<div className='card mb-2 ribbon-container'>
-				<ContextMenuTrigger id={`star-${star.id}`}>
-					<img
-						className='star__image card-img-top'
-						alt='star'
+			<ContextMenuTrigger id={`star-${star.id}`} holdToDisplay={-1}>
+				<Card className={`ribbon-container star ${border ? 'star--active' : ''}`}>
+					<CardMedia
+						component='img'
 						src={`${config.source}/images/stars/${star.id}.jpg`}
+						alt='star'
+						className='star__image'
 					/>
 
 					<Link to={`/star/${star.id}`} className='star__name d-block'>
@@ -1162,8 +1187,8 @@ const Star = ({
 					</Link>
 
 					{handleRibbon(star)}
+				</Card>
 				</ContextMenuTrigger>
-			</div>
 
 			<ContextMenu id={`star-${star.id}`}>
 				<MenuItem
@@ -1171,16 +1196,17 @@ const Star = ({
 						handleModal(
 							'Add Bookmark',
 							categories.map((category) => (
-								<div
+								<Button
 									key={category.id}
-									className='btn btn-sm btn-outline-primary d-block w-auto'
+									variant='outlined'
+									color='primary'
 									onClick={() => {
 										handleModal()
 										addBookmark(category, star)
 									}}
 								>
 									{category.name}
-								</div>
+								</Button>
 							)),
 							true
 						)
@@ -1201,16 +1227,17 @@ const Star = ({
 									return !match ? attribute : null
 								})
 								.map((attribute) => (
-									<div
+									<Button
 										key={attribute.id}
-										className='btn btn-sm btn-outline-primary d-block w-auto'
+										variant='outlined'
+										color='primary'
 										onClick={() => {
 											handleModal()
 											addAttribute(star, attribute)
 										}}
 									>
 										{attribute.name}
-									</div>
+									</Button>
 								)),
 							true
 						)
@@ -1226,7 +1253,7 @@ const Star = ({
 					<i className={config.theme.icons.trash} /> Remove
 				</MenuItem>
 			</ContextMenu>
-		</div>
+		</Grid>
 	)
 }
 
@@ -1240,8 +1267,11 @@ const StarInput = ({ video, stars, bookmarks, getAttributes }: IStarInput) => {
 	const updateVideo = useContext(UpdateContext).video
 	const update = useContext(UpdateContext).stars
 
-	const handleNoStar = (e: React.ChangeEvent<HTMLInputElement>) => {
-		Axios.put(`${config.api}/video/${video.id}`, { noStar: e.target.checked }).then(({ data }) => {
+	const [input, setInput] = useState('')
+	const [checked, setChecked] = useState(false)
+
+	const handleNoStar = (checked: boolean) => {
+		Axios.put(`${config.api}/video/${video.id}`, { noStar: checked }).then(({ data }) => {
 			video.noStar = data.noStar
 
 			updateVideo(video)
@@ -1249,85 +1279,107 @@ const StarInput = ({ video, stars, bookmarks, getAttributes }: IStarInput) => {
 	}
 
 	const addStar = (name: string) => {
+		if (input.length) {
 		Axios.post(`${config.api}/video/${video.id}/star`, { name }).then(({ data }) => {
 			stars.push({ id: data.id, name, attributes: data.attributes })
 
 			update(stars)
 		})
 	}
+	}
+
+	// if 'noStar' is updated outside this component
+	useEffect(() => {
+		if (video.noStar) setChecked(true)
+	}, [video.noStar])
 
 	return (
-		<div className='col-12 mt-2'>
-			{stars.length ? <hr className='mx-auto' /> : null}
+		<Grid container justify='center'>
+			{stars.length ? <Divider light /> : null}
 
-			<div className='row justify-content-center align-items-center'>
-				<label htmlFor='add-star' className='col-1 col-form-label'>
-					Star
-				</label>
-				<div className='col-5'>
-					<input
-						type='text'
-						id='add-star'
-						className='form-control'
+			<Box id='stars-input'>
+				<FormGroup row>
+					<TextField
+						className='form-group__item'
+						variant='outlined'
+						label='Star'
+						value={input}
+						onChange={(e) => setInput(e.target.value)}
 						onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
 							if (e.key === 'Enter') {
-								e.preventDefault()
+								addStar(input)
 
-								addStar(e.currentTarget.value)
+								// Reset Input
+								setInput('')
 
-								e.currentTarget.value = ''
+								// Reset focused state
+								//@ts-ignore
+								e.target.blur()
 							}
 						}}
 						disabled={video.noStar === 1}
 					/>
-				</div>
 
-				<div className='form-check col-2'>
-					<label htmlFor='no-star' className='form-check-label'>
-						No Star
-					</label>
+					<FormControlLabel
+						className='form-group__item'
+						label='No Star'
+						control={
+							<Checkbox
+								checked={checked}
+								onChange={(e, checked) => {
+									// Update checked status
+									setChecked(checked)
 
-					<input
-						type='checkbox'
-						name='no-star'
-						id='no-star'
-						className='form-check-input'
-						onChange={handleNoStar}
-						checked={video.noStar === 1}
+									handleNoStar(checked)
+								}}
+							/>
+						}
 						disabled={bookmarks.length > 0 || stars.length > 0}
 					/>
-				</div>
-			</div>
+				</FormGroup>
+			</Box>
 
-			{getAttributes().length ? <hr className='mx-auto' /> : null}
-		</div>
+			{getAttributes().length ? <Divider light /> : null}
+		</Grid>
 	)
 }
 
-const Franchise = ({ video }: { video: IVideo }) => (
-	<div id='franchise'>
+const Franchise = ({ video }: { video: IVideo }) => {
+	const shortenTitle = (title: string) => {
+		//TODO use franchise as well, to only trim the franchise-part and not the episode-part
+
+		if (title.length > config.franchise.title.maxLength) {
+			return title.slice(0, config.franchise.title.maxLength - 3) + '...'
+		}
+
+		return title
+	}
+
+	return (
+		<Box id='franchise'>
 		{video.related.length > 1
-			? <h2>Episodes</h2> &&
-			  video.related.map((item) => (
-					<a className='episode row' href={`/video/${item.id}`} key={item.id}>
-						<span className='episode__plays col-2'>{item.plays} Plays</span>
+				? video.related.map((item) => (
+						<a href={`/video/${item.id}`} key={item.id}>
+							<Grid container component={Card} className='episode'>
+								<Grid component={CardContent} className='episode__plays'>
+									<Typography>{item.plays} plays</Typography>
+								</Grid>
 
-						<img
-							className='episode__thumbnail col-2'
+								<Grid item xs={2} className='episode__thumbnail'>
+									<CardMedia
+										component='img'
 							src={`${config.source}/images/videos/${item.id}-290.jpg`}
-							alt='thumbnail'
 						/>
+								</Grid>
 
-						<span className='episode__title col-8'>
-							{item.name.length > config.franchise.title.maxLength
-								? item.name.slice(0, config.franchise.title.maxLength - 3) + '...'
-								: item.name}
-						</span>
+								<Grid className='episode__title'>{shortenTitle(item.name)}</Grid>
+							</Grid>
 					</a>
 			  ))
 			: null}
-	</div>
+		</Box>
 )
+}
 
 interface IAttributes {
 	bookmarks: IBookmark[]
@@ -1348,56 +1400,48 @@ const Attributes = ({ bookmarks, clearActive, update, getAttributes }: IAttribut
 	}
 
 	return (
-		<div id='attributes' className='row col-12 justify-content-center'>
+		<Grid container justify='center' id='attributes'>
 			{getAttributes().map((attribute) => (
-				<div
+				<Button
 					key={attribute.id}
-					className='btn btn-outline-primary m-2 attribute w-auto'
+					size='small'
+					variant='outlined'
+					color='primary'
+					className='attribute'
 					onMouseEnter={() => attribute_setActive(attribute)}
 					onMouseLeave={clearActive}
 				>
 					{attribute.name}
-				</div>
+				</Button>
 			))}
-		</div>
+		</Grid>
 	)
 }
 
 const Header = ({ video }: { video: IVideo }) => {
-	const handleModal = useContext(ModalContext).method
 	const update = useContext(UpdateContext).video
 
-	const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>, callback: (value: string) => void) => {
-		if (e.key === 'Enter') {
-			e.preventDefault()
-
-			handleModal()
-			callback(e.currentTarget.value)
-		}
-	}
-
 	return (
-		<header className='header row'>
-			<div className='col-11'>
-				<HeaderTitle video={video} handleModal={handleModal} handleKeyPress={handleKeyPress} />
+		<Grid container component='header' id='header'>
+			<Grid item xs={11}>
+				<HeaderTitle video={video} />
 
-				<HeaderDate video={video} handleModal={handleModal} handleKeyPress={handleKeyPress} update={update} />
+				<HeaderDate video={video} update={update} />
 
 				<HeaderQuality video={video} />
-			</div>
+			</Grid>
 
+			<Grid item xs={1}>
 			<HeaderNext video={video} />
-		</header>
+			</Grid>
+		</Grid>
 	)
 }
 
 // ContainerItem
-interface IHeaderTitle {
-	video: IVideo
-	handleModal: (title: any, data: any, filter?: any) => void
-	handleKeyPress: (e: React.KeyboardEvent<HTMLInputElement>, callback: (value: string) => void) => void
-}
-const HeaderTitle = ({ video, handleModal, handleKeyPress }: IHeaderTitle) => {
+const HeaderTitle = ({ video }: { video: IVideo }) => {
+	const handleModal = useContext(ModalContext).method
+
 	const copyFranchise = async () => await navigator.clipboard.writeText(video.franchise)
 
 	const renameFranchise = (value: string) => {
@@ -1413,9 +1457,11 @@ const HeaderTitle = ({ video, handleModal, handleKeyPress }: IHeaderTitle) => {
 	}
 
 	return (
-		<h1 className='header__title h2 align-middle'>
-			<div className='d-inline-block align-middle'>
-				<ContextMenuTrigger id='title'>{video.name}</ContextMenuTrigger>
+		<Typography variant='h4' id='header__title'>
+			<div className='d-inline-block'>
+				<ContextMenuTrigger id='title' holdToDisplay={-1}>
+					{video.name}
+				</ContextMenuTrigger>
 			</div>
 
 			<ContextMenu id='title'>
@@ -1423,13 +1469,17 @@ const HeaderTitle = ({ video, handleModal, handleKeyPress }: IHeaderTitle) => {
 					onClick={() => {
 						handleModal(
 							'Change Title',
-							<Autosizeinput
-								type='text'
-								className='input__container--autosize'
-								inputClassName='input--autosize'
+							<TextField
 								defaultValue={video.name}
-								ref={setFocus}
-								onKeyDown={(e) => handleKeyPress(e, renameTitle)}
+								autoFocus
+								onKeyDown={(e) => {
+									if (e.key === 'Enter') {
+										handleModal()
+
+										//@ts-ignore
+										renameTitle(e.target.value)
+									}
+								}}
 							/>
 						)
 					}}
@@ -1441,13 +1491,17 @@ const HeaderTitle = ({ video, handleModal, handleKeyPress }: IHeaderTitle) => {
 					onClick={() => {
 						handleModal(
 							'Change Franchise',
-							<Autosizeinput
-								type='text'
-								className='input__container--autosize'
-								inputClassName='input--autosize'
+							<TextField
 								defaultValue={video.franchise}
-								ref={setFocus}
-								onKeyDown={(e) => handleKeyPress(e, renameFranchise)}
+								autoFocus
+								onKeyDown={(e) => {
+									if (e.key === 'Enter') {
+										handleModal()
+
+										//@ts-ignore
+										renameFranchise(e.target.value)
+									}
+								}}
 							/>
 						)
 					}}
@@ -1462,20 +1516,25 @@ const HeaderTitle = ({ video, handleModal, handleKeyPress }: IHeaderTitle) => {
 				</MenuItem>
 			</ContextMenu>
 
-			<small className='header__censored text-muted'>
-				{video.censored ? <span className='label'>Censored</span> : null}
-			</small>
-		</h1>
+			<span id='header__censored'>
+				{video.censored ? (
+					<>
+						<span id='divider'>-</span>
+						<span className='label'>Censored</span>
+					</>
+				) : null}
+			</span>
+		</Typography>
 	)
 }
 
 interface IHeaderDate {
 	video: IVideo
-	handleModal: (title: string, data: React.ReactNode, filter?: boolean) => void
-	handleKeyPress: (e: React.KeyboardEvent<HTMLInputElement>, callback: (value: string) => void) => void
 	update: (video: IVideo) => void
 }
-const HeaderDate = ({ video, handleModal, handleKeyPress, update }: IHeaderDate) => {
+const HeaderDate = ({ video, update }: IHeaderDate) => {
+	const handleModal = useContext(ModalContext).method
+
 	const handleDate = (value: string) => {
 		Axios.put(`${config.api}/video/${video.id}`, { date: value }).then(({ data }) => {
 			video.date.published = data.date_published
@@ -1486,19 +1545,29 @@ const HeaderDate = ({ video, handleModal, handleKeyPress, update }: IHeaderDate)
 
 	return (
 		<>
-			<ContextMenuTrigger id='menu__date' renderTag='span'>
-				<div className='header__date btn btn-sm btn-outline-primary'>
-					<i className={config.theme.icons.calendar} />
+			<ContextMenuTrigger id='menu__date' renderTag='span' holdToDisplay={-1}>
+				<Button size='small' variant='outlined' id='header__date'>
+					<i className={`${config.theme.icons.calendar} ${video.date.published ? '' : 'no-label'}`} />
 					{video.date.published}
-				</div>
+				</Button>
 			</ContextMenuTrigger>
 
 			<ContextMenu id='menu__date'>
 				<MenuItem
 					onClick={() => {
 						handleModal(
-							'Change Time',
-							<input type='text' ref={setFocus} onKeyDown={(e) => handleKeyPress(e, handleDate)} />
+							'Change Date',
+							<TextField
+								autoFocus
+								onKeyDown={(e) => {
+									if (e.key === 'Enter') {
+										handleModal()
+
+										//@ts-ignore
+										handleDate(e.target.value)
+									}
+								}}
+							/>
 						)
 					}}
 				>
@@ -1511,18 +1580,20 @@ const HeaderDate = ({ video, handleModal, handleKeyPress, update }: IHeaderDate)
 }
 
 const HeaderNext = ({ video }: { video: IVideo }) => (
-	<div className='col-1 header__next'>
-		<a className='btn btn-sm btn-outline-primary float-end' id='next' href={`/video/${video.nextID}`}>
+	<Box id='header__next'>
+		<a id='next' href={`/video/${video.nextID}`}>
+			<Button size='small' variant='outlined'>
 			Next
+			</Button>
 		</a>
-	</div>
+	</Box>
 )
 
 const HeaderQuality = ({ video }: { video: IVideo }) => (
-	<div className='header__quality btn btn-sm btn-outline-primary'>
+	<Button size='small' variant='outlined' id='header__quality'>
 		<i className={config.theme.icons.film} />
 		{video.quality}
-	</div>
+	</Button>
 )
 
 export default VideoPage

@@ -1,9 +1,15 @@
 @import 'context-menu';
+@import 'material-ui';
+@import 'util';
+
+body {
+	font-family: 'Roboto', sans-serif;
+}
 
 /* Star */
 .star {
 	&__image {
-		// Prevent large images from beeing oversized
+		// Prevent large images from being oversized
 		max-height: 275px;
 		max-width: 200px;
 	}
@@ -13,18 +19,16 @@
 	text-decoration: none !important;
 	color: black;
 
-	span {
+	&__title {
 		text-align: center;
 	}
 }
 
-.btn {
-	cursor: default !important;
-}
-
 @for $i from 1 through 6 {
 	h#{$i} {
-		font-family: 'Roboto', sans-serif;
+		font-weight: 500;
+		margin-bottom: 0.3em;
+		margin-top: 0.3em;
 	}
 }
 
@@ -47,7 +51,6 @@ label {
 	outline: none;
 }
 
-.btn-link,
 a {
 	text-decoration: none;
 }

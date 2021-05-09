@@ -1,5 +1,18 @@
 import { useState, useEffect } from 'react'
 
+import {
+	Grid,
+	Button,
+	Table,
+	TableContainer,
+	TableBody,
+	TableRow,
+	TableCell,
+	TableHead,
+	Typography,
+	Paper
+} from '@material-ui/core'
+
 import Axios from 'axios'
 
 import Loader from '../loader/loader'
@@ -23,49 +36,52 @@ const AddVideoPage = () => {
 	}, [])
 
 	return (
-		<div className='col-12'>
-			<h2 className='text-center'>Import Videos</h2>
+		<Grid className='text-center'>
+			<Typography style={{ marginBottom: 8 }}>Import Videos</Typography>
+
 			{loaded ? (
 				!videos.length ? (
 					<div className='text-center'>
-						<Button
+						<Action
 							label='Generate Thumbnails'
 							callback={() => Axios.post(`${config.source}/generate/thumb`)}
 						/>
-						<Button
+						<Action
 							label='Generate Metadata'
 							callback={() => Axios.post(`${config.source}/generate/meta`)}
 						/>
-						<Button label='Generate VTT' disabled={true} />
+						<Action label='Generate VTT' disabled={true} />
 					</div>
 				) : (
 					<>
-						<table className='table table-sm table-striped'>
-							<thead>
-								<tr>
-									<th>episode</th>
-									<th>franchise</th>
-									<th>title</th>
-									<th>path</th>
-								</tr>
-							</thead>
+						<TableContainer component={Paper}>
+							<Table size='small'>
+								<TableHead>
+									<TableRow>
+										<TableCell>episode</TableCell>
+										<TableCell>franchise</TableCell>
+										<TableCell>title</TableCell>
+										<TableCell>path</TableCell>
+									</TableRow>
+								</TableHead>
 
-							<tbody>
+								<TableBody>
 								{videos.map((video) => {
 									return (
-										<tr key={video.path}>
-											<td>{video.episode}</td>
-											<td>{video.franchise}</td>
-											<td>{video.name}</td>
-											<td>{video.path}</td>
-										</tr>
+											<TableRow key={video.path}>
+												<TableCell>{video.episode}</TableCell>
+												<TableCell>{video.franchise}</TableCell>
+												<TableCell>{video.name}</TableCell>
+												<TableCell>{video.path}</TableCell>
+											</TableRow>
 									)
 								})}
-							</tbody>
-						</table>
+								</TableBody>
+							</Table>
+						</TableContainer>
 
-						<div className='text-center'>
-							<Button
+						<div style={{ marginTop: 8 }}>
+							<Action
 								label='Add Videos'
 								callback={() =>
 									Axios.post(`${config.source}/video/add`, { videos }).then(() => {
@@ -79,7 +95,7 @@ const AddVideoPage = () => {
 			) : (
 				<Loader />
 			)}
-		</div>
+		</Grid>
 	)
 }
 
@@ -88,7 +104,7 @@ interface IButton {
 	callback?: () => void
 	disabled?: boolean
 }
-const Button = ({ label, callback = () => {}, disabled = false }: IButton) => {
+const Action = ({ label, callback = () => {}, disabled = false }: IButton) => {
 	const [isDisabled, setIsDisabled] = useState(disabled)
 
 	const clickHandler = () => {
@@ -100,9 +116,15 @@ const Button = ({ label, callback = () => {}, disabled = false }: IButton) => {
 	}
 
 	return (
-		<div className={`btn btn-info mx-1 ${isDisabled ? 'disabled' : ''}`} onClick={clickHandler}>
+		<Button
+			variant='outlined'
+			color='primary'
+			disabled={isDisabled}
+			onClick={clickHandler}
+			style={{ marginLeft: 6, marginRight: 6 }}
+		>
 			{label}
-		</div>
+		</Button>
 	)
 }
 

@@ -1,0 +1,40 @@
+.text-center {
+	text-align: center;
+}
+
+.img-thumbnail {
+	width: 100%;
+	padding: 0.25rem;
+	border: 1px solid #dee2e6;
+	border-radius: 0.25rem;
+}
+
+.border {
+	border: 1px solid red;
+}
+
+.d {
+	&-block {
+		display: block !important;
+	}
+
+	&-inline-block {
+		display: inline-block !important;
+	}
+
+	&-none {
+		display: none !important;
+	}
+}
+
+.m {
+	&-0 {
+		margin: 0 !important;
+	}
+}
+
+.p {
+	&-0 {
+		padding: 0 !important;
+	}
+}

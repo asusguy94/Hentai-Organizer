@@ -1,5 +1,18 @@
-import React, { FC } from 'react'
-import { useState, useEffect, cloneElement } from 'react'
+import React, { FC, useState, useEffect, cloneElement } from 'react'
+
+import {
+	Grid,
+	Button,
+	Table,
+	TableContainer,
+	TableHead,
+	TableRow,
+	TableCell,
+	TableBody,
+	TextField,
+	Paper,
+	Checkbox
+} from '@material-ui/core'
 
 import Axios from 'axios'
 import capitalize from 'capitalize'
@@ -9,10 +22,10 @@ import './editor.scss'
 import config from '../config.json'
 
 const EditorPage = () => (
-	<div id='editor-page' className='col-12 row'>
+	<Grid container justify='center' id='editor-page'>
 		<Wrapper label='attributes' name='attribute' obj={['starOnly', 'videoOnly']} />
 		<Wrapper label='categories' name='category' />
-	</div>
+	</Grid>
 )
 
 const Wrapper: FC<any> = ({ label, name, children, obj = [] }) => {
@@ -40,20 +53,33 @@ const Wrapper: FC<any> = ({ label, name, children, obj = [] }) => {
 	}
 
 	return (
-		<div className='col-4'>
-			<header className='row'>
-				<h2 className='col-6'>{capitalize(label)}</h2>
+		<Grid item xs={3} style={{ paddingLeft: 3 * 8, paddingRight: 3 * 8 }}>
+			<Grid container justify='center' style={{ marginBottom: 10 }}>
+				<Grid item component='h2'>
+					{capitalize(label)}
+				</Grid>
 
-				<div className='mt-1 col-6'>
-					<input type='text' className='px-1' onChange={handleChange} onKeyPress={handleKeyPress} />
-					<div className='btn btn-sm btn-primary mb-1' onClick={handleSubmit}>
+				<Grid item>
+					<TextField
+						onChange={handleChange}
+						onKeyPress={handleKeyPress}
+						style={{ marginLeft: 5, marginRight: 5 }}
+					/>
+
+					<Button
+						variant='contained'
+						color='primary'
+						size='small'
+						onClick={handleSubmit}
+						style={{ marginTop: 2 }}
+					>
 						Add {capitalize(name)}
-					</div>
-				</div>
-			</header>
+					</Button>
+				</Grid>
+			</Grid>
 
 			<>{children ? cloneElement(children, { label: name, obj }) : <WrapperItem label={name} obj={obj} />}</>
-		</div>
+		</Grid>
 	)
 }
 
@@ -81,29 +107,31 @@ const WrapperItem = ({ label, obj = [] }: any) => {
 	}
 
 	return (
-		<table className='table table-striped'>
-			<thead>
-				<tr>
-					<th>ID</th>
-					<th>{capitalize(label)}</th>
+		<TableContainer component={Paper}>
+			<Table size='small'>
+				<TableHead>
+					<TableRow>
+						<TableCell>ID</TableCell>
+						<TableCell>{capitalize(label)}</TableCell>
 
-					{obj.map((label: any) => (
-						<th key={label}>{label}</th>
+						{obj.map((label: any) => (
+							<TableCell key={label}>{label}</TableCell>
+						))}
+					</TableRow>
+				</TableHead>
+
+				<TableBody>
+					{data.map((item: any) => (
+						<Item
+							key={item.id}
+							obj={obj}
+							data={item}
+							update={(ref: any, value: any) => updateItem(ref, value)}
+						/>
 					))}
-				</tr>
-			</thead>
-
-			<tbody>
-				{data.map((item: any) => (
-					<Item
-						key={item.id}
-						obj={obj}
-						data={item}
-						update={(ref: any, value: any) => updateItem(ref, value)}
-					/>
-				))}
-			</tbody>
-		</table>
+				</TableBody>
+			</Table>
+		</TableContainer>
 	)
 }
 
@@ -117,52 +145,50 @@ const Item = ({ update, data, obj }: any) => {
 		if (value) update(data, value)
 	}
 
-	const setCondition = (ref: any, prop: any, value: any, checkbox: any) => {
+	const setCondition = (
+		ref: { id: number; name: string; videoOnly: boolean; starOnly: boolean },
+		prop: string,
+		value: number,
+		checkbox: any
+	) => {
 		Axios.put(`${config.api}/attribute/${ref.id}`, { label: prop, value }).catch(() => {
 			checkbox.checked = !checkbox.checked
 		})
 	}
 
-	const handleKeyPress = (e: React.KeyboardEvent) => {
-		if (e.key === 'Enter') {
-			e.preventDefault()
-			save()
-		}
-	}
-
-	const handleConditionChange = (e: any, data: any, prop: any) =>
-		setCondition(data, prop, Number(e.target.checked), e.target)
-	const clickHandler = () => setEdit(true)
-	const changeHandler = (e: React.ChangeEvent<HTMLInputElement>) => setValue(e.currentTarget.value)
-
 	return (
-		<tr>
-			<th>{data.id}</th>
-			<td className='btn-link' onClick={clickHandler}>
+		<TableRow>
+			<TableCell>{data.id}</TableCell>
+			<TableCell>
 				{edit ? (
-					<input
+					<TextField
 						type='text'
 						defaultValue={data.name}
 						autoFocus
 						onBlur={save}
-						onKeyPress={handleKeyPress}
-						onChange={changeHandler}
+						onKeyPress={(e) => {
+							if (e.key === 'Enter') {
+								save()
+							}
+						}}
+						onChange={(e) => setValue(e.currentTarget.value)}
 					/>
 				) : (
-					<span>{data.name}</span>
+					<span onClick={() => setEdit(true)}>{data.name}</span>
 				)}
-			</td>
+			</TableCell>
 
 			{obj.map((item: any) => (
-				<td key={item}>
-					<input
-						type='checkbox'
-						defaultChecked={data[item]}
-						onChange={(e) => handleConditionChange(e, data, item)}
+				<TableCell key={item}>
+					<Checkbox
+						defaultChecked={!!data[item]}
+						onChange={(e) => {
+							setCondition(data, item, Number(e.currentTarget.checked), e.currentTarget)
+						}}
 					/>
-				</td>
+				</TableCell>
 			))}
-		</tr>
+		</TableRow>
 	)
 }
 

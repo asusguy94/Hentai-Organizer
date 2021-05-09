@@ -1,14 +1,13 @@
 export const isHidden = ({ hidden }: any) => {
-	let value = 0
-	for (var prop in hidden) {
-		if (typeof hidden[prop] !== 'object') {
-			value += Number(hidden[prop])
-		} else {
-			value += Number(hidden[prop].length > 0)
+	for (let prop in hidden) {
+		if (Array.isArray(hidden[prop])) {
+			if (hidden[prop].length > 0) return true
+		} else if (hidden[prop]) {
+			return true
 		}
 	}
 
-	return value
+	return false
 }
 
 export const getCount = (obj: any) => {
@@ -17,10 +16,10 @@ export const getCount = (obj: any) => {
 	obj.forEach(({ hidden }: any) => {
 		let value = 0
 		for (const prop in hidden) {
-			if (typeof hidden[prop] !== 'object') {
-				value += Number(hidden[prop])
-			} else {
+			if (Array.isArray(hidden[prop])) {
 				value += Number(hidden[prop].length > 0)
+			} else {
+				value += Number(hidden[prop])
 			}
 		}
 		if (value) count--

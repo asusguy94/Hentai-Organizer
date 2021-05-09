@@ -1,9 +1,25 @@
 import React, { Component, Fragment, useState, useRef } from 'react'
+import { Link } from 'react-router-dom'
+
+import {
+	Box,
+	Grid,
+	Card,
+	CardActionArea,
+	CardContent,
+	CardMedia,
+	Typography,
+	Button,
+	TextField
+} from '@material-ui/core'
+
+import { Autocomplete } from '@material-ui/lab'
 
 import Axios from 'axios'
 import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu'
 
 import Modal from '../modal/modal'
+import Loader from '../loader/loader'
 
 import './star.scss'
 
@@ -54,17 +70,14 @@ class StarPage extends Component {
 
 	render() {
 		return (
-			<div id='star-page' className='col-12 row'>
-				<section className='col-7'>
+			<Grid container justify='center' id='star-page'>
 					{this.state.star.id !== 0 ? (
-						<div id='star'>
+					<Grid item xs={12} id='star'>
 							<StarImageDropbox star={this.state.star} update={(star: any) => this.setState({ star })} />
 
 							<StarTitle
 								star={this.state.star}
-								handleModal={(title: any, data: any, filter: any) =>
-									this.handleModal(title, data, filter)
-								}
+							handleModal={(title: any, data: any, filter: any) => this.handleModal(title, data, filter)}
 								update={(star: any) => this.setState({ star })}
 							/>
 
@@ -73,11 +86,12 @@ class StarPage extends Component {
 								starData={this.state.starData}
 								update={(star: any) => this.setState({ star })}
 							/>
-						</div>
-					) : null}
 
 					{this.state.videos.length ? <StarVideos videos={this.state.videos} /> : null}
-				</section>
+					</Grid>
+				) : (
+					<Loader />
+				)}
 
 				<Modal
 					visible={this.state.modal.visible}
@@ -87,7 +101,7 @@ class StarPage extends Component {
 				>
 					{this.state.modal.data}
 				</Modal>
-			</div>
+			</Grid>
 		)
 	}
 
@@ -103,15 +117,15 @@ class StarPage extends Component {
 
 // Wrapper
 const StarVideos = ({ videos }: any) => (
-	<>
+	<Grid container>
 		<h3>Videos</h3>
 
-		<div id='videos' className='row'>
+		<Grid container id='videos'>
 			{videos.map((video: any) => (
 				<StarVideo key={video.id} video={video} />
 			))}
-		</div>
-	</>
+		</Grid>
+	</Grid>
 )
 
 const StarForm = ({ star, starData, update }: any) => {
@@ -228,7 +242,7 @@ const StarImageDropbox = ({ star, update }: any) => {
 		return (
 			<>
 				<ContextMenuTrigger id='star__dropbox'>
-					<div
+					<Box
 						id='dropbox'
 						className={`unselectable ${hover ? 'hover' : ''}`}
 						onDragEnter={handleEnter}
@@ -236,8 +250,8 @@ const StarImageDropbox = ({ star, update }: any) => {
 						onDragLeave={handleLeave}
 						onDrop={handleDrop}
 					>
-						<div className='label'>Drop Image Here</div>
-					</div>
+						<Box className='label'>Drop Image Here</Box>
+					</Box>
 				</ContextMenuTrigger>
 
 				<ContextMenu id='star__dropbox'>
@@ -313,9 +327,11 @@ const StarVideo = ({ video }: any) => {
 	}
 
 	return (
-		<a className='video  card' href={`/video/${video.id}`}>
-			<video
-				className='card-img-top'
+		<Link className='video' to={`/video/${video.id}`}>
+			<Card>
+				<CardActionArea>
+					<CardMedia
+						component='video'
 				src={src}
 				data-src={dataSrc}
 				poster={`${config.source}/images/videos/${video.image}`}
@@ -325,29 +341,35 @@ const StarVideo = ({ video }: any) => {
 				onMouseLeave={handleMouseLeave}
 			/>
 
-			<span className='title card-title'>{video.name}</span>
-		</a>
+					<CardContent>
+						<Typography className='video__title'>{video.name}</Typography>
+					</CardContent>
+				</CardActionArea>
+			</Card>
+		</Link>
 	)
 }
 
-const StarInputForm = ({ value, emptyByDefault = false, update, name, type, list, children }: any) => {
-	const [inputID, setInputID] = useState('')
-	const [inputValue, setInputValue] = useState(emptyByDefault ? '' : value)
+const StarInputForm = ({ value, emptyByDefault = false, update, name, list, children }: any) => {
+	const [open, setOpen] = useState(false)
+	const [inputValue, setInputValue] = useState('')
 
-	const updateValue = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setInputID(e.currentTarget.id)
-		setInputValue(e.currentTarget.value)
+	const label = name.toLowerCase()
+
+	const updateValue = (value: any) => {
+		if (value === '') setOpen(false)
+
+		setInputValue(value)
 	}
 
-	const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-		if (e.key === 'Enter') {
-			if (inputID.length) update(inputValue, inputID)
+	const handleKeyPress = (e: React.KeyboardEvent<any>) => {
+		if (!open && e.key === 'Enter') {
+			update(inputValue, label)
 
 			if (emptyByDefault) {
 				setInputValue('')
 
-				// Reset input-field
-				e.currentTarget.value = ''
+				//TODO Reset input-field
 			}
 		}
 	}
@@ -360,38 +382,32 @@ const StarInputForm = ({ value, emptyByDefault = false, update, name, type, list
 	}
 
 	return (
-		<div className='input-wrapper mb-1'>
-			<label className={isChanged() ? 'bold' : ''} htmlFor={name.toLowerCase()}>
-				{name}
-			</label>
-
-			<input
-				type={type}
-				id={name.toLowerCase()}
-				defaultValue={emptyByDefault ? '' : value}
-				onChange={updateValue}
-				onKeyDown={(e) => handleKeyPress(e)}
-				list={`${name.toLowerCase()}s`}
+		<Grid container style={{ marginBottom: 4 }}>
+			<Grid item xs={2}>
+				<Autocomplete
+					id={label}
+					value={emptyByDefault ? null : value || null}
+					//
+					// EVENTS
+					onInputChange={(e, val) => updateValue(val)}
+					onKeyPress={handleKeyPress}
+					//
+					// OPTIONS
+					options={list.filter((item: any) => (emptyByDefault && value.includes(item) ? null : item))}
+					renderInput={(params) => <TextField {...params} label={name} error={isChanged()} />}
+					autoHighlight
+					//
+					// open/closed STATUS
+					open={open}
+					onOpen={() => setOpen(true)}
+					onClose={() => setOpen(false)}
 			/>
+			</Grid>
 
-			{list ? (
-				<datalist id={`${name.toLowerCase()}s`}>
-					{list
-						.filter((listItem: any) => {
-							if (emptyByDefault) {
-								if (value.includes(listItem)) return null
-							}
-
-							return listItem
-						})
-						.map((item: any) => (
-							<option key={item} value={item} />
-						))}
-				</datalist>
-			) : null}
-
+			<Grid item style={{ marginTop: 14, marginLeft: 8 }}>
 			{children}
-		</div>
+			</Grid>
+		</Grid>
 	)
 }
 
@@ -399,8 +415,10 @@ const StarAttributes = ({ remove, data }: any) => {
 	return data.map((attribute: any, i: any) => (
 		<Fragment key={attribute}>
 			<ContextMenuTrigger id={`attribute-${i}`} renderTag='span'>
-				<span className='attribute ms-2'>
-					<span className='btn btn-sm btn-outline-primary'>{attribute}</span>
+				<span className='attribute'>
+					<Button size='small' variant='outlined' color='primary'>
+						{attribute}
+					</Button>
 				</span>
 			</ContextMenuTrigger>
 
@@ -433,16 +451,15 @@ const StarTitle = ({ star, handleModal, update }: any) => {
 					onClick={() => {
 						handleModal(
 							'Rename',
-							<input
-								type='text'
+							<TextField
 								defaultValue={star.name}
-								ref={(input) => input && input.focus()}
-								onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+								autoFocus
+								onKeyDown={(e: React.KeyboardEvent<HTMLInputElement> | any) => {
 									if (e.key === 'Enter') {
 										e.preventDefault()
 
 										handleModal()
-										renameStar(e.currentTarget.value)
+										renameStar(e.target.value)
 									}
 								}}
 							/>

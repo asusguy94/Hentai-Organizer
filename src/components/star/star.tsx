@@ -1,4 +1,4 @@
-import React, { Component, Fragment, useState, useRef } from 'react'
+import React, { Component, Fragment, useState, useRef, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 
 import {
@@ -354,8 +354,6 @@ const StarInputForm = ({ value, emptyByDefault = false, update, name, list, chil
 	const [open, setOpen] = useState(false)
 	const [inputValue, setInputValue] = useState('')
 
-	const label = name.toLowerCase()
-
 	const updateValue = (value: any) => {
 		if (value === '') setOpen(false)
 
@@ -364,32 +362,33 @@ const StarInputForm = ({ value, emptyByDefault = false, update, name, list, chil
 
 	const handleKeyPress = (e: React.KeyboardEvent<any>) => {
 		if (!open && e.key === 'Enter') {
-			update(inputValue, label)
+			update(inputValue, name.toLowerCase())
 
-			if (emptyByDefault) {
-				setInputValue('')
-
-				//TODO Reset input-field
-			}
+			if (emptyByDefault) setInputValue('')
 		}
 	}
 
-	const isChanged = () => {
-		const serverValue = (emptyByDefault ? '' : value).toLowerCase()
-		const clientValue = (inputValue || '').toLowerCase()
+	const isChanged = () => inputValue.toLowerCase() !== (!emptyByDefault ? value : '').toLowerCase()
 
-		return clientValue !== serverValue
+	useEffect(() => {
+		if (!emptyByDefault && value.length) {
+			setInputValue(value)
 	}
+	}, [value])
 
+	// FIXME excluding an item from dropdown causes a warning
 	return (
 		<Grid container style={{ marginBottom: 4 }}>
 			<Grid item xs={2}>
 				<Autocomplete
-					id={label}
-					value={emptyByDefault ? null : value || null}
+					inputValue={inputValue}
 					//
 					// EVENTS
-					onInputChange={(e, val) => updateValue(val)}
+					onInputChange={(e, val, reason) => {
+						if (reason === 'reset' && !open) return
+
+						updateValue(val)
+					}}
 					onKeyPress={handleKeyPress}
 					//
 					// OPTIONS

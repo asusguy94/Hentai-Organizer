@@ -965,7 +965,7 @@ const Timeline = ({
 
 								<MenuItem
 										disabled={
-											attributesFromStar(bookmark.starID)?.length >= bookmark.attributes.length
+											attributesFromStar(bookmark.starID).length >= bookmark.attributes.length
 										}
 										onClick={() => {
 											handleModal(
@@ -998,7 +998,7 @@ const Timeline = ({
 
 									<MenuItem
 										disabled={
-											attributesFromStar(bookmark.starID)?.length >= bookmark.attributes.length
+											attributesFromStar(bookmark.starID).length >= bookmark.attributes.length
 										}
 									onClick={() => clearAttributes(bookmark)}
 								>

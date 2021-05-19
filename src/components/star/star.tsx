@@ -368,7 +368,8 @@ const StarInputForm = ({ value, emptyByDefault = false, update, name, list, chil
 		}
 	}
 
-	const isChanged = () => inputValue.toLowerCase() !== (!emptyByDefault ? value : '').toLowerCase()
+	const isChanged = inputValue.toLowerCase() !== (!emptyByDefault ? value : '').toLowerCase()
+	const shouldShrink = isChanged || (typeof value === 'string' && value.length > 0)
 
 	useEffect(() => {
 		if (!emptyByDefault && value.length) {
@@ -393,8 +394,16 @@ const StarInputForm = ({ value, emptyByDefault = false, update, name, list, chil
 					//
 					// OPTIONS
 					options={list.filter((item: any) => (emptyByDefault && value.includes(item) ? null : item))}
-					renderInput={(params) => <TextField {...params} label={name} error={isChanged()} />}
+					renderInput={(params) => (
+						<TextField
+							{...params}
+							label={name}
+							error={isChanged}
+							InputLabelProps={{ shrink: shouldShrink }}
+						/>
+					)}
 					autoHighlight
+					clearOnBlur={false}
 					//
 					// open/closed STATUS
 					open={open}

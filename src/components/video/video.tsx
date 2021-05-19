@@ -749,32 +749,46 @@ const Timeline = ({
 		)
 	}
 
+	const removeAttribute = (bookmark: IBookmark, attribute: IAttribute) => {
+		Axios.delete(`${config.api}/bookmark/${bookmark.id}/attribute/${attribute.id}`).then(() => {
+			update(
+				bookmarks.map((item) => {
+					if (item.id === bookmark.id) {
+						item.attributes = item.attributes.filter((itemAttribute) =>
+							itemAttribute.id === attribute.id ? null : itemAttribute
+		)
+					}
+
+					return item
+				})
+			)
+		})
+	}
+
 	const clearAttributes = (bookmark: IBookmark) => {
 		Axios.delete(`${config.api}/bookmark/${bookmark.id}/attribute`).then(() => {
 			update(
-				bookmarks.map((item) => {
-				if (item.id === bookmark.id) {
+				bookmarks.map((bookmarkItem) => {
+					if (bookmarkItem.id === bookmark.id) {
 					const starID = bookmark.starID
 
 					if (starID !== 0) {
-						const attributes = attributesFromStar(starID)
+							const starAttribute = attributesFromStar(starID)
 
-						if (item.attributes.length > attributes.length) {
-							item.attributes = item.attributes.filter((attribute) => {
-								const match = attributes.some(
-									(bookmarkAttribute) => bookmarkAttribute.name === attribute.name
+							bookmarkItem.attributes = bookmarkItem.attributes.filter((bookmarkAttribute) => {
+								const match = starAttribute.some(
+									(starAttribute) => starAttribute.name === bookmarkAttribute.name
 								)
 
-								return match ? attribute : null
+								return match ? bookmarkAttribute : null
 							})
-						}
 					} else {
-						// bookmark does not have a star
-						item.attributes = []
+							// Bookmark does not have a star
+							bookmarkItem.attributes = []
 					}
 				}
 
-				return item
+					return bookmarkItem
 			})
 			)
 		})
@@ -950,7 +964,42 @@ const Timeline = ({
 								</MenuItem>
 
 								<MenuItem
-									disabled={bookmark.attributes.length === 0}
+										disabled={
+											attributesFromStar(bookmark.starID).length >= bookmark.attributes.length
+										}
+										onClick={() => {
+											handleModal(
+												'Remove Attribute',
+												bookmark.attributes
+													.filter((attribute) => {
+														// only show attribute, if not from star
+														if (isStarAttribute(bookmark.starID, attribute.id)) return null
+
+														return attribute
+													})
+													.map((attribute) => (
+														<Button
+															key={attribute.id}
+															variant='outlined'
+															color='primary'
+															onClick={() => {
+																handleModal()
+																removeAttribute(bookmark, attribute)
+															}}
+														>
+															{attribute.name}
+														</Button>
+													))
+											)
+										}}
+									>
+										<i className={config.theme.icons.trash} /> Remove Attribute
+									</MenuItem>
+
+									<MenuItem
+										disabled={
+											attributesFromStar(bookmark.starID).length >= bookmark.attributes.length
+										}
 									onClick={() => clearAttributes(bookmark)}
 								>
 									<i className={config.theme.icons.trash} /> Clear Attributes

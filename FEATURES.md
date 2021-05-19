@@ -75,7 +75,7 @@
 | Hairstyle _RADIO_     | :heavy_check_mark: |
 | Attributes _CHECKBOX_ | :heavy_check_mark: |
 
-## :x: Video Page
+## :heavy_check_mark: Video Page
 
 ### :heavy_check_mark: Heading
 
@@ -99,19 +99,19 @@
 | Update Video    | :heavy_check_mark:                            |            |
 | Delete Video    | :heavy_check_mark:                            |            |
 
-### :x: Bookmark
+### :heavy_check_mark: Bookmark
 
-| Name             | Status                 | Priority |
-| ---------------- | ---------------------- | :------: |
-| Add Star         | :heavy_check_mark:     |          |
-| Remove Star      | :heavy_check_mark:     |          |
-| Add Attribute    | :heavy_check_mark:     |          |
-| Remove Attribute | :x: Remove 1 attribute |   HIGH   |
-| Clear Attributes | :heavy_check_mark:     |          |
-| Change Category  | :heavy_check_mark:     |          |
-| Change Time      | :heavy_check_mark:     |          |
-| Delete Bookmark  | :heavy_check_mark:     |          |
-| [Hover]          | :heavy_check_mark:     |          |
+| Name             | Status             |
+| ---------------- | ------------------ |
+| Add Star         | :heavy_check_mark: |
+| Remove Star      | :heavy_check_mark: |
+| Add Attribute    | :heavy_check_mark: |
+| Remove Attribute | :heavy_check_mark: |
+| Clear Attributes | :heavy_check_mark: |
+| Change Category  | :heavy_check_mark: |
+| Change Time      | :heavy_check_mark: |
+| Delete Bookmark  | :heavy_check_mark: |
+| [Hover]          | :heavy_check_mark: |
 
 ### :heavy_check_mark: Other videos from same franchise
 

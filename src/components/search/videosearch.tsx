@@ -92,7 +92,7 @@ const Videos = ({ videos }: any) => (
 			</Typography>
 		) : null}
 
-		<Grid container>
+		<Grid container justify='center'>
 			{videos.length ? (
 				videos.map((video: any) => {
 					if (isHidden(video)) return null

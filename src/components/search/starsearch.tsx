@@ -119,7 +119,7 @@ const Stars = ({ stars }: any) => (
 			<span className='count'>{getCount(stars)}</span> Stars
 		</Typography>
 
-		<Grid container>
+		<Grid container justify='center'>
 			{stars.length ? (
 				stars.map((star: any) => {
 					if (isHidden(star)) return null

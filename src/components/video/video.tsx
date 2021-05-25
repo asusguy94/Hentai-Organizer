@@ -706,7 +706,7 @@ const Timeline = ({
 	const isActive = (bookmark: IBookmark) => Boolean(bookmark.active)
 	const hasStar = (bookmark: IBookmark) => Boolean(bookmark.starID)
 	const attributesFromStar = (starID: number) =>
-		stars.filter((star) => (star.id === starID ? star : null))[0]?.attributes
+		stars.filter((star) => (star.id === starID ? star : null))[0]?.attributes || []
 	const isStarAttribute = (starID: number, attributeID: number) =>
 		attributesFromStar(starID)?.some((attr) => attr.id === attributeID)
 

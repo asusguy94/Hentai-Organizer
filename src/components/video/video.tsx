@@ -1231,8 +1231,8 @@ const Star = ({
 						className='star__image'
 					/>
 
-					<Link to={`/star/${star.id}`} className='star__name d-block'>
-						{star.name}
+					<Link to={`/star/${star.id}`} className='star__name'>
+						<Typography>{star.name}</Typography>
 					</Link>
 
 					{handleRibbon(star)}

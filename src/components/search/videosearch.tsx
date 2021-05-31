@@ -352,7 +352,11 @@ const FilterCheckBox = ({ data, label, labelPlural, obj, callback, nullCallback 
 
 		<FormControl>
 				{nullCallback !== null ? (
-				<IndeterminateItem label='NULL' value='NULL' callback={(ref: any) => nullCallback(ref)} />
+				<IndeterminateItem
+					label={<div className='global-category'>NULL</div>}
+					value='NULL'
+					callback={(ref: any) => nullCallback(ref)}
+				/>
 				) : null}
 
 				{data.map((item: any) => (

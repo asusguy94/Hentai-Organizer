@@ -179,12 +179,10 @@ const Item = ({ update, data, obj }: any) => {
 			</TableCell>
 
 			{obj.map((item: any) => (
-				<TableCell key={item}>
+				<TableCell key={item} className='py-0'>
 					<Checkbox
 						defaultChecked={!!data[item]}
-						onChange={(e) => {
-							setCondition(data, item, Number(e.currentTarget.checked), e.currentTarget)
-						}}
+						onChange={(e) => setCondition(data, item, Number(e.currentTarget.checked), e.currentTarget)}
 					/>
 				</TableCell>
 			))}

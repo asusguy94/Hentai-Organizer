@@ -70,9 +70,9 @@ class StarPage extends Component {
 
 	render() {
 		return (
-			<Grid container justify='center' id='star-page'>
+			<Grid container id='star-page'>
 					{this.state.star.id !== 0 ? (
-					<Grid item xs={12} id='star'>
+					<Box id='star'>
 							<StarImageDropbox star={this.state.star} update={(star: any) => this.setState({ star })} />
 
 							<StarTitle
@@ -88,7 +88,7 @@ class StarPage extends Component {
 							/>
 
 					{this.state.videos.length ? <StarVideos videos={this.state.videos} /> : null}
-					</Grid>
+					</Box>
 				) : (
 					<Loader />
 				)}
@@ -224,8 +224,9 @@ const StarImageDropbox = ({ star, update }: any) => {
 		addImage(e.dataTransfer.getData('text'))
 	}
 
-	if (star.image !== null) {
 		return (
+		<Box className='d-inline-block'>
+			{star.image !== null ? (
 			<>
 				<ContextMenuTrigger id='star__image'>
 					<img className='star__image' src={`${config.source}/images/stars/${star.image}`} alt='star' />
@@ -237,9 +238,7 @@ const StarImageDropbox = ({ star, update }: any) => {
 					</MenuItem>
 				</ContextMenu>
 			</>
-		)
-	} else {
-		return (
+			) : (
 			<>
 				<ContextMenuTrigger id='star__dropbox'>
 					<Box
@@ -260,9 +259,10 @@ const StarImageDropbox = ({ star, update }: any) => {
 					</MenuItem>
 				</ContextMenu>
 			</>
+			)}
+		</Box>
 		)
 	}
-}
 
 // Container
 const StarVideo = ({ video }: any) => {
@@ -380,7 +380,7 @@ const StarInputForm = ({ value, emptyByDefault = false, update, name, list, chil
 	// FIXME excluding an item from dropdown causes a warning
 	return (
 		<Grid container style={{ marginBottom: 4 }}>
-			<Grid item xs={2}>
+			<Grid item xs={3}>
 				<Autocomplete
 					inputValue={inputValue}
 					//
@@ -449,10 +449,12 @@ const StarTitle = ({ star, handleModal, update }: any) => {
 	}
 
 	return (
-		<>
+		<Box>
+			<Box className='d-inline-block'>
 			<ContextMenuTrigger id='title'>
 				<h2>{star.name}</h2>
 			</ContextMenuTrigger>
+			</Box>
 
 			<ContextMenu id='title'>
 				<MenuItem
@@ -477,7 +479,7 @@ const StarTitle = ({ star, handleModal, update }: any) => {
 					<i className={config.theme.icons.edit} /> Rename
 				</MenuItem>
 			</ContextMenu>
-		</>
+		</Box>
 	)
 }
 

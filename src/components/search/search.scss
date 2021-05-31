@@ -76,27 +76,6 @@
 		font-weight: bold;
 	}
 
-	.flag {
-		margin-right: 5px;
-	}
-
-	.prettydropdown {
-		li {
-			padding-left: 0.3rem !important;
-		}
-
-		.color {
-			display: inline-block;
-			margin-right: 5px;
-
-			$width: 12px;
-			width: $width;
-			height: $width;
-
-			border: 1px solid black;
-		}
-	}
-
 	.count {
 		color: blue;
 	}

@@ -1,29 +1,6 @@
 @import '../styles/functions';
 
 #star-page {
-	aside {
-		#relations {
-			text-align: center;
-
-			a.relation {
-				display: inline-block;
-				width: 200px;
-
-				margin: 10px;
-				text-decoration: none;
-				color: inherit;
-
-				&:hover {
-					text-decoration: underline;
-				}
-
-				img {
-					width: inherit;
-				}
-			}
-		}
-	}
-
 	#star {
 		#dropbox {
 			width: 200px;

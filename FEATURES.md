@@ -14,8 +14,7 @@
 | ------------------ | ------------------------------------------------------------------------ |
 | VideoFileRename    | Solution breaks the VideoPlayer, so reloading is still the best solution |
 | FranchiseVideoLink | Should use native link-tag instead of browser link-tag                   |
-| ImportVideos       | Changes are not sent to the server, always uses the parsed data          |
-| StarVideosHover    | Throws an error when hovering, still works though                        |
+| StarVideosHover    | Throws an error when hovering                                            |
 
 ## :heavy_check_mark: Home Page
 
@@ -26,13 +25,12 @@
 | Popular Videos | :heavy_check_mark: |
 | Random Videos  | :heavy_check_mark: |
 
-## :x: Add Videos
+## :heavy_check_mark: Add Videos
 
-| Name                | Status                                        |  Priority  |
-| ------------------- | --------------------------------------------- | :--------: |
-| Import Videos       | :heavy_check_mark: [Info](#issue-explanation) | FUNCTIONAL |
-| Generate Thumbnails | :heavy_check_mark:                            |            |
-| Generate WebVTT     | :x:                                           |    LOW     |
+| Name                | Status             |
+| ------------------- | ------------------ |
+| Import Videos       | :heavy_check_mark: |
+| Generate Thumbnails | :heavy_check_mark: |
 
 ## :x: Video Search
 
@@ -49,7 +47,7 @@
 | Name                 | Status             | Priority |
 | -------------------- | ------------------ | :------: |
 | Censored _TOGGLE_    | :x:                |   HIGH   |
-| Star _TOGGLE_        | :x:                |   HIGH   |
+| noStar _TOGGLE_      | :x:                |   HIGH   |
 | Quality _TOGGLE_     | :x:                |   HIGH   |
 | Title Search _INPUT_ | :heavy_check_mark: |          |
 | Sort                 | :heavy_check_mark: |          |

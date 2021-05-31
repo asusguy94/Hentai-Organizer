@@ -27,7 +27,7 @@ import KeyboardEventHandler from 'react-keyboard-event-handler'
 
 import Modal, { IModal } from '../modal/modal'
 import Ribbon from '../ribbon/ribbon'
-import { useRefWithEffect } from '../../hooks'
+import { useRefWithEffect, useWindowSize } from '../../hooks'
 
 import './video.scss'
 
@@ -855,7 +855,7 @@ const Timeline = ({
 
 			current.setAttribute('data-level', `${level}`)
 		}
-	}, [bookmarksArr])
+	}, [bookmarksArr, useWindowSize().width])
 
 	return (
 		<div className='col-12' id='timeline'>

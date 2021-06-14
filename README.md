@@ -44,8 +44,3 @@
 ## Features
 
 Status of functionality can be found at [features.md](FEATURES.md)
-
-## TODOS
-
--   [ ] Change Typescript `:any` to proper _type_
--   [ ] Fix and remove `//@ts-ignore`

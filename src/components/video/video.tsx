@@ -1,4 +1,4 @@
-import React, { Component, Fragment, useEffect, useState, useContext, createContext } from 'react'
+import React, { Fragment, useEffect, useState, useContext, createContext } from 'react'
 import { Link } from 'react-router-dom'
 
 import {
@@ -25,7 +25,7 @@ import ReactTooltip from 'react-tooltip'
 //@ts-ignore
 import KeyboardEventHandler from 'react-keyboard-event-handler'
 
-import Modal, { IModal } from '../modal/modal'
+import Modal from '../modal/modal'
 import Ribbon from '../ribbon/ribbon'
 import { useRefWithEffect, useWindowSize } from '../../hooks'
 
@@ -40,21 +40,17 @@ const ModalContext = createContext({
 	data: { visible: false, title: null, data: null, filter: false }
 })
 const UpdateContext = createContext({
-	video: (video: any): void => {},
-	stars: (stars: any[]): void => {},
-	bookmarks: (bookmarks: any[]): void => {}
+	video: (...args: any): void => {},
+	stars: (...args: any[]): void => {},
+	bookmarks: (...args: any[]): void => {}
 })
 
 const starEventData = { id: 0, name: '', starID: 0, start: 0, active: false, attributes: [] }
 const SetStarEventContext = createContext((...args: any): void => {})
-const GetStarEventContext = createContext({
-	event: false,
-	data: starEventData
-})
+const GetStarEventContext = createContext({ event: false, data: starEventData })
 
-class VideoPage extends Component {
-	state = {
-		video: {
+const VideoPage = (props: any) => {
+	const [video, setVideo] = useState({
 			id: 0,
 			nextID: 0,
 			episode: 0,
@@ -74,110 +70,102 @@ class VideoPage extends Component {
 			attributes: [],
 			related: [],
 			noStar: 0
-		},
-		stars: [],
-		bookmarks: [],
-		categories: [],
-		attributes: [],
-		modal: {
+	})
+
+	const [stars, setStars] = useState([])
+	const [bookmarks, setBookmarks] = useState([])
+	const [categories, setCategories] = useState([])
+	const [attributes, setAttributes] = useState([])
+
+	const [modal, setModal] = useState({
 			visible: false,
 			title: null,
 			data: null,
 			filter: false
-		},
-		addStarEvent: {
+	})
+
+	const [addStarEvent, setAddStarEvent] = useState({
 			event: false,
 			data: starEventData
-		}
-	}
+	})
 
-	handleKeyPress(key: string, e: IKeyPress) {
+	const handleKeyPress = (key: string, e: IKeyPress) => {
 		e.preventDefault()
 
 		switch (key) {
 			case 'tab':
-				window.location.href = this.state.video.nextID ? `${this.state.video.nextID}` : '/video'
+				window.location.href = video.nextID ? `${video.nextID}` : '/video'
+
+				//TODO use stateObj instead
 				break
 			default:
 				console.log(`${key} was pressed`)
 		}
 	}
 
-	handleModal(title = null, data = null, filter = false) {
-		if (title !== null && data !== null && this.state.modal.visible) this.handleModal()
+	const handleModal = (title = null, data = null, filter = false) => {
+		setModal((prevModal) => ({ title, data, visible: !prevModal.visible, filter }))
+	}
 
-		this.setState(({ modal }: { modal: IModal }) => {
-			modal.title = title
-			modal.data = data
-			modal.visible = !modal.visible
-			modal.filter = filter
+	const handleAddStarEvent = (event: boolean, data: any = addStarEvent.data) => {
+		setAddStarEvent({ event, data })
+	}
 
-			return { modal }
+	useEffect(() => {
+		const { id } = props.match.params
+
+		Axios.get(`${config.api}/video/${id}`).then(({ data: video }) => setVideo(video))
+		Axios.get(`${config.api}/video/${id}/bookmark`).then(({ data: bookmarks }) => {
+			bookmarks.map((bookmark: IBookmark) => (bookmark.active = false))
+
+			setBookmarks(bookmarks)
 		})
-	}
 
-	handleAddStarEvent(event: boolean, data: any = this.state.addStarEvent.data) {
-		const preEvent = this.state.addStarEvent
-		preEvent.event = event
-		preEvent.data = data
+		Axios.get(`${config.api}/video/${id}/star`).then(({ data: stars }) => setStars(stars))
+		Axios.get(`${config.api}/category`).then(({ data: categories }) => setCategories(categories))
+		Axios.get(`${config.api}/attribute/video`).then(({ data: attributes }) => setAttributes(attributes))
+	}, [])
 
-		this.setState({ addStarEvent: preEvent })
-	}
-
-	render() {
 		return (
 			<Grid container id='video-page'>
 				<ModalContext.Provider
 					value={{
-						method: (title: any, data: any, filter: boolean) => this.handleModal(title, data, filter),
-						data: this.state.modal
+					method: (title: any, data: any, filter: boolean) => handleModal(title, data, filter),
+					data: modal
 					}}
 				>
-					<UpdateContext.Provider
-						value={{
-							bookmarks: (bookmarks: IBookmark[]) => this.setState({ bookmarks }),
-							video: (video: IVideo[]) => this.setState({ video }),
-							stars: (stars: IStars[]) => this.setState({ stars })
-						}}
-					>
+				<UpdateContext.Provider value={{ bookmarks: setBookmarks, video: setVideo, stars: setStars }}>
 						<SetStarEventContext.Provider
-							value={(event: boolean, data: any = this.state.addStarEvent.data) =>
-								this.handleAddStarEvent(event, data)
-							}
+						value={(event: boolean, data: any = addStarEvent.data) => handleAddStarEvent(event, data)}
 						>
-							<GetStarEventContext.Provider value={this.state.addStarEvent}>
+						<GetStarEventContext.Provider value={addStarEvent}>
 						<Section
-							video={this.state.video}
-							bookmarks={this.state.bookmarks}
-							categories={this.state.categories}
-							attributes={this.state.attributes}
-							stars={this.state.stars}
-									updateBookmarks={(bookmarks: IBookmark[]) => this.setState({ bookmarks })}
+								video={video}
+								bookmarks={bookmarks}
+								categories={categories}
+								attributes={attributes}
+								stars={stars}
+								updateBookmarks={(bookmarks: any) => setBookmarks(bookmarks)}
 						/>
 
 						<Sidebar
-							video={this.state.video}
-							stars={this.state.stars}
-							bookmarks={this.state.bookmarks}
-							attributes={this.state.attributes}
-							categories={this.state.categories}
-									updateBookmarks={(bookmarks: IBookmark[]) => this.setState({ bookmarks })}
+								video={video}
+								stars={stars}
+								bookmarks={bookmarks}
+								attributes={attributes}
+								categories={categories}
+								updateBookmarks={(bookmarks: any) => setBookmarks(bookmarks)}
 						/>
 							</GetStarEventContext.Provider>
 						</SetStarEventContext.Provider>
 
-						<Modal
-							visible={this.state.modal.visible}
-							title={this.state.modal.title}
-							filter={this.state.modal.filter}
-							onClose={() => this.handleModal()}
-						>
-							{this.state.modal.data}
+					<Modal visible={modal.visible} title={modal.title} filter={modal.filter} onClose={handleModal}>
+						{modal.data}
 						</Modal>
 
 						<KeyboardEventHandler
 							handleKeys={['tab']}
-							onKeyEvent={(key: string, e: IKeyPress) => this.handleKeyPress(key, e)}
+						onKeyEvent={(key: string, e: IKeyPress) => handleKeyPress(key, e)}
 							handleFocusableElements={true}
 						/>
 					</UpdateContext.Provider>
@@ -185,24 +173,6 @@ class VideoPage extends Component {
 			</Grid>
 		)
 	}
-
-	componentDidMount() {
-		const props: any = this.props
-		const { id } = props.match.params
-
-		Axios.get(`${config.api}/video/${id}`).then(({ data: video }) => this.setState({ video }))
-
-		Axios.get(`${config.api}/video/${id}/bookmark`).then(({ data: bookmarks }) => {
-			bookmarks.map((bookmark: IBookmark) => (bookmark.active = false))
-
-			this.setState({ bookmarks })
-		})
-
-		Axios.get(`${config.api}/video/${id}/star`).then(({ data: stars }) => this.setState({ stars }))
-		Axios.get(`${config.api}/category`).then(({ data: categories }) => this.setState({ categories }))
-		Axios.get(`${config.api}/attribute/video`).then(({ data: attributes }) => this.setState({ attributes }))
-	}
-}
 
 // Wrapper
 interface ISection {
@@ -474,9 +444,10 @@ const VideoPlayer = ({
 
 	const censorToggle = () => {
 		Axios.put(`${config.api}/video/${video.id}`, { cen: !video.censored }).then(() => {
-			video.censored = !video.censored
+			const videoRef = { ...video }
+			videoRef.censored = !videoRef.censored
 
-			update(video)
+			update(videoRef)
 		})
 	}
 
@@ -494,17 +465,19 @@ const VideoPlayer = ({
 				let attributes = data.attributes
 				if (typeof data.attributes === 'undefined') attributes = []
 
-				bookmarks.push({
+				updateBookmarks(
+					[
+						...bookmarks,
+						{
 					id: data.id,
 					name: category.name,
 					start: time,
 					starID: 0,
 					attributes,
 					active: false
-				})
-				bookmarks.sort((a, b) => a.start - b.start)
-
-				updateBookmarks(bookmarks)
+						}
+					].sort((a, b) => a.start - b.start)
+				)
 			})
 		}
 	}
@@ -690,6 +663,7 @@ const Timeline = ({
 	const setStarEvent = useContext(SetStarEventContext)
 	const handleModal = useContext(ModalContext).method
 
+	useEffect(() => {
 	if (duration && video.duration) {
 		if (Math.abs(duration - video.duration) > 3) {
 			alert('invalid video-duration')
@@ -700,6 +674,7 @@ const Timeline = ({
 			console.log('Re-Transcode to fix this issue')
 		}
 	}
+	}, [duration, video.duration])
 
 	const bookmarksArr: HTMLElement[] = []
 
@@ -1061,7 +1036,7 @@ const Stars = ({ video, stars, bookmarks, attributes, categories, clearActive, u
 
 	const removeStar = (id: number) => {
 		Axios.delete(`${config.api}/video/${video.id}/star/${id}`).then(() => {
-			update(stars.filter((star) => star.id !== id))
+			update([...stars].filter((star) => star.id !== id))
 		})
 	}
 
@@ -1129,17 +1104,19 @@ const Star = ({
 				let attributes = data.attributes
 				if (typeof data.attributes === 'undefined') attributes = []
 
-				bookmarks.push({
+				updateBookmarks(
+					[
+						...bookmarks,
+						{
 					id: data.id,
 					name: category.name,
 					start: time,
 					starID: star.id,
 					attributes,
 					active: false
-				})
-
-				bookmarks.sort((a, b) => a.start - b.start)
-				updateBookmarks(bookmarks)
+						}
+					].sort((a, b) => a.start - b.start)
+				)
 			})
 		}
 	}
@@ -1321,18 +1298,17 @@ const StarInput = ({ video, stars, bookmarks, getAttributes }: IStarInput) => {
 
 	const handleNoStar = (checked: boolean) => {
 		Axios.put(`${config.api}/video/${video.id}`, { noStar: checked }).then(({ data }) => {
-			video.noStar = data.noStar
+			const videoRef = { ...video }
+			videoRef.noStar = data.noStar
 
-			updateVideo(video)
+			updateVideo(videoRef)
 		})
 	}
 
 	const addStar = (name: string) => {
 		if (input.length) {
 		Axios.post(`${config.api}/video/${video.id}/star`, { name }).then(({ data }) => {
-			stars.push({ id: data.id, name, attributes: data.attributes })
-
-			update(stars)
+				update([...stars, { id: data.id, name, attributes: data.attributes }])
 		})
 	}
 	}
@@ -1586,9 +1562,10 @@ const HeaderDate = ({ video, update }: IHeaderDate) => {
 
 	const handleDate = (value: string) => {
 		Axios.put(`${config.api}/video/${video.id}`, { date: value }).then(({ data }) => {
-			video.date.published = data.date_published
+			const videoRef = { ...video }
+			videoRef.date.published = data.date_published
 
-			update(video)
+			update(videoRef)
 		})
 	}
 

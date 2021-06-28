@@ -1,4 +1,4 @@
-import React, { Component, Fragment, useState, useRef, useEffect } from 'react'
+import React, { Fragment, useState, useRef, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 
 import {
@@ -25,9 +25,22 @@ import './star.scss'
 
 import config from '../config.json'
 
-class StarPage extends Component {
-	state = {
-		star: {
+interface IStarVideo {
+	fname: string
+	id: number
+	image: string
+	name: string
+}
+
+const StarPage = (props: any) => {
+	const [modal, setModal] = useState({
+		visible: false,
+		title: null,
+		data: null,
+		filter: false
+	})
+
+	const [star, setStar] = useState({
 			id: 0,
 			name: '',
 			image: '',
@@ -38,122 +51,102 @@ class StarPage extends Component {
 				hairstyle: '',
 				attribute: []
 			}
-		},
-		starData: {
+	})
+
+	const [starData, setStarData] = useState({
 			breast: [],
 			eyecolor: [],
 			haircolor: [],
 			hairstyle: [],
 			attribute: []
-		},
-		videos: [],
-		modal: {
-			visible: false,
-			title: null,
-			data: null,
-			filter: false
-		}
+	})
+
+	const [videos, setVideos] = useState<IStarVideo[]>([])
+
+	const handleModal = (title = null, data = null, filter = false) => {
+		setModal((prevModal) => ({ title, data, visible: !prevModal.visible, filter }))
 	}
 
-	handleModal(title = null, data = null, filter = false) {
-		if (title !== null && data !== null && this.state.modal.visible) this.handleModal()
+	useEffect(() => {
+		const { id } = props.match.params
 
-		this.setState(({ modal }: any) => {
-			modal.title = title
-			modal.data = data
-			modal.visible = !modal.visible
-			modal.filter = filter
+		Axios.get(`${config.api}/star/${id}`).then(({ data }) => setStar(data))
+		Axios.get(`${config.api}/star/${id}/video`).then(({ data }) => setVideos(data))
+		Axios.get(`${config.api}/star`).then(({ data }) => setStarData(data))
+	}, [])
 
-			return { modal }
-		})
-	}
-
-	render() {
 		return (
 			<Grid container id='star-page'>
-					{this.state.star.id !== 0 ? (
+			<Grid item xs={6}>
+				{star.id !== 0 ? (
 					<Box id='star'>
-							<StarImageDropbox star={this.state.star} update={(star: any) => this.setState({ star })} />
+						<StarImageDropbox star={star} update={setStar} />
 
-							<StarTitle
-								star={this.state.star}
-							handleModal={(title: any, data: any, filter: any) => this.handleModal(title, data, filter)}
-								update={(star: any) => this.setState({ star })}
-							/>
+						<StarTitle star={star} handleModal={handleModal} update={setStar} />
 
-							<StarForm
-								star={this.state.star}
-								starData={this.state.starData}
-								update={(star: any) => this.setState({ star })}
-							/>
+						<StarForm star={star} starData={starData} update={setStar} />
 
-					{this.state.videos.length ? <StarVideos videos={this.state.videos} /> : null}
+						{videos.length ? <StarVideos videos={videos} /> : null}
 					</Box>
 				) : (
 					<Loader />
 				)}
 
-				<Modal
-					visible={this.state.modal.visible}
-					title={this.state.modal.title}
-					filter={this.state.modal.filter}
-					onClose={() => this.handleModal()}
-				>
-					{this.state.modal.data}
+				<Modal visible={modal.visible} title={modal.title} filter={modal.filter} onClose={handleModal}>
+					{modal.data}
 				</Modal>
 			</Grid>
+		</Grid>
 		)
 	}
 
-	componentDidMount() {
-		const props: any = this.props
-		const { id } = props.match.params
-
-		Axios.get(`${config.api}/star/${id}`).then(({ data: star }) => this.setState({ star }))
-		Axios.get(`${config.api}/star/${id}/video`).then(({ data: videos }) => this.setState({ videos }))
-		Axios.get(`${config.api}/star`).then(({ data: starData }) => this.setState({ starData }))
-	}
-}
-
 // Wrapper
-const StarVideos = ({ videos }: any) => (
+const StarVideos = ({ videos }: { videos: IStarVideo[] }) => (
 	<Grid container>
 		<h3>Videos</h3>
 
 		<Grid container id='videos'>
-			{videos.map((video: any) => (
+			{videos.map((video) => (
 				<StarVideo key={video.id} video={video} />
 			))}
 		</Grid>
 	</Grid>
 )
 
-const StarForm = ({ star, starData, update }: any) => {
-	const addAttribute = (name: any) => {
+interface IStarForm {
+	star: any
+	starData: any
+	update: any
+}
+const StarForm = ({ star, starData, update }: IStarForm) => {
+	const addAttribute = (name: string) => {
 		Axios.put(`${config.api}/star/${star.id}/attribute`, { name }).then(() => {
-			star.info.attribute.push(name)
+			const starRef = { ...star }
+			starRef.info.attribute.push(name)
 
-			update(star)
+			update(starRef)
 		})
 	}
 
-	const removeAttribute = (name: any) => {
+	const removeAttribute = (name: string) => {
 		Axios.put(`${config.api}/star/${star.id}/attribute`, { name, delete: true }).then(() => {
-			star.info.attribute = star.info.attribute.filter((attribute: any) => {
+			const starRef = { ...star }
+			starRef.info.attribute = starRef.info.attribute.filter((attribute: any) => {
 				if (attribute.toLowerCase() === name.toLowerCase()) return null
 
 				return attribute
 			})
 
-			update(star)
+			update(starRef)
 		})
 	}
 
-	const updateInfo = (value: any, label: any) => {
+	const updateInfo = (value: string, label: string) => {
 		Axios.put(`${config.api}/star/${star.id}`, { label, value }).then(() => {
-			star.info[label] = value
+			const starRef = { ...star }
+			starRef.info[label] = value
 
-			update(star)
+			update(starRef)
 		})
 	}
 
@@ -179,19 +172,21 @@ const StarForm = ({ star, starData, update }: any) => {
 const StarImageDropbox = ({ star, update }: any) => {
 	const [hover, setHover] = useState(false)
 
-	const addImage = (image: any) => {
+	const addImage = (image: string) => {
 		Axios.post(`${config.source}/star/${star.id}/image`, { url: image }).then(() => {
-			star.image = `${star.id}.jpg?${Date.now()}`
+			const starRef = { ...star }
+			starRef.image = `${star.id}.jpg?${Date.now()}`
 
-			update(star)
+			update(starRef)
 		})
 	}
 
 	const removeImage = () => {
 		Axios.delete(`${config.source}/star/${star.id}/image`).then(() => {
-			star.image = null
+			const starRef = { ...star }
+			starRef.image = null
 
-			update(star)
+			update(starRef)
 		})
 	}
 
@@ -440,11 +435,12 @@ const StarAttributes = ({ remove, data }: any) => {
 }
 
 const StarTitle = ({ star, handleModal, update }: any) => {
-	const renameStar = (name: any) => {
+	const renameStar = (name: string) => {
 		Axios.put(`${config.api}/star/${star.id}`, { name }).then(() => {
-			star.name = name
+			const starRef = { ...star }
+			starRef.name = name
 
-			update(star)
+			update(starRef)
 		})
 	}
 

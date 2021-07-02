@@ -1,4 +1,4 @@
-import React, { Component, useState } from 'react'
+import React, { useState, useEffect } from 'react'
 
 import {
 	Grid,
@@ -29,22 +29,19 @@ import './search.scss'
 import config from '../config.json'
 
 //TODO use children-prop instead of coded-children inside component
-class StarSearchPage extends Component {
-	state = {
-		stars: [],
+const StarSearchPage = () => {
+	const [stars, setStars] = useState([])
 
-		breasts: [],
-		eyecolors: [],
-		haircolors: [],
-		hairstyles: [],
-		attributes: []
-	}
+	const [breasts, setBreasts] = useState([])
+	const [eyecolors, setEyecolors] = useState([])
+	const [haircolors, setHaircolors] = useState([])
+	const [hairstyles, setHairstyles] = useState([])
+	const [attributes, setAttributes] = useState([])
 
-	componentDidMount() {
-		// Stars
+	useEffect(() => {
 		Axios.get(`${config.api}/search/star`).then(({ data: stars }) => {
-			this.setState(() => {
-				stars = stars.map((star: any) => {
+			setStars(
+				stars.map((star: any) => {
 					star.hidden = {
 						titleSearch: false,
 
@@ -52,55 +49,49 @@ class StarSearchPage extends Component {
 						eyecolor: false,
 						haircolor: false,
 						hairstyle: false,
+
 						attribute: [],
 						notAttribute: []
 					}
 
 					return star
 				})
-
-				return { stars }
-			})
+			)
 		})
 
-		// starData
 		Axios.get(`${config.api}/star`).then(({ data }) => {
-			this.setState({
-				breasts: data.breast,
-				eyecolors: data.eyecolor,
-				haircolors: data.haircolor,
-				hairstyles: data.hairstyle,
-				attributes: data.attribute
+			setBreasts(data.breast)
+			setEyecolors(data.eyecolor)
+			setHaircolors(data.haircolor)
+			setHairstyles(data.hairstyle)
+			setAttributes(data.attribute)
 			})
-		})
-	}
+	}, [])
 
-	render() {
 		return (
 			<Grid container id='search-page'>
 				<Grid item xs={2}>
 				<Sidebar
 					starData={{
-						breasts: this.state.breasts,
-						eyecolors: this.state.eyecolors,
-						haircolors: this.state.haircolors,
-						hairstyles: this.state.hairstyles,
-						attributes: this.state.attributes
+						breasts,
+						eyecolors,
+						haircolors,
+						hairstyles,
+						attributes
 					}}
-					stars={this.state.stars}
-					update={(stars: any) => this.setState({ stars })}
+					stars={stars}
+					update={setStars}
 				/>
 				</Grid>
 
 				<Grid item container xs={10} justify='center'>
-				<Stars stars={this.state.stars} />
+				<Stars stars={stars} />
 				</Grid>
 
 				<ScrollToTop smooth />
 			</Grid>
 		)
 	}
-}
 
 // Wrapper
 const Sidebar = ({ starData, stars, update }: any) => (
@@ -153,10 +144,12 @@ interface ISort {
 
 const Sort = ({ stars, update }: ISort) => {
 	const sortDefault = (reverse = false) => {
-		stars.sort((a: any, b: any) => a.name.toLowerCase().localeCompare(b.name.toLowerCase(), 'en'))
-
-		if (reverse) stars.reverse()
-		update(stars)
+		update(
+			[...stars].sort((a: any, b: any) => {
+				const result = a.name.toLowerCase().localeCompare(b.name.toLowerCase(), 'en')
+				return reverse ? result * -1 : result
+			})
+		)
 	}
 
 	return (

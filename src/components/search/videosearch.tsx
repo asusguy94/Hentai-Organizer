@@ -1,4 +1,4 @@
-import React, { Component, useState } from 'react'
+import React, { useState, useEffect } from 'react'
 
 import {
 	Box,
@@ -29,38 +29,15 @@ import './search.scss'
 
 import config from '../config.json'
 
-class VideoSearchPage extends Component {
-	state = {
-		videos: [],
+const VideoSearchPage = () => {
+	const [videos, setVideos] = useState([])
+	const [categories, setCategories] = useState([])
+	const [attributes, setAttributes] = useState([])
 
-		categories: [],
-		attributes: []
-	}
-
-	render() {
-		return (
-			<Grid container id='search-page'>
-				<Grid item xs={2}>
-				<Sidebar
-					videoData={{ categories: this.state.categories, attributes: this.state.attributes }}
-					videos={this.state.videos}
-					update={(videos: any) => this.setState({ videos })}
-				/>
-				</Grid>
-
-				<Grid item container xs={10} justify='center'>
-				<Videos videos={this.state.videos} />
-				</Grid>
-
-				<ScrollToTop smooth />
-			</Grid>
-		)
-	}
-
-	componentDidMount() {
+	useEffect(() => {
 		Axios.get(`${config.api}/search/video`).then(({ data: videos }) => {
-			this.setState(() => {
-				videos = videos.filter((video: any) => {
+			setVideos(
+				videos.filter((video: any) => {
 					video.hidden = {
 						category: [],
 						notCategory: [],
@@ -71,16 +48,31 @@ class VideoSearchPage extends Component {
 						notNoCategory: false
 					}
 
-					return item
-				})
+					//TODO This code skips videos with .noStar=1
+					if (video.noStar) return null
 
-				return { videos }
+					return video
 			})
+			)
 		})
 
-		Axios.get(`${config.api}/category`).then(({ data: categories }) => this.setState({ categories }))
-		Axios.get(`${config.api}/attribute`).then(({ data: attributes }) => this.setState({ attributes }))
-	}
+		Axios.get(`${config.api}/category`).then(({ data: categories }) => setCategories(categories))
+		Axios.get(`${config.api}/attribute`).then(({ data: attributes }) => setAttributes(attributes))
+	}, [])
+
+	return (
+		<Grid container id='search-page'>
+			<Grid item xs={2}>
+				<Sidebar videoData={{ categories, attributes }} videos={videos} update={setVideos} />
+			</Grid>
+
+			<Grid item container xs={10} justify='center'>
+				<Videos videos={videos} />
+			</Grid>
+
+			<ScrollToTop smooth />
+		</Grid>
+	)
 }
 
 // Wrapper
@@ -149,36 +141,51 @@ const TitleSearch = ({ update, videos }: any) => {
 
 const Sort = ({ videos, update }: any) => {
 	const sortDefault = (reverse = false) => {
-		videos.sort((a: any, b: any) => a.name.toLowerCase().localeCompare(b.name.toLowerCase(), 'en'))
-
-		if (reverse) videos.reverse()
-		update(videos)
+		update(
+			[...videos].sort((a: any, b: any) => {
+				const result = a.name.toLowerCase().localeCompare(b.name.toLowerCase(), 'en')
+				return reverse ? result * -1 : result
+			})
+		)
 	}
 
 	const sortAdded = (reverse = false) => {
-		videos.sort((a: any, b: any) => a.id - b.id)
-
-		if (reverse) videos.reverse()
-		update(videos)
+		update(
+			[...videos].sort((a: any, b: any) => {
+				const result = a.id - b.id
+				return reverse ? result * -1 : result
+			})
+		)
 	}
 
 	const sortDate = (reverse = false) => {
-		videos.sort((a: any, b: any) => {
+		update(
+			[...videos].sort((a: any, b: any) => {
 			const dateA: any = new Date(a.published)
 			const dateB: any = new Date(b.published)
 
-			return dateA - dateB
+				const result = dateA - dateB
+				return reverse ? result * -1 : result
 		})
-
-		if (reverse) videos.reverse()
-		update(videos)
+		)
 	}
 
 	const sortPlays = (reverse = false) => {
-		videos.sort((a: any, b: any) => a.plays - b.plays)
+		update(
+			[...videos].sort((a: any, b: any) => {
+				const result = a.plays - b.plays
+				return reverse ? result * -1 : result
+			})
+		)
+	}
 
-		if (reverse) videos.reverse()
-		update(videos)
+	const sortQuality = (reverse = false) => {
+		update(
+			[...videos].sort((a: any, b: any) => {
+				const result = a.quality - b.quality
+				return reverse ? result * -1 : result
+			})
+		)
 	}
 
 	return (
@@ -243,7 +250,8 @@ const Filter = ({ videoData, videos, update }: any) => {
 	const category = (ref: any, target: any) => {
 		const targetLower = target.name.toLowerCase()
 
-		videos = videos.map((video: any) => {
+		update(
+			videos.map((video: any) => {
 			if (ref.indeterminate) {
 				const match = video.categories.some((category: any) => category.toLowerCase() === targetLower)
 
@@ -270,14 +278,14 @@ const Filter = ({ videoData, videos, update }: any) => {
 
 			return video
 		})
-
-		update(videos)
+		)
 	}
 
 	const attribute = (ref: any, target: any) => {
 		const targetLower = target.name.toLowerCase()
 
-		videos = videos.map((video: any) => {
+		update(
+			videos.map((video: any) => {
 			if (ref.indeterminate) {
 				const match = video.attributes.some((attribute: any) => attribute.toLowerCase() === targetLower)
 
@@ -288,26 +296,30 @@ const Filter = ({ videoData, videos, update }: any) => {
 					video.hidden.attribute.splice(video.hidden.attribute.indexOf(targetLower), 1)
 				}
 			} else if (!ref.checked) {
-				const match = video.attributes.map((attribute: any) => attribute.toLowerCase()).includes(targetLower)
+					const match = video.attributes
+						.map((attribute: any) => attribute.toLowerCase())
+						.includes(targetLower)
 
 				if (match) {
 					// Remove indeterminate-status from filtering
 					video.hidden.notAttribute.splice(video.hidden.notAttribute.indexOf(targetLower), 1)
 				}
 			} else {
-				const match = !video.attributes.map((attribute: any) => attribute.toLowerCase()).includes(targetLower)
+					const match = !video.attributes
+						.map((attribute: any) => attribute.toLowerCase())
+						.includes(targetLower)
 
 				if (match) video.hidden.attribute.push(targetLower)
 			}
 
 			return video
 		})
-
-		update(videos)
+		)
 	}
 
 	const category_NULL = (ref: any) => {
-		videos = videos.map((video: any) => {
+		update(
+			videos.map((video: any) => {
 			if (ref.indeterminate) {
 				video.hidden.noCategory = false
 				video.hidden.notNoCategory = video.categories.length === 0
@@ -319,8 +331,7 @@ const Filter = ({ videoData, videos, update }: any) => {
 
 			return video
 		})
-
-		update(videos)
+		)
 	}
 
 	return (

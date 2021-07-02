@@ -15,8 +15,8 @@
 		font-weight: bold;
 		min-width: 20px;
 
-		&:before,
-		&:after {
+		&::before,
+		&::after {
 			content: '';
 			position: absolute;
 			top: 0;
@@ -26,11 +26,11 @@
 			background: red;
 		}
 
-		&:before {
+		&::before {
 			right: 100%;
 		}
 
-		&:after {
+		&::after {
 			left: 100%;
 		}
 
@@ -46,8 +46,8 @@
 			$color: purple;
 			background-color: $color !important;
 
-			&:before,
-			&:after {
+			&::before,
+			&::after {
 				background-color: $color !important;
 			}
 		}
@@ -56,8 +56,8 @@
 			$color: green;
 			background-color: $color !important;
 
-			&:before,
-			&:after {
+			&::before,
+			&::after {
 				background-color: $color !important;
 			}
 		}

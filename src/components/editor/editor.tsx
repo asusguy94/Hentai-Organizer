@@ -167,9 +167,7 @@ const Item = ({ update, data, obj }: any) => {
 						autoFocus
 						onBlur={save}
 						onKeyPress={(e) => {
-							if (e.key === 'Enter') {
-								save()
-							}
+							if (e.key === 'Enter') save()
 						}}
 						onChange={(e) => setValue(e.currentTarget.value)}
 					/>
@@ -178,7 +176,7 @@ const Item = ({ update, data, obj }: any) => {
 				)}
 			</TableCell>
 
-			{obj.map((item: any) => (
+			{obj.map((item) => (
 				<TableCell key={item} className='py-0'>
 					<Checkbox
 						defaultChecked={!!data[item]}

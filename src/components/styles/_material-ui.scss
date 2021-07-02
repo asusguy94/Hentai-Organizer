@@ -2,6 +2,18 @@
 	padding: 8px 12px !important;
 }
 
+.MuiTableContainer-root {
+	overflow: visible !important;
+}
+
 .MuiButton-root {
 	cursor: default !important;
+}
+
+#search-page {
+	.MuiCardMedia-img {
+		// Required to fix oddly shaped images
+		//> omitting this, causes only the center of the image to be displayed
+		object-fit: inherit;
+	}
 }

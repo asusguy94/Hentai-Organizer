@@ -37,8 +37,15 @@
 			margin-left: 15px;
 			color: black;
 
-			i:not(.no-label) {
-				margin-right: 5px;
+			i,
+			svg {
+				$spacing: 5px;
+
+				margin-right: $spacing;
+
+				& + .no-label {
+					margin-left: -$spacing;
+				}
 			}
 		}
 	}
@@ -51,6 +58,8 @@
 		.bookmark {
 			position: absolute;
 			white-space: nowrap;
+			//font-weight: 700;
+			border-width: 1px;
 
 			@include bookmarkPosition();
 
@@ -131,8 +140,8 @@
 	}
 
 	.separator {
-		&:before,
-		&:after {
+		&::before,
+		&::after {
 			content: ' ';
 		}
 	}

@@ -39,8 +39,8 @@ button {
 .divider {
 	color: grey;
 
-	&:before,
-	&:after {
+	&::before,
+	&::after {
 		content: ' ';
 	}
 }

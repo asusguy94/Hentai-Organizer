@@ -121,32 +121,29 @@ interface IStarForm {
 const StarForm = ({ star, starData, update }: IStarForm) => {
 	const addAttribute = (name: string) => {
 		Axios.put(`${config.api}/star/${star.id}/attribute`, { name }).then(() => {
-			const starRef = { ...star }
-			starRef.info.attribute.push(name)
-
-			update(starRef)
+			update({ ...star, info: { ...star.info, attribute: [...star.info.attribute, name] } })
 		})
 	}
 
 	const removeAttribute = (name: string) => {
 		Axios.put(`${config.api}/star/${star.id}/attribute`, { name, delete: true }).then(() => {
-			const starRef = { ...star }
-			starRef.info.attribute = starRef.info.attribute.filter((attribute: any) => {
+			update({
+				...star,
+				info: {
+					...star.info,
+					attribute: star.info.attribute.filter((attribute: any) => {
 				if (attribute.toLowerCase() === name.toLowerCase()) return null
 
 				return attribute
 			})
-
-			update(starRef)
+				}
+			})
 		})
 	}
 
 	const updateInfo = (value: string, label: string) => {
 		Axios.put(`${config.api}/star/${star.id}`, { label, value }).then(() => {
-			const starRef = { ...star }
-			starRef.info[label] = value
-
-			update(starRef)
+			update({ ...star, info: { ...star.info, [label]: value } })
 		})
 	}
 
@@ -174,19 +171,13 @@ const StarImageDropbox = ({ star, update }: any) => {
 
 	const addImage = (image: string) => {
 		Axios.post(`${config.source}/star/${star.id}/image`, { url: image }).then(() => {
-			const starRef = { ...star }
-			starRef.image = `${star.id}.jpg?${Date.now()}`
-
-			update(starRef)
+			update({ ...star, image: `${star.id}.jpg?${Date.now()}` })
 		})
 	}
 
 	const removeImage = () => {
 		Axios.delete(`${config.source}/star/${star.id}/image`).then(() => {
-			const starRef = { ...star }
-			starRef.image = null
-
-			update(starRef)
+			update({ ...star, image: null })
 		})
 	}
 
@@ -437,10 +428,7 @@ const StarAttributes = ({ remove, data }: any) => {
 const StarTitle = ({ star, handleModal, update }: any) => {
 	const renameStar = (name: string) => {
 		Axios.put(`${config.api}/star/${star.id}`, { name }).then(() => {
-			const starRef = { ...star }
-			starRef.name = name
-
-			update(starRef)
+			update({ ...star, name })
 		})
 	}
 

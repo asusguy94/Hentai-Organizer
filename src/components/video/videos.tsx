@@ -23,7 +23,7 @@ const VideosPage = () => {
 		<Grid item id='videos-page'>
 			<List>
 				{videos.map((video) => (
-					<Link to={`video/${video.id}`}>
+					<Link key={video.id} to={`video/${video.id}`}>
 						<ListItem button divider>
 							<ListItemText>{video.name}</ListItemText>
 						</ListItem>

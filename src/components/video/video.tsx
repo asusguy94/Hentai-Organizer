@@ -523,8 +523,8 @@ const VideoPlayer = ({
 							controls: ['play-large', 'play', 'current-time', 'progress', 'duration', 'settings'],
 							fullscreen: { enabled: false },
 							settings: ['speed'],
-							hideControls: false,
 							ratio: '21:9',
+							hideControls: false,
 							keyboard: { focused: false, global: false }
 						}}
 						sources={{
@@ -811,15 +811,16 @@ const Timeline = ({
 
 	useEffect(() => {
 		const LEVEL_MIN = 1
-		const LEVEL_MAX = 10
+		const LEVEL_MAX = 13
 		for (let i = 0, items = bookmarksArr, level = LEVEL_MIN; i < items.length; i++) {
-			let collision = false
-
+			const prevPrev = items[i - 2]
 			const prev = items[i - 1]
 			const current = items[i]
 
+			let collision = false
 			if (collisionCheck(prev, current)) {
 				collision = true
+				if (collisionCheck(prevPrev, current)) collision = true
 			}
 
 			if (collision && level < LEVEL_MAX) {
@@ -964,7 +965,8 @@ const Timeline = ({
 														>
 															{attribute.name}
 														</Button>
-													))
+													)),
+												true
 											)
 										}}
 									>
@@ -1298,10 +1300,7 @@ const StarInput = ({ video, stars, bookmarks, getAttributes }: IStarInput) => {
 
 	const handleNoStar = (checked: boolean) => {
 		Axios.put(`${config.api}/video/${video.id}`, { noStar: checked }).then(({ data }) => {
-			const videoRef = { ...video }
-			videoRef.noStar = data.noStar
-
-			updateVideo(videoRef)
+			updateVideo({ ...video, noStar: data.noStar })
 		})
 	}
 
@@ -1562,10 +1561,7 @@ const HeaderDate = ({ video, update }: IHeaderDate) => {
 
 	const handleDate = (value: string) => {
 		Axios.put(`${config.api}/video/${video.id}`, { date: value }).then(({ data }) => {
-			const videoRef = { ...video }
-			videoRef.date.published = data.date_published
-
-			update(videoRef)
+			update({ ...video, date: { ...video.date, published: data.date_published } })
 		})
 	}
 
@@ -1573,8 +1569,8 @@ const HeaderDate = ({ video, update }: IHeaderDate) => {
 		<>
 			<ContextMenuTrigger id='menu__date' renderTag='span' holdToDisplay={-1}>
 				<Button size='small' variant='outlined' id='header__date'>
-					<i className={`${config.theme.icons.calendar} ${video.date.published ? '' : 'no-label'}`} />
-					{video.date.published}
+					<i className={config.theme.icons.calendar} />
+					<span className={video.date.published ? '' : 'no-label'}>{video.date.published}</span>
 				</Button>
 			</ContextMenuTrigger>
 

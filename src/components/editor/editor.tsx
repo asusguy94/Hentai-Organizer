@@ -78,26 +78,39 @@ const Wrapper: FC<any> = ({ label, name, children, obj = [] }) => {
 				</Grid>
 			</Grid>
 
-			<>{children ? cloneElement(children, { label: name, obj }) : <WrapperItem label={name} obj={obj} />}</>
+			<>{children ? cloneElement(children, { label: name, obj }) : <TableWrapper label={name} obj={obj} />}</>
 		</Grid>
 	)
 }
 
-const WrapperItem = ({ label, obj = [] }: any) => {
-	const [data, setData] = useState([])
+interface IData {
+	id: number
+	name: string
+}
+
+interface ITableWrapper {
+	label: string
+	obj: string[]
+}
+const TableWrapper = ({ label, obj = [] }: ITableWrapper) => {
+	const [data, setData] = useState<IData[]>([])
 
 	useEffect(() => {
-		Axios.get(`${config.api}/${label}`).then(({ data }) => {
-			data.sort((a: any, b: any) => a.id - b.id)
-
-			setData(data)
+		Axios.get(`${config.api}/${label}`).then(({ data }: { data: IData[] }) => {
+			setData(data.sort((a, b) => a.id - b.id))
 		})
 	}, [])
 
-	const updateItem = (ref: any, value: any) => {
+	interface IUpdateRef {
+		id: number
+		name: string
+		videoOnly?: number
+		starOnly?: number
+	}
+	const updateItem = (ref: IUpdateRef, value: string) => {
 		Axios.put(`${config.api}/${label}/${ref.id}`, { value }).then(() => {
 			setData(
-				data.filter((item: any) => {
+				[...data].filter((item) => {
 					if (ref.id === item.id) item.name = value
 
 					return item
@@ -108,25 +121,25 @@ const WrapperItem = ({ label, obj = [] }: any) => {
 
 	return (
 		<TableContainer component={Paper}>
-			<Table size='small'>
+			<Table size='small' stickyHeader>
 				<TableHead>
 					<TableRow>
 						<TableCell>ID</TableCell>
 						<TableCell>{capitalize(label)}</TableCell>
 
-						{obj.map((label: any) => (
+						{obj.map((label) => (
 							<TableCell key={label}>{label}</TableCell>
 						))}
 					</TableRow>
 				</TableHead>
 
 				<TableBody>
-					{data.map((item: any) => (
-						<Item
+					{data.map((item) => (
+						<TableItem
 							key={item.id}
 							obj={obj}
 							data={item}
-							update={(ref: any, value: any) => updateItem(ref, value)}
+							update={(ref: IUpdateRef, value: string) => updateItem(ref, value)}
 						/>
 					))}
 				</TableBody>
@@ -135,7 +148,12 @@ const WrapperItem = ({ label, obj = [] }: any) => {
 	)
 }
 
-const Item = ({ update, data, obj }: any) => {
+interface ITableItem {
+	update: any
+	data: any
+	obj: string[]
+}
+const TableItem = ({ update, data, obj }: ITableItem) => {
 	const [edit, setEdit] = useState(false)
 	const [value, setValue] = useState<null | string>(null)
 

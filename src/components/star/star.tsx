@@ -336,11 +336,18 @@ const StarVideo = ({ video }: any) => {
 	)
 }
 
-const StarInputForm = ({ value, emptyByDefault = false, update, name, list, children }: any) => {
+interface IStarInputForm {
+	update: (value: string, label: string) => void
+	value: string
+	name: string
+	list: any
+	emptyByDefault?: boolean
+}
+const StarInputForm: React.FC<IStarInputForm> = ({ value, emptyByDefault = false, update, name, list, children }) => {
 	const [open, setOpen] = useState(false)
 	const [inputValue, setInputValue] = useState('')
 
-	const updateValue = (value: any) => {
+	const updateValue = (value: string) => {
 		if (value === '') setOpen(false)
 
 		setInputValue(value)
@@ -406,7 +413,7 @@ const StarInputForm = ({ value, emptyByDefault = false, update, name, list, chil
 }
 
 const StarAttributes = ({ remove, data }: any) => {
-	return data.map((attribute: any, i: any) => (
+	return data.map((attribute: any, i: number) => (
 		<Fragment key={attribute}>
 			<ContextMenuTrigger id={`attribute-${i}`} renderTag='span'>
 				<span className='attribute'>

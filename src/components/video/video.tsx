@@ -1045,7 +1045,14 @@ const Stars = ({ video, stars, bookmarks, attributes, categories, clearActive, u
 
 	return (
 		<Grid container justify='center' id='stars'>
-			{stars.map((star) => (
+			{stars
+				.sort((a, b) => {
+					const bookmarkTime = (star: IStar) =>
+						bookmarks.find((bookmark) => bookmark.starID === star.id)?.start || Infinity
+
+					return bookmarkTime(a) - bookmarkTime(b)
+				})
+				.map((star) => (
 				<Star
 					key={star.id}
 					video={video}

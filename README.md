@@ -17,16 +17,20 @@
 
 ## Installation
 
-1. Edit config.json
+1. Edit `config/server.ts`
    | Variable | Details |
    | :---: | --- |
    | `api` | The URL to the backend scripts |
-   | `source` | The path to the old server...usefull for grabbing images, and also to be able to play videos |
+   | `source` | The path to the old server...useful for grabbing images, and also to be able to play videos |
    | `db` | The root path for phpMyAdmin, it can usually be set to the same as `source` |
+
+2. Edit `config/settings.ts`
+   | Variable | Details |
+   | :---: | --- |
    |`hls`|`enable`: Enable HLS playback (requires special files)<br/>`maxLevel`: Highest quality allowed by HLS<br/>`maxStartLevel`: Highest initial quality allowed by HLS |
 
-2. Install NPM and then Yarn
-3. Make sure the backend scripts are running, _scroll down for more info_
+3. Install NPM and then Yarn
+4. Make sure the backend scripts are running, _scroll down for more info_
 
 ## Backend START
 
@@ -44,3 +48,19 @@
 ## Features
 
 Status of functionality can be found at [features.md](FEATURES.md)
+
+### Customization
+
+You can easily change some functionality by altering some of the variables in `config/`
+
+#### `server.ts`
+
+Change this if your server has changed network address
+
+#### `settings.ts`
+
+Change this if you want to alter the functionality of the app app
+
+#### `theme.ts`
+
+Change this if you want a different look/feel of the app

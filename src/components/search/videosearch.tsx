@@ -27,7 +27,7 @@ import Loader from '../loader/loader'
 
 import './search.scss'
 
-import config from '../config.json'
+import { server as serverConfig } from '../../config'
 
 const VideoSearchPage = () => {
 	const [videos, setVideos] = useState([])
@@ -35,7 +35,7 @@ const VideoSearchPage = () => {
 	const [attributes, setAttributes] = useState([])
 
 	useEffect(() => {
-		Axios.get(`${config.api}/search/video`).then(({ data: videos }) => {
+		Axios.get(`${serverConfig.api}/search/video`).then(({ data: videos }) => {
 			setVideos(
 				videos.filter((video: any) => {
 					video.hidden = {
@@ -56,8 +56,8 @@ const VideoSearchPage = () => {
 			)
 		})
 
-		Axios.get(`${config.api}/category`).then(({ data: categories }) => setCategories(categories))
-		Axios.get(`${config.api}/attribute`).then(({ data: attributes }) => setAttributes(attributes))
+		Axios.get(`${serverConfig.api}/category`).then(({ data: categories }) => setCategories(categories))
+		Axios.get(`${serverConfig.api}/attribute`).then(({ data: attributes }) => setAttributes(attributes))
 	}, [])
 
 	return (
@@ -102,7 +102,7 @@ const VideoCard = ({ video }: any) => (
 	<a href={`/video/${video.id}`}>
 						<Card className='video ribbon-container'>
 							<CardActionArea>
-								<CardMedia component='img' src={`${config.source}/images/videos/${video.id}-290.jpg`} />
+				<CardMedia component='img' src={`${serverConfig.source}/images/videos/${video.id}-290.jpg`} />
 
 								<Typography className='text-center'>{video.name}</Typography>
 

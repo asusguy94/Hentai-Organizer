@@ -26,7 +26,7 @@ import Loader from '../loader/loader'
 
 import './search.scss'
 
-import config from '../config.json'
+import { server as serverConfig } from '../../config'
 
 //TODO use children-prop instead of coded-children inside component
 const StarSearchPage = () => {
@@ -39,7 +39,7 @@ const StarSearchPage = () => {
 	const [attributes, setAttributes] = useState([])
 
 	useEffect(() => {
-		Axios.get(`${config.api}/search/star`).then(({ data: stars }) => {
+		Axios.get(`${serverConfig.api}/search/star`).then(({ data: stars }) => {
 			setStars(
 				stars.map((star: any) => {
 					star.hidden = {
@@ -59,7 +59,7 @@ const StarSearchPage = () => {
 			)
 		})
 
-		Axios.get(`${config.api}/star`).then(({ data }) => {
+		Axios.get(`${serverConfig.api}/star`).then(({ data }) => {
 			setBreasts(data.breast)
 			setEyecolors(data.eyecolor)
 			setHaircolors(data.haircolor)
@@ -128,7 +128,7 @@ const StarCard = ({ star }: any) => (
 	<a href={`/star/${star.id}`}>
 						<Card className='star ribbon-container'>
 							<CardActionArea>
-								<CardMedia component='img' src={`${config.source}/images/stars/${star.id}.jpg`} />
+				<CardMedia component='img' src={`${serverConfig.source}/images/stars/${star.id}.jpg`} />
 
 								<Typography className='text-center'>{star.name}</Typography>
 							</CardActionArea>

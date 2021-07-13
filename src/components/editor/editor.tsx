@@ -19,7 +19,7 @@ import capitalize from 'capitalize'
 
 import './editor.scss'
 
-import config from '../config.json'
+import { server as serverConfig } from '../../config'
 
 const EditorPage = () => (
 	<Grid container justify='center' id='editor-page'>
@@ -37,7 +37,7 @@ const Wrapper: FC<any> = ({ label, name, children, obj = [] }) => {
 		if (input.length) {
 			if (input.toLowerCase() === input) return false
 
-			Axios.post(`${config.api}/${name}`, { name: input }).then(() => {
+			Axios.post(`${serverConfig.api}/${name}`, { name: input }).then(() => {
 				window.location.reload()
 
 				//TODO use stateObj instead
@@ -96,7 +96,7 @@ const TableWrapper = ({ label, obj = [] }: ITableWrapper) => {
 	const [data, setData] = useState<IData[]>([])
 
 	useEffect(() => {
-		Axios.get(`${config.api}/${label}`).then(({ data }: { data: IData[] }) => {
+		Axios.get(`${serverConfig.api}/${label}`).then(({ data }: { data: IData[] }) => {
 			setData(data.sort((a, b) => a.id - b.id))
 		})
 	}, [])
@@ -108,7 +108,7 @@ const TableWrapper = ({ label, obj = [] }: ITableWrapper) => {
 		starOnly?: number
 	}
 	const updateItem = (ref: IUpdateRef, value: string) => {
-		Axios.put(`${config.api}/${label}/${ref.id}`, { value }).then(() => {
+		Axios.put(`${serverConfig.api}/${label}/${ref.id}`, { value }).then(() => {
 			setData(
 				[...data].filter((item) => {
 					if (ref.id === item.id) item.name = value
@@ -169,7 +169,7 @@ const TableItem = ({ update, data, obj }: ITableItem) => {
 		value: number,
 		checkbox: any
 	) => {
-		Axios.put(`${config.api}/attribute/${ref.id}`, { label: prop, value }).catch(() => {
+		Axios.put(`${serverConfig.api}/attribute/${ref.id}`, { label: prop, value }).catch(() => {
 			checkbox.checked = !checkbox.checked
 		})
 	}

@@ -6,8 +6,13 @@ export default {
 	maxDurationDiff: 10,
 	hls: {
 		enabled: false,
-		levels: { '1080': 3, '720': 2, '480': 1, '360': 0 },
+		levels: { '1080': 3, '720': 2, '468': 1, '360': 0 },
 		maxLevel: 720,
+		maxStartLevel: 480
+	},
+	dash: {
+		enabled: false,
+		levels: { '1080': 3, '720': 2, '468': 1, '360': 0 },
 		maxStartLevel: 480
 	},
 	franchise: {

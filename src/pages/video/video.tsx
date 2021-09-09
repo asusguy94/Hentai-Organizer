@@ -19,21 +19,24 @@ import {
 import Axios from 'axios'
 //@ts-ignore
 import { PlyrComponent as Plyr } from 'plyr-react'
-import Hls from 'hls.js'
+import HlsJS from 'hls.js'
+import DashJS from 'dashjs'
 import { ContextMenu, ContextMenuTrigger, MenuItem } from 'react-contextmenu'
 import ReactTooltip from 'react-tooltip'
+import { Flipper, Flipped } from 'react-flip-toolkit'
 //@ts-ignore
 import KeyboardEventHandler from 'react-keyboard-event-handler'
 
-import Modal from '../modal/modal'
-import Ribbon from '../ribbon/ribbon'
-import { useRefWithEffect, useWindowSize } from '../../hooks'
+import Modal from '@components/modal/modal'
+import Ribbon from '@components/ribbon/ribbon'
+import { timeToSeconds } from '@/time'
+import { useRefWithEffect, useWindowSize } from '@/hooks'
 
 import './video.scss'
 
-import { server as serverConfig, settings as settingsConfig, theme as themeConfig } from '../../config'
+import { server as serverConfig, settings as settingsConfig, theme as themeConfig } from '@/config'
 
-import { IVideo, IAttribute, ICategory, IVideoStar as IStar, IBookmark, IKeyPress } from '../../interfaces'
+import { IVideo, IAttribute, ICategory, IVideoStar as IStar, IBookmark, IKeyPress } from '@/interfaces'
 
 const ModalContext = createContext({
 	method: (...args: any): void => {},
@@ -51,25 +54,25 @@ const GetStarEventContext = createContext({ event: false, data: starEventData })
 
 const VideoPage = (props: any) => {
 	const [video, setVideo] = useState({
-			id: 0,
-			nextID: 0,
-			episode: 0,
-			franchise: '',
-			name: '',
-			path: {
-				file: '',
-				stream: ''
-			},
-			duration: 0,
-			date: {
-				added: '',
-				published: ''
-			},
-			quality: 0,
-			censored: false,
-			attributes: [],
-			related: [],
-			noStar: 0
+		id: 0,
+		nextID: 0,
+		episode: 0,
+		franchise: '',
+		name: '',
+		path: {
+			file: '',
+			stream: ''
+		},
+		duration: 0,
+		date: {
+			added: '',
+			published: ''
+		},
+		quality: 0,
+		censored: false,
+		attributes: [],
+		related: [],
+		noStar: 0
 	})
 
 	const [stars, setStars] = useState([])
@@ -78,15 +81,15 @@ const VideoPage = (props: any) => {
 	const [attributes, setAttributes] = useState([])
 
 	const [modal, setModal] = useState({
-			visible: false,
-			title: null,
-			data: null,
-			filter: false
+		visible: false,
+		title: null,
+		data: null,
+		filter: false
 	})
 
 	const [addStarEvent, setAddStarEvent] = useState({
-			event: false,
-			data: starEventData
+		event: false,
+		data: starEventData
 	})
 
 	const handleKeyPress = (key: string, e: IKeyPress) => {
@@ -115,64 +118,69 @@ const VideoPage = (props: any) => {
 		const { id } = props.match.params
 
 		Axios.get(`${serverConfig.api}/video/${id}`).then(({ data: video }) => setVideo(video))
-		Axios.get(`${serverConfig.api}/video/${id}/bookmark`).then(({ data: bookmarks }) => {
-			bookmarks.map((bookmark: IBookmark) => (bookmark.active = false))
 
-			setBookmarks(bookmarks)
-		})
+		Axios.get(`${serverConfig.api}/video/${id}/star`)
+			.then(({ data: stars }) => setStars(stars))
+			.finally(() => {
+				// Only get bookmarks after /star has been loaded
+				Axios.get(`${serverConfig.api}/video/${id}/bookmark`).then(({ data: bookmarks }) => {
+					bookmarks.map((bookmark: IBookmark) => (bookmark.active = false))
 
-		Axios.get(`${serverConfig.api}/video/${id}/star`).then(({ data: stars }) => setStars(stars))
+					setBookmarks(bookmarks)
+				})
+			})
+
 		Axios.get(`${serverConfig.api}/category`).then(({ data: categories }) => setCategories(categories))
 		Axios.get(`${serverConfig.api}/attribute/video`).then(({ data: attributes }) => setAttributes(attributes))
 	}, [])
 
-		return (
-			<Grid container id='video-page'>
-				<ModalContext.Provider
-					value={{
+	return (
+		<Grid container id='video-page'>
+			<ModalContext.Provider
+				value={{
 					method: (title: any, data: any, filter: boolean) => handleModal(title, data, filter),
 					data: modal
-					}}
-				>
+				}}
+			>
 				<UpdateContext.Provider value={{ bookmarks: setBookmarks, video: setVideo, stars: setStars }}>
-						<SetStarEventContext.Provider
+					<SetStarEventContext.Provider
 						value={(event: boolean, data: any = addStarEvent.data) => handleAddStarEvent(event, data)}
-						>
+					>
 						<GetStarEventContext.Provider value={addStarEvent}>
-						<Section
+							<Section
 								video={video}
 								bookmarks={bookmarks}
 								categories={categories}
 								attributes={attributes}
 								stars={stars}
 								updateBookmarks={(bookmarks: any) => setBookmarks(bookmarks)}
-						/>
+							/>
 
-						<Sidebar
+							<Sidebar
 								video={video}
 								stars={stars}
 								bookmarks={bookmarks}
 								attributes={attributes}
 								categories={categories}
 								updateBookmarks={(bookmarks: any) => setBookmarks(bookmarks)}
-						/>
-							</GetStarEventContext.Provider>
-						</SetStarEventContext.Provider>
+							/>
+						</GetStarEventContext.Provider>
+					</SetStarEventContext.Provider>
 
 					<Modal visible={modal.visible} title={modal.title} filter={modal.filter} onClose={handleModal}>
 						{modal.data}
-						</Modal>
+					</Modal>
 
-						<KeyboardEventHandler
-							handleKeys={['tab']}
+					<KeyboardEventHandler
+						handleKeys={['tab']}
 						onKeyEvent={(key: string, e: IKeyPress) => handleKeyPress(key, e)}
-							handleFocusableElements={true}
-						/>
-					</UpdateContext.Provider>
-				</ModalContext.Provider>
-			</Grid>
-		)
-	}
+						handleFocusableElements={true}
+					/>
+				</UpdateContext.Provider>
+			</ModalContext.Provider>
+		</Grid>
+	)
+}
 
 // Wrapper
 interface ISection {
@@ -203,12 +211,12 @@ const Section = ({ video, bookmarks, categories, attributes, stars, updateBookma
 		Axios.put(`${serverConfig.api}/bookmark/${bookmarkID}`, { time }).then(() => {
 			updateBookmarks(
 				bookmarks
-				.map((bookmark) => {
-					if (bookmark.id === bookmarkID) bookmark.start = time
+					.map((bookmark) => {
+						if (bookmark.id === bookmarkID) bookmark.start = time
 
-					return bookmark
-				})
-				.sort((a, b) => a.start - b.start)
+						return bookmark
+					})
+					.sort((a, b) => a.start - b.start)
 			)
 		})
 	}
@@ -255,10 +263,10 @@ const Sidebar = ({ video, stars, bookmarks, attributes, categories, updateBookma
 	const clearActive = () => {
 		updateBookmarks(
 			bookmarks.map((bookmark) => {
-			bookmark.active = false
+				bookmark.active = false
 
-			return bookmark
-		})
+				return bookmark
+			})
 		)
 	}
 
@@ -279,19 +287,21 @@ const Sidebar = ({ video, stars, bookmarks, attributes, categories, updateBookma
 		<Grid item xs={3} id='sidebar'>
 			<Franchise video={video} />
 
-			<Grid container justify='center' id='stars_section'>
-				<Stars
-					video={video}
-					stars={stars}
-					bookmarks={bookmarks}
-					attributes={attributes}
-					categories={categories}
-					clearActive={clearActive}
-					updateBookmarks={updateBookmarks}
-				/>
+			<Flipper flipKey={stars}>
+				<Grid container justifyContent='center' id='stars_section'>
+					<Stars
+						video={video}
+						stars={stars}
+						bookmarks={bookmarks}
+						attributes={attributes}
+						categories={categories}
+						clearActive={clearActive}
+						updateBookmarks={updateBookmarks}
+					/>
+				</Grid>
+			</Flipper>
 
-				<StarInput video={video} stars={stars} bookmarks={bookmarks} getAttributes={getAttributes} />
-			</Grid>
+			<StarInput video={video} stars={stars} bookmarks={bookmarks} getAttributes={getAttributes} />
 
 			<Attributes
 				bookmarks={bookmarks}
@@ -380,15 +390,17 @@ const VideoPlayer = ({
 		if (events) {
 			const player = getPlayer()
 
-			if (Hls.isSupported() && settingsConfig.hls.enabled) {
-				const hls = new Hls({
-					autoStartLoad: false,
+			if (HlsJS.isSupported() && settingsConfig.hls.enabled) {
+				const hls = new HlsJS({
+					//maxBufferLength: timeToSeconds(2),
+					//maxMaxBufferLength: timeToSeconds(2),
+					autoStartLoad: false
 				})
 
-				hls.loadSource(`${serverConfig.source}/videos/${video.path.stream}`)
+				hls.loadSource(`${serverConfig.source}/videos_hls/${video.path.stream}`)
 				hls.attachMedia(player.media)
 
-				hls.on(Hls.Events.MANIFEST_PARSED, (e, data) => {
+				hls.on(HlsJS.Events.MANIFEST_PARSED, (e, data) => {
 					const dataLevels = data['levels'].length - 1
 
 					const levels: { [key: string]: number } = settingsConfig.hls.levels
@@ -419,14 +431,99 @@ const VideoPlayer = ({
 						player.pause()
 					}
 				})
-				hls.on(Hls.Events.LEVEL_LOADED, (e, data) => updateDuration(data.details.totalduration))
+				hls.on(HlsJS.Events.LEVEL_LOADED, (e, data) => updateDuration(data.details.totalduration))
+			} else if (DashJS.supportsMediaSource() && settingsConfig.dash.enabled) {
+				const dash = DashJS.MediaPlayer().create()
+
+				// Initial settings
+				dash.updateSettings({
+					streaming: {
+						buffer: {
+							bufferTimeAtTopQuality: timeToSeconds(5),
+							bufferTimeAtTopQualityLongForm: timeToSeconds(5),
+							bufferToKeep: timeToSeconds(10)
+						}
+					}
+				})
+
+				dash.on(DashJS.MediaPlayer.events.MANIFEST_LOADED, ({ data }: any) => {
+					const qualityArr = data['Period']['AdaptationSet'][0]['Representation']
+					const dataLevels = qualityArr.length
+
+					const levels: { [key: string]: number } = settingsConfig.dash.levels
+					const maxLevel = levels[settingsConfig.dash.maxLevel]
+					const maxStartLevel = levels[settingsConfig.dash.maxStartLevel]
+
+					// StartLevel
+					let desiredStartLevel = maxLevel - 1
+					if (desiredStartLevel > maxStartLevel) desiredStartLevel = maxStartLevel
+					if (desiredStartLevel > dataLevels) desiredStartLevel = dataLevels - 1
+					if (desiredStartLevel < 0) desiredStartLevel = 0
+
+					// MaxLevel
+					let desiredBitrate = -1
+					for (var i = 0, currentQuality = 0; i < qualityArr.length; i++) {
+						const obj = qualityArr[i]
+
+						if (obj.height <= settingsConfig.dash.maxLevel && obj.height > currentQuality) {
+							currentQuality = obj.height
+
+							desiredBitrate = Math.ceil(obj.bandwidth / 1000)
+						}
+					}
+
+					dash.updateSettings({
+						streaming: {
+							buffer: {
+								initialBufferLevel: desiredStartLevel
+							},
+							abr: {
+								maxBitrate: {
+									video: desiredBitrate
+								}
+							}
+						}
+					})
+
+					//TODO add start-time
+				})
+
+				// Required, otherwise crashes component
+				dash.initialize()
+				dash.setAutoPlay(false)
+				dash.attachSource(`${serverConfig.source}/videos/${video.path.stream.replace('.m3u8', '.mpd')}`)
+				dash.attachView(player.media)
+
+				let triggered = false
+				dash.on(DashJS.MediaPlayer.events.CAN_PLAY, () => {
+					if (!triggered) {
+						triggered = true
+
+						if (!newVideo) {
+							dash.seek(Number(localStorage.bookmark))
+
+							if (Number(localStorage.playing)) dash.play()
+						} else {
+							localStorage.video = video.id
+							localStorage.bookmark = 0
+
+							dash.pause()
+						}
+
+						updateDuration(dash.duration())
+					}
+				})
 			} else {
 				player.media.ondurationchange = (e: any) => updateDuration(e.target.duration)
 			}
 		}
 	}, [events])
 
-	const handleWheel = (e: React.WheelEvent) => (getPlayer().currentTime += 10 * Math.sign(e.deltaY) * -1)
+	const handleWheel = (e: React.WheelEvent) => {
+		const multiplier = 10
+
+		getPlayer().currentTime += multiplier * Math.sign(e.deltaY) * -1
+	}
 	const copy = async () => await navigator.clipboard.writeText(video.path.file)
 
 	const resetPlays = () => {
@@ -481,12 +578,12 @@ const VideoPlayer = ({
 					[
 						...bookmarks,
 						{
-					id: data.id,
-					name: category.name,
-					start: time,
-					starID: 0,
-					attributes,
-					active: false
+							id: data.id,
+							name: category.name,
+							start: time,
+							starID: 0,
+							attributes,
+							active: false
 						}
 					].sort((a, b) => a.start - b.start)
 				)
@@ -542,10 +639,6 @@ const VideoPlayer = ({
 						sources={{
 							type: 'video',
 							sources: [
-								{
-									src: `${serverConfig.source}/videos/${video.path.stream}`,
-									type: 'application/x-mpegURL'
-								},
 								{
 									src: `${serverConfig.source}/videos/${video.path.file}`,
 									type: 'video/mp4'
@@ -658,7 +751,7 @@ interface ITimeline {
 	attributes: IAttribute[]
 	categories: ICategory[]
 	playVideo: (time?: any) => void
-	setTime: (bookmarkID: number) => void
+	setTime: (bookmarkID: number, time?: number) => void
 	update: (bookmarks: IBookmark[]) => void
 	duration: number
 }
@@ -677,16 +770,16 @@ const Timeline = ({
 	const handleModal = useContext(ModalContext).method
 
 	useEffect(() => {
-	if (duration && video.duration) {
-		if (Math.abs(duration - video.duration) > 3) {
-			alert('invalid video-duration')
+		if (duration && video.duration) {
+			if (Math.abs(duration - video.duration) > settingsConfig.maxDurationDiff) {
+				alert('invalid video-duration')
 
-			console.log('dur', duration)
-			console.log('vDur', video.duration)
+				console.log('vDur', duration)
+				console.log('dbDur', video.duration)
 
-			console.log('Re-Transcode to fix this issue')
+				console.log('Re-Transcode to fix this issue')
+			}
 		}
-	}
 	}, [duration, video.duration])
 
 	const bookmarksArr: HTMLElement[] = []
@@ -708,12 +801,12 @@ const Timeline = ({
 		Axios.put(`${serverConfig.api}/bookmark/${bookmark.id}`, { categoryID: category.id }).then(() => {
 			update(
 				bookmarks.map((bookmarkItem) => {
-				if (bookmarkItem.id === bookmark.id) {
-					bookmarkItem.name = category.name
-				}
+					if (bookmarkItem.id === bookmark.id) {
+						bookmarkItem.name = category.name
+					}
 
-				return bookmarkItem
-			})
+					return bookmarkItem
+				})
 			)
 		})
 	}
@@ -723,18 +816,18 @@ const Timeline = ({
 			bookmarkID: bookmark.id,
 			attributeID: attribute.id
 		}).then(() => {
-				update(
-					bookmarks.map((bookmarkItem) => {
-						if (bookmarkItem.id === bookmark.id) {
-							bookmarkItem.attributes.push({
-								id: attribute.id,
-								name: attribute.name
-							})
-						}
+			update(
+				bookmarks.map((bookmarkItem) => {
+					if (bookmarkItem.id === bookmark.id) {
+						bookmarkItem.attributes.push({
+							id: attribute.id,
+							name: attribute.name
+						})
+					}
 
-						return bookmarkItem
-					})
-				)
+					return bookmarkItem
+				})
+			)
 		})
 	}
 
@@ -745,7 +838,7 @@ const Timeline = ({
 					if (item.id === bookmark.id) {
 						item.attributes = item.attributes.filter((itemAttribute) =>
 							itemAttribute.id === attribute.id ? null : itemAttribute
-		)
+						)
 					}
 
 					return item
@@ -759,9 +852,9 @@ const Timeline = ({
 			update(
 				bookmarks.map((bookmarkItem) => {
 					if (bookmarkItem.id === bookmark.id) {
-					const starID = bookmark.starID
+						const starID = bookmark.starID
 
-					if (starID !== 0) {
+						if (starID !== 0) {
 							const starAttribute = attributesFromStar(starID)
 
 							bookmarkItem.attributes = bookmarkItem.attributes.filter((bookmarkAttribute) => {
@@ -771,14 +864,14 @@ const Timeline = ({
 
 								return match ? bookmarkAttribute : null
 							})
-					} else {
+						} else {
 							// Bookmark does not have a star
 							bookmarkItem.attributes = []
+						}
 					}
-				}
 
 					return bookmarkItem
-			})
+				})
 			)
 		})
 	}
@@ -787,28 +880,27 @@ const Timeline = ({
 		Axios.delete(`${serverConfig.api}/bookmark/${bookmark.id}/star`).then(() => {
 			update(
 				bookmarks.map((item) => {
-				if (item.id === bookmark.id) {
-					const attributes = attributesFromStar(bookmark.starID)
+					if (item.id === bookmark.id) {
+						const attributes = attributesFromStar(bookmark.starID)
 
-					if (item.attributes.length > attributes.length) {
-						// Bookmark have at least 1 attribute not from star
-						item.attributes = item.attributes.filter((attribute) => {
-							const match = attributes.some((starAttribute) => starAttribute.name === attribute.name)
+						if (item.attributes.length > attributes.length) {
+							// Bookmark have at least 1 attribute not from star
+							item.attributes = item.attributes.filter((attribute) => {
+								const match = attributes.some((starAttribute) => starAttribute.name === attribute.name)
 
-							if (!match) return attribute
-							return null
-						})
-					} else {
-						// Bookmark has only attributes from star
-						item.attributes = []
+								return !match ? attribute : null
+							})
+						} else {
+							// Bookmark has only attributes from star
+							item.attributes = []
+						}
+
+						// RESET starID
+						item.starID = 0
 					}
 
-					// RESET starID
-					item.starID = 0
-				}
-
-				return item
-			})
+					return item
+				})
 			)
 		})
 	}
@@ -837,6 +929,19 @@ const Timeline = ({
 			let collision = false
 			if (collisionCheck(prev, current)) {
 				collision = true
+			} else {
+				// Check if bookmarks collide with previous items
+				//> not doing this check, causes collision of level-1 items
+				// j<i-1    >> EXPLANATION
+				// j<i      >> Collision of previous element, caught by previous block
+				// j<i-1    >> Collision of element before previous
+				/*for (let j = 0; j < i - 1; j++) {
+					if (collisionCheck(items[j], current)) {
+						collision = true
+					}
+				}*/
+				// this is faster, and can also be run in one loop
+				// if run in one loop, it can also be combined with the next section, to make it even shorter
 				if (collisionCheck(prevPrev, current)) collision = true
 			}
 
@@ -857,45 +962,45 @@ const Timeline = ({
 						const tooltip = bookmark.starID !== 0 || bookmark.attributes.length > 0
 
 						return (
-						<Fragment key={bookmark.id}>
+							<Fragment key={bookmark.id}>
 								<ContextMenuTrigger id={`bookmark-${bookmark.id}`} holdToDisplay={-1}>
 									<Button
 										size='small'
 										variant={isActive(bookmark) ? 'contained' : 'outlined'}
 										color={hasStar(bookmark) ? 'primary' : 'default'}
 										className='bookmark'
-									style={{
+										style={{
 											left: `${
 												((bookmark.start * 100) / duration) * settingsConfig.timeline.offset
 											}%`
-									}}
-									onClick={() => playVideo(bookmark.start)}
+										}}
+										onClick={() => playVideo(bookmark.start)}
 										ref={(item: HTMLButtonElement) => (bookmarksArr[i] = item)}
-									data-level={1}
-								>
+										data-level={1}
+									>
 										<div data-tip={tooltip} data-for={`bookmark-info-${bookmark.id}`}>
-										{bookmark.name}
-									</div>
+											{bookmark.name}
+										</div>
 
 										{tooltip ? (
-										<ReactTooltip id={`bookmark-info-${bookmark.id}`} effect='solid'>
-											{bookmark.starID !== 0 ? (
-												<img
-													alt='star'
-													className='star__image'
-													data-star-id={bookmark.starID}
+											<ReactTooltip id={`bookmark-info-${bookmark.id}`} effect='solid'>
+												{bookmark.starID !== 0 ? (
+													<img
+														alt='star'
+														className='star__image'
+														data-star-id={bookmark.starID}
 														src={`${serverConfig.source}/images/stars/${bookmark.starID}.jpg`}
-												/>
-											) : null}
+													/>
+												) : null}
 
-											{bookmark.attributes
-												.sort((a, b) => {
-													if (isStarAttribute(bookmark.starID, a.id)) return -1
-													else if (isStarAttribute(bookmark.starID, b.id)) return 1
+												{bookmark.attributes
+													.sort((a, b) => {
+														if (isStarAttribute(bookmark.starID, a.id)) return -1
+														else if (isStarAttribute(bookmark.starID, b.id)) return 1
 
-													return a.name.localeCompare(b.name)
-												})
-												.map((attribute) => (
+														return a.name.localeCompare(b.name)
+													})
+													.map((attribute) => (
 														<Button
 															key={attribute.id}
 															size='small'
@@ -903,62 +1008,62 @@ const Timeline = ({
 															component='div'
 															className='attribute btn'
 														>
-														{attribute.name}
+															{attribute.name}
 														</Button>
-												))}
-										</ReactTooltip>
-									) : null}
+													))}
+											</ReactTooltip>
+										) : null}
 									</Button>
-							</ContextMenuTrigger>
+								</ContextMenuTrigger>
 
-							<ContextMenu id={`bookmark-${bookmark.id}`}>
-								<MenuItem
-									disabled={bookmark.starID !== 0 || (bookmark.starID === 0 && !stars.length)}
-									onClick={() => setStarEvent(true, bookmark)}
-								>
+								<ContextMenu id={`bookmark-${bookmark.id}`}>
+									<MenuItem
+										disabled={bookmark.starID !== 0 || (bookmark.starID === 0 && !stars.length)}
+										onClick={() => setStarEvent(true, bookmark)}
+									>
 										<i className={themeConfig.icons.add} /> Add Star
-								</MenuItem>
+									</MenuItem>
 
-								<MenuItem disabled={bookmark.starID === 0} onClick={() => removeStar(bookmark)}>
+									<MenuItem disabled={bookmark.starID === 0} onClick={() => removeStar(bookmark)}>
 										<i className={themeConfig.icons.trash} /> Remove Star
-								</MenuItem>
+									</MenuItem>
 
-								<MenuItem divider />
+									<MenuItem divider />
 
-								<MenuItem
-									onClick={() => {
-										handleModal(
-											'Add Attribute',
-											attributes
-												.filter((attribute) => {
-													const match = bookmark.attributes.some(
+									<MenuItem
+										onClick={() => {
+											handleModal(
+												'Add Attribute',
+												attributes
+													.filter((attribute) => {
+														const match = bookmark.attributes.some(
 															(bookmarkAttribute) =>
 																attribute.name === bookmarkAttribute.name
-													)
+														)
 
-													return !match ? attribute : null
-												})
-												.map((attribute) => (
+														return !match ? attribute : null
+													})
+													.map((attribute) => (
 														<Button
-														key={attribute.id}
+															key={attribute.id}
 															variant='outlined'
 															color='primary'
-														onClick={() => {
-															handleModal()
-															addAttribute(attribute, bookmark)
-														}}
-													>
-														{attribute.name}
+															onClick={() => {
+																handleModal()
+																addAttribute(attribute, bookmark)
+															}}
+														>
+															{attribute.name}
 														</Button>
-												)),
-											true
-										)
-									}}
-								>
+													)),
+												true
+											)
+										}}
+									>
 										<i className={themeConfig.icons.add} /> Add Attribute
-								</MenuItem>
+									</MenuItem>
 
-								<MenuItem
+									<MenuItem
 										disabled={
 											attributesFromStar(bookmark.starID).length >= bookmark.attributes.length
 										}
@@ -996,46 +1101,46 @@ const Timeline = ({
 										disabled={
 											attributesFromStar(bookmark.starID).length >= bookmark.attributes.length
 										}
-									onClick={() => clearAttributes(bookmark)}
-								>
+										onClick={() => clearAttributes(bookmark)}
+									>
 										<i className={themeConfig.icons.trash} /> Clear Attributes
-								</MenuItem>
+									</MenuItem>
 
-								<MenuItem
-									onClick={() => {
-										handleModal(
-											'Change Category',
-											categories
-												.filter((category) => category.name !== bookmark.name)
-												.map((category) => (
+									<MenuItem
+										onClick={() => {
+											handleModal(
+												'Change Category',
+												categories
+													.filter((category) => category.name !== bookmark.name)
+													.map((category) => (
 														<Button
-														key={category.id}
+															key={category.id}
 															variant='outlined'
 															color='primary'
-														onClick={() => {
-															handleModal()
-															setCategory(category, bookmark)
-														}}
-													>
-														{category.name}
+															onClick={() => {
+																handleModal()
+																setCategory(category, bookmark)
+															}}
+														>
+															{category.name}
 														</Button>
-												)),
-											true
-										)
-									}}
-								>
+													)),
+												true
+											)
+										}}
+									>
 										<i className={themeConfig.icons.edit} /> Change Category
-								</MenuItem>
+									</MenuItem>
 
-								<MenuItem onClick={() => setTime(bookmark.id)}>
+									<MenuItem onClick={() => setTime(bookmark.id)}>
 										<i className={themeConfig.icons.clock} /> Change Time
-								</MenuItem>
+									</MenuItem>
 
-								<MenuItem onClick={() => removeBookmark(bookmark.id)}>
+									<MenuItem onClick={() => removeBookmark(bookmark.id)}>
 										<i className={themeConfig.icons.trash} /> Delete
-								</MenuItem>
-							</ContextMenu>
-						</Fragment>
+									</MenuItem>
+								</ContextMenu>
+							</Fragment>
 						)
 				  })
 				: null}
@@ -1061,16 +1166,20 @@ const Stars = ({ video, stars, bookmarks, attributes, categories, clearActive, u
 		})
 	}
 
-	return (
-		<Grid container justify='center' id='stars'>
-			{stars
-				.sort((a, b) => {
-					const bookmarkTime = (star: IStar) =>
-						bookmarks.find((bookmark) => bookmark.starID === star.id)?.start || Infinity
+	useEffect(() => {
+		update(
+			[...stars].sort((a, b) => {
+				const bookmarkTime = (star: IStar) =>
+					bookmarks.find((bookmark) => bookmark.starID === star.id)?.start || Infinity
 
-					return bookmarkTime(a) - bookmarkTime(b)
-				})
-				.map((star) => (
+				return bookmarkTime(a) - bookmarkTime(b)
+			})
+		)
+	}, [bookmarks])
+
+	return (
+		<Grid container justifyContent='center' id='stars'>
+			{stars.map((star) => (
 				<Star
 					key={star.id}
 					video={video}
@@ -1136,12 +1245,12 @@ const Star = ({
 					[
 						...bookmarks,
 						{
-					id: data.id,
-					name: category.name,
-					start: time,
-					starID: star.id,
-					attributes,
-					active: false
+							id: data.id,
+							name: category.name,
+							start: time,
+							starID: star.id,
+							attributes,
+							active: false
 						}
 					].sort((a, b) => a.start - b.start)
 				)
@@ -1158,9 +1267,9 @@ const Star = ({
 			updateBookmarks(
 				bookmarks.map((bookmark) => {
 					if (bookmark.starID === star.id) {
-					if (!bookmark.attributes.some((attr) => attr.id === attribute.id)) {
-						bookmark.attributes.push(attribute)
-					}
+						if (!bookmark.attributes.some((attr) => attr.id === attribute.id)) {
+							bookmark.attributes.push(attribute)
+						}
 					}
 
 					return bookmark
@@ -1196,22 +1305,22 @@ const Star = ({
 
 				// Bookmark has ZERO Overlapping Attributes
 				if (!overlappingAttributes) {
-		// Request Bookmark Update
+					// Request Bookmark Update
 					Axios.post(`${serverConfig.api}/bookmark/${bookmark.id}/star`, {
-			starID: star.id
-		}).then(() => {
+						starID: star.id
+					}).then(() => {
 						updateBookmarks(
-			bookmarks.map((item) => {
-				if (item.id === bookmark.id) {
-					// MERGE bookmark-attributes with star-attributes
-					item.attributes = item.attributes.concat(star.attributes)
+							bookmarks.map((item) => {
+								if (item.id === bookmark.id) {
+									// MERGE bookmark-attributes with star-attributes
+									item.attributes = item.attributes.concat(star.attributes)
 
-					// SET starID
-					item.starID = star.id
-				}
+									// SET starID
+									item.starID = star.id
+								}
 
-				return item
-			})
+								return item
+							})
 						)
 					})
 				}
@@ -1220,94 +1329,96 @@ const Star = ({
 	}
 
 	return (
-		<Grid
-			item
-			xs={4}
-			onClick={getStarEvent.event ? () => addStar(star) : () => {}}
-			onMouseEnter={getStarEvent.event ? () => setBorder(true) : () => setActive(star)}
-			onMouseLeave={getStarEvent.event ? () => setBorder(false) : clearActive}
-		>
-			<ContextMenuTrigger id={`star-${star.id}`} holdToDisplay={-1}>
-				<Card className={`ribbon-container star ${border ? 'star--active' : ''}`}>
-					<CardMedia
-						component='img'
-						src={`${serverConfig.source}/images/stars/${star.id}.jpg`}
-						alt='star'
-						className='star__image'
-					/>
+		<Flipped key={star.id} flipId={star.id}>
+			<Grid
+				item
+				xs={4}
+				onClick={getStarEvent.event ? () => addStar(star) : () => {}}
+				onMouseEnter={getStarEvent.event ? () => setBorder(true) : () => setActive(star)}
+				onMouseLeave={getStarEvent.event ? () => setBorder(false) : clearActive}
+			>
+				<ContextMenuTrigger id={`star-${star.id}`} holdToDisplay={-1}>
+					<Card className={`ribbon-container star ${border ? 'star--active' : ''}`}>
+						<CardMedia
+							component='img'
+							src={`${serverConfig.source}/images/stars/${star.id}.jpg`}
+							alt='star'
+							className='star__image'
+						/>
 
-					<Link to={`/star/${star.id}`} className='star__name'>
-						<Typography>{star.name}</Typography>
-					</Link>
+						<Link to={`/star/${star.id}`} className='star__name'>
+							<Typography>{star.name}</Typography>
+						</Link>
 
-					{handleRibbon(star)}
-				</Card>
+						{handleRibbon(star)}
+					</Card>
 				</ContextMenuTrigger>
 
-			<ContextMenu id={`star-${star.id}`}>
-				<MenuItem
-					onClick={() => {
-						handleModal(
-							'Add Bookmark',
-							categories.map((category) => (
-								<Button
-									key={category.id}
-									variant='outlined'
-									color='primary'
-									onClick={() => {
-										handleModal()
-										addBookmark(category, star)
-									}}
-								>
-									{category.name}
-								</Button>
-							)),
-							true
-						)
-					}}
-				>
-					<i className={themeConfig.icons.add} /> Add Bookmark
-				</MenuItem>
-
-				<MenuItem
-					disabled={!bookmarks.some((bookmark) => bookmark.starID === star.id)}
-					onClick={() => {
-						handleModal(
-							'Add Attribute',
-							attributes
-								.filter((attribute) => {
-									const match = star.attributes.some((attr) => attr.id === attribute.id)
-
-									return !match ? attribute : null
-								})
-								.map((attribute) => (
+				<ContextMenu id={`star-${star.id}`}>
+					<MenuItem
+						onClick={() => {
+							handleModal(
+								'Add Bookmark',
+								categories.map((category) => (
 									<Button
-										key={attribute.id}
+										key={category.id}
 										variant='outlined'
 										color='primary'
 										onClick={() => {
 											handleModal()
-											addAttribute(star, attribute)
+											addBookmark(category, star)
 										}}
 									>
-										{attribute.name}
+										{category.name}
 									</Button>
 								)),
-							true
-						)
-					}}
-				>
-					<i className={themeConfig.icons.add} /> Add Attribute
-				</MenuItem>
+								true
+							)
+						}}
+					>
+						<i className={themeConfig.icons.add} /> Add Bookmark
+					</MenuItem>
 
-				<MenuItem
-					disabled={bookmarks.some((bookmark) => bookmark.starID === star.id)}
-					onClick={() => removeStar(star.id)}
-				>
-					<i className={themeConfig.icons.trash} /> Remove
-				</MenuItem>
-			</ContextMenu>
-		</Grid>
+					<MenuItem
+						disabled={!bookmarks.some((bookmark) => bookmark.starID === star.id)}
+						onClick={() => {
+							handleModal(
+								'Add Attribute',
+								attributes
+									.filter((attribute) => {
+										const match = star.attributes.some((attr) => attr.id === attribute.id)
+
+										return !match ? attribute : null
+									})
+									.map((attribute) => (
+										<Button
+											key={attribute.id}
+											variant='outlined'
+											color='primary'
+											onClick={() => {
+												handleModal()
+												addAttribute(star, attribute)
+											}}
+										>
+											{attribute.name}
+										</Button>
+									)),
+								true
+							)
+						}}
+					>
+						<i className={themeConfig.icons.add} /> Add Attribute
+					</MenuItem>
+
+					<MenuItem
+						disabled={bookmarks.some((bookmark) => bookmark.starID === star.id)}
+						onClick={() => removeStar(star.id)}
+					>
+						<i className={themeConfig.icons.trash} /> Remove
+					</MenuItem>
+				</ContextMenu>
+			</Grid>
+		</Flipped>
 	)
 }
 
@@ -1334,8 +1445,8 @@ const StarInput = ({ video, stars, bookmarks, getAttributes }: IStarInput) => {
 		if (input.length) {
 			Axios.post(`${serverConfig.api}/video/${video.id}/star`, { name }).then(({ data }) => {
 				update([...stars, { id: data.id, name, attributes: data.attributes }])
-		})
-	}
+			})
+		}
 	}
 
 	// if 'noStar' is updated outside this component
@@ -1344,7 +1455,7 @@ const StarInput = ({ video, stars, bookmarks, getAttributes }: IStarInput) => {
 	}, [video.noStar])
 
 	return (
-		<Grid container justify='center'>
+		<Grid container justifyContent='center'>
 			{stars.length ? <Divider light /> : null}
 
 			<Box id='stars-input'>
@@ -1407,7 +1518,7 @@ const Franchise = ({ video }: { video: IVideo }) => {
 
 	return (
 		<Box id='franchise'>
-		{video.related.length > 1
+			{video.related.length > 1
 				? video.related.map((item) => (
 						<a href={`/video/${item.id}`} key={item.id}>
 							<Grid container component={Card} className='episode'>
@@ -1419,16 +1530,16 @@ const Franchise = ({ video }: { video: IVideo }) => {
 									<CardMedia
 										component='img'
 										src={`${serverConfig.source}/images/videos/${item.id}-290.jpg`}
-						/>
+									/>
 								</Grid>
 
 								<Grid className='episode__title'>{shortenTitle(item.name)}</Grid>
 							</Grid>
-					</a>
-			  ))
-			: null}
+						</a>
+				  ))
+				: null}
 		</Box>
-)
+	)
 }
 
 interface IAttributes {
@@ -1436,21 +1547,21 @@ interface IAttributes {
 	clearActive: () => void
 	update: (bookmarks: IBookmark[]) => void
 	getAttributes: () => IAttribute[]
-	}
+}
 const Attributes = ({ bookmarks, clearActive, update, getAttributes }: IAttributes) => {
 	const attribute_setActive = (attribute: IAttribute) => {
 		update(
 			bookmarks.map((bookmark) => {
-			if (bookmark.attributes.some((bookmarkAttribute) => bookmarkAttribute.id === attribute.id))
-				bookmark.active = true
+				if (bookmark.attributes.some((bookmarkAttribute) => bookmarkAttribute.id === attribute.id))
+					bookmark.active = true
 
-			return bookmark
-		})
+				return bookmark
+			})
 		)
 	}
 
 	return (
-		<Grid container justify='center' id='attributes'>
+		<Grid container justifyContent='center' id='attributes'>
 			{getAttributes().map((attribute) => (
 				<Button
 					key={attribute.id}
@@ -1482,7 +1593,7 @@ const Header = ({ video }: { video: IVideo }) => {
 			</Grid>
 
 			<Grid item xs={1}>
-			<HeaderNext video={video} />
+				<HeaderNext video={video} />
 			</Grid>
 		</Grid>
 	)
@@ -1631,7 +1742,7 @@ const HeaderNext = ({ video }: { video: IVideo }) => (
 	<Box id='header__next'>
 		<a id='next' href={`/video/${video.nextID}`}>
 			<Button size='small' variant='outlined'>
-			Next
+				Next
 			</Button>
 		</a>
 	</Box>

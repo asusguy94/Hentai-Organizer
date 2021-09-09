@@ -19,10 +19,10 @@ import capitalize from 'capitalize'
 
 import './editor.scss'
 
-import { server as serverConfig } from '../../config'
+import { server as serverConfig } from '@/config'
 
 const EditorPage = () => (
-	<Grid container justify='center' id='editor-page'>
+	<Grid container justifyContent='center' id='editor-page'>
 		<Wrapper label='attributes' name='attribute' obj={['starOnly', 'videoOnly']} />
 		<Wrapper label='categories' name='category' />
 	</Grid>
@@ -54,7 +54,7 @@ const Wrapper: FC<any> = ({ label, name, children, obj = [] }) => {
 
 	return (
 		<Grid item xs={3} style={{ paddingLeft: 3 * 8, paddingRight: 3 * 8 }}>
-			<Grid container justify='center' style={{ marginBottom: 10 }}>
+			<Grid container justifyContent='center' style={{ marginBottom: 10 }}>
 				<Grid item component='h2'>
 					{capitalize(label)}
 				</Grid>

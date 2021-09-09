@@ -19,14 +19,14 @@ import Axios from 'axios'
 import ScrollToTop from 'react-scroll-to-top'
 import capitalize from 'capitalize'
 
-import { handler as indeterminateHandler } from '../indeterminate/indeterminate'
-import LabelCount from '../labelcount/labelcount'
-import { getCount, isHidden } from './helper'
-import Loader from '../loader/loader'
+import { handler as indeterminateHandler } from '@components/indeterminate/indeterminate'
+import LabelCount from '@components/labelcount/labelcount'
+import { getCount, isHidden } from '@components/search/helper'
+import Loader from '@components/loader/loader'
 
 import './search.scss'
 
-import { server as serverConfig } from '../../config'
+import { server as serverConfig } from '@/config'
 
 //TODO use children-prop instead of coded-children inside component
 const StarSearchPage = () => {
@@ -65,12 +65,12 @@ const StarSearchPage = () => {
 			setHaircolors(data.haircolor)
 			setHairstyles(data.hairstyle)
 			setAttributes(data.attribute)
-			})
+		})
 	}, [])
 
-		return (
-			<Grid container id='search-page'>
-				<Grid item xs={2}>
+	return (
+		<Grid container id='search-page'>
+			<Grid item xs={2}>
 				<Sidebar
 					starData={{
 						breasts,
@@ -82,16 +82,16 @@ const StarSearchPage = () => {
 					stars={stars}
 					update={setStars}
 				/>
-				</Grid>
-
-				<Grid item container xs={10} justify='center'>
-				<Stars stars={stars} />
-				</Grid>
-
-				<ScrollToTop smooth />
 			</Grid>
-		)
-	}
+
+			<Grid item container xs={10} justifyContent='center'>
+				<Stars stars={stars} />
+			</Grid>
+
+			<ScrollToTop smooth />
+		</Grid>
+	)
+}
 
 // Wrapper
 const Sidebar = ({ starData, stars, update }: any) => (
@@ -110,7 +110,7 @@ const Stars = ({ stars }: any) => (
 			<span className='count'>{getCount(stars)}</span> Stars
 		</Typography>
 
-		<Grid container justify='center'>
+		<Grid container justifyContent='center'>
 			{stars.length ? (
 				stars.map((star: any) => {
 					if (isHidden(star)) return null
@@ -126,14 +126,14 @@ const Stars = ({ stars }: any) => (
 
 const StarCard = ({ star }: any) => (
 	<a href={`/star/${star.id}`}>
-						<Card className='star ribbon-container'>
-							<CardActionArea>
+		<Card className='star ribbon-container'>
+			<CardActionArea>
 				<CardMedia component='img' src={`${serverConfig.source}/images/stars/${star.id}.jpg`} />
 
-								<Typography className='text-center'>{star.name}</Typography>
-							</CardActionArea>
-						</Card>
-					</a>
+				<Typography className='text-center'>{star.name}</Typography>
+			</CardActionArea>
+		</Card>
+	</a>
 )
 
 // Container
@@ -315,10 +315,10 @@ const TitleSearch = ({ stars, update }: any) => {
 
 		update(
 			stars.map((star: any) => {
-			star.hidden.titleSearch = !star.name.toLowerCase().includes(searchValue)
+				star.hidden.titleSearch = !star.name.toLowerCase().includes(searchValue)
 
-			return star
-		})
+				return star
+			})
 		)
 	}
 
@@ -332,25 +332,25 @@ const FilterRadio = ({ data, label, obj, callback, globalCallback = null, nullCa
 
 		<FormControl>
 			<RadioGroup name={label} defaultValue='ALL'>
-			{globalCallback !== null ? (
+				{globalCallback !== null ? (
 					<FormControlLabel
 						value='ALL'
 						label={<div className='global-category'>ALL</div>}
 						onChange={globalCallback}
 						control={<Radio />}
 					/>
-			) : null}
+				) : null}
 
-			{nullCallback !== null ? (
+				{nullCallback !== null ? (
 					<FormControlLabel
 						value='NULL'
 						label={<div className='global-category'>NULL</div>}
 						onChange={nullCallback}
 						control={<Radio />}
 					/>
-			) : null}
+				) : null}
 
-			{data.map((item: any) => (
+				{data.map((item: any) => (
 					<FormControlLabel
 						key={item}
 						value={item}
@@ -362,26 +362,26 @@ const FilterRadio = ({ data, label, obj, callback, globalCallback = null, nullCa
 						}
 						control={<Radio />}
 					/>
-			))}
+				))}
 			</RadioGroup>
 		</FormControl>
 	</>
 )
 
 const FilterCheckBox = ({ data, label, labelPlural, obj, callback, nullCallback = null }: any) => (
-		<>
-			<h2>{capitalize(label, true)}</h2>
+	<>
+		<h2>{capitalize(label, true)}</h2>
 
 		<FormControl>
-				{nullCallback !== null ? (
+			{nullCallback !== null ? (
 				<IndeterminateItem
 					label={<div className='global-category'>NULL</div>}
 					value='NULL'
 					callback={(ref: any) => nullCallback(ref)}
 				/>
-				) : null}
+			) : null}
 
-				{data.map((item: any) => (
+			{data.map((item: any) => (
 				<IndeterminateItem
 					key={item}
 					label={
@@ -393,10 +393,10 @@ const FilterCheckBox = ({ data, label, labelPlural, obj, callback, nullCallback 
 					item={item}
 					callback={(ref: any, item: any) => callback(ref, item)}
 				/>
-				))}
+			))}
 		</FormControl>
-		</>
-	)
+	</>
+)
 
 const IndeterminateItem = ({ label, value, item = null, callback }: any) => {
 	const [indeterminate, setIndeterminate] = useState(false)
@@ -419,9 +419,9 @@ const IndeterminateItem = ({ label, value, item = null, callback }: any) => {
 						callback(result, item)
 					}}
 				/>
-}
+			}
 		/>
-)
+	)
 }
 
 export default StarSearchPage

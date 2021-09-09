@@ -33,6 +33,9 @@ const Modal = (props: any) => {
 			case 'backspace':
 				setQuery(query.slice(0, -1))
 				break
+			case 'space':
+				setQuery(query + ' ')
+				break
 			default:
 				setQuery(query + key)
 		}

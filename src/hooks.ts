@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState, useRef } from 'react'
 
 export const useRefWithEffect = () => {
 	const [refValue, setRefValue] = useState()
@@ -24,4 +24,16 @@ export const useWindowSize = () => {
 	}, [])
 
 	return windowSize
+}
+
+export const usePrevious = (value: any): any => {
+	// Store current value in ref
+	const ref = useRef()
+
+	useEffect(() => {
+		ref.current = value
+	}, [value]) // Only re-run if value changes
+
+	// Return previous value (happens before update in useEffect above)
+	return ref.current
 }

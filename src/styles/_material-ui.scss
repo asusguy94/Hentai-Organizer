@@ -10,7 +10,8 @@
 	cursor: default !important;
 }
 
-#search-page {
+#search-page,
+#video-page {
 	.MuiCardMedia-img {
 		// Required to fix oddly shaped images
 		//> omitting this, causes only the center of the image to be displayed

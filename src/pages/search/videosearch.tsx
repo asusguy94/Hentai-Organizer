@@ -19,15 +19,15 @@ import Axios from 'axios'
 import ScrollToTop from 'react-scroll-to-top'
 import capitalize from 'capitalize'
 
-import Ribbon from '../ribbon/ribbon'
-import LabelCount from '../labelcount/labelcount'
-import { handler as indeterminateHandler } from '../indeterminate/indeterminate'
-import { isHidden, getCount } from './helper'
-import Loader from '../loader/loader'
+import Ribbon from '@components/ribbon/ribbon'
+import LabelCount from '@components/labelcount/labelcount'
+import { handler as indeterminateHandler } from '@components/indeterminate/indeterminate'
+import { isHidden, getCount } from '@components/search/helper'
+import Loader from '@components/loader/loader'
 
 import './search.scss'
 
-import { server as serverConfig } from '../../config'
+import { server as serverConfig } from '@/config'
 
 const VideoSearchPage = () => {
 	const [videos, setVideos] = useState([])
@@ -52,7 +52,7 @@ const VideoSearchPage = () => {
 					if (video.noStar) return null
 
 					return video
-			})
+				})
 			)
 		})
 
@@ -66,7 +66,7 @@ const VideoSearchPage = () => {
 				<Sidebar videoData={{ categories, attributes }} videos={videos} update={setVideos} />
 			</Grid>
 
-			<Grid item container xs={10} justify='center'>
+			<Grid item container xs={10} justifyContent='center'>
 				<Videos videos={videos} />
 			</Grid>
 
@@ -84,7 +84,7 @@ const Videos = ({ videos }: any) => (
 			</Typography>
 		) : null}
 
-		<Grid container justify='center'>
+		<Grid container justifyContent='center'>
 			{videos.length ? (
 				videos.map((video: any) => {
 					if (isHidden(video)) return null
@@ -100,16 +100,16 @@ const Videos = ({ videos }: any) => (
 
 const VideoCard = ({ video }: any) => (
 	<a href={`/video/${video.id}`}>
-						<Card className='video ribbon-container'>
-							<CardActionArea>
+		<Card className='video ribbon-container'>
+			<CardActionArea>
 				<CardMedia component='img' src={`${serverConfig.source}/images/videos/${video.id}-290.jpg`} />
 
-								<Typography className='text-center'>{video.name}</Typography>
+				<Typography className='text-center'>{video.name}</Typography>
 
-						<Ribbon label={video.quality} />
-							</CardActionArea>
-						</Card>
-					</a>
+				<Ribbon label={video.quality} />
+			</CardActionArea>
+		</Card>
+	</a>
 )
 
 const Sidebar = ({ videos, update, videoData }: any) => (
@@ -129,10 +129,10 @@ const TitleSearch = ({ update, videos }: any) => {
 
 		update(
 			videos.map((video: any) => {
-			video.hidden.titleSearch = !video.name.toLowerCase().includes(searchValue)
+				video.hidden.titleSearch = !video.name.toLowerCase().includes(searchValue)
 
-			return video
-		})
+				return video
+			})
 		)
 	}
 
@@ -161,12 +161,12 @@ const Sort = ({ videos, update }: any) => {
 	const sortDate = (reverse = false) => {
 		update(
 			[...videos].sort((a: any, b: any) => {
-			const dateA: any = new Date(a.published)
-			const dateB: any = new Date(b.published)
+				const dateA: any = new Date(a.published)
+				const dateB: any = new Date(b.published)
 
 				const result = dateA - dateB
 				return reverse ? result * -1 : result
-		})
+			})
 		)
 	}
 
@@ -252,32 +252,32 @@ const Filter = ({ videoData, videos, update }: any) => {
 
 		update(
 			videos.map((video: any) => {
-			if (ref.indeterminate) {
-				const match = video.categories.some((category: any) => category.toLowerCase() === targetLower)
+				if (ref.indeterminate) {
+					const match = video.categories.some((category: any) => category.toLowerCase() === targetLower)
 
-				if (match) {
-					video.hidden.notCategory.push(targetLower)
+					if (match) {
+						video.hidden.notCategory.push(targetLower)
+					} else {
+						// Remove checked-status from filtering
+						video.hidden.category.splice(video.hidden.category.indexOf(targetLower), 1)
+					}
+				} else if (!ref.checked) {
+					video.hidden.noCategory = false
+
+					const match = video.categories.map((category: any) => category.toLowerCase()).includes(targetLower)
+
+					if (match) {
+						// Remove indeterminate-status from filtering
+						video.hidden.notCategory.splice(video.hidden.notCategory.indexOf(targetLower), 1)
+					}
 				} else {
-					// Remove checked-status from filtering
-					video.hidden.category.splice(video.hidden.category.indexOf(targetLower), 1)
+					const match = !video.categories.map((category: any) => category.toLowerCase()).includes(targetLower)
+
+					if (match) video.hidden.category.push(targetLower)
 				}
-			} else if (!ref.checked) {
-				video.hidden.noCategory = false
 
-				const match = video.categories.map((category: any) => category.toLowerCase()).includes(targetLower)
-
-				if (match) {
-					// Remove indeterminate-status from filtering
-					video.hidden.notCategory.splice(video.hidden.notCategory.indexOf(targetLower), 1)
-				}
-			} else {
-				const match = !video.categories.map((category: any) => category.toLowerCase()).includes(targetLower)
-
-				if (match) video.hidden.category.push(targetLower)
-			}
-
-			return video
-		})
+				return video
+			})
 		)
 	}
 
@@ -286,51 +286,51 @@ const Filter = ({ videoData, videos, update }: any) => {
 
 		update(
 			videos.map((video: any) => {
-			if (ref.indeterminate) {
-				const match = video.attributes.some((attribute: any) => attribute.toLowerCase() === targetLower)
+				if (ref.indeterminate) {
+					const match = video.attributes.some((attribute: any) => attribute.toLowerCase() === targetLower)
 
-				if (match) {
-					video.hidden.notAttribute.push(targetLower)
-				} else {
-					// Remove checked-status from filtering
-					video.hidden.attribute.splice(video.hidden.attribute.indexOf(targetLower), 1)
-				}
-			} else if (!ref.checked) {
+					if (match) {
+						video.hidden.notAttribute.push(targetLower)
+					} else {
+						// Remove checked-status from filtering
+						video.hidden.attribute.splice(video.hidden.attribute.indexOf(targetLower), 1)
+					}
+				} else if (!ref.checked) {
 					const match = video.attributes
 						.map((attribute: any) => attribute.toLowerCase())
 						.includes(targetLower)
 
-				if (match) {
-					// Remove indeterminate-status from filtering
-					video.hidden.notAttribute.splice(video.hidden.notAttribute.indexOf(targetLower), 1)
-				}
-			} else {
+					if (match) {
+						// Remove indeterminate-status from filtering
+						video.hidden.notAttribute.splice(video.hidden.notAttribute.indexOf(targetLower), 1)
+					}
+				} else {
 					const match = !video.attributes
 						.map((attribute: any) => attribute.toLowerCase())
 						.includes(targetLower)
 
-				if (match) video.hidden.attribute.push(targetLower)
-			}
+					if (match) video.hidden.attribute.push(targetLower)
+				}
 
-			return video
-		})
+				return video
+			})
 		)
 	}
 
 	const category_NULL = (ref: any) => {
 		update(
 			videos.map((video: any) => {
-			if (ref.indeterminate) {
-				video.hidden.noCategory = false
-				video.hidden.notNoCategory = video.categories.length === 0
-			} else if (!ref.checked) {
-				video.hidden.notNoCategory = false
-			} else {
-				video.hidden.noCategory = video.categories.length !== 0
-			}
+				if (ref.indeterminate) {
+					video.hidden.noCategory = false
+					video.hidden.notNoCategory = video.categories.length === 0
+				} else if (!ref.checked) {
+					video.hidden.notNoCategory = false
+				} else {
+					video.hidden.noCategory = video.categories.length !== 0
+				}
 
-			return video
-		})
+				return video
+			})
 		)
 	}
 
@@ -358,19 +358,19 @@ const Filter = ({ videoData, videos, update }: any) => {
 
 // ContainerItem
 const FilterCheckBox = ({ data, label, labelPlural, obj, callback, nullCallback = null }: any) => (
-		<>
-			<h2>{capitalize(label, true)}</h2>
+	<>
+		<h2>{capitalize(label, true)}</h2>
 
 		<FormControl>
-				{nullCallback !== null ? (
+			{nullCallback !== null ? (
 				<IndeterminateItem
 					label={<div className='global-category'>NULL</div>}
 					value='NULL'
 					callback={(ref: any) => nullCallback(ref)}
 				/>
-				) : null}
+			) : null}
 
-				{data.map((item: any) => (
+			{data.map((item: any) => (
 				<IndeterminateItem
 					key={item.id}
 					label={
@@ -382,10 +382,10 @@ const FilterCheckBox = ({ data, label, labelPlural, obj, callback, nullCallback 
 					item={item}
 					callback={(ref: any, item: any) => callback(ref, item)}
 				/>
-				))}
+			))}
 		</FormControl>
-		</>
-	)
+	</>
+)
 
 const IndeterminateItem = ({ label, value, item = null, callback }: any) => {
 	const [indeterminate, setIndeterminate] = useState(false)

@@ -18,12 +18,12 @@ import { Autocomplete } from '@material-ui/lab'
 import Axios from 'axios'
 import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu'
 
-import Modal from '../modal/modal'
-import Loader from '../loader/loader'
+import Modal from '@components/modal/modal'
+import Loader from '@components/loader/loader'
 
 import './star.scss'
 
-import { theme as themeConfig, server as serverConfig } from '../../config'
+import { theme as themeConfig, server as serverConfig } from '@/config'
 
 interface IStarVideo {
 	fname: string
@@ -41,24 +41,24 @@ const StarPage = (props: any) => {
 	})
 
 	const [star, setStar] = useState({
-			id: 0,
-			name: '',
-			image: '',
-			info: {
-				breast: '',
-				eyecolor: '',
-				haircolor: '',
-				hairstyle: '',
-				attribute: []
-			}
+		id: 0,
+		name: '',
+		image: '',
+		info: {
+			breast: '',
+			eyecolor: '',
+			haircolor: '',
+			hairstyle: '',
+			attribute: []
+		}
 	})
 
 	const [starData, setStarData] = useState({
-			breast: [],
-			eyecolor: [],
-			haircolor: [],
-			hairstyle: [],
-			attribute: []
+		breast: [],
+		eyecolor: [],
+		haircolor: [],
+		hairstyle: [],
+		attribute: []
 	})
 
 	const [videos, setVideos] = useState<IStarVideo[]>([])
@@ -75,8 +75,8 @@ const StarPage = (props: any) => {
 		Axios.get(`${serverConfig.api}/star`).then(({ data }) => setStarData(data))
 	}, [])
 
-		return (
-			<Grid container id='star-page'>
+	return (
+		<Grid container id='star-page'>
 			<Grid item xs={6}>
 				{star.id !== 0 ? (
 					<Box id='star'>
@@ -97,8 +97,8 @@ const StarPage = (props: any) => {
 				</Modal>
 			</Grid>
 		</Grid>
-		)
-	}
+	)
+}
 
 // Wrapper
 const StarVideos = ({ videos }: { videos: IStarVideo[] }) => (
@@ -132,10 +132,10 @@ const StarForm = ({ star, starData, update }: IStarForm) => {
 				info: {
 					...star.info,
 					attribute: star.info.attribute.filter((attribute: any) => {
-				if (attribute.toLowerCase() === name.toLowerCase()) return null
+						if (attribute.toLowerCase() === name.toLowerCase()) return null
 
-				return attribute
-			})
+						return attribute
+					})
 				}
 			})
 		})
@@ -210,49 +210,49 @@ const StarImageDropbox = ({ star, update }: any) => {
 		addImage(e.dataTransfer.getData('text'))
 	}
 
-		return (
+	return (
 		<Box className='d-inline-block'>
 			{star.image !== null ? (
-			<>
-				<ContextMenuTrigger id='star__image'>
+				<>
+					<ContextMenuTrigger id='star__image'>
 						<img
 							className='star__image'
 							src={`${serverConfig.source}/images/stars/${star.image}`}
 							alt='star'
 						/>
-				</ContextMenuTrigger>
+					</ContextMenuTrigger>
 
-				<ContextMenu id='star__image'>
-					<MenuItem onClick={removeImage}>
+					<ContextMenu id='star__image'>
+						<MenuItem onClick={removeImage}>
 							<i className={themeConfig.icons.trash} /> Delete Image
-					</MenuItem>
-				</ContextMenu>
-			</>
+						</MenuItem>
+					</ContextMenu>
+				</>
 			) : (
-			<>
-				<ContextMenuTrigger id='star__dropbox'>
-					<Box
-						id='dropbox'
-						className={`unselectable ${hover ? 'hover' : ''}`}
-						onDragEnter={handleEnter}
-						onDragOver={handleEnter}
-						onDragLeave={handleLeave}
-						onDrop={handleDrop}
-					>
-						<Box className='label'>Drop Image Here</Box>
-					</Box>
-				</ContextMenuTrigger>
+				<>
+					<ContextMenuTrigger id='star__dropbox'>
+						<Box
+							id='dropbox'
+							className={`unselectable ${hover ? 'hover' : ''}`}
+							onDragEnter={handleEnter}
+							onDragOver={handleEnter}
+							onDragLeave={handleLeave}
+							onDrop={handleDrop}
+						>
+							<Box className='label'>Drop Image Here</Box>
+						</Box>
+					</ContextMenuTrigger>
 
-				<ContextMenu id='star__dropbox'>
-					<MenuItem onClick={removeStar}>
+					<ContextMenu id='star__dropbox'>
+						<MenuItem onClick={removeStar}>
 							<i className={themeConfig.icons.trash} /> Remove Star
-					</MenuItem>
-				</ContextMenu>
-			</>
+						</MenuItem>
+					</ContextMenu>
+				</>
 			)}
 		</Box>
-		)
-	}
+	)
+}
 
 // Container
 const StarVideo = ({ video }: any) => {
@@ -322,14 +322,14 @@ const StarVideo = ({ video }: any) => {
 				<CardActionArea>
 					<CardMedia
 						component='video'
-				src={src}
-				data-src={dataSrc}
+						src={src}
+						data-src={dataSrc}
 						poster={`${serverConfig.source}/images/videos/${video.image}`}
-				preload='metadata'
-				muted
-				onMouseEnter={handleMouseEnter}
-				onMouseLeave={handleMouseLeave}
-			/>
+						preload='metadata'
+						muted
+						onMouseEnter={handleMouseEnter}
+						onMouseLeave={handleMouseLeave}
+					/>
 
 					<CardContent>
 						<Typography className='video__title'>{video.name}</Typography>
@@ -371,7 +371,7 @@ const StarInputForm: React.FC<IStarInputForm> = ({ value, emptyByDefault = false
 	useEffect(() => {
 		if (!emptyByDefault && value.length) {
 			setInputValue(value)
-	}
+		}
 	}, [value])
 
 	// FIXME excluding an item from dropdown causes a warning
@@ -406,11 +406,11 @@ const StarInputForm: React.FC<IStarInputForm> = ({ value, emptyByDefault = false
 					open={open}
 					onOpen={() => setOpen(true)}
 					onClose={() => setOpen(false)}
-			/>
+				/>
 			</Grid>
 
 			<Grid item style={{ marginTop: 14, marginLeft: 8 }}>
-			{children}
+				{children}
 			</Grid>
 		</Grid>
 	)
@@ -446,9 +446,9 @@ const StarTitle = ({ star, handleModal, update }: any) => {
 	return (
 		<Box>
 			<Box className='d-inline-block'>
-			<ContextMenuTrigger id='title'>
-				<h2>{star.name}</h2>
-			</ContextMenuTrigger>
+				<ContextMenuTrigger id='title'>
+					<h2>{star.name}</h2>
+				</ContextMenuTrigger>
 			</Box>
 
 			<ContextMenu id='title'>

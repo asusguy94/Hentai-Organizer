@@ -6,7 +6,7 @@ import { Card, CardContent, Button, Typography, Box } from '@material-ui/core'
 //@ts-ignore
 import KeyboardEventHandler from 'react-keyboard-event-handler'
 
-import { settings as settingsConfig } from '../../config'
+import { settings as settingsConfig } from '@/config'
 
 import './modal.scss'
 

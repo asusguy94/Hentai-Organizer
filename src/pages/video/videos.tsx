@@ -5,7 +5,7 @@ import { Grid, List, ListItem, ListItemText } from '@material-ui/core'
 
 import Axios from 'axios'
 
-import { server as serverConfig } from '../../config'
+import { server as serverConfig } from '@/config'
 
 interface IVideo {
 	id: number

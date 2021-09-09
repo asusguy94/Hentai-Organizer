@@ -15,9 +15,9 @@ import {
 
 import Axios from 'axios'
 
-import Loader from '../loader/loader'
+import Loader from '@components/loader/loader'
 
-import { server as serverConfig } from '../../config'
+import { server as serverConfig } from '@/config'
 
 interface IVideo {
 	path: string
@@ -66,16 +66,16 @@ const AddVideoPage = () => {
 								</TableHead>
 
 								<TableBody>
-								{videos.map((video) => {
-									return (
+									{videos.map((video) => {
+										return (
 											<TableRow key={video.path}>
 												<TableCell>{video.episode}</TableCell>
 												<TableCell>{video.franchise}</TableCell>
 												<TableCell>{video.name}</TableCell>
 												<TableCell>{video.path}</TableCell>
 											</TableRow>
-									)
-								})}
+										)
+									})}
 								</TableBody>
 							</Table>
 						</TableContainer>

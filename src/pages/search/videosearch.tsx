@@ -22,7 +22,8 @@ import capitalize from 'capitalize'
 import Ribbon from '@components/ribbon/ribbon'
 import LabelCount from '@components/labelcount/labelcount'
 import { handler as indeterminateHandler } from '@components/indeterminate/indeterminate'
-import { isHidden, getCount } from '@components/search/helper'
+import { getCount, getVisible } from '@components/search/helper'
+import VGrid from '@components/virtualized/virtuoso'
 import Loader from '@components/loader/loader'
 
 import './search.scss'
@@ -66,7 +67,7 @@ const VideoSearchPage = () => {
 				<Sidebar videoData={{ categories, attributes }} videos={videos} update={setVideos} />
 			</Grid>
 
-			<Grid item container xs={10} justifyContent='center'>
+			<Grid item xs={10}>
 				<Videos videos={videos} />
 			</Grid>
 
@@ -76,27 +77,28 @@ const VideoSearchPage = () => {
 }
 
 // Wrapper
-const Videos = ({ videos }: any) => (
+const Videos = ({ videos }: any) => {
+	const visibleVideos = getVisible(videos)
+
+	return (
 	<Box id='videos'>
 		{videos.length ? (
+				<>
 			<Typography variant='h6' className='text-center'>
 				<span className='count'>{getCount(videos)}</span> Videos
 			</Typography>
-		) : null}
 
-		<Grid container justifyContent='center'>
-			{videos.length ? (
-				videos.map((video: any) => {
-					if (isHidden(video)) return null
-
-					return <VideoCard key={video.id} video={video} />
-				})
+					<VGrid
+						items={visibleVideos}
+						renderData={(idx: number) => <VideoCard video={visibleVideos[idx]} />}
+					/>
+				</>
 			) : (
 				<Loader />
 			)}
-		</Grid>
 	</Box>
 )
+}
 
 const VideoCard = ({ video }: any) => (
 	<a href={`/video/${video.id}`}>

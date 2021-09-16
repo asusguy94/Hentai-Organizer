@@ -21,7 +21,8 @@ import capitalize from 'capitalize'
 
 import { handler as indeterminateHandler } from '@components/indeterminate/indeterminate'
 import LabelCount from '@components/labelcount/labelcount'
-import { getCount, isHidden } from '@components/search/helper'
+import { getCount, getVisible } from '@components/search/helper'
+import VGrid from '@components/virtualized/virtuoso'
 import Loader from '@components/loader/loader'
 
 import './search.scss'
@@ -84,7 +85,7 @@ const StarSearchPage = () => {
 				/>
 			</Grid>
 
-			<Grid item container xs={10} justifyContent='center'>
+			<Grid item xs={10}>
 				<Stars stars={stars} />
 			</Grid>
 
@@ -104,25 +105,25 @@ const Sidebar = ({ starData, stars, update }: any) => (
 	</>
 )
 
-const Stars = ({ stars }: any) => (
+const Stars = ({ stars }: any) => {
+	const visibleStars = getVisible(stars)
+
+	return (
 	<Box id='stars'>
+			{stars.length ? (
+				<>
 		<Typography variant='h6' className='text-center'>
 			<span className='count'>{getCount(stars)}</span> Stars
 		</Typography>
 
-		<Grid container justifyContent='center'>
-			{stars.length ? (
-				stars.map((star: any) => {
-					if (isHidden(star)) return null
-
-					return <StarCard key={star.id} star={star} />
-				})
+					<VGrid items={visibleStars} renderData={(idx: number) => <StarCard star={visibleStars[idx]} />} />
+				</>
 			) : (
 				<Loader />
 			)}
-		</Grid>
 	</Box>
 )
+}
 
 const StarCard = ({ star }: any) => (
 	<a href={`/star/${star.id}`}>

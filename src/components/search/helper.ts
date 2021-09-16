@@ -26,3 +26,5 @@ export const getCount = (obj: any) => {
 	})
 	return count
 }
+
+export const getVisible = (arr: any[]) => arr.filter((item: any) => (!isHidden(item) ? item : null))

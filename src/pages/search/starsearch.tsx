@@ -358,7 +358,7 @@ const FilterRadio = ({ data, label, obj, callback, globalCallback = null, nullCa
 						onChange={() => callback(item)}
 						label={
 							<>
-								{item} {count ? <LabelCount prop={label} label={item} obj={obj} isArr /> : null}
+								{item} {count ? <LabelCount prop={label} label={item} obj={obj} /> : null}
 							</>
 						}
 						control={<Radio />}

@@ -9,6 +9,7 @@ export default {
 		clock: 'far fa-clock',
 		'toggle-yes': 'far fa-check-circle',
 		'toggle-no': 'far fa-exclamation-circle',
-		add: 'far fa-plus'
+		add: 'far fa-plus',
+		brand: 'far fa-copyright'
 	}
 }

@@ -8,6 +8,7 @@ export interface IVideo {
 	id: number
 	name: string
 	franchise: string
+	brand: string
 	episode: number
 	duration: number
 	nextID: number

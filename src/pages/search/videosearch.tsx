@@ -9,8 +9,10 @@ import {
 	FormControl,
 	FormControlLabel,
 	Grid,
+	MenuItem,
 	Radio,
 	RadioGroup,
+	Select,
 	TextField,
 	Typography
 } from '@material-ui/core'
@@ -34,6 +36,7 @@ const VideoSearchPage = () => {
 	const [videos, setVideos] = useState([])
 	const [categories, setCategories] = useState([])
 	const [attributes, setAttributes] = useState([])
+	const [brand, setBrand] = useState([])
 
 	useEffect(() => {
 		Axios.get(`${serverConfig.api}/search/video`).then(({ data: videos }) => {
@@ -44,6 +47,7 @@ const VideoSearchPage = () => {
 						notCategory: [],
 						attribute: [],
 						notAttribute: [],
+						brand: false,
 						titleSearch: false,
 						noCategory: false,
 						notNoCategory: false
@@ -59,12 +63,13 @@ const VideoSearchPage = () => {
 
 		Axios.get(`${serverConfig.api}/category`).then(({ data: categories }) => setCategories(categories))
 		Axios.get(`${serverConfig.api}/attribute`).then(({ data: attributes }) => setAttributes(attributes))
+		Axios.get(`${serverConfig.api}/brand`).then(({ data: brand }) => setBrand(brand))
 	}, [])
 
 	return (
 		<Grid container id='search-page'>
 			<Grid item xs={2}>
-				<Sidebar videoData={{ categories, attributes }} videos={videos} update={setVideos} />
+				<Sidebar videoData={{ categories, attributes, brand }} videos={videos} update={setVideos} />
 			</Grid>
 
 			<Grid item xs={10}>
@@ -249,6 +254,24 @@ const Sort = ({ videos, update }: any) => {
 }
 
 const Filter = ({ videoData, videos, update }: any) => {
+	const brand = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const targetLower = e.target.value.toLowerCase()
+
+		update(
+			[...videos].map((video: any) => {
+				if (targetLower === 'all') {
+					video.hidden.brand = false
+				} else if (targetLower === 'null') {
+					video.hidden.brand = video.brand !== null
+				} else {
+					video.hidden.brand = !(video.brand?.toLowerCase() === targetLower)
+				}
+
+				return video
+			})
+		)
+	}
+
 	const category = (ref: any, target: any) => {
 		const targetLower = target.name.toLowerCase()
 
@@ -338,6 +361,8 @@ const Filter = ({ videoData, videos, update }: any) => {
 
 	return (
 		<>
+			<FilterDropdown data={videoData.brand} label='network' callback={brand} nullCallback={brand} />
+
 			<FilterCheckBox
 				data={videoData.categories}
 				obj={videos}
@@ -385,6 +410,30 @@ const FilterCheckBox = ({ data, label, labelPlural, obj, callback, nullCallback 
 					callback={(ref: any, item: any) => callback(ref, item)}
 				/>
 			))}
+		</FormControl>
+	</>
+)
+
+const FilterDropdown = ({ data, label, labelPlural, callback, nullCallback = null }: any) => (
+	<>
+		<h2>{capitalize(label, true)}</h2>
+
+		<FormControl>
+			<Select id={label} name={labelPlural} defaultValue='ALL' onChange={callback}>
+				<MenuItem value='ALL'>All</MenuItem>
+
+				{nullCallback !== null ? (
+					<MenuItem value='NULL' onChange={nullCallback}>
+						NULL
+					</MenuItem>
+				) : null}
+
+				{data.map((item: any) => (
+					<MenuItem key={item} value={item}>
+						{item}
+					</MenuItem>
+				))}
+			</Select>
 		</FormControl>
 	</>
 )

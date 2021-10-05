@@ -58,6 +58,7 @@ const VideoPage = (props: any) => {
 		nextID: 0,
 		episode: 0,
 		franchise: '',
+		brand: '',
 		name: '',
 		path: {
 			file: '',
@@ -1588,6 +1589,7 @@ const Header = ({ video }: { video: IVideo }) => {
 				<HeaderTitle video={video} />
 
 				<HeaderDate video={video} update={update} />
+				<HeaderNetwork video={video} update={update} />
 
 				<HeaderQuality video={video} />
 			</Grid>
@@ -1730,8 +1732,56 @@ const HeaderDate = ({ video, update }: IHeaderDate) => {
 						)
 					}}
 				>
-					<i className={themeConfig.icons.edit} />
-					Edit Date
+					<i className={themeConfig.icons.edit} /> Edit Date
+				</MenuItem>
+			</ContextMenu>
+		</>
+	)
+}
+
+interface IHeaderNetwork {
+	video: IVideo
+	update: (video: IVideo) => void
+}
+const HeaderNetwork = ({ video, update }: IHeaderNetwork) => {
+	const handleModal = useContext(ModalContext).method
+
+	const handleNetwork = (value: string) => {
+		Axios.put(`${serverConfig.api}/video/${video.id}`, { brand: value }).then(() => {
+			update({ ...video, brand: value })
+		})
+	}
+
+	return (
+		<>
+			<ContextMenuTrigger id='menu_network' renderTag='span' holdToDisplay={-1}>
+				<Button size='small' variant='outlined' id='header__network'>
+					<i className={themeConfig.icons.brand} />
+					<span className={video.brand ? '' : 'no-label'}>{video.brand}</span>
+				</Button>
+			</ContextMenuTrigger>
+
+			<ContextMenu id='menu_network'>
+				<MenuItem
+					onClick={() => {
+						handleModal(
+							'Change Network',
+							<TextField
+								autoFocus
+								defaultValue={video.brand}
+								onKeyDown={(e) => {
+									if (e.key === 'Enter') {
+										handleModal()
+
+										//@ts-ignore
+										handleNetwork(e.target.value)
+									}
+								}}
+							/>
+						)
+					}}
+				>
+					<i className={themeConfig.icons.edit} /> Edit Network
 				</MenuItem>
 			</ContextMenu>
 		</>

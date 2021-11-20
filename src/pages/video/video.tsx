@@ -813,7 +813,7 @@ const Timeline = ({
 	}
 
 	const addAttribute = (attribute: IAttribute, bookmark: IBookmark) => {
-		Axios.post(`${serverConfig.api}/bookmark/attribute/`, {
+		Axios.post(`${serverConfig.api}/bookmark/attribute`, {
 			bookmarkID: bookmark.id,
 			attributeID: attribute.id
 		}).then(() => {

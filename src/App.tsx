@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 
 import { Container, CssBaseline } from '@material-ui/core'
 
@@ -28,21 +28,25 @@ const App = () => (
 			<NavBar />
 
 			<Container component='main' maxWidth={false}>
-				<Switch>
-					<Route path='/video/search' component={VideoSearchPage} />
-					<Route path='/video/add' component={AddVideoPage} />
-					<Route path='/video/:id' component={VideoPage} />
-					<Route path='/video' component={VideosPage} />
+				<Routes>
+					<Route path='video'>
+						<Route path='search' element={<VideoSearchPage />} />
+						<Route path='add' element={<AddVideoPage />} />
+						<Route path=':id' element={<VideoPage />} />
+						<Route path='' element={<VideosPage />} />
+					</Route>
 
-					<Route path='/star/search' component={StarSearchPage} />
-					<Route path='/star/:id' component={StarPage} />
+					<Route path='star'>
+						<Route path='search' element={<StarSearchPage />} />
+						<Route path=':id' element={<StarPage />} />
+					</Route>
 
-					<Route path='/editor' component={EditorPage} />
-					<Route path='/test' component={TestPage} />
+					<Route path='editor' element={<EditorPage />} />
+					<Route path='test' element={<TestPage />} />
 
-					<Route path='/' exact component={HomePage} />
-					<Route path='*' component={ErrorPage} />
-				</Switch>
+					<Route path='/' element={<HomePage />} />
+					<Route path='*' element={<ErrorPage />} />
+				</Routes>
 			</Container>
 		</CssBaseline>
 	</Router>

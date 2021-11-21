@@ -106,7 +106,7 @@ const Videos = ({ videos }: any) => {
 }
 
 const VideoCard = ({ video }: any) => (
-	<a href={`/video/${video.id}`}>
+	<a href={`${video.id}`}>
 		<Card className='video ribbon-container'>
 			<CardActionArea>
 				<CardMedia component='img' src={`${serverConfig.source}/images/videos/${video.id}-290.jpg`} />

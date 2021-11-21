@@ -41,7 +41,7 @@ export const HomeColumn = ({ enabled = true, label, limit = 12 }: IHomeColumn) =
 				<Grid container spacing={2}>
 					{data.map((video) => (
 						<Grid item xs={1} key={video.id}>
-							<Link to={`/video/${video.id}`}>
+							<Link to={`video/${video.id}`}>
 								<Box className='video ribbon-container'>
 									<img
 										src={`${serverConfig.source}/images/videos/${video.id}.jpg`}

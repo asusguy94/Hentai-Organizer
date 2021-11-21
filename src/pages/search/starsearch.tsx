@@ -126,7 +126,7 @@ const Stars = ({ stars }: any) => {
 }
 
 const StarCard = ({ star }: any) => (
-	<a href={`/star/${star.id}`}>
+	<a href={`${star.id}`}>
 		<Card className='star ribbon-container'>
 			<CardActionArea>
 				<CardMedia component='img' src={`${serverConfig.source}/images/stars/${star.id}.jpg`} />

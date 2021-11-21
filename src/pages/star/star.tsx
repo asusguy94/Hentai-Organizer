@@ -1,5 +1,5 @@
 import React, { Fragment, useState, useRef, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 
 import {
 	Box,
@@ -32,7 +32,9 @@ interface IStarVideo {
 	name: string
 }
 
-const StarPage = (props: any) => {
+const StarPage = () => {
+	const { id } = useParams()
+
 	const [modal, setModal] = useState({
 		visible: false,
 		title: null,
@@ -68,8 +70,6 @@ const StarPage = (props: any) => {
 	}
 
 	useEffect(() => {
-		const { id } = props.match.params
-
 		Axios.get(`${serverConfig.api}/star/${id}`).then(({ data }) => setStar(data))
 		Axios.get(`${serverConfig.api}/star/${id}/video`).then(({ data }) => setVideos(data))
 		Axios.get(`${serverConfig.api}/star`).then(({ data }) => setStarData(data))

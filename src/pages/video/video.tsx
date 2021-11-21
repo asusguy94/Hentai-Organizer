@@ -1,5 +1,5 @@
 import React, { Fragment, useEffect, useState, useContext, createContext } from 'react'
-import { Link, useHistory } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 
 import {
 	Grid,
@@ -52,8 +52,8 @@ const starEventData = { id: 0, name: '', starID: 0, start: 0, active: false, att
 const SetStarEventContext = createContext((...args: any): void => {})
 const GetStarEventContext = createContext({ event: false, data: starEventData })
 
-const VideoPage = (props: any) => {
-	const { id } = props.match.params
+const VideoPage = () => {
+	const { id } = useParams()
 
 	const [video, setVideo] = useState({
 		id: 0,
@@ -96,7 +96,7 @@ const VideoPage = (props: any) => {
 		data: starEventData
 	})
 
-	const history = useHistory()
+	const history = useNavigate()
 	const handleKeyPress = (key: string, e: IKeyPress) => {
 		e.preventDefault()
 
@@ -105,7 +105,7 @@ const VideoPage = (props: any) => {
 				if (video.nextID) {
 					window.location.href = `${video.nextID}`
 				} else {
-					history.push('/video')
+					history('/video')
 				}
 				break
 			default:
@@ -1589,7 +1589,7 @@ const Franchise = ({ video }: { video: IVideo }) => {
 		<Box id='franchise'>
 			{video.related.length > 1
 				? video.related.map((item) => (
-						<a href={`/video/${item.id}`} key={item.id}>
+						<a href={`${item.id}`} key={item.id}>
 							<Grid container component={Card} className='episode'>
 								<Grid component={CardContent} className='episode__plays'>
 									<Typography>{item.plays} plays</Typography>
@@ -1862,7 +1862,7 @@ const HeaderNetwork = ({ video, update }: IHeaderNetwork) => {
 
 const HeaderNext = ({ video }: { video: IVideo }) => (
 	<Box id='header__next'>
-		<a id='next' href={`/video/${video.nextID}`}>
+		<a id='next' href={`${video.nextID}`}>
 			<Button size='small' variant='outlined'>
 				Next
 			</Button>

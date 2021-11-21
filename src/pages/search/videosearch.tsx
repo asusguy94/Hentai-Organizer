@@ -111,7 +111,7 @@ const VideoCard = ({ video }: any) => (
 			<CardActionArea>
 				<CardMedia component='img' src={`${serverConfig.source}/images/videos/${video.id}-290.jpg`} />
 
-				<Grid container justifyContent='center' className='card__title--fixed-height height-3'>
+				<Grid container justifyContent='center' className='card__title--fixed-height height-3 px-1'>
 				<Typography className='text-center'>{video.name}</Typography>
 				</Grid>
 

@@ -1,5 +1,5 @@
 export const isHidden = ({ hidden }: any) => {
-	for (let prop in hidden) {
+	for (const prop in hidden) {
 		if (Array.isArray(hidden[prop])) {
 			if (hidden[prop].length > 0) return true
 		} else if (hidden[prop]) {

@@ -131,7 +131,9 @@ const StarCard = ({ star }: any) => (
 			<CardActionArea>
 				<CardMedia component='img' src={`${serverConfig.source}/images/stars/${star.id}.jpg`} />
 
+				<Grid container justifyContent='center' className='card__title--fixed-height height-2'>
 				<Typography className='text-center'>{star.name}</Typography>
+				</Grid>
 			</CardActionArea>
 		</Card>
 	</a>

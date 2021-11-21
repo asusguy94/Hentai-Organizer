@@ -14,7 +14,7 @@ export interface IVideo {
 	nextID: number
 	noStar: number
 	censored: boolean
-	path: { file: string; stream: string }
+	path: { file: string; stream: string; dash: string }
 	date: { added: string; published: string }
 	quality: number
 	related: IRelated[]

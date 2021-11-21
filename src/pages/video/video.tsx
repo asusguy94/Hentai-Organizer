@@ -1,5 +1,5 @@
 import React, { Fragment, useEffect, useState, useContext, createContext } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useHistory } from 'react-router-dom'
 
 import {
 	Grid,
@@ -30,7 +30,7 @@ import KeyboardEventHandler from 'react-keyboard-event-handler'
 import Modal from '@components/modal/modal'
 import Ribbon from '@components/ribbon/ribbon'
 import { timeToSeconds } from '@/time'
-import { useRefWithEffect, useWindowSize } from '@/hooks'
+import { useRefWithEffect, useWindowSize, usePrevious } from '@/hooks'
 
 import './video.scss'
 
@@ -53,6 +53,8 @@ const SetStarEventContext = createContext((...args: any): void => {})
 const GetStarEventContext = createContext({ event: false, data: starEventData })
 
 const VideoPage = (props: any) => {
+	const { id } = props.match.params
+
 	const [video, setVideo] = useState({
 		id: 0,
 		nextID: 0,
@@ -62,7 +64,8 @@ const VideoPage = (props: any) => {
 		name: '',
 		path: {
 			file: '',
-			stream: ''
+			stream: '',
+			dash: ''
 		},
 		duration: 0,
 		date: {
@@ -93,14 +96,17 @@ const VideoPage = (props: any) => {
 		data: starEventData
 	})
 
+	const history = useHistory()
 	const handleKeyPress = (key: string, e: IKeyPress) => {
 		e.preventDefault()
 
 		switch (key) {
 			case 'tab':
-				window.location.href = video.nextID ? `${video.nextID}` : '/video'
-
-				//TODO use stateObj instead
+				if (video.nextID) {
+					window.location.href = `${video.nextID}`
+				} else {
+					history.push('/video')
+				}
 				break
 			default:
 				console.log(`${key} was pressed`)
@@ -116,8 +122,6 @@ const VideoPage = (props: any) => {
 	}
 
 	useEffect(() => {
-		const { id } = props.match.params
-
 		Axios.get(`${serverConfig.api}/video/${id}`).then(({ data: video }) => setVideo(video))
 
 		Axios.get(`${serverConfig.api}/video/${id}/star`)
@@ -133,7 +137,7 @@ const VideoPage = (props: any) => {
 
 		Axios.get(`${serverConfig.api}/category`).then(({ data: categories }) => setCategories(categories))
 		Axios.get(`${serverConfig.api}/attribute/video`).then(({ data: attributes }) => setAttributes(attributes))
-	}, [])
+	}, [id])
 
 	return (
 		<Grid container id='video-page'>
@@ -261,6 +265,8 @@ interface ISidebar {
 	updateBookmarks: (bookmarks: IBookmark[]) => void
 }
 const Sidebar = ({ video, stars, bookmarks, attributes, categories, updateBookmarks }: ISidebar) => {
+	// const update = useContext(UpdateContext).video
+
 	const clearActive = () => {
 		updateBookmarks(
 			bookmarks.map((bookmark) => {
@@ -286,6 +292,12 @@ const Sidebar = ({ video, stars, bookmarks, attributes, categories, updateBookma
 
 	return (
 		<Grid item xs={3} id='sidebar'>
+			<Grid container justifyContent='center' style={{ marginTop: 6, marginBottom: 18 }}>
+				{/* <HeaderNetwork video={video} update={update} /> */}
+
+				<div style={{ height: 30 }}></div>
+			</Grid>
+
 			<Franchise video={video} />
 
 			<Flipper flipKey={stars}>
@@ -343,12 +355,22 @@ const VideoPlayer = ({
 	const [newVideo, setNewVideo] = useState<boolean>()
 	const [events, setEvents] = useState(false)
 
+	const prevID = usePrevious(video.id)
+
 	let playAdded = false
 
 	const getPlayer = () => playerValue?.player
 
+	//FIXME the poster is not updated when on soft-link change
+
 	useEffect(() => {
-		if (playerValue !== undefined) {
+		if (prevID > 0) {
+			setEvents(false)
+		}
+	}, [video.id])
+
+	useEffect(() => {
+		if (playerValue !== undefined && !events) {
 			if (Number(localStorage.video) === video.id) {
 				setNewVideo(false)
 			} else {
@@ -356,7 +378,7 @@ const VideoPlayer = ({
 			}
 			setEvents(true)
 		}
-	}, [playerValue])
+	}, [playerValue, events])
 
 	useEffect(() => {
 		if (events) {
@@ -463,9 +485,9 @@ const VideoPlayer = ({
 
 					// MaxLevel
 					let desiredBitrate = -1
-					for (var i = 0, currentQuality = 0; i < qualityArr.length; i++) {
-						const obj = qualityArr[i]
 
+					let currentQuality = 0
+					for (let obj of qualityArr) {
 						if (obj.height <= settingsConfig.dash.maxLevel && obj.height > currentQuality) {
 							currentQuality = obj.height
 
@@ -492,7 +514,7 @@ const VideoPlayer = ({
 				// Required, otherwise crashes component
 				dash.initialize()
 				dash.setAutoPlay(false)
-				dash.attachSource(`${serverConfig.source}/videos/${video.path.stream.replace('.m3u8', '.mpd')}`)
+				dash.attachSource(`${serverConfig.source}/videos/${video.path.dash}`)
 				dash.attachView(player.media)
 
 				let triggered = false
@@ -1434,7 +1456,7 @@ const StarInput = ({ video, stars, bookmarks, getAttributes }: IStarInput) => {
 	const update = useContext(UpdateContext).stars
 
 	const [input, setInput] = useState('')
-	const [checked, setChecked] = useState(false)
+	const [noStarToggle, setNoStarToggle] = useState(false)
 
 	const handleNoStar = (checked: boolean) => {
 		Axios.put(`${serverConfig.api}/video/${video.id}`, { noStar: checked }).then(({ data }) => {
@@ -1452,7 +1474,7 @@ const StarInput = ({ video, stars, bookmarks, getAttributes }: IStarInput) => {
 
 	// if 'noStar' is updated outside this component
 	useEffect(() => {
-		if (video.noStar) setChecked(true)
+		if (video.noStar) setNoStarToggle(true)
 	}, [video.noStar])
 
 	return (
@@ -1487,10 +1509,10 @@ const StarInput = ({ video, stars, bookmarks, getAttributes }: IStarInput) => {
 						label='No Star'
 						control={
 							<Checkbox
-								checked={checked}
+								checked={noStarToggle}
 								onChange={(e, checked) => {
 									// Update checked status
-									setChecked(checked)
+									setNoStarToggle(checked)
 
 									handleNoStar(checked)
 								}}
@@ -1501,8 +1523,54 @@ const StarInput = ({ video, stars, bookmarks, getAttributes }: IStarInput) => {
 				</FormGroup>
 			</Box>
 
+			<AddRelatedStars
+				video={video}
+				stars={stars}
+				disabled={bookmarks.length > 0 || stars.length > 0 || noStarToggle}
+			/>
+
 			{getAttributes().length ? <Divider light /> : null}
 		</Grid>
+	)
+}
+
+const AddRelatedStars = ({ video, stars, disabled }: any) => {
+	const update = useContext(UpdateContext).stars
+
+	const [relatedStars, setRelatedStars] = useState<any>([])
+
+	useEffect(() => {
+		if (video.id !== 0) {
+			Axios.get(`${serverConfig.api}/video/${video.id}/related/star`).then(({ data }) => {
+				setRelatedStars(data)
+			})
+		}
+	}, [video])
+
+	if (disabled || relatedStars.length === 0) return null
+
+	const addStar = async (name: string) => {
+		return new Promise((resolve) => {
+			Axios.post(`${serverConfig.api}/video/${video.id}/star`, { name }).then(({ data }) => {
+				resolve({ id: data.id, name, attributes: data.attributes })
+			})
+		})
+	}
+
+	const handleClick = async () => {
+		for (let star of relatedStars) {
+			stars = [...stars, await addStar(star.name)]
+		}
+
+		update(stars)
+	}
+
+	return (
+		<div style={{ width: '100%' }} className='text-center'>
+			<Button size='small' variant='outlined' color='primary' onClick={handleClick}>
+				Add Related Stars ({relatedStars.length})
+			</Button>
+		</div>
 	)
 }
 
@@ -1610,12 +1678,16 @@ const HeaderTitle = ({ video }: { video: IVideo }) => {
 	const renameFranchise = (value: string) => {
 		Axios.put(`${serverConfig.api}/video/${video.id}`, { franchise: value }).then(() => {
 			window.location.reload()
+
+			//TODO use stateObj instead
 		})
 	}
 
 	const renameTitle = (value: string) => {
 		Axios.put(`${serverConfig.api}/video/${video.id}`, { title: value }).then(() => {
 			window.location.reload()
+
+			//TODO use stateObj instead
 		})
 	}
 

@@ -45,7 +45,8 @@
 		"dev:browser": "npx cross-env PORT=3002 react-app-rewired start",
 		"build": "react-scripts build",
 		"server": "serve -l 3002 -s build",
-		"build+server": "yarn build & yarn server"
+		"build+server": "yarn build & yarn server",
+		"test": "react-app-rewired test --maxWorkers=1"
 	},
 	"eslintConfig": {
 		"extends": [

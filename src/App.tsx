@@ -13,7 +13,9 @@ import AddVideoPage from '@pages/video/add'
 import StarPage from '@pages/star/star'
 import VideoSearchPage from '@pages/search/videosearch'
 import StarSearchPage from '@pages/search/starsearch'
+
 import EditorPage from '@pages/editor/editor'
+import TestPage from '@/pages/test/testpage'
 
 import ErrorPage from '@pages/404/404'
 
@@ -36,6 +38,7 @@ const App = () => (
 					<Route path='/star/:id' component={StarPage} />
 
 					<Route path='/editor' component={EditorPage} />
+					<Route path='/test' component={TestPage} />
 
 					<Route path='/' exact component={HomePage} />
 					<Route path='*' component={ErrorPage} />

@@ -61,6 +61,26 @@ a {
 
 .card {
 	padding: 0;
+
+	&__title {
+		&--fixed-height {
+			display: flex;
+			align-items: center;
+
+			&.height-1 {
+				height: 24px;
+			}
+			&.height-2 {
+				height: 24px * 2;
+			}
+			&.height-3 {
+				height: 24px * 3;
+			}
+			&.height-4 {
+				height: 24px * 3;
+			}
+		}
+	}
 }
 
 .form-control:focus,

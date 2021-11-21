@@ -14,7 +14,7 @@ import {
 	Divider,
 	FormGroup,
 	FormControlLabel
-} from '@material-ui/core'
+} from '@mui/material'
 
 import Axios from 'axios'
 //@ts-ignore
@@ -990,7 +990,7 @@ const Timeline = ({
 									<Button
 										size='small'
 										variant={isActive(bookmark) ? 'contained' : 'outlined'}
-										color={hasStar(bookmark) ? 'primary' : 'default'}
+										color={hasStar(bookmark) ? 'primary' : 'secondary'}
 										className='bookmark'
 										style={{
 											left: `${
@@ -1026,6 +1026,7 @@ const Timeline = ({
 													.map((attribute) => (
 														<Button
 															key={attribute.id}
+															color='info'
 															size='small'
 															variant='contained'
 															component='div'

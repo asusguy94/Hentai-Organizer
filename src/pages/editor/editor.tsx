@@ -12,7 +12,7 @@ import {
 	TextField,
 	Paper,
 	Checkbox
-} from '@material-ui/core'
+} from '@mui/material'
 
 import Axios from 'axios'
 import capitalize from 'capitalize'
@@ -61,6 +61,7 @@ const Wrapper: FC<any> = ({ label, name, children, obj = [] }) => {
 
 				<Grid item>
 					<TextField
+						variant='standard'
 						onChange={handleChange}
 						onKeyPress={handleKeyPress}
 						style={{ marginLeft: 5, marginRight: 5 }}

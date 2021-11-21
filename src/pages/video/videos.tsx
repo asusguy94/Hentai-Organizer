@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 
-import { Grid, List, ListItem, ListItemText } from '@material-ui/core'
+import { Grid, List, ListItem, ListItemText } from '@mui/material'
 
 import Axios from 'axios'
 

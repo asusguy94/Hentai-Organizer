@@ -15,7 +15,7 @@ import {
 	Select,
 	TextField,
 	Typography
-} from '@material-ui/core'
+} from '@mui/material'
 
 import Axios from 'axios'
 import ScrollToTop from 'react-scroll-to-top'
@@ -145,7 +145,7 @@ const TitleSearch = ({ update, videos }: any) => {
 		)
 	}
 
-	return <TextField autoFocus placeholder='Name' onChange={callback} />
+	return <TextField variant='standard' autoFocus placeholder='Name' onChange={callback} />
 }
 
 const Sort = ({ videos, update }: any) => {
@@ -421,7 +421,7 @@ const FilterDropdown = ({ data, label, labelPlural, callback, nullCallback = nul
 		<h2>{capitalize(label, true)}</h2>
 
 		<FormControl>
-			<Select id={label} name={labelPlural} defaultValue='ALL' onChange={callback}>
+			<Select variant='standard' id={label} name={labelPlural} defaultValue='ALL' onChange={callback}>
 				<MenuItem value='ALL'>All</MenuItem>
 
 				{nullCallback !== null ? (

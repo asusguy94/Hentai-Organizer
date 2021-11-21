@@ -13,7 +13,7 @@ import {
 	FormControlLabel,
 	Radio,
 	Checkbox
-} from '@material-ui/core'
+} from '@mui/material'
 
 import Axios from 'axios'
 import ScrollToTop from 'react-scroll-to-top'
@@ -325,7 +325,7 @@ const TitleSearch = ({ stars, update }: any) => {
 		)
 	}
 
-	return <TextField autoFocus placeholder='Name' onChange={callback} />
+	return <TextField variant='standard' autoFocus placeholder='Name' onChange={callback} />
 }
 
 // ContainerItem

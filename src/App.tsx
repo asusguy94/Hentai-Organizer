@@ -15,7 +15,7 @@ import VideoSearchPage from '@pages/search/videosearch'
 import StarSearchPage from '@pages/search/starsearch'
 
 import EditorPage from '@pages/editor/editor'
-import TestPage from '@/pages/test/testpage'
+import TestPage from '@pages/test/testpage'
 
 import ErrorPage from '@pages/404/404'
 

@@ -1,8 +1,18 @@
 import React, { Fragment, useState, useRef, useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom'
 
-import { Box, Grid, Card, CardActionArea, CardContent, CardMedia, Typography, Button, TextField } from '@mui/material'
-import { Autocomplete } from '@mui/lab'
+import {
+	Box,
+	Grid,
+	Card,
+	CardActionArea,
+	CardContent,
+	CardMedia,
+	Typography,
+	Button,
+	TextField,
+	Autocomplete
+} from '@mui/material'
 
 import Axios from 'axios'
 import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu'

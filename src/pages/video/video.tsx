@@ -420,7 +420,7 @@ const VideoPlayer = ({
 					autoStartLoad: false
 				})
 
-				hls.loadSource(`${serverConfig.source}/videos_hls/${video.path.stream}`)
+				hls.loadSource(`${serverConfig.source}/videos/${video.path.stream}`)
 				hls.attachMedia(player.media)
 
 				hls.on(HlsJS.Events.MANIFEST_PARSED, (e, data) => {
@@ -1468,7 +1468,7 @@ const StarInput = ({ video, stars, bookmarks, getAttributes }: IStarInput) => {
 	const addStar = (name: string) => {
 		if (input.length) {
 			Axios.post(`${serverConfig.api}/video/${video.id}/star`, { name }).then(({ data }) => {
-				update([...stars, { id: data.id, name, attributes: data.attributes }])
+				update([...stars, { ...data, name }])
 			})
 		}
 	}
@@ -1553,7 +1553,7 @@ const AddRelatedStars = ({ video, stars, disabled }: any) => {
 	const addStar = async (name: string) => {
 		return new Promise((resolve) => {
 			Axios.post(`${serverConfig.api}/video/${video.id}/star`, { name }).then(({ data }) => {
-				resolve({ id: data.id, name, attributes: data.attributes })
+				resolve({ ...data, name })
 			})
 		})
 	}

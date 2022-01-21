@@ -49,6 +49,7 @@ const StarPage = () => {
 			eyecolor: '',
 			haircolor: '',
 			hairstyle: '',
+			personality: '',
 			attribute: []
 		}
 	})
@@ -58,6 +59,7 @@ const StarPage = () => {
 		eyecolor: [],
 		haircolor: [],
 		hairstyle: [],
+		personality: [],
 		attribute: []
 	})
 
@@ -151,6 +153,12 @@ const StarForm = ({ star, starData, update }: IStarForm) => {
 			<StarInputForm update={updateInfo} name='EyeColor' value={star.info.eyecolor} list={starData.eyecolor} />
 			<StarInputForm update={updateInfo} name='HairColor' value={star.info.haircolor} list={starData.haircolor} />
 			<StarInputForm update={updateInfo} name='HairStyle' value={star.info.hairstyle} list={starData.hairstyle} />
+			<StarInputForm
+				update={updateInfo}
+				name='Personality'
+				value={star.info.personality}
+				list={starData.personality}
+			/>
 			<StarInputForm
 				update={addAttribute}
 				name='Attribute'

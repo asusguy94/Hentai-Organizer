@@ -37,6 +37,7 @@ const StarSearchPage = () => {
 	const [eyecolors, setEyecolors] = useState([])
 	const [haircolors, setHaircolors] = useState([])
 	const [hairstyles, setHairstyles] = useState([])
+	const [personalities, setPersonalities] = useState([])
 	const [attributes, setAttributes] = useState([])
 
 	useEffect(() => {
@@ -50,6 +51,7 @@ const StarSearchPage = () => {
 						eyecolor: false,
 						haircolor: false,
 						hairstyle: false,
+						personality: false,
 
 						attribute: [],
 						notAttribute: []
@@ -65,6 +67,7 @@ const StarSearchPage = () => {
 			setEyecolors(data.eyecolor)
 			setHaircolors(data.haircolor)
 			setHairstyles(data.hairstyle)
+			setPersonalities(data.personality)
 			setAttributes(data.attribute)
 		})
 	}, [])
@@ -78,6 +81,7 @@ const StarSearchPage = () => {
 						eyecolors,
 						haircolors,
 						hairstyles,
+						personalities,
 						attributes
 					}}
 					stars={stars}
@@ -212,6 +216,16 @@ const Filter = ({ stars, starData, update }: any) => {
 		update(stars)
 	}
 
+	const personality = (target: any) => {
+		stars = stars.map((star: any) => {
+			star.hidden.personality = star.personality.toLowerCase() !== target.toLowerCase()
+
+			return star
+		})
+
+		update(stars)
+	}
+
 	const attribute = (ref: any, target: any) => {
 		const targetLower = target.toLowerCase()
 
@@ -237,6 +251,16 @@ const Filter = ({ stars, starData, update }: any) => {
 
 				if (match) star.hidden.attribute.push(targetLower)
 			}
+
+			return star
+		})
+
+		update(stars)
+	}
+
+	const personality_ALL = () => {
+		stars = stars.map((star: any) => {
+			star.hidden.personality = false
 
 			return star
 		})
@@ -277,6 +301,14 @@ const Filter = ({ stars, starData, update }: any) => {
 
 	return (
 		<>
+			<FilterRadio
+				data={starData.personalities}
+				obj={stars}
+				label='personality'
+				callback={personality}
+				globalCallback={personality_ALL}
+			/>
+
 			<FilterRadio
 				data={starData.breasts}
 				obj={stars}

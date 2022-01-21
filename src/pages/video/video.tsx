@@ -1363,12 +1363,16 @@ const Star = ({
 			>
 				<ContextMenuTrigger id={`star-${star.id}`} holdToDisplay={-1}>
 					<Card className={`ribbon-container star ${border ? 'star--active' : ''}`}>
+						{star.image !== undefined && star.image !== null ? (
 						<CardMedia
 							component='img'
-							src={`${serverConfig.source}/images/stars/${star.id}.jpg`}
+								src={`${serverConfig.source}/star/${star.id}`}
 							alt='star'
 							className='star__image'
 						/>
+						) : (
+							<div className='star__image--empty' />
+						)}
 
 						<Link to={`/star/${star.id}`} className='star__name'>
 							<Typography>{star.name}</Typography>

@@ -667,7 +667,7 @@ const VideoPlayer = ({
 									type: 'video/mp4'
 								}
 							],
-							poster: `${serverConfig.source}/images/videos/${video.id}.jpg`
+							poster: `${serverConfig.source}/video/${video.id}`
 						}}
 					/>
 				)}
@@ -1012,7 +1012,7 @@ const Timeline = ({
 														alt='star'
 														className='star__image'
 														data-star-id={bookmark.starID}
-														src={`${serverConfig.source}/images/stars/${bookmark.starID}.jpg`}
+														src={`${serverConfig.source}/star/${bookmark.starID}`}
 													/>
 												) : null}
 
@@ -1599,7 +1599,7 @@ const Franchise = ({ video }: { video: IVideo }) => {
 								<Grid item xs={2} className='episode__thumbnail'>
 									<CardMedia
 										component='img'
-										src={`${serverConfig.source}/images/videos/${item.id}-290.jpg`}
+											src={`${serverConfig.source}/video/${item.id}/thumb`}
 									/>
 								</Grid>
 

@@ -387,7 +387,7 @@ const VideoPlayer = ({
 			if (Number(localStorage.video) !== video.id) localStorage.playing = 0
 
 			player.on('timeupdate', () => {
-				if (player.currentTime) localStorage.bookmark = Math.round(player.currentTime)
+				if (player.currentTime > 0.007) localStorage.bookmark = Math.round(player.currentTime)
 			})
 			player.on('play', () => {
 				localStorage.playing = 1

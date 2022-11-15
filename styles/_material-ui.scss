@@ -1,0 +1,25 @@
+// Card spacing
+.MuiCardContent-root {
+  // padding: 8px 12px !important;
+}
+
+// Sticky table-header
+.MuiTableContainer-root {
+  // overflow: visible !important;
+}
+
+// Cursor on button
+.MuiButton-root {
+  // cursor: default !important;
+}
+
+// Proper spacing of card-images
+.MuiCardMedia-img {
+  // object-fit: inherit;
+}
+
+.MuiGrid-item {
+  img {
+    // width: 100%;
+  }
+}

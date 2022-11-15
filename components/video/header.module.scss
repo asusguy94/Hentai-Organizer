@@ -1,0 +1,49 @@
+$spacing: 5px;
+
+#header {
+  margin-bottom: 15px;
+
+  #title {
+    vertical-align: middle;
+  }
+
+  #date,
+  #network {
+    min-width: 0;
+  }
+
+  #title,
+  #date,
+  #network,
+  #quality {
+    display: inline-block;
+  }
+
+  #censored {
+    #divider {
+      color: black;
+      margin-left: 0.2em;
+      margin-right: 0.3em;
+    }
+
+    #label {
+      font-size: 0.6em;
+      color: red;
+      vertical-align: middle;
+    }
+  }
+
+  button {
+    margin-left: 15px;
+    color: black;
+
+    i,
+    svg {
+      margin-right: $spacing;
+
+      & + .no-label {
+        margin-left: -$spacing;
+      }
+    }
+  }
+}

@@ -1,11 +1,18 @@
 {
-	"compilerOptions": {
-		"baseUrl": ".",
-		"paths": {
-			"@/*": ["src/*"],
-			"@components/*": ["src/components/*"],
-			"@styles/*": ["src/styles/*"],
-			"@pages/*": ["src/pages/*"]
-		}
-	}
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@api": ["api"], // only index-page
+      "@components/*": ["components/*"],
+      "@config": ["config"], // only index-page
+      "@pages/*": ["pages/*"],
+      "@styles/*": ["styles/*"],
+      "@utils/client": ["utils/client"],
+      "@utils/server": ["utils/server"],
+      "@utils/server/helper": ["utils/server/helper"],
+      "@utils/server/generate": ["utils/server/generate"],
+      "@hooks/*": ["hooks/*"],
+      "@interfaces": ["interfaces"] // only 1-file
+    }
+  }
 }

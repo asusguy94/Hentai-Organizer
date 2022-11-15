@@ -1,0 +1,47 @@
+@import '@styles/variables';
+
+#timeline {
+  position: relative;
+  left: 95px;
+  margin-top: 5px;
+
+  .bookmark {
+    position: absolute;
+    white-space: nowrap;
+    border-width: 1px;
+
+    $spacing: 1;
+
+    $levelSelector: 1;
+    $margin: 0;
+
+    @for $i from 1 through ($bookmarkRows * $bookmarkCols) {
+      $modLevelSelector: (($levelSelector - 1) % $bookmarkCols);
+      $margin: ($modLevelSelector) * $bookmarkSpacing;
+
+      &[data-level='#{$i}'] {
+        margin-top: $margin + px;
+      }
+
+      $levelSelector: $levelSelector + 1;
+    }
+
+    [id^='bookmark-info-'] {
+      opacity: 1;
+      padding-bottom: 10px;
+
+      .btn {
+        display: block;
+        margin-top: 3px;
+
+        &:first-of-type {
+          margin-top: 6px;
+        }
+      }
+
+      img {
+        width: $starWidth + px;
+      }
+    }
+  }
+}

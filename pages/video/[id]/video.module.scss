@@ -1,0 +1,60 @@
+#sidebar {
+  #stars {
+    margin-bottom: 3%;
+    text-align: center;
+
+    .star {
+      margin: 0.5em;
+
+      &.active {
+        border: 4px solid green;
+      }
+    }
+  }
+
+  #stars-input {
+    margin-top: 3%;
+    margin-bottom: 3%;
+
+    .form-group__item {
+      margin: 0;
+    }
+  }
+
+  #franchise {
+    margin-bottom: 3%;
+    margin-left: 3%;
+
+    .episode {
+      align-items: center;
+      margin-bottom: 6px;
+
+      &:hover {
+        background-color: lightgray;
+      }
+
+      .thumbnail {
+        padding: 3px 0;
+      }
+
+      .title {
+        padding: 12px;
+
+        // restrict with of title
+        width: 60%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+  }
+
+  #attributes .attribute,
+  #outfits .outfit {
+    margin: 1em 0.5em 0;
+  }
+
+  hr {
+    width: 60%;
+  }
+}

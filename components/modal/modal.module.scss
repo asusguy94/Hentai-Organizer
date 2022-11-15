@@ -1,0 +1,41 @@
+#modal {
+  position: absolute;
+  left: 50%;
+  translate: -50%;
+  outline: none; // prevent selection outline
+
+  #header {
+    padding: 6px 10px;
+    background-color: lightgrey;
+    text-align: center;
+
+    #label {
+      margin-bottom: 5px;
+    }
+
+    #query {
+      display: inline-block;
+      padding: 0 3px;
+      background-color: orange;
+    }
+  }
+
+  #body {
+    padding: 10px;
+
+    #content {
+      button {
+        margin-bottom: 4px;
+        padding: 3px 10px; // TODO smaller buttons
+
+        width: 100%;
+        display: block;
+      }
+    }
+
+    #actions {
+      margin-top: 15px; //TODO spacing above close button
+      text-align: center;
+    }
+  }
+}

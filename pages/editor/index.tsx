@@ -35,7 +35,7 @@ type IOnlyType = 'starOnly' | 'videoOnly'
 type IWithOnlyType = IGeneral & { videoOnly?: boolean; starOnly?: boolean }
 
 const EditorPage: NextPage = () => (
-  <Grid container justifyContent='center' id='editor-page'>
+  <Grid container justifyContent='center'>
     <Wrapper label='attributes' name='attribute' obj={['starOnly', 'videoOnly']} />
     <Wrapper label='categories' name='category' />
     <Wrapper label='outfits' name='outfit' />
@@ -114,8 +114,8 @@ const TableWrapper = ({ label, obj = [] }: TableWrapperProps) => {
   }
 
   return (
-    <TableContainer component={Paper}>
-      <Table size='small' stickyHeader className={styles['table-striped']}>
+    <TableContainer component={Paper} style={{ overflowX: 'visible' }}>
+      <Table size='small' className={styles['table-striped']} stickyHeader>
         <TableHead>
           <TableRow>
             <TableCell>ID</TableCell>

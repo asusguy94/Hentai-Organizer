@@ -1,5 +1,6 @@
-import { Button, Grid, TextField, Typography } from '@mui/material'
 import { useRouter } from 'next/router'
+
+import { Button, Grid, TextField, Typography } from '@mui/material'
 
 import axios from 'axios'
 import { ContextMenu, ContextMenuTrigger, MenuItem } from 'react-contextmenu'
@@ -25,8 +26,6 @@ const Header = ({ video, update, onModal }: HeaderProps) => {
 
         <HeaderDate video={video} update={update} onModal={onModal} />
         <HeaderNetwork video={video} update={update} onModal={onModal} />
-
-        <HeaderQuality video={video} />
       </Grid>
     </Grid>
   )
@@ -226,15 +225,5 @@ const HeaderNetwork = ({ video, update, onModal }: HeaderNetworkProps) => {
     </>
   )
 }
-
-interface HeaderQualityProps {
-  video: IVideo
-}
-const HeaderQuality = ({ video }: HeaderQualityProps) => (
-  <Button size='small' variant='outlined' id={styles.quality}>
-    <Icon code='film' />
-    {video.quality}
-  </Button>
-)
 
 export default Header

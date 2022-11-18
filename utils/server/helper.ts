@@ -85,8 +85,10 @@ export const removeCover = async (videoID: number) => {
 
 export const removePreviews = async (videoID: number) => {
   // Remove Previews
-  fs.promises.unlink(`./media/vtt/${videoID}.vtt`)
-  fs.promises.unlink(`./media/vtt/${videoID}.jpg`)
+  await Promise.allSettled([
+    fs.promises.unlink(`./media/vtt/${videoID}.vtt`),
+    fs.promises.unlink(`./media/vtt/${videoID}.jpg`)
+  ])
 }
 
 // This requires a specific pipeline, as such it is using callbacks

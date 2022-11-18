@@ -134,18 +134,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         await removeCover(parseInt(id))
         await removePreviews(parseInt(id))
 
-        // Remove video-file
-        fs.promises.unlink(`./media/videos/${video.path}`)
+        await Promise.allSettled([
+          // Remove video-file
+          fs.promises.unlink(`./media/videos/${video.path}`),
 
-        // Remove stream-files
-        fs.promises.rm(`./media/videos/${dirOnly(video.path)}`, {
-          recursive: true,
-          force: true,
-          maxRetries: 20,
-          retryDelay: 200
-        })
+          // Remove stream-files
+          fs.promises.rm(`./media/videos/${dirOnly(video.path)}`, { recursive: true, force: true })
+        ])
       })
-      const video = await prisma.video.findFirstOrThrow({ where: { id: parseInt(id) } })
 
       res.end()
     }

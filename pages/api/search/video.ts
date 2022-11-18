@@ -41,7 +41,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           ...video.bookmarks.flatMap(({ attributes }) => attributes).map(({ attribute }) => attribute.name)
         ]),
         categories: getUnique(video.bookmarks.map(({ category }) => category.name)),
-        outfits: getUnique(video.bookmarks.map(({ outfit }) => outfit?.name).filter(outfit => outfit !== undefined))
+        outfits: getUnique(video.bookmarks.filter(({ outfit }) => outfit !== null).map(({ outfit }) => outfit!.name))
       }))
     )
   }

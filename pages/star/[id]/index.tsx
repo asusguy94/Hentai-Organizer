@@ -432,9 +432,9 @@ interface StarAttributesProps {
   data: any
 }
 const StarAttributes = ({ remove, data }: StarAttributesProps) => {
-  return data.map((attribute: any, i: number) => (
+  return data.map((attribute: any, idx: number) => (
     <Fragment key={attribute}>
-      <ContextMenuTrigger id={`attribute-${i}`} renderTag='span'>
+      <ContextMenuTrigger id={`attribute-${idx}`} renderTag='span'>
         <span className={styles.attribute}>
           <Button size='small' variant='outlined' color='primary'>
             {attribute}
@@ -442,7 +442,7 @@ const StarAttributes = ({ remove, data }: StarAttributesProps) => {
         </span>
       </ContextMenuTrigger>
 
-      <ContextMenu id={`attribute-${i}`}>
+      <ContextMenu id={`attribute-${idx}`}>
         <MenuItem onClick={() => remove(attribute)}>
           <Icon code='trash' /> Remove
         </MenuItem>

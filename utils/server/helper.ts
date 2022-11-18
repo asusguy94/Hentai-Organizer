@@ -41,9 +41,7 @@ export const downloader = async (url: string, path: string) => {
   await fs.promises.writeFile(`./${path}`, buffer)
 }
 
-export function getUnique<T = number | string>(arr: T[]): T[]
-export function getUnique<T = { [key: string]: number }>(arr: T[], prop: keyof T): T[]
-export function getUnique<T = number | string | { [key: string]: number }>(arr: T[], prop?: keyof T): T[] {
+export const getUnique = <T>(arr: T[], prop?: keyof T): T[] => {
   if (prop !== undefined) {
     return arr.filter((obj, idx) => arr.findIndex(item => item[prop] === obj[prop]) === idx)
   }
@@ -82,7 +80,7 @@ export const noExt = (dir: string) => path.parse(dir).name
  */
 export const removeCover = async (videoID: number) => {
   // Remove Images
-  fs.promises.unlink(`./media/images/videos/${videoID}.png`)
+  await fs.promises.unlink(`./media/images/videos/${videoID}.png`)
 }
 
 export const removePreviews = async (videoID: number) => {
@@ -97,6 +95,7 @@ export const rebuildVideoFile = async (src: string) => {
   const newSrc = `${dir}/${name}_${ext}`
 
   return new Promise<boolean>((resolve, reject) => {
+    // eslint-disable-next-line @typescript-eslint/require-await
     fs.promises.rename(src, newSrc).then(async () => {
       ffmpeg(newSrc)
         .videoCodec('copy')

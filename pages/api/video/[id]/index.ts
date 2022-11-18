@@ -4,7 +4,7 @@ import fs from 'fs'
 import Joi from 'joi'
 
 import { prisma, validate } from '@utils/server'
-import { dirOnly, downloader, formatDate, noExt, removeCover, removePreviews, sendPartial } from '@utils/server/helper'
+import { dirOnly, downloader, formatDate, noExt, removeCover, removePreviews } from '@utils/server/helper'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'GET') {
@@ -147,7 +147,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       })
       const video = await prisma.video.findFirstOrThrow({ where: { id: parseInt(id) } })
 
-      await sendPartial(req, res, `./media/videos/${video.path}`)
+      res.end()
     }
   }
 

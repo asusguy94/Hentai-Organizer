@@ -258,7 +258,7 @@ const Timeline = ({
 
   return (
     <div className='col-12' id={styles.timeline}>
-      {bookmarks.map((bookmark, i) => {
+      {bookmarks.map((bookmark, idx) => {
         const tooltip = bookmark.starID > 0 || bookmark.attributes.length > 0 || bookmark.outfit !== null
 
         return (
@@ -273,7 +273,7 @@ const Timeline = ({
                   left: `${((bookmark.start * 100) / duration) * settingsConfig.timeline.offset}%`
                 }}
                 onClick={() => playVideo(bookmark.start)}
-                ref={(item: HTMLButtonElement) => (bookmarksArr[i] = item)}
+                ref={(item: HTMLButtonElement) => (bookmarksArr[idx] = item)}
                 data-level={1}
               >
                 <div data-tip={tooltip} data-for={`bookmark-info-${bookmark.id}`}>

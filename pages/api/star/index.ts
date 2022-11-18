@@ -8,17 +8,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     res.json({
       breast: getUnique(
         (await prisma.star.findMany({ where: { breast: { not: null } }, orderBy: { breast: 'asc' } })).map(
-          ({ breast }) => breast
+          ({ breast }) => breast!
         )
       ),
       haircolor: getUnique(
         (await prisma.star.findMany({ where: { haircolor: { not: null } }, orderBy: { haircolor: 'asc' } })).map(
-          ({ haircolor }) => haircolor
+          ({ haircolor }) => haircolor!
         )
       ),
       hairstyle: getUnique(
         (await prisma.star.findMany({ where: { hairstyle: { not: null } }, orderBy: { hairstyle: 'asc' } })).map(
-          ({ hairstyle }) => hairstyle
+          ({ hairstyle }) => hairstyle!
         )
       ),
       attribute: (await prisma.attribute.findMany({ where: { videoOnly: false }, orderBy: { name: 'asc' } })).map(

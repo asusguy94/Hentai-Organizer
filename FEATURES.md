@@ -23,7 +23,6 @@
 | Recent Videos  | :heavy_check_mark: |
 | Newest Videos  | :heavy_check_mark: |
 | Popular Videos | :heavy_check_mark: |
-| Random Videos  | :heavy_check_mark: |
 
 ## :heavy_check_mark: Add Videos
 
@@ -31,6 +30,7 @@
 | ------------------- | ------------------ |
 | Import Videos       | :heavy_check_mark: |
 | Generate Thumbnails | :heavy_check_mark: |
+| Generate VTT        | :heavy_check_mark: |
 
 ## :x: Video Search
 
@@ -46,13 +46,14 @@
 
 | Name                 | Status             | Priority |
 | -------------------- | ------------------ | :------: |
-| Censored _TOGGLE_    | :x:                |   HIGH   |
+| Censored _TOGGLE_    | :heavy_check_mark: |          |
 | noStar _TOGGLE_      | :x:                |   HIGH   |
 | Quality _TOGGLE_     | :x:                |   HIGH   |
 | Title Search _INPUT_ | :heavy_check_mark: |          |
 | Sort                 | :heavy_check_mark: |          |
 | Category _CHECKBOX_  | :heavy_check_mark: |          |
 | Attribute _CHECKBOX_ | :heavy_check_mark: |          |
+| Outfit _CHECKBOX_    | :heavy_check_mark: |          |
 
 ## :heavy_check_mark: Star Search
 
@@ -83,7 +84,6 @@
 | Rename Franchise | :heavy_check_mark: |
 | Copy Franchise   | :heavy_check_mark: |
 | Edit Date        | :heavy_check_mark: |
-| Next ID          | :heavy_check_mark: |
 
 ### :heavy_check_mark: Video
 
@@ -170,7 +170,6 @@
 | Name               | Status             |
 | ------------------ | ------------------ |
 | Breast _INPUT_     | :heavy_check_mark: |
-| Eye Color _INPUT_  | :heavy_check_mark: |
 | Hair Color _INPUT_ | :heavy_check_mark: |
 | Hair Style _INPUT_ | :heavy_check_mark: |
 

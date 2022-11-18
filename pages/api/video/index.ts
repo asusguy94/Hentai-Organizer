@@ -15,8 +15,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const maxFiles = 10
     const newFiles = []
-    for (let i = 0, fileCount = 0; fileCount < maxFiles && i < files.length; i++) {
-      const file = files[i]
+    for (let idx = 0, fileCount = 0; fileCount < maxFiles && idx < files.length; idx++) {
+      const file = files[idx]
 
       if (fileCount < maxFiles) {
         if (

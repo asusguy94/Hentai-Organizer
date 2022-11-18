@@ -60,7 +60,7 @@ export const Column = ({ enabled = true, label, rows = 1, colSize = 16 }: Column
       </h2>
 
       <Grid container spacing={2} columns={colSize}>
-        {data.map((video, i) => {
+        {data.map((video, idx) => {
           const isMissing = video.image === null
 
           return (
@@ -81,7 +81,7 @@ export const Column = ({ enabled = true, label, rows = 1, colSize = 16 }: Column
                     missing={isMissing}
                     className={classes.thumb}
                     alt='video'
-                    priority={i % colSize === 0}
+                    priority={idx % colSize === 0}
                   />
 
                   <div className={classes.title}>{video.name}</div>

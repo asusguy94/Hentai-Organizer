@@ -6,7 +6,7 @@
 $initialHeight: 91.2vh;
 
 .plyr {
-  max-height: calc(#{$initialHeight} - ($bookmarkSpacing *#{$bookmarkCols} + px));
+  max-height: calc(#{$initialHeight} - (#{$bookmarkSpacing}px * #{$bookmarkCols}));
 
   .plyr__progress {
     .plyr__progress__buffer {

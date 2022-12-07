@@ -6,8 +6,6 @@ import fetch from 'node-fetch'
 import path from 'path'
 
 import dayjs from 'dayjs'
-import utc from 'dayjs/plugin/utc'
-dayjs.extend(utc)
 
 import { settingsConfig } from '@config'
 
@@ -137,7 +135,7 @@ export const fileExists = async (path: string): Promise<boolean> => {
  * @param raw should the raw date be returned?
  */
 export const formatDate = (dateStr: string | Date, raw = false) => {
-  const date = dayjs.utc(dateStr)
+  const date = dayjs(dateStr)
 
   return raw ? date.format('YYYY-MM-DD') : date.format('D MMMM YYYY')
 }

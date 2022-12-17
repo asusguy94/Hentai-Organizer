@@ -1,4 +1,4 @@
-const ip = '192.168.1.100' // now only used for db-management
+const ip = '127.0.0.1'
 
 export default {
   api: '/api',

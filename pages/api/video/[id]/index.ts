@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next/types'
 
 import fs from 'fs'
-import Joi from 'joi'
+import { z } from 'zod'
 
 import { prisma, validate } from '@utils/server'
 import { dirOnly, downloader, formatDate, noExt, removeCover, removePreviews } from '@utils/server/helper'
@@ -45,24 +45,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     if (typeof id === 'string') {
       const { cen, noStar, plays, title, brand, franchise, date, path, cover } = validate(
-        Joi.object({
-          cen: Joi.boolean(),
-          noStar: Joi.boolean(),
-          plays: Joi.number().integer().min(0),
-          title: Joi.string(),
-          brand: Joi.string(),
-          franchise: Joi.string(),
-          date: Joi.string().allow(''),
-          path: Joi.string(),
-          cover: Joi.string()
-        }).max(1),
+        z.object({
+          cen: z.boolean().optional(),
+          noStar: z.boolean().optional(),
+          plays: z.number().int().nonnegative().optional(),
+          title: z.string().optional(),
+          brand: z.string().optional(),
+          franchise: z.string().optional(),
+          date: z.string().optional(),
+          path: z.string().optional(),
+          cover: z.string().optional()
+        }),
         req.body
       )
 
       if (cen !== undefined) {
-        res.json(await prisma.video.update({ where: { id: parseInt(id) }, data: { cen: !!parseInt(cen) } }))
+        res.json(await prisma.video.update({ where: { id: parseInt(id) }, data: { cen } }))
       } else if (noStar !== undefined) {
-        await prisma.video.update({ where: { id: parseInt(id) }, data: { noStar: !!parseInt(noStar) } })
+        await prisma.video.update({ where: { id: parseInt(id) }, data: { noStar } })
       } else if (plays !== undefined) {
         if (!plays) {
           await prisma.plays.deleteMany({ where: { id: parseInt(id) } })

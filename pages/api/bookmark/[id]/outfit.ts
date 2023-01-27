@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next/types'
 
-import Joi from 'joi'
+import { z } from 'zod'
 
 import { prisma, validate } from '@utils/server'
 
@@ -10,13 +10,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     if (typeof id === 'string') {
       const { outfitID } = validate(
-        Joi.object({
-          outfitID: Joi.number().integer().min(1)
+        z.object({
+          outfitID: z.number().int().min(1)
         }),
         req.body
       )
 
-      await prisma.bookmark.update({ where: { id: parseInt(id) }, data: { outfitID: parseInt(outfitID) } })
+      await prisma.bookmark.update({ where: { id: parseInt(id) }, data: { outfitID } })
 
       res.end()
     }

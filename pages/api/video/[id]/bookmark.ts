@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next/types'
 
-import Joi from 'joi'
+import { z } from 'zod'
 
 import { prisma, validate } from '@utils/server'
 import { getUnique } from '@utils/server/helper'
@@ -45,11 +45,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     if (typeof id === 'string') {
       const { categoryID, time, starID } = validate(
-        Joi.object({
-          categoryID: Joi.number().integer().min(1).required(),
-          time: Joi.number().integer().min(1).required(),
-          starID: Joi.number().integer().min(1)
-        }).with('starID', 'time'),
+        z.object({
+          categoryID: z.number().int().min(1),
+          time: z.number().int().min(1),
+          starID: z.number().int().min(1).optional()
+        }),
         req.body
       )
 
@@ -97,7 +97,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             'id'
           )
         })
-      } else if (starID === undefined) {
+      } else {
         // create bookmark without star
         const bookmark = await prisma.bookmark.create({
           data: {
@@ -122,21 +122,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           starID: 0,
           starImage: null,
           attributes: []
-        })
-      } else {
-        // update bookmark with categoryID
-        const bookmark = await prisma.bookmark.update({
-          where: { id: parseInt(id) },
-          data: { category: { connect: { id: categoryID } } },
-          select: { id: true, videoID: true, categoryID: true, start: true, starID: true }
-        })
-
-        res.json({
-          id: bookmark.id,
-          videoID: bookmark.videoID,
-          categoryID: bookmark.videoID,
-          time: bookmark.start,
-          starID: bookmark.starID
         })
       }
     }

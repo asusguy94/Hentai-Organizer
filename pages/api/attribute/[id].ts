@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next/types'
 
-import Joi from 'joi'
+import { z } from 'zod'
 
 import { prisma, validate } from '@utils/server'
 
@@ -10,9 +10,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     if (typeof id === 'string') {
       const { value, label } = validate(
-        Joi.object({
-          value: Joi.alternatives(Joi.string(), Joi.boolean()).required(),
-          label: Joi.string()
+        z.object({
+          value: z.string().or(z.boolean()),
+          label: z.string().optional()
         }),
         req.body
       )

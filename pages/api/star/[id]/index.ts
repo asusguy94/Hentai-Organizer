@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next/types'
 
-import Joi from 'joi'
+import { z } from 'zod'
 
 import { prisma, validate } from '@utils/server'
 
@@ -35,19 +35,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     if (typeof id === 'string') {
       const { name, label, value } = validate(
-        Joi.object({
-          name: Joi.string(),
-          label: Joi.string(),
-          value: Joi.string().allow('')
-        })
-          .with('label', 'value')
-          .xor('name', 'label'),
+        z.object({
+          name: z.string().optional(),
+          label: z.string().optional(),
+          value: z.string().optional()
+        }),
+
         req.body
       )
 
       if (name !== undefined) {
         res.json(await prisma.star.update({ where: { id: parseInt(id) }, data: { name } }))
-      } else if (label !== undefined) {
+      } else if (label !== undefined && value !== undefined) {
         if (value.length) {
           await prisma.star.update({ where: { id: parseInt(id) }, data: { [label]: value } })
         } else {

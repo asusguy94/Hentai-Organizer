@@ -82,8 +82,6 @@ const AddVideoPage: NextPage = () => {
                 callback={() =>
                   void axios.post(`${serverConfig.api}/video/add`, { videos }).then(() => {
                     router.reload()
-
-                    //TODO use stateObj instead
                   })
                 }
               />

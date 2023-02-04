@@ -17,7 +17,7 @@ import ScrollToTop from 'react-scroll-to-top'
 import capitalize from 'capitalize'
 
 import { ImageCard } from '@components/image'
-import IndeterminateItem, { HandlerProps as IIndeterminateHandler } from '@components/indeterminate'
+import { RegularHandlerProps, RegularItem } from '@components/indeterminate'
 import LabelCount from '@components/labelcount'
 import { getVisible } from '@components/search/helper'
 import { FilterButton } from '@components/search/sidebar'
@@ -27,7 +27,7 @@ import Link from '@components/link'
 import SortObj from '@components/search/sort'
 
 import { IStar, ISetState } from '@interfaces'
-import { searchApi, starApi } from '@api'
+import { searchService, starService } from '@service'
 import { serverConfig } from '@config'
 
 import styles from './search.module.scss'
@@ -40,30 +40,29 @@ interface IStarData {
 }
 
 const StarSearchPage: NextPage = () => {
+  const { data } = searchService.useStars()
   const [stars, setStars] = useState<IStar[]>([])
 
   useEffect(() => {
-    searchApi.getStars().then(({ data }) => {
-      setStars(
-        data.map(star => ({
-          ...star,
-          hidden: {
-            titleSearch: false,
+    setStars(
+      (data ?? []).map(star => ({
+        ...star,
+        hidden: {
+          titleSearch: false,
 
-            breast: false,
-            haircolor: false,
-            hairstyle: false,
+          breast: false,
+          haircolor: false,
+          hairstyle: false,
 
-            // Placeholder for temporary feature
-            other: false,
+          // Placeholder for temporary feature
+          other: false,
 
-            attribute: [],
-            notAttribute: []
-          }
-        }))
-      )
-    })
-  }, [])
+          attribute: [],
+          notAttribute: []
+        }
+      }))
+    )
+  }, [data])
 
   return (
     <Grid container>
@@ -85,19 +84,7 @@ interface SidebarProps {
   update: ISetState<IStar[]>
 }
 const Sidebar = ({ stars, update }: SidebarProps) => {
-  const [breasts, setBreasts] = useState<string[]>([])
-  const [haircolors, setHaircolors] = useState<string[]>([])
-  const [hairstyles, setHairstyles] = useState<string[]>([])
-  const [attributes, setAttributes] = useState<string[]>([])
-
-  useEffect(() => {
-    starApi.getInfo().then(({ data }) => {
-      setBreasts(data.breast)
-      setHaircolors(data.haircolor)
-      setHairstyles(data.hairstyle)
-      setAttributes(data.attribute)
-    })
-  }, [])
+  const { breast, haircolor, hairstyle, attribute } = starService.useInfo().data ?? {}
 
   return (
     <>
@@ -105,7 +92,16 @@ const Sidebar = ({ stars, update }: SidebarProps) => {
 
       <Sort stars={stars} update={update} />
 
-      <Filter stars={stars} update={update} starData={{ breasts, haircolors, hairstyles, attributes }} />
+      <Filter
+        stars={stars}
+        update={update}
+        starData={{
+          breasts: breast ?? [],
+          haircolors: haircolor ?? [],
+          hairstyles: hairstyle ?? [],
+          attributes: attribute ?? []
+        }}
+      />
     </>
   )
 }
@@ -263,38 +259,28 @@ const Filter = ({ stars, starData, update }: FilterProps) => {
     ])
   }
 
-  const attribute = (ref: IIndeterminateHandler, target: string | undefined) => {
+  const attribute = (ref: RegularHandlerProps, target: string | undefined) => {
     if (target === undefined) throw new Error('target is undefined')
 
     const targetLower = target.toLowerCase()
 
-    update([
-      ...stars.map(star => {
-        if (ref.indeterminate) {
-          const match = star.attributes.some(attribute => attribute.toLowerCase() === targetLower)
+    update(
+      stars.map(star => {
+        const lowerSearch = star.attributes.map(attribute => attribute.toLowerCase())
 
-          if (match) {
-            star.hidden.notAttribute.push(targetLower)
+        if (!lowerSearch.includes(targetLower)) {
+          if (!ref.checked) {
+            // unchecked >> checked
+            star.hidden.attribute.push(targetLower)
           } else {
-            // Remove checked-status from filtering
+            // checked >> unchecked
             star.hidden.attribute.splice(star.hidden.attribute.indexOf(targetLower), 1)
           }
-        } else if (!ref.checked) {
-          const match = star.attributes.map(attribute => attribute.toLowerCase()).includes(targetLower)
-
-          if (match) {
-            // Remove indeterminate-status from filtering
-            star.hidden.notAttribute.splice(star.hidden.notAttribute.indexOf(targetLower), 1)
-          }
-        } else {
-          const match = !star.attributes.map(attribute => attribute.toLowerCase()).includes(targetLower)
-
-          if (match) star.hidden.attribute.push(targetLower)
         }
 
         return star
       })
-    ])
+    )
   }
 
   const breast_ALL = () => {
@@ -442,7 +428,7 @@ interface FilterCheckBoxProps {
   label: string
   labelPlural: string
   obj: IStar[]
-  callback: (ref: IIndeterminateHandler, item: string | undefined) => void
+  callback: (ref: RegularHandlerProps, item: string | undefined) => void
 }
 const FilterCheckBox = ({ data, label, labelPlural, obj, callback }: FilterCheckBoxProps) => {
   return (
@@ -451,7 +437,7 @@ const FilterCheckBox = ({ data, label, labelPlural, obj, callback }: FilterCheck
 
       <FormControl>
         {data.map(item => (
-          <IndeterminateItem
+          <RegularItem
             key={item}
             label={
               <>

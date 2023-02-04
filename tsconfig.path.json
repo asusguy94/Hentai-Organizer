@@ -3,10 +3,12 @@
     "baseUrl": ".",
     "paths": {
       "@api": ["api"], // only index-page
+      "@service": ["api/service"], // only index-page
       "@components/*": ["components/*"],
       "@config": ["config"], // only index-page
       "@pages/*": ["pages/*"],
       "@styles/*": ["styles/*"],
+      "@utils/shared": ["utils/shared"],
       "@utils/client": ["utils/client"],
       "@utils/server": ["utils/server"],
       "@utils/server/helper": ["utils/server/helper"],

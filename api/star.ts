@@ -7,8 +7,8 @@ const api = axios.create({
 })
 
 export default {
-  getInfo: async () => {
-    return await api.get<{
+  getInfo: () => {
+    return api.get<{
       breast: string[]
       haircolor: string[]
       hairstyle: string[]

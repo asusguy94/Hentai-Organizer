@@ -2,14 +2,13 @@ import { useRouter } from 'next/router'
 
 import { Button, Grid, TextField, Typography } from '@mui/material'
 
-import axios from 'axios'
 import { ContextMenu, ContextMenuTrigger, MenuItem } from 'react-contextmenu'
 
 import { IModalHandler } from '../modal'
 import Icon from '../icon'
 
 import { IVideo, ISetState } from '@interfaces'
-import { serverConfig } from '@config'
+import { videoService } from '@service'
 
 import styles from './header.module.scss'
 
@@ -18,18 +17,16 @@ interface HeaderProps {
   onModal: IModalHandler
   update: ISetState<IVideo | undefined>
 }
-const Header = ({ video, update, onModal }: HeaderProps) => {
-  return (
-    <Grid container component='header' id={styles.header}>
-      <Grid item>
-        <HeaderTitle video={video} onModal={onModal} />
+const Header = ({ video, update, onModal }: HeaderProps) => (
+  <Grid container component='header' id={styles.header}>
+    <Grid item>
+      <HeaderTitle video={video} onModal={onModal} />
 
-        <HeaderDate video={video} update={update} onModal={onModal} />
-        <HeaderNetwork video={video} update={update} onModal={onModal} />
-      </Grid>
+      <HeaderDate video={video} update={update} onModal={onModal} />
+      <HeaderNetwork video={video} update={update} onModal={onModal} />
     </Grid>
-  )
-}
+  </Grid>
+)
 
 interface HeaderTitleProps {
   video: IVideo
@@ -41,18 +38,14 @@ const HeaderTitle = ({ video, onModal }: HeaderTitleProps) => {
   const copyFranchise = async () => await navigator.clipboard.writeText(video.franchise)
 
   const renameFranchise = (value: string) => {
-    axios.put(`${serverConfig.api}/video/${video.id}`, { franchise: value }).then(() => {
+    videoService.renameFranchise(video.id, value).then(() => {
       router.reload()
-
-      //TODO use stateObj instead
     })
   }
 
   const renameTitle = (value: string) => {
-    axios.put(`${serverConfig.api}/video/${video.id}`, { title: value }).then(() => {
+    videoService.renameTitle(video.id, value).then(() => {
       router.reload()
-
-      //TODO use stateObj instead
     })
   }
 
@@ -135,7 +128,7 @@ interface HeaderDateProps {
 }
 const HeaderDate = ({ video, update, onModal }: HeaderDateProps) => {
   const handleDate = (value: string) => {
-    axios.put(`${serverConfig.api}/video/${video.id}`, { date: value }).then(({ data }) => {
+    videoService.setDate(video.id, value).then(({ data }) => {
       update({
         ...video,
         date: { ...video.date, published: data.date_published }
@@ -185,7 +178,7 @@ interface HeaderNetworkProps {
 }
 const HeaderNetwork = ({ video, update, onModal }: HeaderNetworkProps) => {
   const handleNetwork = (value: string) => {
-    axios.put(`${serverConfig.api}/video/${video.id}`, { brand: value }).then(() => {
+    videoService.setBrand(video.id, value).then(() => {
       update({ ...video, brand: value })
     })
   }

@@ -7,6 +7,10 @@ export interface HandlerProps {
   indeterminate: boolean
 }
 
+export interface RegularHandlerProps {
+  checked: boolean
+}
+
 const Handler = ({ checked, indeterminate }: HandlerProps) => {
   if (checked) {
     return { indeterminate: true, checked: false }
@@ -17,13 +21,13 @@ const Handler = ({ checked, indeterminate }: HandlerProps) => {
   }
 }
 
-interface ItemProps {
+interface ItemProps<T> {
   label: FormControlLabelProps['label']
   value: string
-  item?: any
-  callback: (result: HandlerProps, item: string | undefined) => void
+  item?: T
+  callback: (result: HandlerProps, item?: T) => void
 }
-function Item({ label, value, item, callback }: ItemProps) {
+function Item<T>({ label, value, item, callback }: ItemProps<T>) {
   const [indeterminate, setIndeterminate] = useState(false)
   const [checked, setChecked] = useState(false)
 
@@ -42,6 +46,33 @@ function Item({ label, value, item, callback }: ItemProps) {
             setChecked(result.checked)
 
             callback(result, item)
+          }}
+        />
+      }
+    />
+  )
+}
+
+interface RegularItemProps<T> {
+  label: FormControlLabelProps['label']
+  value: string
+  item?: T
+  callback: (result: RegularHandlerProps, item: T) => void
+}
+export function RegularItem<T>({ label, value, item, callback }: RegularItemProps<T>) {
+  const [checked, setChecked] = useState(false)
+
+  return (
+    <FormControlLabel
+      label={label}
+      value={value}
+      control={
+        <Checkbox
+          checked={checked}
+          onChange={() => {
+            setChecked(checked => !checked)
+
+            callback({ checked }, item!)
           }}
         />
       }

@@ -11,6 +11,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { id } = req.query
 
     if (typeof id === 'string') {
+      if (id === '0') {
+        res.end()
+        return
+      }
+
       const video = await prisma.video.findFirstOrThrow({ where: { id: parseInt(id) } })
 
       res.json({

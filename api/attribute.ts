@@ -8,6 +8,6 @@ const api = axios.create({
 })
 
 export default {
-  getAll: async <T extends IAttribute>() => api.get<T[]>('/'),
-  getVideos: async () => api.get<IAttribute[]>('/video')
+  getAll: <T extends IAttribute>() => api.get<T[]>('/'),
+  getVideos: () => api.get<IAttribute[]>('/video')
 }

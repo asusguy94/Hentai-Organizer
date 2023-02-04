@@ -1,10 +1,9 @@
 import { NextPage } from 'next/types'
-import { useState, useEffect } from 'react'
 
 import { Grid } from '@mui/material'
 
-import axios from 'axios'
 import capitalize from 'capitalize'
+import { useFetch } from 'usehooks-ts'
 
 import { ResponsiveImage } from '@components/image'
 import Ribbon, { RibbonContainer } from '@components/ribbon'
@@ -21,7 +20,7 @@ interface ColumnProps {
   rows?: number
   colSize?: number
 }
-export const Column = ({ enabled = true, label, rows = 1, colSize = 16 }: ColumnProps) => {
+export const Column = ({ label, rows = 1, colSize = 16 }: ColumnProps) => {
   interface IVideo {
     id: number
     name: string
@@ -29,16 +28,10 @@ export const Column = ({ enabled = true, label, rows = 1, colSize = 16 }: Column
     total?: number
   }
 
-  const [data, setData] = useState<IVideo[]>([])
-
   const limit = rows * colSize
-  useEffect(() => {
-    if (enabled) {
-      axios.get(`${serverConfig.api}/home/${label}/${limit}`).then(({ data }) => setData(data))
-    }
-  }, [enabled, label, limit])
 
-  if (!data.length) return null
+  const { data } = useFetch<IVideo[]>(`${serverConfig.api}/home/${label}/${limit}`)
+  if (data === undefined) return null
 
   return (
     <Grid container component='section' style={{ marginBottom: '0.5em' }}>

@@ -8,7 +8,7 @@ export interface IGeneral {
   name: string
 }
 
-export type IndexType<V = any> = Record<string, V>
+export type IndexType<V> = Record<string, V>
 
 // Other Interfaces
 interface IRelated {

@@ -7,8 +7,7 @@ interface FilterButtonProps {
   data: string[]
   label: string
   labelPlural?: string
-  obj?: any
-  callback: any
+  callback: (data: any) => void
   disabled?: boolean
 }
 export const FilterButton = ({ defaultValue, data, label, callback, disabled = false }: FilterButtonProps) => {
@@ -30,7 +29,7 @@ export const FilterButton = ({ defaultValue, data, label, callback, disabled = f
       <h2>{capitalize(label, true)}</h2>
 
       <ToggleButtonGroup color='primary' size='small' exclusive value={selection} onChange={handleChange}>
-        {data.map((item) => (
+        {data.map(item => (
           <ToggleButton key={item} value={item}>
             {item}
           </ToggleButton>

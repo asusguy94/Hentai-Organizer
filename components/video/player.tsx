@@ -3,7 +3,6 @@ import { useRouter } from 'next/router'
 
 import { Button, TextField } from '@mui/material'
 
-import axios from 'axios'
 import { ContextMenu, ContextMenuTrigger, MenuItem } from 'react-contextmenu'
 import HlsJS, { ErrorDetails } from 'hls.js'
 import { useKey } from 'react-use'
@@ -14,7 +13,7 @@ import Icon from '../icon'
 import Plyr from '../plyr'
 
 import { IBookmark, ICategory, IVideo, IVideoStar, ISetState } from '@interfaces'
-
+import { videoService } from '@service'
 import { serverConfig } from '@config'
 
 interface VideoPlayerProps {
@@ -120,8 +119,8 @@ const VideoPlayer = ({
         if (newVideo && !playAddedRef.current) {
           playAddedRef.current = true
 
-          axios
-            .put(`${serverConfig.api}/video/${video.id}`, { plays: 1 })
+          videoService
+            .addPlays(video.id)
             .then(() => {
               console.log('Play Added')
               playAddedRef.current = true
@@ -188,45 +187,37 @@ const VideoPlayer = ({
   const copy = async () => await navigator.clipboard.writeText(video.path.file.slice(0, -4))
 
   const resetPlays = () => {
-    axios.put(`${serverConfig.api}/video/${video.id}`, { plays: 0 }).then(() => {
+    videoService.resetPlays(video.id).then(() => {
       router.reload()
-
-      //TODO use stateObj instead
     })
   }
 
   const deleteVideo = () => {
-    axios.delete(`${serverConfig.api}/video/${video.id}`).then(() => {
+    videoService.deleteVideo(video.id).then(() => {
       router.replace('/video')
-
-      //TODO use stateObj instead
     })
   }
 
   const renameVideo = (path: string) => {
-    axios.put(`${serverConfig.api}/video/${video.id}`, { path }).then(() => {
+    videoService.renameVideo(video.id, path).then(() => {
       router.reload()
-
-      //TODO use stateObj instead
     })
   }
 
   const censorToggle = () => {
-    axios.put(`${serverConfig.api}/video/${video.id}`, { cen: !video.censored }).then(() => {
+    videoService.toggleCensor(video.id, video.censored).then(() => {
       update.video({ ...video, censored: !video.censored })
     })
   }
 
   const updateVideo = () => {
-    axios.put(`${serverConfig.api}/video/${video.id}`).then(() => {
+    videoService.updateVideo(video.id).then(() => {
       router.reload()
-
-      //TODO use stateObj instead
     })
   }
 
   const setCover = (url: string) => {
-    axios.put(`${serverConfig.api}/video/${video.id}`, { cover: url }).then(() => {
+    videoService.setCover(video.id, url).then(() => {
       router.reload()
     })
   }
@@ -234,27 +225,22 @@ const VideoPlayer = ({
   const addBookmark = (category: ICategory) => {
     const time = Math.round(getPlayer().currentTime)
     if (time) {
-      axios
-        .post(`${serverConfig.api}/video/${video.id}/bookmark`, {
-          categoryID: category.id,
-          time
-        })
-        .then(({ data }) => {
-          update.bookmarks(
-            [
-              ...bookmarks,
-              {
-                id: data.id,
-                name: category.name,
-                start: time,
-                starID: 0,
-                attributes: typeof data.attributes !== 'undefined' ? data.attributes : [],
-                active: false,
-                outfit: null
-              }
-            ].sort((a, b) => a.start - b.start)
-          )
-        })
+      videoService.addBookmark(video.id, category.id, time).then(({ data }) => {
+        update.bookmarks(
+          [
+            ...bookmarks,
+            {
+              id: data.id,
+              name: category.name,
+              start: time,
+              starID: 0,
+              attributes: typeof data.attributes !== 'undefined' ? data.attributes : [],
+              active: false,
+              outfit: null
+            }
+          ].sort((a, b) => a.start - b.start)
+        )
+      })
     }
   }
 

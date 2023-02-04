@@ -1,5 +1,5 @@
 import { NextPage } from 'next/types'
-import React, { Fragment, useState, useRef, useEffect } from 'react'
+import { Fragment, useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/router'
 
 import {
@@ -14,7 +14,6 @@ import {
   Autocomplete
 } from '@mui/material'
 
-import axios from 'axios'
 import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu'
 
 import Image from '@components/image'
@@ -25,6 +24,7 @@ import Dropbox from '@components/dropbox'
 import Icon from '@components/icon'
 
 import { ISetState } from '@interfaces'
+import { starService } from '@service'
 import { serverConfig } from '@config'
 
 import styles from './star.module.scss'
@@ -49,26 +49,24 @@ interface IStar {
 }
 
 const StarPage: NextPage = () => {
-  const { query } = useRouter()
+  const { query, isReady } = useRouter()
 
-  const { modal, setModal } = useModal()
+  const starID = isReady && typeof query.id === 'string' ? parseInt(query.id) : undefined
+  const { data: starData } = starService.useStar<IStar>(starID)
+  const { data: videoData } = starService.useVideos<IStarVideo>(starID)
 
   const [star, setStar] = useState<IStar>()
   const [videos, setVideos] = useState<IStarVideo[]>([])
 
+  const { modal, setModal } = useModal()
+
   useEffect(() => {
-    if (typeof query.id === 'string') {
-      const id = parseInt(query.id)
+    setStar(starData)
+  }, [starData])
 
-      axios.get<IStar>(`${serverConfig.api}/star/${id}`).then(({ data }) => {
-        setStar(data)
-      })
-
-      axios.get<IStarVideo[]>(`${serverConfig.api}/star/${id}/video`).then(({ data }) => {
-        setVideos(data)
-      })
-    }
-  }, [query.id])
+  useEffect(() => {
+    setVideos(videoData ?? [])
+  }, [videoData])
 
   return (
     <Grid container>
@@ -103,7 +101,7 @@ const StarVideos = ({ videos }: StarVideosProps) => {
 
   return (
     <Grid container>
-      <h3>Videos</h3>
+      <Typography variant='h6'>Videos</Typography>
 
       <Grid container id={styles.videos}>
         {videos.map(video => (
@@ -119,23 +117,10 @@ interface StarFormProps {
   update: ISetState<IStar | undefined>
 }
 const StarForm = ({ star, update }: StarFormProps) => {
-  interface IStarData {
-    breast: string[]
-    haircolor: string[]
-    hairstyle: string[]
-    attribute: string[]
-  }
-
-  const [starData, setStarData] = useState<IStarData>()
-
-  useEffect(() => {
-    axios.get<IStarData>(`${serverConfig.api}/star`).then(({ data }) => {
-      setStarData(data)
-    })
-  }, [])
+  const { data: starData } = starService.useInfo()
 
   const addAttribute = (name: string) => {
-    axios.put(`${serverConfig.api}/star/${star.id}/attribute`, { name }).then(() => {
+    starService.addAttribute(star.id, name).then(() => {
       update({
         ...star,
         info: { ...star.info, attribute: [...star.info.attribute, name] }
@@ -144,28 +129,19 @@ const StarForm = ({ star, update }: StarFormProps) => {
   }
 
   const removeAttribute = (name: string) => {
-    axios
-      .put(`${serverConfig.api}/star/${star.id}/attribute`, {
-        name,
-        remove: true
+    starService.removeAttribute(star.id, name).then(() => {
+      update({
+        ...star,
+        info: {
+          ...star.info,
+          attribute: star.info.attribute.filter(attr => attr.toLowerCase() !== name.toLowerCase())
+        }
       })
-      .then(() => {
-        update({
-          ...star,
-          info: {
-            ...star.info,
-            attribute: star.info.attribute.filter((attribute: any) => {
-              if (attribute.toLowerCase() === name.toLowerCase()) return null
-
-              return attribute
-            })
-          }
-        })
-      })
+    })
   }
 
   const updateInfo = (value: string, label: string) => {
-    axios.put(`${serverConfig.api}/star/${star.id}`, { label, value }).then(() => {
+    starService.updateInfo(star.id, label, value).then(() => {
       update({ ...star, info: { ...star.info, [label]: value } })
     })
   }
@@ -199,22 +175,20 @@ const StarImageDropbox = ({ star, videos, update }: StarImageDropboxProps) => {
   const router = useRouter()
 
   const addImage = (image: string) => {
-    axios.post(`${serverConfig.api}/star/${star.id}/image`, { url: image }).then(() => {
+    starService.addImage(star.id, image).then(() => {
       update({ ...star, image: `${star.id}.jpg` })
     })
   }
 
   const removeImage = () => {
-    axios.delete(`${serverConfig.api}/star/${star.id}/image`).then(() => {
+    starService.removeImage(star.id).then(() => {
       update({ ...star, image: null })
     })
   }
 
   const removeStar = () => {
-    axios.delete(`${serverConfig.api}/star/${star.id}`).then(() => {
+    starService.removeStar(star.id).then(() => {
       router.replace('/star')
-
-      //TODO use stateObj instead
     })
   }
 
@@ -458,20 +432,15 @@ interface StarTitleProps {
 }
 const StarTitle = ({ star, onModal: handleModal, update }: StarTitleProps) => {
   const renameStar = (name: string) => {
-    axios.put(`${serverConfig.api}/star/${star.id}`, { name }).then(() => {
+    starService.renameStar(star.id, name).then(() => {
       update({ ...star, name })
     })
   }
 
   const setLink = (link: string) => {
-    axios
-      .put(`${serverConfig.api}/star/${star.id}`, {
-        label: 'starLink',
-        value: link
-      })
-      .then(() => {
-        update({ ...star, link })
-      })
+    starService.setLink(star.id, link).then(() => {
+      update({ ...star, link })
+    })
   }
 
   return (

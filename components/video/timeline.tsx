@@ -1,8 +1,7 @@
-import { Fragment, useEffect, useState } from 'react'
+import { Fragment, useEffect } from 'react'
 
 import { Button } from '@mui/material'
 
-import axios from 'axios'
 import ReactTooltip from 'react-tooltip'
 import { ContextMenu, ContextMenuTrigger, MenuItem } from 'react-contextmenu'
 import { useWindowSize } from 'react-use'
@@ -13,7 +12,7 @@ import Icon from '../icon'
 
 import type { IEventHandler } from '@hooks/star-event'
 import { IAttribute, IBookmark, ICategory, IVideoStar as IStar, IVideo, ISetState, IOutfit } from '@interfaces'
-import { outfitApi } from '@api'
+import { bookmarkService, outfitService } from '@service'
 import { serverConfig, settingsConfig } from '@config'
 
 import styles from './timeline.module.scss'
@@ -46,11 +45,7 @@ const Timeline = ({
 }: TimelineProps) => {
   const windowSize = useWindowSize()
 
-  const [outfits, setOutfits] = useState<IOutfit[]>([])
-
-  useEffect(() => {
-    outfitApi.getAll().then(({ data }) => setOutfits(data))
-  }, [])
+  const { data: outfits } = outfitService.useOutfits()
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const bookmarksArr: HTMLElement[] = []
@@ -76,49 +71,41 @@ const Timeline = ({
   }
 
   const removeBookmark = (id: number) => {
-    axios.delete(`${serverConfig.api}/bookmark/${id}`).then(() => {
+    bookmarkService.removeBookmark(id).then(() => {
       update(bookmarks.filter(bookmark => bookmark.id !== id))
     })
   }
 
   const setCategory = (category: ICategory, bookmark: IBookmark) => {
-    axios
-      .put(`${serverConfig.api}/bookmark/${bookmark.id}`, {
-        categoryID: category.id
-      })
-      .then(() => {
-        update(
-          bookmarks.map(bookmarkItem => {
-            if (bookmarkItem.id === bookmark.id) {
-              bookmarkItem.name = category.name
-            }
+    bookmarkService.setCategory(bookmark.id, category.id).then(() => {
+      update(
+        bookmarks.map(bookmarkItem => {
+          if (bookmarkItem.id === bookmark.id) {
+            bookmarkItem.name = category.name
+          }
 
-            return bookmarkItem
-          })
-        )
-      })
+          return bookmarkItem
+        })
+      )
+    })
   }
 
   const setOutfit = (outfit: IOutfit, bookmark: IBookmark) => {
-    axios
-      .put(`${serverConfig.api}/bookmark/${bookmark.id}/outfit`, {
-        outfitID: outfit.id
-      })
-      .then(() => {
-        update(
-          bookmarks.map(bookmarkItem => {
-            if (bookmarkItem.id === bookmark.id) {
-              bookmarkItem.outfit = outfit.name
-            }
+    bookmarkService.setOutfit(bookmark.id, outfit.id).then(() => {
+      update(
+        bookmarks.map(bookmarkItem => {
+          if (bookmarkItem.id === bookmark.id) {
+            bookmarkItem.outfit = outfit.name
+          }
 
-            return bookmarkItem
-          })
-        )
-      })
+          return bookmarkItem
+        })
+      )
+    })
   }
 
   const removeOutfit = (bookmark: IBookmark) => {
-    axios.delete(`${serverConfig.api}/bookmark/${bookmark.id}/outfit`).then(() => {
+    bookmarkService.removeOutfit(bookmark.id).then(() => {
       update(
         bookmarks.map(bookmarkItem => {
           if (bookmarkItem.id === bookmark.id) {
@@ -132,29 +119,24 @@ const Timeline = ({
   }
 
   const addAttribute = (attribute: IAttribute, bookmark: IBookmark) => {
-    axios
-      .post(`${serverConfig.api}/bookmark/attribute`, {
-        bookmarkID: bookmark.id,
-        attributeID: attribute.id
-      })
-      .then(() => {
-        update(
-          bookmarks.map(bookmarkItem => {
-            if (bookmarkItem.id === bookmark.id) {
-              bookmarkItem.attributes.push({
-                id: attribute.id,
-                name: attribute.name
-              })
-            }
+    bookmarkService.addAttribute(bookmark.id, attribute.id).then(() => {
+      update(
+        bookmarks.map(bookmarkItem => {
+          if (bookmarkItem.id === bookmark.id) {
+            bookmarkItem.attributes.push({
+              id: attribute.id,
+              name: attribute.name
+            })
+          }
 
-            return bookmarkItem
-          })
-        )
-      })
+          return bookmarkItem
+        })
+      )
+    })
   }
 
   const removeAttribute = (bookmark: IBookmark, attribute: IAttribute) => {
-    axios.delete(`${serverConfig.api}/bookmark/${bookmark.id}/attribute/${attribute.id}`).then(() => {
+    bookmarkService.removeAttribute(bookmark.id, attribute.id).then(() => {
       update(
         bookmarks.map(item => {
           if (item.id === bookmark.id) {
@@ -170,7 +152,7 @@ const Timeline = ({
   }
 
   const clearAttributes = (bookmark: IBookmark) => {
-    axios.delete(`${serverConfig.api}/bookmark/${bookmark.id}/attribute`).then(() => {
+    bookmarkService.clearAttributes(bookmark.id).then(() => {
       update(
         bookmarks.map(bookmarkItem => {
           if (bookmarkItem.id === bookmark.id) {
@@ -197,7 +179,7 @@ const Timeline = ({
   }
 
   const removeStar = (bookmark: IBookmark) => {
-    axios.delete(`${serverConfig.api}/bookmark/${bookmark.id}/star`).then(() => {
+    bookmarkService.removeStar(bookmark.id).then(() => {
       update(
         bookmarks.map(item => {
           if (item.id === bookmark.id) {
@@ -423,7 +405,7 @@ const Timeline = ({
                 onClick={() => {
                   onModal(
                     'Set Outfit',
-                    outfits
+                    (outfits ?? [])
                       .filter(outfit => outfit.name !== bookmark.outfit)
                       .map(outfit => (
                         <Button

@@ -1,34 +1,25 @@
 import { NextPage } from 'next/types'
-import { useState, useEffect } from 'react'
 
-import { Grid, List, ListItem, ListItemText, Typography } from '@mui/material'
-
-import axios from 'axios'
+import { Grid, List, ListItemButton, ListItemText, Typography } from '@mui/material'
 
 import Link from '@components/link'
 
-import { IGeneral } from '@interfaces'
-
-import { serverConfig } from '@config'
+import { videoService } from '@service'
 
 const VideosPage: NextPage = () => {
-  const [videos, setVideos] = useState<IGeneral[]>([])
-
-  useEffect(() => {
-    axios.get<IGeneral[]>(`${serverConfig.api}/video/missing-star`).then(({ data }) => setVideos(data))
-  }, [])
+  const { data: videos } = videoService.useMissingStar()
 
   return (
     <Grid container>
       <Grid item id='videos'>
-        <Typography variant='h4'>Without BookmarkStar ({videos.length})</Typography>
+        <Typography variant='h4'>Without BookmarkStar ({(videos ?? []).length})</Typography>
 
         <List>
-          {videos.map(video => (
+          {(videos ?? []).map(video => (
             <Link key={video.id} href={{ pathname: '/video/[id]', query: { id: video.id } }}>
-              <ListItem button divider>
+              <ListItemButton divider>
                 <ListItemText>{video.name}</ListItemText>
-              </ListItem>
+              </ListItemButton>
             </Link>
           ))}
         </List>

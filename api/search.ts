@@ -9,6 +9,6 @@ const api = axios.create({
 })
 
 export default {
-  getStars: async () => await api.get<MakeOptional<IStar, 'hidden'>[]>('/star'),
-  getVideos: async <T extends IndexType>() => await api.get<MakeOptional<T, 'hidden'>[]>('/video')
+  getStars: () => api.get<MakeOptional<IStar, 'hidden'>[]>('/star'),
+  getVideos: <T extends IndexType<any>>() => api.get<MakeOptional<T, 'hidden'>[]>('/video')
 }

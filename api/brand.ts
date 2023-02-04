@@ -7,5 +7,5 @@ const api = axios.create({
 })
 
 export default {
-  getAll: async () => api.get<string[]>('/')
+  getAll: () => api.get<string[]>('/')
 }

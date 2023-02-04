@@ -1,7 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next/types'
 
 import { prisma } from '@utils/server'
-import { formatDate, getUnique } from '@utils/server/helper'
+import { formatDate } from '@utils/server/helper'
+import { getUnique } from '@utils/shared'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'GET') {

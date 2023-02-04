@@ -1,7 +1,8 @@
 import { NextPage } from 'next/types'
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 
 import {
+  Button,
   Card,
   CardActionArea,
   FormControl,
@@ -9,6 +10,7 @@ import {
   MenuItem,
   RadioGroup,
   Select,
+  SelectChangeEvent,
   TextField,
   Typography
 } from '@mui/material'
@@ -19,7 +21,7 @@ import capitalize from 'capitalize'
 import { ImageCard } from '@components/image'
 import Ribbon, { RibbonContainer } from '@components/ribbon'
 import LabelCount from '@components/labelcount'
-import IndeterminateItem, { HandlerProps as IIndeterminateHandler } from '@components/indeterminate'
+import { RegularHandlerProps, RegularItem } from '@components/indeterminate'
 import { getVisible } from '@components/search/helper'
 import { FilterButton } from '@components/search/sidebar'
 import VGrid from '@components/virtualized/virtuoso'
@@ -28,7 +30,7 @@ import Link from '@components/link'
 import SortObj from '@components/search/sort'
 
 import { IAttribute as IAttributeRef, ICategory, IGeneral, IOutfit, ISetState } from '@interfaces'
-import { attributeApi, brandApi, categoryApi, outfitApi, searchApi } from '@api'
+import { attributeService, brandService, categoryService, outfitService, searchService } from '@service'
 
 import { serverConfig } from '@config'
 
@@ -50,16 +52,11 @@ interface IVideo {
   outfits: string[]
   hidden: {
     category: string[]
-    notCategory: string[]
     attribute: string[]
-    notAttribute: string[]
     outfit: string[]
-    notOutfit: string[]
     cen: boolean
     brand: boolean
     titleSearch: boolean
-    noCategory: boolean
-    notNoCategory: boolean
   }
 }
 
@@ -71,38 +68,31 @@ interface IAttribute extends IAttributeRef {
 interface IVideoData {
   categories: ICategory[]
   attributes: IAttribute[]
-  brand: string[]
+  brands: string[]
   outfits: IOutfit[]
 }
 
 const VideoSearchPage: NextPage = () => {
+  const { data } = searchService.useVideos<IVideo>()
   const [videos, setVideos] = useState<IVideo[]>([])
 
   useEffect(() => {
-    searchApi.getVideos<IVideo>().then(({ data: videos }) => {
       setVideos(
-        videos
+      (data ?? [])
           .filter(video => !video.noStar)
           .map(video => ({
             ...video,
             hidden: {
               category: [],
-              notCategory: [],
               attribute: [],
-              notAttribute: [],
               outfit: [],
-              notOutfit: [],
               cen: false,
               brand: false,
-              titleSearch: false,
-              noCategory: false,
-              notNoCategory: false
+            titleSearch: false
             }
           }))
-          .sort(() => Math.random() - 0.5)
       )
-    })
-  }, [])
+  }, [data])
 
   return (
     <Grid container>
@@ -181,17 +171,10 @@ interface SidebarProps {
   update: ISetState<IVideo[]>
 }
 const Sidebar = ({ videos, update }: SidebarProps) => {
-  const [categories, setCategories] = useState<ICategory[]>([])
-  const [attributes, setAttributes] = useState<IAttribute[]>([])
-  const [brand, setBrand] = useState<string[]>([])
-  const [outfits, setOutfits] = useState<IOutfit[]>([])
-
-  useEffect(() => {
-    categoryApi.getAll().then(({ data }) => setCategories(data))
-    attributeApi.getAll<IAttribute>().then(({ data }) => setAttributes(data))
-    brandApi.getAll().then(({ data }) => setBrand(data))
-    outfitApi.getAll().then(({ data }) => setOutfits(data))
-  }, [])
+  const { data: categories } = categoryService.useCategories()
+  const { data: attributes } = attributeService.useAttributes<IAttribute>()
+  const { data: brands } = brandService.useBrands()
+  const { data: outfits } = outfitService.useOutfits()
 
   return (
     <>
@@ -199,7 +182,16 @@ const Sidebar = ({ videos, update }: SidebarProps) => {
 
       <Sort videos={videos} update={update} />
 
-      <Filter videos={videos} update={update} videoData={{ categories, attributes, brand, outfits }} />
+      <Filter
+        videos={videos}
+        update={update}
+        videoData={{
+          categories: categories ?? [],
+          attributes: attributes ?? [],
+          brands: brands ?? [],
+          outfits: outfits ?? []
+        }}
+      />
     </>
   )
 }
@@ -312,7 +304,7 @@ interface FilterProps {
   update: ISetState<IVideo[]>
 }
 const Filter = ({ videoData, videos, update }: FilterProps) => {
-  const brand = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const brand = (e: SelectChangeEvent) => {
     const targetLower = e.target.value.toLowerCase()
 
     update(
@@ -346,33 +338,21 @@ const Filter = ({ videoData, videos, update }: FilterProps) => {
     )
   }
 
-  const category = (ref: IIndeterminateHandler, target: IAttribute) => {
+  const category = (ref: RegularHandlerProps, target: ICategory) => {
     const targetLower = target.name.toLowerCase()
 
     update(
       videos.map(video => {
-        if (ref.indeterminate) {
-          const match = video.categories.some(category => category.toLowerCase() === targetLower)
+        const lowerSearch = video.categories.map(category => category.toLowerCase())
 
-          if (match) {
-            video.hidden.notCategory.push(targetLower)
+        if (!lowerSearch.includes(targetLower)) {
+          if (!ref.checked) {
+            // unchecked >> checked
+            video.hidden.category.push(targetLower)
           } else {
-            // Remove checked-status from filtering
+            // checked >> unchecked
             video.hidden.category.splice(video.hidden.category.indexOf(targetLower), 1)
           }
-        } else if (!ref.checked) {
-          video.hidden.noCategory = false
-
-          const match = video.categories.map(category => category.toLowerCase()).includes(targetLower)
-
-          if (match) {
-            // Remove indeterminate-status from filtering
-            video.hidden.notCategory.splice(video.hidden.notCategory.indexOf(targetLower), 1)
-          }
-        } else {
-          const match = !video.categories.map(category => category.toLowerCase()).includes(targetLower)
-
-          if (match) video.hidden.category.push(targetLower)
         }
 
         return video
@@ -380,31 +360,21 @@ const Filter = ({ videoData, videos, update }: FilterProps) => {
     )
   }
 
-  const attribute = (ref: IIndeterminateHandler, target: IAttribute) => {
+  const attribute = (ref: RegularHandlerProps, target: IAttribute) => {
     const targetLower = target.name.toLowerCase()
 
     update(
       videos.map(video => {
-        if (ref.indeterminate) {
-          const match = video.attributes.some(attribute => attribute.toLowerCase() === targetLower)
+        const lowerSearch = video.attributes.map(attribute => attribute.toLowerCase())
 
-          if (match) {
-            video.hidden.notAttribute.push(targetLower)
+        if (!lowerSearch.includes(targetLower)) {
+          if (!ref.checked) {
+            // unchecked >> checked
+            video.hidden.attribute.push(targetLower)
           } else {
-            // Remove checked-status from filtering
+            // checked >> unchecked
             video.hidden.attribute.splice(video.hidden.attribute.indexOf(targetLower), 1)
           }
-        } else if (!ref.checked) {
-          const match = video.attributes.map(attribute => attribute.toLowerCase()).includes(targetLower)
-
-          if (match) {
-            // Remove indeterminate-status from filtering
-            video.hidden.notAttribute.splice(video.hidden.notAttribute.indexOf(targetLower), 1)
-          }
-        } else {
-          const match = !video.attributes.map(attribute => attribute.toLowerCase()).includes(targetLower)
-
-          if (match) video.hidden.attribute.push(targetLower)
         }
 
         return video
@@ -412,48 +382,21 @@ const Filter = ({ videoData, videos, update }: FilterProps) => {
     )
   }
 
-  const outfits = (ref: IIndeterminateHandler, target: IOutfit) => {
+  const outfits = (ref: RegularHandlerProps, target: IOutfit) => {
     const targetLower = target.name.toLowerCase()
 
     update(
       videos.map(video => {
-        if (ref.indeterminate) {
-          const match = video.outfits.some(outfit => outfit.toLowerCase() === targetLower)
+        const lowerSearch = video.outfits.map(outfit => outfit.toLowerCase())
 
-          if (match) {
-            video.hidden.notOutfit.push(targetLower)
+        if (!lowerSearch.includes(targetLower)) {
+          if (!ref.checked) {
+            // unchecked >> checked
+            video.hidden.outfit.push(targetLower)
           } else {
-            // Remove checked-status from filtering
+            // checked >> unchecked
             video.hidden.outfit.splice(video.hidden.outfit.indexOf(targetLower), 1)
           }
-        } else if (!ref.checked) {
-          const match = video.outfits.map(outfit => outfit.toLowerCase()).includes(targetLower)
-
-          if (match) {
-            // Remove indeterminate-status from filtering
-            video.hidden.notOutfit.splice(video.hidden.notOutfit.indexOf(targetLower), 1)
-          }
-        } else {
-          const match = !video.outfits.map(outfit => outfit.toLowerCase()).includes(targetLower)
-
-          if (match) video.hidden.outfit.push(targetLower)
-        }
-
-        return video
-      })
-    )
-  }
-
-  const category_NULL = (ref: IIndeterminateHandler) => {
-    update(
-      videos.map(video => {
-        if (ref.indeterminate) {
-          video.hidden.noCategory = false
-          video.hidden.notNoCategory = video.categories.length === 0
-        } else if (!ref.checked) {
-          video.hidden.notNoCategory = false
-        } else {
-          video.hidden.noCategory = video.categories.length !== 0
         }
 
         return video
@@ -470,7 +413,7 @@ const Filter = ({ videoData, videos, update }: FilterProps) => {
         callback={censorship}
       />
 
-      <FilterDropdown data={videoData.brand} label='network' callback={brand} nullCallback={brand} />
+      <FilterDropdown data={videoData.brands} label='network' callback={brand} nullCallback={brand} />
 
       <FilterCheckBox
         data={videoData.categories}
@@ -478,7 +421,6 @@ const Filter = ({ videoData, videos, update }: FilterProps) => {
         label='category'
         labelPlural='categories'
         callback={category}
-        nullCallback={category_NULL}
       />
       <FilterCheckBox data={videoData.outfits} obj={videos} label='outfit' callback={outfits} />
       <FilterCheckBox
@@ -492,29 +434,21 @@ const Filter = ({ videoData, videos, update }: FilterProps) => {
   )
 }
 
-interface FilterCheckboxProps {
-  data: IGeneral[]
+interface FilterCheckboxProps<T extends IGeneral> {
+  data: T[]
   label: string
   labelPlural?: string
   obj: IVideo[]
-  callback: (ref: IIndeterminateHandler, item: any) => void
-  nullCallback?: (ref: IIndeterminateHandler) => void
+  callback: (ref: RegularHandlerProps, item: T) => void
 }
-const FilterCheckBox = ({ data, label, labelPlural, obj, callback, nullCallback }: FilterCheckboxProps) => (
+function FilterCheckBox<T extends IGeneral>({ data, label, labelPlural, obj, callback }: FilterCheckboxProps<T>) {
+  return (
   <>
     <h2>{capitalize(label, true)}</h2>
 
     <FormControl>
-      {nullCallback !== undefined && (
-        <IndeterminateItem
-          label={<div className={styles.global}>NULL</div>}
-          value='NULL'
-          callback={ref => nullCallback(ref)}
-        />
-      )}
-
       {data.map(item => (
-        <IndeterminateItem
+          <RegularItem
           key={item.id}
           label={
             <>
@@ -529,13 +463,14 @@ const FilterCheckBox = ({ data, label, labelPlural, obj, callback, nullCallback 
     </FormControl>
   </>
 )
+}
 
 interface FilterDropdownProps {
-  data: any[]
+  data: string[]
   label: string
   labelPlural?: string
-  callback: any
-  nullCallback?: any
+  callback: (e: SelectChangeEvent) => void
+  nullCallback?: (e: any) => void
 }
 const FilterDropdown = ({ data, label, labelPlural, callback, nullCallback }: FilterDropdownProps) => (
   <>

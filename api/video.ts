@@ -8,7 +8,7 @@ const api = axios.create({
 })
 
 export default {
-  get: async (id: number) => await api.get<IVideo>(`/${id}`),
-  getStars: async (id: number) => await api.get<IVideoStar[]>(`/${id}/star`),
-  getBookmarks: async (id: number) => await api.get<IBookmark[]>(`/${id}/bookmark`)
+  get: (id: number) => api.get<IVideo>(`/${id}`),
+  getStars: (id: number) => api.get<IVideoStar[]>(`/${id}/star`),
+  getBookmarks: (id: number) => api.get<IBookmark[]>(`/${id}/bookmark`)
 }

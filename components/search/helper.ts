@@ -1,10 +1,10 @@
 import { IndexType } from '@interfaces'
 
-export interface HiddenProps {
-  hidden: IndexType
+export interface HiddenProps<T extends IndexType<any> = IndexType<any>> {
+  hidden: T
 }
 
-export const isHidden = ({ hidden }: HiddenProps) => {
+export function isHidden({ hidden }: HiddenProps) {
   for (const prop in hidden) {
     if (Array.isArray(hidden[prop])) {
       if (hidden[prop].length > 0) return true
@@ -16,4 +16,6 @@ export const isHidden = ({ hidden }: HiddenProps) => {
   return false
 }
 
-export const getVisible = (arr: any[]) => arr.filter((item: any) => !isHidden(item) && item)
+export function getVisible<T extends HiddenProps>(arr: T[]) {
+  return arr.filter(item => !isHidden(item))
+}

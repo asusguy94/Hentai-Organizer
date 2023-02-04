@@ -16,7 +16,6 @@ import {
 } from '@mui/material'
 
 import { ContextMenu, ContextMenuTrigger, MenuItem } from 'react-contextmenu'
-import axios from 'axios'
 import { Flipped, Flipper } from 'react-flip-toolkit'
 
 import { ImageCard, ResponsiveImage } from '@components/image'
@@ -27,41 +26,45 @@ import Ribbon, { RibbonContainer } from '@components/ribbon'
 import Link from '@components/link'
 
 import useStarEvent, { type IEvent, type IEventData, type IEventHandler } from '@hooks/star-event'
-import { attributeApi, categoryApi, videoApi } from '@api'
+import { attributeService, bookmarkService, categoryService, videoService } from '@service'
 import { serverConfig } from '@config'
-import { IAttribute, IBookmark, ICategory, ISetState, IVideoStar as IStar, IVideo, IGeneral } from '@interfaces'
+import { IAttribute, IBookmark, ICategory, ISetState, IVideoStar as IStar, IVideo } from '@interfaces'
 
 import styles from './video.module.scss'
 
 const VideoPage: NextPage = () => {
-  const { query } = useRouter()
+  const { query, isReady } = useRouter()
+
+  const videoID = isReady && typeof query.id === 'string' ? parseInt(query.id) : undefined
+  const { data: starData } = videoService.useStars(videoID)
+  const { data: videoData } = videoService.useVideo(videoID)
+  const { data: bookmarksData } = videoService.useBookmarks(videoID)
+
+  const { data: categories } = categoryService.useCategories()
+  const { data: attributes } = attributeService.useAttributes()
 
   const [video, setVideo] = useState<IVideo>()
   const [stars, setStars] = useState<IStar[]>([])
   const [bookmarks, setBookmarks] = useState<IBookmark[]>([])
-  const [categories, setCategories] = useState<ICategory[]>([])
-  const [attributes, setAttributes] = useState<IAttribute[]>([])
 
   const { modal, setModal } = useModal()
   const { setEvent, getEvent, getDefault } = useStarEvent()
 
   useEffect(() => {
-    if (typeof query.id === 'string') {
-      const videoID = parseInt(query.id)
+    setStars(starData ?? [])
+  }, [starData])
 
-      // TODO seems like these requests are too fast? grouping them togheter fixes the issue
-      // self-executing async does not solve the issue, becuse setState is not async
-      Promise.all([
-        categoryApi.getAll().then(({ data }) => setCategories(data)),
-        attributeApi.getVideos().then(({ data }) => setAttributes(data)),
-        videoApi.get(videoID).then(({ data }) => setVideo(data)),
-        videoApi.getStars(videoID).then(({ data }) => setStars(data)),
-        videoApi.getBookmarks(videoID).then(({ data }) => {
-          setBookmarks(data.map(bookmark => ({ ...bookmark, active: false })))
-        })
-      ])
-    }
-  }, [query.id])
+  useEffect(() => {
+    setBookmarks(
+      (bookmarksData ?? []).map(bookmark => {
+        return { ...bookmark, active: false }
+      })
+    )
+  }, [bookmarksData])
+
+  useEffect(() => {
+    setVideo(videoData)
+  }, [videoData])
 
   return (
     <Grid container>
@@ -70,8 +73,8 @@ const VideoPage: NextPage = () => {
           <Section
             video={video}
             bookmarks={bookmarks}
-            categories={categories}
-            attributes={attributes}
+            categories={categories ?? []}
+            attributes={attributes ?? []}
             stars={stars}
             update={{
               bookmarks: setBookmarks,
@@ -86,8 +89,8 @@ const VideoPage: NextPage = () => {
             video={video}
             stars={stars}
             bookmarks={bookmarks}
-            attributes={attributes}
-            categories={categories}
+            attributes={attributes ?? []}
+            categories={categories ?? []}
             update={{
               stars: setStars,
               bookmarks: setBookmarks,
@@ -145,7 +148,7 @@ const Section = ({ video, bookmarks, categories, attributes, stars, update, moda
     if (plyrRef.current !== undefined) {
       const time = Math.round(plyrRef.current.currentTime)
 
-      axios.put(`${serverConfig.api}/bookmark/${bookmarkID}`, { time }).then(() => {
+      bookmarkService.setTime(bookmarkID, time).then(() => {
         update.bookmarks(
           bookmarks
             .map(bookmark => {
@@ -302,8 +305,8 @@ const Stars = ({
   starEvent
 }: StarsProps) => {
   const removeStar = (id: number) => {
-    axios.delete(`${serverConfig.api}/video/${video.id}/star/${id}`).then(() => {
-      update.stars([...stars].filter(star => star.id !== id))
+    videoService.removeStar(video.id, id).then(() => {
+      update.stars(stars.filter(star => star.id !== id))
     })
   }
 
@@ -382,51 +385,39 @@ const Star = ({
 
     const time = Math.round(player.currentTime)
     if (time) {
-      axios
-        .post(`${serverConfig.api}/video/${video.id}/bookmark`, {
-          categoryID: category.id,
-          time,
-          starID: star.id
-        })
-        .then(({ data }) => {
-          update(
-            [
-              ...bookmarks,
-              {
-                id: data.id,
-                name: category.name,
-                start: time,
-                starID: star.id,
-                attributes: data.attributes,
-                active: false,
-                outfit: null
-              }
-            ].sort((a, b) => a.start - b.start)
-          )
-        })
+      videoService.addBookmark(video.id, category.id, time, star.id).then(({ data }) => {
+        update(
+          [
+            ...bookmarks,
+            {
+              id: data.id,
+              name: category.name,
+              start: time,
+              starID: star.id,
+              attributes: data.attributes,
+              active: false,
+              outfit: null
+            }
+          ].sort((a, b) => a.start - b.start)
+        )
+      })
     }
   }
 
   const addAttribute = (star: IStar, attribute: IAttribute) => {
-    axios
-      .post(`${serverConfig.api}/bookmark/attribute`, {
-        videoID: video.id,
-        starID: star.id,
-        attributeID: attribute.id
-      })
-      .then(() => {
-        update(
-          bookmarks.map(bookmark => {
-            if (bookmark.starID === star.id) {
-              if (!bookmark.attributes.some(attr => attr.id === attribute.id)) {
-                bookmark.attributes.push(attribute)
-              }
+    bookmarkService.addStarAttribute(video.id, star.id, attribute.id).then(() => {
+      update(
+        bookmarks.map(bookmark => {
+          if (bookmark.starID === star.id) {
+            if (!bookmark.attributes.some(attr => attr.id === attribute.id)) {
+              bookmark.attributes.push(attribute)
             }
+          }
 
-            return bookmark
-          })
-        )
-      })
+          return bookmark
+        })
+      )
+    })
   }
 
   const setActive = (star: IStar) => {
@@ -457,25 +448,21 @@ const Star = ({
         // Bookmark has ZERO Overlapping Attributes
         if (!overlappingAttributes) {
           // Request Bookmark Update
-          axios
-            .post(`${serverConfig.api}/bookmark/${bookmark.id}/star`, {
-              starID: star.id
-            })
-            .then(() => {
-              update(
-                bookmarks.map(item => {
-                  if (item.id === bookmark.id) {
-                    // MERGE bookmark-attributes with star-attributes
-                    item.attributes = item.attributes.concat(star.attributes)
+          bookmarkService.addStar(bookmark.id, star.id).then(() => {
+            update(
+              bookmarks.map(item => {
+                if (item.id === bookmark.id) {
+                  // MERGE bookmark-attributes with star-attributes
+                  item.attributes = item.attributes.concat(star.attributes)
 
-                    // SET starID
-                    item.starID = star.id
-                  }
+                  // SET starID
+                  item.starID = star.id
+                }
 
-                  return item
-                })
-              )
-            })
+                return item
+              })
+            )
+          })
         }
       }
     })
@@ -599,14 +586,14 @@ const StarInput = ({ video, stars, bookmarks, getAttributes, update }: StarInput
   const [noStarToggle, setNoStarToggle] = useState(false)
 
   const handleNoStar = (checked: boolean) => {
-    axios.put(`${serverConfig.api}/video/${video.id}`, { noStar: checked }).then(({ data }) => {
+    videoService.toggleNoStar(video.id, checked).then(({ data }) => {
       update.video({ ...video, noStar: data.noStar })
     })
   }
 
   const addStar = (name: string) => {
     if (input.length) {
-      axios.post(`${serverConfig.api}/video/${video.id}/star`, { name }).then(({ data }) => {
+      videoService.addStar(video.id, name).then(({ data }) => {
         update.stars([...stars, { ...data, name }])
       })
     }
@@ -693,19 +680,13 @@ interface AddRelatedStarsProps {
   update: ISetState<IStar[]>
 }
 const AddRelatedStars = ({ video, stars, disabled, update }: AddRelatedStarsProps) => {
-  const [relatedStars, setRelatedStars] = useState<IGeneral[]>([])
+  const { data: relatedStars } = videoService.useRelatedStars(video.id)
 
-  useEffect(() => {
-    axios.get(`${serverConfig.api}/video/${video.id}/related/star`).then(({ data }) => {
-      setRelatedStars(data)
-    })
-  }, [video])
-
-  if (disabled || relatedStars.length === 0) return null
+  if (disabled || relatedStars === undefined || relatedStars.length === 0) return null
 
   const addStar = async (name: string) => {
     return new Promise(resolve => {
-      axios.post(`${serverConfig.api}/video/${video.id}/star`, { name }).then(({ data }) => {
+      videoService.addStar(video.id, name).then(({ data }) => {
         resolve({ ...data, name })
       })
     })
@@ -744,13 +725,13 @@ const RemoveUnusedStars = ({ video, bookmarks, stars, disabled, update }: Remove
     update(
       stars.filter(star => {
         if (bookmarks.some(bookmark => bookmark.starID === star.id)) {
-          return star
+          return true
         } else {
-          axios.delete(`${serverConfig.api}/video/${video.id}/star/${star.id}`).catch(() => {
+          videoService.removeStar(video.id, star.id).catch(() => {
             throw new Error('Cannot remove star' + star.name)
           })
 
-          return null
+          return false
         }
       })
     )
@@ -817,7 +798,7 @@ const Attributes = ({ video, bookmarks, clearActive, update, getAttributes }: At
   }
 
   const removeAttribute = (attribute: IAttribute) => {
-    axios.delete(`${serverConfig.api}/video/${video.id}/attribute/${attribute.id}`).then(() => {
+    videoService.removeAttribute(video.id, attribute.id).then(() => {
       update(
         bookmarks.map(bookmark => ({
           ...bookmark,

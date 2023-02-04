@@ -6,7 +6,8 @@ interface LabelCountProps<T> {
   label: string
   prop: string
 }
-function LabelCount<T extends IndexType & HiddenProps>({ obj, label, prop }: LabelCountProps<T>) {
+
+function LabelCount<T extends IndexType<any> & HiddenProps>({ obj, label, prop }: LabelCountProps<T>) {
   const getPropCount = (visibleOnly = false) => {
     const filtered = obj.filter(item => item[prop]?.includes(label) && !(isHidden(item) && visibleOnly))
 

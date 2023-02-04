@@ -8,5 +8,5 @@ const api = axios.create({
 })
 
 export default {
-  getAll: async () => api.get<ICategory[]>('/')
+  getAll: () => api.get<ICategory[]>('/')
 }

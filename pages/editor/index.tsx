@@ -1,5 +1,5 @@
 import { NextPage } from 'next/types'
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 
 import {
@@ -55,8 +55,6 @@ const Wrapper = ({ label, name, obj = [] }: { label: string; name: string; obj?:
 
       axios.post(`${serverConfig.api}/${name}`, { name: input }).then(() => {
         router.reload()
-
-        //TODO use stateObj instead
       })
     }
   }

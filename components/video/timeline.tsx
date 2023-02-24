@@ -238,6 +238,8 @@ const Timeline = ({
     })
   }, [bookmarksArr, windowSize.width])
 
+  if (outfits === undefined) return null
+
   return (
     <div className='col-12' id={styles.timeline}>
       {bookmarks.map((bookmark, idx) => {
@@ -405,7 +407,7 @@ const Timeline = ({
                 onClick={() => {
                   onModal(
                     'Set Outfit',
-                    (outfits ?? [])
+                    outfits
                       .filter(outfit => outfit.name !== bookmark.outfit)
                       .map(outfit => (
                         <Button

@@ -52,15 +52,19 @@ const VideoPage: NextPage = () => {
   const { setEvent, getEvent, getDefault } = useStarEvent()
 
   useEffect(() => {
-    setStars(starData ?? [])
+    if (starData !== undefined) {
+      setStars(starData)
+    }
   }, [starData])
 
   useEffect(() => {
-    setBookmarks(
-      (bookmarksData ?? []).map(bookmark => {
-        return { ...bookmark, active: false }
-      })
-    )
+    if (bookmarksData !== undefined) {
+      setBookmarks(
+        bookmarksData.map(bookmark => {
+          return { ...bookmark, active: false }
+        })
+      )
+    }
   }, [bookmarksData])
 
   useEffect(() => {
@@ -69,39 +73,35 @@ const VideoPage: NextPage = () => {
 
   return (
     <Grid container>
-      {video !== undefined && (
-        <>
-          <Section
-            video={video}
-            bookmarks={bookmarks}
-            categories={categories ?? []}
-            attributes={attributes ?? []}
-            stars={stars}
-            update={{
-              bookmarks: setBookmarks,
-              stars: setStars,
-              video: setVideo
-            }}
-            modal={{ handler: setModal, data: modal }}
-            setStarEvent={setEvent}
-          />
+      <Section
+        video={video}
+        bookmarks={bookmarks}
+        categories={categories}
+        attributes={attributes}
+        stars={stars}
+        update={{
+          bookmarks: setBookmarks,
+          stars: setStars,
+          video: setVideo
+        }}
+        modal={{ handler: setModal, data: modal }}
+        setStarEvent={setEvent}
+      />
 
-          <Sidebar
-            video={video}
-            stars={stars}
-            bookmarks={bookmarks}
-            attributes={attributes ?? []}
-            categories={categories ?? []}
-            update={{
-              stars: setStars,
-              bookmarks: setBookmarks,
-              video: setVideo
-            }}
-            onModal={setModal}
-            starEvent={{ getEvent, setEvent, getDefault: getDefault }}
-          />
-        </>
-      )}
+      <Sidebar
+        video={video}
+        stars={stars}
+        bookmarks={bookmarks}
+        attributes={attributes}
+        categories={categories}
+        update={{
+          stars: setStars,
+          bookmarks: setBookmarks,
+          video: setVideo
+        }}
+        onModal={setModal}
+        starEvent={{ getEvent, setEvent, getDefault: getDefault }}
+      />
 
       <ModalComponent visible={modal.visible} title={modal.title} filter={modal.filter} onClose={setModal}>
         {modal.data}
@@ -110,22 +110,22 @@ const VideoPage: NextPage = () => {
   )
 }
 
-interface SectionProps {
-  video: IVideo
-  bookmarks: IBookmark[]
-  categories: ICategory[]
-  attributes: IAttribute[]
-  stars: IStar[]
+type SectionProps = {
+  video?: Video
+  bookmarks: Bookmark[]
+  categories?: Category[]
+  attributes?: Attribute[]
+  stars: Star[]
   update: {
-    stars: ISetState<IStar[]>
-    bookmarks: ISetState<IBookmark[]>
-    video: ISetState<IVideo | undefined>
+    stars: SetState<Star[]>
+    bookmarks: SetState<Bookmark[]>
+    video: SetState<Video | undefined>
   }
   modal: {
-    handler: IModalHandler
-    data: IModal
+    handler: ModalHandler
+    data: Modal
   }
-  setStarEvent: IEventHandler
+  setStarEvent: EventHandler
 }
 const Section = ({ video, bookmarks, categories, attributes, stars, update, modal, setStarEvent }: SectionProps) => {
   // const [playerRef, ref] = useRefWithEffect()
@@ -163,6 +163,8 @@ const Section = ({ video, bookmarks, categories, attributes, stars, update, moda
     }
   }
 
+  if (video === undefined || categories === undefined || attributes === undefined) return <Spinner />
+
   return (
     <Grid item xs={9}>
       <Header video={video} update={update.video} onModal={modal.handler} />
@@ -195,19 +197,19 @@ const Section = ({ video, bookmarks, categories, attributes, stars, update, moda
   )
 }
 
-interface SidebarProps {
-  video: IVideo
-  stars: IStar[]
-  bookmarks: IBookmark[]
-  attributes: IAttribute[]
-  categories: ICategory[]
+type SidebarProps = {
+  video?: Video
+  stars: Star[]
+  bookmarks: Bookmark[]
+  attributes?: Attribute[]
+  categories?: Category[]
   update: {
-    stars: ISetState<IStar[]>
-    bookmarks: ISetState<IBookmark[]>
-    video: ISetState<IVideo | undefined>
+    stars: SetState<Star[]>
+    bookmarks: SetState<Bookmark[]>
+    video: SetState<Video | undefined>
   }
-  onModal: IModalHandler
-  starEvent: { getEvent: IEvent; getDefault: IEventData; setEvent: IEventHandler }
+  onModal: ModalHandler
+  starEvent: { getEvent: Event; getDefault: EventData; setEvent: EventHandler }
 }
 const Sidebar = ({ video, stars, bookmarks, attributes, categories, update, onModal, starEvent }: SidebarProps) => {
   const clearActive = () => {
@@ -232,6 +234,8 @@ const Sidebar = ({ video, stars, bookmarks, attributes, categories, update, onMo
 
     return attributeArr
   }
+
+  if (video === undefined || categories === undefined || attributes === undefined) return <Spinner />
 
   return (
     <Grid item xs={3} id={styles.sidebar}>

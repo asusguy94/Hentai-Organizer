@@ -47,8 +47,7 @@ type VideoData = Partial<{
 }>
 
 const VideoSearchPage: NextPage = () => {
-  const { data } = searchService.useVideos<IVideo>()
-  const [videos, setVideos] = useState<IVideo[]>([])
+  const { data: videos } = searchService.useVideos()
 
   const [sort, setSort] = useState<VideoSort>({ type: 'alphabetically', reverse: false })
   const [hidden, setHidden] = useState<Hidden>({
@@ -80,17 +79,16 @@ type VideosProps = {
   hidden: Hidden
   sortMethod: SortMethodVideo
 }
-const Videos = ({ videos }: VideosProps) => {
+const Videos = ({ videos = [], hidden, sortMethod }: VideosProps) => {
   const visible = getVisible(videos.sort(sortMethod), hidden)
 
   return (
     <div id={styles.videos}>
-      {videos.length > 0 ? (
-        <>
           <Typography variant='h6' className='text-center'>
-            <span id={styles.count}>{visibleVideos.length}</span> Videos
+        <span id={styles.count}>{visible.length}</span> Videos
           </Typography>
 
+      {videos.length > 0 ? (
           <VGrid
             itemHeight={385.375}
           total={visible.length}
@@ -227,11 +225,6 @@ const Filter = ({ videoData, setHidden }: FilterProps) => {
   const attribute = (ref: RegularHandlerProps, target: Attribute) => {
     const targetLower = target.name.toLowerCase()
 
-    update(
-      videos.map(video => {
-        const lowerSearch = video.attributes.map(attribute => attribute.toLowerCase())
-
-        if (!lowerSearch.includes(targetLower)) {
           if (!ref.checked) {
             // unchecked >> checked
             video.hidden.attribute.push(targetLower)
@@ -244,11 +237,6 @@ const Filter = ({ videoData, setHidden }: FilterProps) => {
   const outfits = (ref: RegularHandlerProps, target: Outfit) => {
     const targetLower = target.name.toLowerCase()
 
-    update(
-      videos.map(video => {
-        const lowerSearch = video.outfits.map(outfit => outfit.toLowerCase())
-
-        if (!lowerSearch.includes(targetLower)) {
           if (!ref.checked) {
             // unchecked >> checked
             video.hidden.outfit.push(targetLower)
@@ -256,11 +244,6 @@ const Filter = ({ videoData, setHidden }: FilterProps) => {
             // checked >> unchecked
             video.hidden.outfit.splice(video.hidden.outfit.indexOf(targetLower), 1)
           }
-        }
-
-        return video
-      })
-    )
   }
 
   return (
@@ -280,6 +263,8 @@ type FilterCheckboxProps<T extends General> = {
   callback: (ref: RegularHandlerProps, item: T) => void
 }
 function FilterCheckBox<T extends General>({ data, label, callback }: FilterCheckboxProps<T>) {
+  if (data === undefined) return <Spinner />
+
   return (
   <>
     <h2>{capitalize(label, true)}</h2>
@@ -306,6 +291,8 @@ type FilterDropdownProps = {
   callback: (e: SelectChangeEvent) => void
 }
 const FilterDropdown = ({ data, label, labelPlural, callback }: FilterDropdownProps) => {
+  if (data === undefined) return <Spinner />
+
   return (
   <>
     <h2>{capitalize(label, true)}</h2>

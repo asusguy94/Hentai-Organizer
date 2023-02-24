@@ -39,8 +39,7 @@ type StarData = Partial<{
 }>
 
 const StarSearchPage: NextPage = () => {
-  const { data } = searchService.useStars()
-  const [stars, setStars] = useState<IStar[]>([])
+  const { data: stars } = searchService.useStars()
 
   const [sort, setSort] = useState<StarSort>({ type: 'alphabetically', reverse: false })
   const [hidden, setHidden] = useState<Hidden>({
@@ -195,11 +194,6 @@ const Filter = ({ starData, setHidden }: FilterProps) => {
 
     const targetLower = target.toLowerCase()
 
-    update(
-      stars.map(star => {
-        const lowerSearch = star.attributes.map(attribute => attribute.toLowerCase())
-
-        if (!lowerSearch.includes(targetLower)) {
           if (!ref.checked) {
             // unchecked >> checked
             star.hidden.attribute.push(targetLower)
@@ -207,11 +201,6 @@ const Filter = ({ starData, setHidden }: FilterProps) => {
             // checked >> unchecked
             star.hidden.attribute.splice(star.hidden.attribute.indexOf(targetLower), 1)
           }
-        }
-
-        return star
-      })
-    )
   }
 
   const breast_ALL = () => {
@@ -257,6 +246,8 @@ type FilterRadioProps = {
   globalCallback?: () => void
 }
 const FilterRadio = ({ data, label, callback, globalCallback }: FilterRadioProps) => {
+  if (data === undefined) return <Spinner />
+
   return (
   <>
     <h2>{capitalize(label, true)}</h2>
@@ -293,6 +284,8 @@ type FilterCheckBoxProps = {
   callback: (ref: RegularHandlerProps, item: string | undefined) => void
 }
 const FilterCheckBox = ({ data, label, callback }: FilterCheckBoxProps) => {
+  if (data === undefined) return <Spinner />
+
   return (
     <>
       <h2>{capitalize(label, true)}</h2>

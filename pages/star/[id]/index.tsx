@@ -61,29 +61,31 @@ const StarPage: NextPage = () => {
   const { modal, setModal } = useModal()
 
   useEffect(() => {
-    setStar(starData)
+    if (starData !== undefined) {
+      setStar(starData)
+    }
   }, [starData])
 
   useEffect(() => {
-    setVideos(videoData ?? [])
+    if (videoData !== undefined) {
+      setVideos(videoData)
+    }
   }, [videoData])
+
+  if (star === undefined) return <Spinner />
 
   return (
     <Grid container>
       <Grid item xs={6}>
-        {star !== undefined ? (
-          <div id={styles.star}>
-            <StarImageDropbox star={star} videos={videos} update={setStar} />
+        <div id={styles.star}>
+          <StarImageDropbox star={star} videos={videos} update={setStar} />
 
-            <StarTitle star={star} onModal={setModal} update={setStar} />
+          <StarTitle star={star} onModal={setModal} update={setStar} />
 
-            <StarForm star={star} update={setStar} />
+          <StarForm star={star} update={setStar} />
 
-            <StarVideos videos={videos} />
-          </div>
-        ) : (
-          <Loader />
-        )}
+          <StarVideos videos={videos} />
+        </div>
 
         <ModalComponent visible={modal.visible} title={modal.title} filter={modal.filter} onClose={setModal}>
           {modal.data}

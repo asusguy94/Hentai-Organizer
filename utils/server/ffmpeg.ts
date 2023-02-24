@@ -54,11 +54,12 @@ export const getDuration = async (file: string) => Math.round(await getRawDurati
 export const getHeight = async (file: string) => await getRawHeight(file)
 
 export const extractVtt = async (src: string, dest: string, videoID: number) => {
-  const duration = await getDuration(src) // in seconds
-  const delayBetweenFrames = calculateDelay(duration) // in seconds (new frame every THIS seconds)
+  const duration = await getRawDuration(src) // in seconds
 
   const cols = 8 // images per row
-  const rows = Math.floor(Math.floor(duration / delayBetweenFrames) / cols)
+  const rows = 40 // images per column
+
+  const delay = duration / (rows * cols)
 
   /* Generate Preview */
   const {
@@ -69,8 +70,8 @@ export const extractVtt = async (src: string, dest: string, videoID: number) => 
   } = await generatePreview({
     input: src,
     output: dest,
-    width: getDividableWidth({ min: 80, max: 160 }, await getWidth(src)),
-    quality: 6,
+    width: getDividableWidth(await getRawWidth(src)),
+    quality: 4,
     rows: rows,
     cols: cols
   })
@@ -78,7 +79,7 @@ export const extractVtt = async (src: string, dest: string, videoID: number) => 
   /* Generate VTT output */
   await generateVTTData(
     videoID,
-    delayBetweenFrames,
+    delay,
     { rows: numRows, cols: numCols },
     {
       width: calcWidth,

@@ -54,8 +54,8 @@ const VideoSearchPage: NextPage = () => {
     titleSearch: '',
     cen: null,
     brand: '',
-              category: [],
-              attribute: [],
+    category: [],
+    attribute: [],
     outfit: []
   })
 
@@ -84,16 +84,16 @@ const Videos = ({ videos = [], hidden, sortMethod }: VideosProps) => {
 
   return (
     <div id={styles.videos}>
-          <Typography variant='h6' className='text-center'>
+      <Typography variant='h6' className='text-center'>
         <span id={styles.count}>{visible.length}</span> Videos
-          </Typography>
+      </Typography>
 
       {videos.length > 0 ? (
-          <VGrid
-            itemHeight={385.375}
+        <VGrid
+          itemHeight={385.375}
           total={visible.length}
           renderData={(idx: number) => <VideoCard video={visible[idx]} />}
-          />
+        />
       ) : (
         <Spinner />
       )}
@@ -167,6 +167,7 @@ type SortProps = {
   setSort: SetState<VideoSort>
 }
 const Sort = ({ setSort }: SortProps) => {
+  const shuffle = () => setSort({ type: 'shuffle', reverse: false })
   const sortDefault = (reverse = false) => setSort({ type: 'alphabetically', reverse })
   const sortAdded = (reverse = false) => setSort({ type: 'added', reverse })
   const sortDate = (reverse = false) => setSort({ type: 'published', reverse })
@@ -176,6 +177,9 @@ const Sort = ({ setSort }: SortProps) => {
   return (
     <>
       <h2>Sort</h2>
+      <Button variant='contained' onClick={shuffle} style={{ display: 'block' }}>
+        Shuffle
+      </Button>
 
       <FormControl>
         <RadioGroup name='sort' defaultValue='alphabetically'>
@@ -203,41 +207,41 @@ const Filter = ({ videoData, setHidden }: FilterProps) => {
   const brand = (e: SelectChangeEvent) => {
     const targetLower = e.target.value.toLowerCase()
 
-        if (targetLower === 'all') {
+    if (targetLower === 'all') {
       setHidden(hidden => ({ ...hidden, brand: '' }))
-        } else {
+    } else {
       setHidden(hidden => ({ ...hidden, brand: targetLower }))
-        }
+    }
   }
 
   const category = (ref: RegularHandlerProps, target: Category) => {
     const targetLower = target.name.toLowerCase()
 
-          if (!ref.checked) {
+    if (!ref.checked) {
       setHidden(hidden => ({ ...hidden, category: hidden.category.filter(category => category !== targetLower) }))
-          } else {
+    } else {
       setHidden(hidden => ({ ...hidden, category: [...hidden.category, targetLower] }))
-          }
-        }
+    }
+  }
 
   const attribute = (ref: RegularHandlerProps, target: Attribute) => {
     const targetLower = target.name.toLowerCase()
 
-          if (!ref.checked) {
+    if (!ref.checked) {
       setHidden(hidden => ({ ...hidden, attribute: hidden.attribute.filter(attribute => attribute !== targetLower) }))
-          } else {
+    } else {
       setHidden(hidden => ({ ...hidden, attribute: [...hidden.attribute, targetLower] }))
-          }
-        }
+    }
+  }
 
   const outfits = (ref: RegularHandlerProps, target: Outfit) => {
     const targetLower = target.name.toLowerCase()
 
-          if (!ref.checked) {
+    if (!ref.checked) {
       setHidden(hidden => ({ ...hidden, outfit: hidden.outfit.filter(outfit => outfit !== targetLower) }))
-          } else {
+    } else {
       setHidden(hidden => ({ ...hidden, outfit: [...hidden.outfit, targetLower] }))
-          }
+    }
   }
 
   return (
@@ -260,22 +264,22 @@ function FilterCheckBox<T extends General>({ data, label, callback }: FilterChec
   if (data === undefined) return <Spinner />
 
   return (
-  <>
-    <h2>{capitalize(label, true)}</h2>
+    <>
+      <h2>{capitalize(label, true)}</h2>
 
-    <FormControl>
-      {data.map(item => (
+      <FormControl>
+        {data.map(item => (
           <RegularItem
-          key={item.id}
+            key={item.id}
             label={item.name}
-          value={item.name}
-          item={item}
-          callback={(ref, item) => callback(ref, item)}
-        />
-      ))}
-    </FormControl>
-  </>
-)
+            value={item.name}
+            item={item}
+            callback={(ref, item) => callback(ref, item)}
+          />
+        ))}
+      </FormControl>
+    </>
+  )
 }
 
 type FilterDropdownProps = {
@@ -288,21 +292,21 @@ const FilterDropdown = ({ data, label, labelPlural, callback }: FilterDropdownPr
   if (data === undefined) return <Spinner />
 
   return (
-  <>
-    <h2>{capitalize(label, true)}</h2>
+    <>
+      <h2>{capitalize(label, true)}</h2>
 
-    <FormControl>
-      <Select variant='standard' id={label} name={labelPlural ?? `${label}s`} defaultValue='ALL' onChange={callback}>
-        <MenuItem value='ALL'>All</MenuItem>
+      <FormControl>
+        <Select variant='standard' id={label} name={labelPlural ?? `${label}s`} defaultValue='ALL' onChange={callback}>
+          <MenuItem value='ALL'>All</MenuItem>
 
-        {data.map(item => (
-          <MenuItem key={item} value={item}>
-            {item}
-          </MenuItem>
-        ))}
-      </Select>
-    </FormControl>
-  </>
-)
+          {data.map(item => (
+            <MenuItem key={item} value={item}>
+              {item}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+    </>
+  )
 }
 export default VideoSearchPage

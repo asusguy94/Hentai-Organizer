@@ -3,7 +3,7 @@
 @import 'util';
 @import 'variables';
 
-$initialHeight: 91.2vh;
+$initialHeight: 86vh;
 
 .plyr {
   max-height: calc(#{$initialHeight} - (#{$bookmarkSpacing}px * #{$bookmarkCols}));

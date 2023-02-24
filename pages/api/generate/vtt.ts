@@ -18,7 +18,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const absoluteImagePath = `./media/${imagePath}`
       const absoluteVttPath = `./media/${vttPath}`
 
-      if ((await fileExists(absoluteVideoPath)) && !(await fileExists(absoluteVttPath))) {
+      if (
+        (await fileExists(absoluteVideoPath)) &&
+        (!(await fileExists(absoluteVttPath)) || !(await fileExists(absoluteImagePath)))
+      ) {
         console.log(`Generating VTT: ${video.id}`)
         await extractVtt(absoluteVideoPath, absoluteImagePath, video.id)
       }

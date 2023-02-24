@@ -214,11 +214,9 @@ const Filter = ({ videoData, setHidden }: FilterProps) => {
     const targetLower = target.name.toLowerCase()
 
           if (!ref.checked) {
-            // unchecked >> checked
-            video.hidden.category.push(targetLower)
+      setHidden(hidden => ({ ...hidden, category: hidden.category.filter(category => category !== targetLower) }))
           } else {
-            // checked >> unchecked
-            video.hidden.category.splice(video.hidden.category.indexOf(targetLower), 1)
+      setHidden(hidden => ({ ...hidden, category: [...hidden.category, targetLower] }))
           }
         }
 
@@ -226,11 +224,9 @@ const Filter = ({ videoData, setHidden }: FilterProps) => {
     const targetLower = target.name.toLowerCase()
 
           if (!ref.checked) {
-            // unchecked >> checked
-            video.hidden.attribute.push(targetLower)
+      setHidden(hidden => ({ ...hidden, attribute: hidden.attribute.filter(attribute => attribute !== targetLower) }))
           } else {
-            // checked >> unchecked
-            video.hidden.attribute.splice(video.hidden.attribute.indexOf(targetLower), 1)
+      setHidden(hidden => ({ ...hidden, attribute: [...hidden.attribute, targetLower] }))
           }
         }
 
@@ -238,11 +234,9 @@ const Filter = ({ videoData, setHidden }: FilterProps) => {
     const targetLower = target.name.toLowerCase()
 
           if (!ref.checked) {
-            // unchecked >> checked
-            video.hidden.outfit.push(targetLower)
+      setHidden(hidden => ({ ...hidden, outfit: hidden.outfit.filter(outfit => outfit !== targetLower) }))
           } else {
-            // checked >> unchecked
-            video.hidden.outfit.splice(video.hidden.outfit.indexOf(targetLower), 1)
+      setHidden(hidden => ({ ...hidden, outfit: [...hidden.outfit, targetLower] }))
           }
   }
 

@@ -101,9 +101,9 @@ const Stars = ({ stars = [], hidden, sortMethod }: StarsProps) => {
 
   return (
     <div id={styles.stars}>
-          <Typography variant='h6' className='text-center'>
+      <Typography variant='h6' className='text-center'>
         <span id={styles.count}>{visible.length}</span> Stars
-          </Typography>
+      </Typography>
 
       {stars.length !== 0 ? (
         <VGrid itemHeight={333} total={visible.length} renderData={(idx: number) => <StarCard star={visible[idx]} />} />
@@ -194,13 +194,11 @@ const Filter = ({ starData, setHidden }: FilterProps) => {
 
     const targetLower = target.toLowerCase()
 
-          if (!ref.checked) {
-            // unchecked >> checked
-            star.hidden.attribute.push(targetLower)
-          } else {
-            // checked >> unchecked
-            star.hidden.attribute.splice(star.hidden.attribute.indexOf(targetLower), 1)
-          }
+    if (!ref.checked) {
+      setHidden(prev => ({ ...prev, attribute: prev.attribute.filter(attribute => attribute !== targetLower) }))
+    } else {
+      setHidden(prev => ({ ...prev, attribute: [...prev.attribute, targetLower] }))
+    }
   }
 
   const breast_ALL = () => {
@@ -249,33 +247,33 @@ const FilterRadio = ({ data, label, callback, globalCallback }: FilterRadioProps
   if (data === undefined) return <Spinner />
 
   return (
-  <>
-    <h2>{capitalize(label, true)}</h2>
+    <>
+      <h2>{capitalize(label, true)}</h2>
 
-    <FormControl>
-      <RadioGroup name={label} defaultValue='ALL'>
-        {globalCallback !== undefined && (
-          <FormControlLabel
-            value='ALL'
-            label={<div className={styles.global}>ALL</div>}
-            onChange={globalCallback}
-            control={<Radio />}
-          />
-        )}
+      <FormControl>
+        <RadioGroup name={label} defaultValue='ALL'>
+          {globalCallback !== undefined && (
+            <FormControlLabel
+              value='ALL'
+              label={<div className={styles.global}>ALL</div>}
+              onChange={globalCallback}
+              control={<Radio />}
+            />
+          )}
 
-        {data.map(item => (
-          <FormControlLabel
-            key={item}
-            value={item}
-            onChange={() => callback(item)}
+          {data.map(item => (
+            <FormControlLabel
+              key={item}
+              value={item}
+              onChange={() => callback(item)}
               label={item}
-            control={<Radio />}
-          />
-        ))}
-      </RadioGroup>
-    </FormControl>
-  </>
-)
+              control={<Radio />}
+            />
+          ))}
+        </RadioGroup>
+      </FormControl>
+    </>
+  )
 }
 
 type FilterCheckBoxProps = {

@@ -25,7 +25,7 @@ import { getVisible, HiddenVideo as Hidden, VideoSearch as Video } from '@compon
 import VGrid from '@components/virtualized/virtuoso'
 import Spinner from '@components/spinner'
 import Link from '@components/link'
-import SortObj from '@components/search/sort'
+import SortObj, { getVideoSort, type SortMethodVideo, type SortTypeVideo as VideoSort } from '@components/search/sort'
 
 import { Attribute as AttributeRef, Category, General, Outfit, SetState } from '@interfaces'
 import { attributeService, brandService, categoryService, outfitService, searchService } from '@service'
@@ -50,6 +50,7 @@ const VideoSearchPage: NextPage = () => {
   const { data } = searchService.useVideos<IVideo>()
   const [videos, setVideos] = useState<IVideo[]>([])
 
+  const [sort, setSort] = useState<VideoSort>({ type: 'alphabetically', reverse: false })
   const [hidden, setHidden] = useState<Hidden>({
     titleSearch: '',
     cen: null,
@@ -62,11 +63,11 @@ const VideoSearchPage: NextPage = () => {
   return (
     <Grid container>
       <Grid item xs={2} id={styles.sidebar}>
-        <Sidebar videos={videos} update={setVideos} />
+        <Sidebar setHidden={setHidden} setSort={setSort} />
       </Grid>
 
       <Grid item xs={10}>
-        <Videos videos={videos} />
+        <Videos videos={videos} hidden={hidden} sortMethod={getVideoSort(sort)} />
       </Grid>
 
       <ScrollToTop smooth />
@@ -74,11 +75,13 @@ const VideoSearchPage: NextPage = () => {
   )
 }
 
-interface VideosProps {
-  videos: IVideo[]
+type VideosProps = {
+  videos?: Video[]
+  hidden: Hidden
+  sortMethod: SortMethodVideo
 }
 const Videos = ({ videos }: VideosProps) => {
-  const visibleVideos = getVisible(videos)
+  const visible = getVisible(videos.sort(sortMethod), hidden)
 
   return (
     <div id={styles.videos}>
@@ -90,10 +93,9 @@ const Videos = ({ videos }: VideosProps) => {
 
           <VGrid
             itemHeight={385.375}
-            total={visibleVideos.length}
-            renderData={(idx: number) => <VideoCard video={visibleVideos[idx]} />}
+          total={visible.length}
+          renderData={(idx: number) => <VideoCard video={visible[idx]} />}
           />
-        </>
       ) : (
         <Spinner />
       )}
@@ -131,11 +133,11 @@ const VideoCard = ({ video }: VideoCardProps) => {
   )
 }
 
-interface SidebarProps {
-  videos: IVideo[]
-  update: ISetState<IVideo[]>
+type SidebarProps = {
+  setHidden: SetState<Hidden>
+  setSort: SetState<VideoSort>
 }
-const Sidebar = ({ videos, update }: SidebarProps) => {
+const Sidebar = ({ setHidden, setSort }: SidebarProps) => {
   const { data: categories } = categoryService.useCategories()
   const { data: attributes } = attributeService.useAttributes<Attribute>()
   const { data: brands } = brandService.useBrands()
@@ -144,6 +146,7 @@ const Sidebar = ({ videos, update }: SidebarProps) => {
   return (
     <>
       <TitleSearch setHidden={setHidden} />
+      <Sort setSort={setSort} />
       <Filter videoData={{ categories, attributes, brands, outfits }} setHidden={setHidden} />
     </>
   )
@@ -162,65 +165,15 @@ const TitleSearch = ({ setHidden }: TitleSearchProps) => {
   return <TextField variant='standard' autoFocus placeholder='Name' onChange={callback} />
 }
 
-interface SortProps {
-  videos: IVideo[]
-  update: ISetState<IVideo[]>
+type SortProps = {
+  setSort: SetState<VideoSort>
 }
-const Sort = ({ videos, update }: SortProps) => {
-  const sortDefault = (reverse = false) => {
-    update(
-      [...videos].sort((a, b) => {
-        const result = a.name.toLowerCase().localeCompare(b.name.toLowerCase(), 'en')
-        return reverse ? result * -1 : result
-      })
-    )
-  }
-
-  const sortAdded = (reverse = false) => {
-    update(
-      [...videos].sort((a, b) => {
-        const result = a.id - b.id
-        return reverse ? result * -1 : result
-      })
-    )
-  }
-
-  // TODO when sorting by date, handle case where two episodes are released on the same date
-  // usually this is for the same franchies, and so...should compare franchise and episode
-  const sortDate = (reverse = false) => {
-    update(
-      [...videos].sort((a, b) => {
-        if (a.published === null && b.published === null) {
-          return 0
-        } else if (a.published === null) {
-          return 1
-        } else if (b.published === null) {
-          return -1
-        }
-
-        const result = new Date(a.published).getTime() - new Date(b.published).getTime()
-        return reverse ? result * -1 : result
-      })
-    )
-  }
-
-  const sortPlays = (reverse = false) => {
-    update(
-      [...videos].sort((a, b) => {
-        const result = a.plays - b.plays
-        return reverse ? result * -1 : result
-      })
-    )
-  }
-
-  const sortQuality = (reverse = false) => {
-    update(
-      [...videos].sort((a, b) => {
-        const result = a.quality - b.quality
-        return reverse ? result * -1 : result
-      })
-    )
-  }
+const Sort = ({ setSort }: SortProps) => {
+  const sortDefault = (reverse = false) => setSort({ type: 'alphabetically', reverse })
+  const sortAdded = (reverse = false) => setSort({ type: 'added', reverse })
+  const sortDate = (reverse = false) => setSort({ type: 'published', reverse })
+  const sortPlays = (reverse = false) => setSort({ type: 'plays', reverse })
+  const sortQuality = (reverse = false) => setSort({ type: 'quality', reverse })
 
   return (
     <>
@@ -259,30 +212,9 @@ const Filter = ({ videoData, setHidden }: FilterProps) => {
         }
   }
 
-  const censorship = (value: string) => {
-    update(
-      [...videos].map(video => {
-        if (value === 'censored') {
-          video.hidden.cen = !video.cen
-        } else if (value === 'uncensored') {
-          video.hidden.cen = video.cen
-        } else {
-          video.hidden.cen = false
-        }
-
-        return video
-      })
-    )
-  }
-
-  const category = (ref: RegularHandlerProps, target: ICategory) => {
+  const category = (ref: RegularHandlerProps, target: Category) => {
     const targetLower = target.name.toLowerCase()
 
-    update(
-      videos.map(video => {
-        const lowerSearch = video.categories.map(category => category.toLowerCase())
-
-        if (!lowerSearch.includes(targetLower)) {
           if (!ref.checked) {
             // unchecked >> checked
             video.hidden.category.push(targetLower)
@@ -292,12 +224,7 @@ const Filter = ({ videoData, setHidden }: FilterProps) => {
           }
         }
 
-        return video
-      })
-    )
-  }
-
-  const attribute = (ref: RegularHandlerProps, target: IAttribute) => {
+  const attribute = (ref: RegularHandlerProps, target: Attribute) => {
     const targetLower = target.name.toLowerCase()
 
     update(
@@ -314,12 +241,7 @@ const Filter = ({ videoData, setHidden }: FilterProps) => {
           }
         }
 
-        return video
-      })
-    )
-  }
-
-  const outfits = (ref: RegularHandlerProps, target: IOutfit) => {
+  const outfits = (ref: RegularHandlerProps, target: Outfit) => {
     const targetLower = target.name.toLowerCase()
 
     update(
@@ -357,7 +279,7 @@ type FilterCheckboxProps<T extends General> = {
   label: string
   callback: (ref: RegularHandlerProps, item: T) => void
 }
-function FilterCheckBox<T extends IGeneral>({ data, label, labelPlural, obj, callback }: FilterCheckboxProps<T>) {
+function FilterCheckBox<T extends General>({ data, label, callback }: FilterCheckboxProps<T>) {
   return (
   <>
     <h2>{capitalize(label, true)}</h2>

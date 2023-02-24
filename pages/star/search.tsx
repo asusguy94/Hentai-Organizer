@@ -22,6 +22,7 @@ import { getVisible } from '@components/search/helper'
 import VGrid from '@components/virtualized/virtuoso'
 import Spinner from '@components/spinner'
 import Link from '@components/link'
+import SortObj, { type SortTypeStar as StarSort, type SortMethodStar, getStarSort } from '@components/search/sort'
 import { type StarSearch as Star, type HiddenStar as Hidden } from '@components/search/helper'
 
 import { SetState } from '@interfaces'
@@ -41,6 +42,7 @@ const StarSearchPage: NextPage = () => {
   const { data } = searchService.useStars()
   const [stars, setStars] = useState<IStar[]>([])
 
+  const [sort, setSort] = useState<StarSort>({ type: 'alphabetically', reverse: false })
   const [hidden, setHidden] = useState<Hidden>({
     titleSearch: '',
     breast: '',
@@ -52,11 +54,11 @@ const StarSearchPage: NextPage = () => {
   return (
     <Grid container>
       <Grid item xs={2} id={styles.sidebar}>
-        <Sidebar stars={stars} update={setStars} />
+        <Sidebar setHidden={setHidden} setSort={setSort} />
       </Grid>
 
       <Grid item xs={10}>
-        <Stars stars={stars} />
+        <Stars stars={stars} hidden={hidden} sortMethod={getStarSort(sort)} />
       </Grid>
 
       <ScrollToTop smooth />
@@ -68,14 +70,14 @@ type SidebarProps = {
   setHidden: SetState<Hidden>
   setSort: SetState<StarSort>
 }
-const Sidebar = ({ stars, update }: SidebarProps) => {
+const Sidebar = ({ setHidden, setSort }: SidebarProps) => {
   const { breast, haircolor, hairstyle, attribute } = starService.useInfo().data ?? {}
 
   return (
     <>
       <TitleSearch setHidden={setHidden} />
 
-      <Sort stars={stars} update={update} />
+      <Sort setSort={setSort} />
 
       <Filter
         starData={{
@@ -95,13 +97,13 @@ type StarsProps = {
   hidden: Hidden
   sortMethod: SortMethodStar
 }
-const Stars = ({ stars }: StarsProps) => {
-  const visibleStars = getVisible(stars)
+const Stars = ({ stars = [], hidden, sortMethod }: StarsProps) => {
+  const visible = getVisible(stars.sort(sortMethod), hidden)
 
   return (
     <div id={styles.stars}>
           <Typography variant='h6' className='text-center'>
-            <span id={styles.count}>{visibleStars.length}</span> Stars
+        <span id={styles.count}>{visible.length}</span> Stars
           </Typography>
 
       {stars.length !== 0 ? (
@@ -144,42 +146,11 @@ const StarCard = ({ star }: StarCardProps) => {
 type SortProps = {
   setSort: SetState<StarSort>
 }
-const Sort = ({ stars, update }: SortProps) => {
-  const sortDefault = (reverse = false) => {
-    update(
-      [...stars].sort((a, b) => {
-        const result = a.name.toLowerCase().localeCompare(b.name.toLowerCase(), 'en')
-        return reverse ? result * -1 : result
-      })
-    )
-  }
-
-  const sortAdded = (reverse = false) => {
-    update(
-      [...stars].sort((a, b) => {
-        const result = a.id - b.id
-        return reverse ? result * -1 : result
-      })
-    )
-  }
-
-  const sortVideos = (reverse = false) => {
-    update(
-      [...stars].sort((a, b) => {
-        const result = a.videos.total - b.videos.total
-        return reverse ? result * -1 : result
-      })
-    )
-  }
-
-  const sortActivity = (reverse = false) => {
-    update(
-      [...stars].sort((a, b) => {
-        const result = new Date(a.videos.last ?? 0).getTime() - new Date(b.videos.last ?? 0).getTime()
-        return reverse ? result * -1 : result
-      })
-    )
-  }
+const Sort = ({ setSort }: SortProps) => {
+  const title = (reverse = false) => setSort({ type: 'alphabetically', reverse })
+  const date = (reverse = false) => setSort({ type: 'added', reverse })
+  const activity = (reverse = false) => setSort({ type: 'videos', reverse: !reverse })
+  const lastActivity = (reverse = false) => setSort({ type: 'activity', reverse })
 
   return (
     <>
@@ -187,13 +158,13 @@ const Sort = ({ stars, update }: SortProps) => {
 
       <FormControl>
         <RadioGroup name='sort' defaultValue='alphabetically'>
-          <SortObj id='alphabetically' label={{ asc: 'A-Z', desc: 'Z-A' }} callback={sortDefault} />
-          <SortObj id='added' label={{ asc: 'Oldest', desc: 'Newest' }} callback={sortAdded} reversed />
-          <SortObj id='videos' label={{ asc: 'Least Active', desc: 'Most Active' }} callback={sortVideos} reversed />
+          <SortObj id='alphabetically' label={{ asc: 'A-Z', desc: 'Z-A' }} callback={title} />
+          <SortObj id='added' label={{ asc: 'Oldest', desc: 'Newest' }} callback={date} reversed />
+          <SortObj id='videos' label={{ asc: 'Least Active', desc: 'Most Active' }} callback={activity} reversed />
           <SortObj
             id='activity'
             label={{ asc: 'Oldest Activity', desc: 'Newest Activity' }}
-            callback={sortActivity}
+            callback={lastActivity}
             reversed
           />
         </RadioGroup>
@@ -208,33 +179,15 @@ type FilterProps = {
 }
 const Filter = ({ starData, setHidden }: FilterProps) => {
   const breast = (target: string) => {
-    update([
-      ...stars.map(star => {
-        star.hidden.breast = star.breast === null || star.breast.toLowerCase() !== target.toLowerCase()
-
-        return star
-      })
-    ])
+    setHidden(prev => ({ ...prev, breast: target.toLowerCase() }))
   }
 
   const haircolor = (target: string) => {
-    update([
-      ...stars.map(star => {
-        star.hidden.haircolor = star.haircolor === null || star.haircolor.toLowerCase() !== target.toLowerCase()
-
-        return star
-      })
-    ])
+    setHidden(prev => ({ ...prev, haircolor: target.toLowerCase() }))
   }
 
   const hairstyle = (target: string) => {
-    update([
-      ...stars.map(star => {
-        star.hidden.hairstyle = star.hairstyle === null || star.hairstyle.toLowerCase() !== target.toLowerCase()
-
-        return star
-      })
-    ])
+    setHidden(prev => ({ ...prev, hairstyle: target.toLowerCase() }))
   }
 
   const attribute = (ref: RegularHandlerProps, target: string | undefined) => {

@@ -22,7 +22,7 @@ import { getVisible } from '@components/search/helper'
 import VGrid from '@components/virtualized/virtuoso'
 import Spinner from '@components/spinner'
 import Link from '@components/link'
-import SortObj from '@components/search/sort'
+import { type StarSearch as Star, type HiddenStar as Hidden } from '@components/search/helper'
 
 import { SetState } from '@interfaces'
 import { searchService, starService } from '@service'
@@ -41,26 +41,13 @@ const StarSearchPage: NextPage = () => {
   const { data } = searchService.useStars()
   const [stars, setStars] = useState<IStar[]>([])
 
-  useEffect(() => {
-    setStars(
-      (data ?? []).map(star => ({
-        ...star,
-        hidden: {
-          titleSearch: false,
-
-          breast: false,
-          haircolor: false,
-          hairstyle: false,
-
-          // Placeholder for temporary feature
-          other: false,
-
-          attribute: [],
-          notAttribute: []
-        }
-      }))
-    )
-  }, [data])
+  const [hidden, setHidden] = useState<Hidden>({
+    titleSearch: '',
+    breast: '',
+    haircolor: '',
+    hairstyle: '',
+    attribute: []
+  })
 
   return (
     <Grid container>
@@ -86,19 +73,18 @@ const Sidebar = ({ stars, update }: SidebarProps) => {
 
   return (
     <>
-      <TitleSearch stars={stars} update={update} />
+      <TitleSearch setHidden={setHidden} />
 
       <Sort stars={stars} update={update} />
 
       <Filter
-        stars={stars}
-        update={update}
         starData={{
-          breasts: breast ?? [],
-          haircolors: haircolor ?? [],
-          hairstyles: hairstyle ?? [],
-          attributes: attribute ?? []
+          breasts: breast,
+          haircolors: haircolor,
+          hairstyles: hairstyle,
+          attributes: attribute
         }}
+        setHidden={setHidden}
       />
     </>
   )
@@ -216,12 +202,11 @@ const Sort = ({ stars, update }: SortProps) => {
   )
 }
 
-interface FilterProps {
-  stars: IStar[]
-  starData: IStarData
-  update: ISetState<IStar[]>
+type FilterProps = {
+  starData: StarData
+  setHidden: SetState<Hidden>
 }
-const Filter = ({ stars, starData, update }: FilterProps) => {
+const Filter = ({ starData, setHidden }: FilterProps) => {
   const breast = (target: string) => {
     update([
       ...stars.map(star => {
@@ -277,111 +262,46 @@ const Filter = ({ stars, starData, update }: FilterProps) => {
   }
 
   const breast_ALL = () => {
-    update([
-      ...stars.map(star => {
-        star.hidden.breast = false
-
-        return star
-      })
-    ])
+    setHidden(prev => ({ ...prev, breast: '' }))
   }
 
   const haircolor_ALL = () => {
-    update([
-      ...stars.map(star => {
-        star.hidden.haircolor = false
-
-        return star
-      })
-    ])
+    setHidden(prev => ({ ...prev, haircolor: '' }))
   }
 
   const hairstyle_ALL = () => {
-    update([
-      ...stars.map(star => {
-        star.hidden.hairstyle = false
-
-        return star
-      })
-    ])
-  }
-
-  const improvement = (value: 'numbered' | 'no-space' | 'all') => {
-    update(
-      [...stars].map(star => {
-        if (value === 'numbered') {
-          star.hidden.other = !/\d+$/.test(star.name)
-        } else if (value === 'no-space') {
-          star.hidden.other = star.name.includes(' ')
-        } else {
-          star.hidden.other = false
-        }
-
-        return star
-      })
-    )
+    setHidden(prev => ({ ...prev, hairstyle: '' }))
   }
 
   return (
     <>
-      <FilterButton label='FixName' data={['numbered', 'all', 'no-space']} defaultValue='all' callback={improvement} />
+      <FilterRadio data={starData.breasts} label='breast' callback={breast} globalCallback={breast_ALL} />
+      <FilterRadio data={starData.haircolors} label='haircolor' callback={haircolor} globalCallback={haircolor_ALL} />
+      <FilterRadio data={starData.hairstyles} label='hairstyle' callback={hairstyle} globalCallback={hairstyle_ALL} />
 
-      <FilterRadio data={starData.breasts} obj={stars} label='breast' callback={breast} globalCallback={breast_ALL} />
-
-      <FilterRadio
-        data={starData.haircolors}
-        obj={stars}
-        label='haircolor'
-        callback={haircolor}
-        globalCallback={haircolor_ALL}
-      />
-
-      <FilterRadio
-        data={starData.hairstyles}
-        obj={stars}
-        label='hairstyle'
-        callback={hairstyle}
-        globalCallback={hairstyle_ALL}
-      />
-
-      <FilterCheckBox
-        data={starData.attributes}
-        obj={stars}
-        label='attribute'
-        labelPlural='attributes'
-        callback={attribute}
-      />
+      <FilterCheckBox data={starData.attributes} label='attribute' callback={attribute} />
     </>
   )
 }
 
-interface TitleSearchProps {
-  stars: IStar[]
-  update: ISetState<IStar[]>
+type TitleSearchProps = {
+  setHidden: SetState<Hidden>
 }
-const TitleSearch = ({ stars, update }: TitleSearchProps) => {
+const TitleSearch = ({ setHidden }: TitleSearchProps) => {
   const callback = (e: React.ChangeEvent<HTMLInputElement>) => {
     const searchValue = e.currentTarget.value.toLowerCase()
 
-    update(
-      stars.map(star => {
-        star.hidden.titleSearch = !star.name.toLowerCase().includes(searchValue)
-
-        return star
-      })
-    )
+    setHidden(prev => ({ ...prev, titleSearch: searchValue }))
   }
 
   return <TextField variant='standard' autoFocus placeholder='Name' onChange={callback} />
 }
 
-interface FilterRadioProps {
-  data: string[]
+type FilterRadioProps = {
+  data?: string[]
   label: string
-  obj: IStar[]
   callback: (item: string) => void
   globalCallback?: () => void
-  count?: boolean
 }
 const FilterRadio = ({ data, label, callback, globalCallback }: FilterRadioProps) => {
   return (

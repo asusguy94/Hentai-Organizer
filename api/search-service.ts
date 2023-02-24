@@ -1,12 +1,12 @@
 import { useFetch } from 'usehooks-ts'
 
-import { IndexType, IStar, MakeOptional } from '@interfaces'
+import type { StarSearch, VideoSearch } from '@components/search/helper'
 
 import { serverConfig } from '@config'
 
 const baseURL = `${serverConfig.api}/search`
 
 export default {
-  useStars: () => useFetch<MakeOptional<IStar, 'hidden'>[]>(`${baseURL}/star`),
-  useVideos: <T extends IndexType<any>>() => useFetch<MakeOptional<T, 'hidden'>[]>(`${baseURL}/video`)
+  useStars: () => useFetch<StarSearch[]>(`${baseURL}/star`),
+  useVideos: () => useFetch<VideoSearch[]>(`${baseURL}/video`)
 }

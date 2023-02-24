@@ -50,23 +50,14 @@ const VideoSearchPage: NextPage = () => {
   const { data } = searchService.useVideos<IVideo>()
   const [videos, setVideos] = useState<IVideo[]>([])
 
-  useEffect(() => {
-      setVideos(
-      (data ?? [])
-          .filter(video => !video.noStar)
-          .map(video => ({
-            ...video,
-            hidden: {
+  const [hidden, setHidden] = useState<Hidden>({
+    titleSearch: '',
+    cen: null,
+    brand: '',
               category: [],
               attribute: [],
-              outfit: [],
-              cen: false,
-              brand: false,
-            titleSearch: false
-            }
-          }))
-      )
-  }, [data])
+    outfit: []
+  })
 
   return (
     <Grid container>
@@ -152,39 +143,20 @@ const Sidebar = ({ videos, update }: SidebarProps) => {
 
   return (
     <>
-      <TitleSearch videos={videos} update={update} />
-
-      <Sort videos={videos} update={update} />
-
-      <Filter
-        videos={videos}
-        update={update}
-        videoData={{
-          categories: categories ?? [],
-          attributes: attributes ?? [],
-          brands: brands ?? [],
-          outfits: outfits ?? []
-        }}
-      />
+      <TitleSearch setHidden={setHidden} />
+      <Filter videoData={{ categories, attributes, brands, outfits }} setHidden={setHidden} />
     </>
   )
 }
 
-interface TitleSearchProps {
-  update: ISetState<IVideo[]>
-  videos: IVideo[]
+type TitleSearchProps = {
+  setHidden: SetState<Hidden>
 }
-const TitleSearch = ({ update, videos }: TitleSearchProps) => {
+const TitleSearch = ({ setHidden }: TitleSearchProps) => {
   const callback = (e: React.ChangeEvent<HTMLInputElement>) => {
     const searchValue = e.target.value.toLowerCase()
 
-    update(
-      videos.map(video => {
-        video.hidden.titleSearch = !video.name.toLowerCase().includes(searchValue)
-
-        return video
-      })
-    )
+    setHidden(hidden => ({ ...hidden, titleSearch: searchValue }))
   }
 
   return <TextField variant='standard' autoFocus placeholder='Name' onChange={callback} />
@@ -272,28 +244,19 @@ const Sort = ({ videos, update }: SortProps) => {
   )
 }
 
-interface FilterProps {
-  videoData: IVideoData
-  videos: IVideo[]
-  update: ISetState<IVideo[]>
+type FilterProps = {
+  videoData: VideoData
+  setHidden: SetState<Hidden>
 }
-const Filter = ({ videoData, videos, update }: FilterProps) => {
+const Filter = ({ videoData, setHidden }: FilterProps) => {
   const brand = (e: SelectChangeEvent) => {
     const targetLower = e.target.value.toLowerCase()
 
-    update(
-      [...videos].map(video => {
         if (targetLower === 'all') {
-          video.hidden.brand = false
-        } else if (targetLower === 'null') {
-          video.hidden.brand = video.brand !== null
+      setHidden(hidden => ({ ...hidden, brand: '' }))
         } else {
-          video.hidden.brand = video.brand === null || video.brand.toLowerCase() !== targetLower
+      setHidden(hidden => ({ ...hidden, brand: targetLower }))
         }
-
-        return video
-      })
-    )
   }
 
   const censorship = (value: string) => {
@@ -380,39 +343,18 @@ const Filter = ({ videoData, videos, update }: FilterProps) => {
 
   return (
     <>
-      <FilterButton
-        label='censorship'
-        data={['censored', 'all', 'uncensored']}
-        defaultValue='all'
-        callback={censorship}
-      />
+      <FilterDropdown data={videoData.brands} label='network' callback={brand} />
 
-      <FilterDropdown data={videoData.brands} label='network' callback={brand} nullCallback={brand} />
-
-      <FilterCheckBox
-        data={videoData.categories}
-        obj={videos}
-        label='category'
-        labelPlural='categories'
-        callback={category}
-      />
-      <FilterCheckBox data={videoData.outfits} obj={videos} label='outfit' callback={outfits} />
-      <FilterCheckBox
-        data={videoData.attributes}
-        obj={videos}
-        label='attribute'
-        labelPlural='attributes'
-        callback={attribute}
-      />
+      <FilterCheckBox data={videoData.categories} label='category' callback={category} />
+      <FilterCheckBox data={videoData.outfits} label='outfit' callback={outfits} />
+      <FilterCheckBox data={videoData.attributes} label='attribute' callback={attribute} />
     </>
   )
 }
 
-interface FilterCheckboxProps<T extends IGeneral> {
-  data: T[]
+type FilterCheckboxProps<T extends General> = {
+  data?: T[]
   label: string
-  labelPlural?: string
-  obj: IVideo[]
   callback: (ref: RegularHandlerProps, item: T) => void
 }
 function FilterCheckBox<T extends IGeneral>({ data, label, labelPlural, obj, callback }: FilterCheckboxProps<T>) {
@@ -424,11 +366,7 @@ function FilterCheckBox<T extends IGeneral>({ data, label, labelPlural, obj, cal
       {data.map(item => (
           <RegularItem
           key={item.id}
-          label={
-            <>
-              {item.name} <LabelCount prop={labelPlural ?? `${label}s`} label={item.name} obj={obj} />
-            </>
-          }
+            label={item.name}
           value={item.name}
           item={item}
           callback={(ref, item) => callback(ref, item)}
@@ -444,7 +382,6 @@ type FilterDropdownProps = {
   label: string
   labelPlural?: string
   callback: (e: SelectChangeEvent) => void
-  nullCallback?: (e: any) => void
 }
 const FilterDropdown = ({ data, label, labelPlural, callback }: FilterDropdownProps) => {
   return (

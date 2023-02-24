@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import { IndexType, IStar, MakeOptional } from '@interfaces'
+import type { StarSearch, VideoSearch } from '@components/search/helper'
 
 import { serverConfig } from '@config'
 
@@ -9,6 +9,6 @@ const api = axios.create({
 })
 
 export default {
-  getStars: () => api.get<MakeOptional<IStar, 'hidden'>[]>('/star'),
-  getVideos: <T extends IndexType<any>>() => api.get<MakeOptional<T, 'hidden'>[]>('/video')
+  getStars: () => api.get<StarSearch[]>('/star'),
+  getVideos: () => api.get<VideoSearch[]>('/video')
 }

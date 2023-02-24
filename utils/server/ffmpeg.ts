@@ -60,7 +60,6 @@ export const extractVtt = async (src: string, dest: string, videoID: number) => 
   const rows = Math.floor(Math.floor(duration / delayBetweenFrames) / cols)
 
   /* Generate Preview */
-  console.log(`Creating a preview with ${cols * rows} frames`)
   const {
     width: calcWidth,
     height: calcHeight,

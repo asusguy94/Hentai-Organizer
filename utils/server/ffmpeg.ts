@@ -1,6 +1,6 @@
 import generatePreview from 'ffmpeg-generate-video-preview'
 import getDimensions from 'get-video-dimensions'
-import { getVideoDurationInSeconds } from 'get-video-duration'
+import ffmpeg from 'fluent-ffmpeg'
 
 import { generateVTTData, getDividableWidth } from './helper'
 
@@ -9,48 +9,49 @@ import { generateVTTData, getDividableWidth } from './helper'
  * @param file video file
  * @return duration as seconds
  */
-const getDuration = async (file: string) => Math.round(await getVideoDurationInSeconds(file))
+const getRawDuration = async (file: string) => {
+  return new Promise<number>((resolve, reject) => {
+    ffmpeg.ffprobe(file, (err, metadata) => {
+      if (err) {
+        reject(err)
+        return
+      }
+
+      const duration = metadata.format.duration
+      if (duration === undefined) {
+        reject('Duration is undefined')
+      } else {
+        resolve(duration)
+      }
+    })
+  })
+}
 
 /**
  * Get the height of a video
  * @param file video file
  * @return height in pixels
  */
-const getHeight = async (file: string) => (await getDimensions(file)).height
+const getRawHeight = async (file: string) => (await getDimensions(file)).height
 
 /**
  * Get the width of a video
  * @param file video file
  * @return height in pixels
  */
-const getWidth = async (file: string) => (await getDimensions(file)).width
+const getRawWidth = async (file: string) => (await getDimensions(file)).width
 
 /**
  * Helper method for getting video-duration
  * @param file
  */
-export const duration = async (file: string) => await getDuration(file)
+export const getDuration = async (file: string) => Math.round(await getRawDuration(file))
 
 /**
  * Helper method for getting video-height
  * @param file
  */
-export const height = async (file: string) => await getHeight(file)
-
-const calculateDelay = (duration: number) => {
-  if (duration > 60 * 60) {
-    return 10
-  } else if (duration > 20 * 60) {
-    //20m-60m
-    return 5
-  } else if (duration > 5 * 60) {
-    //5m-20m
-    return 2
-  } else {
-    //0-5m
-    return 1
-  }
-}
+export const getHeight = async (file: string) => await getRawHeight(file)
 
 export const extractVtt = async (src: string, dest: string, videoID: number) => {
   const duration = await getDuration(src) // in seconds

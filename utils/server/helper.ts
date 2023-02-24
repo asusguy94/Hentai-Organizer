@@ -1,4 +1,4 @@
-import type { NextApiRequest, NextApiResponse } from 'next'
+import type { NextApiRequest, NextApiResponse } from 'next/types'
 
 import ffmpeg from 'fluent-ffmpeg'
 import fs from 'fs'
@@ -147,7 +147,7 @@ const calculateTime = (secs: number) =>
 
 export const generateVTTData = async (
   videoID: number,
-  delayBetweenFrames: number,
+  frameDelay: number,
   tiles: { rows: number; cols: number },
   dimension: { height: number; width: number }
 ) => {
@@ -158,9 +158,9 @@ export const generateVTTData = async (
     const timeCodeFormat = 'HH:mm:ss.SSS'
 
     const start = calculateTime(nextTimeCode)
-    const end = calculateTime(nextTimeCode + delayBetweenFrames)
+    const end = calculateTime(nextTimeCode + frameDelay)
 
-    nextTimeCode += delayBetweenFrames
+    nextTimeCode += frameDelay
 
     return {
       start: start.format(timeCodeFormat),
@@ -184,70 +184,103 @@ export const generateVTTData = async (
   }
 }
 
-export const getDividableWidth = (limits: { min: number; max: number }, width: number, increment = 10): number => {
-  const min = 10 * 2
-  const max = width / 2
+export const getDividableWidth = (width: number, limits = { min: 120, max: 240 }): number => {
+  const MIN = 10 * 2
+  const MAX = width / 2
 
+  const increment = 10
   for (let dividend = limits.max; dividend >= limits.min; dividend--) {
     if (width % dividend === 0) return dividend
   }
 
   // Check if calculation is out-of-bounds
-  if (limits.max + increment < max || limits.min - increment > min) {
-    if (limits.max + increment < max) {
+  if (limits.max + increment < MAX || limits.min - increment > MIN) {
+    if (limits.max + increment < MAX) {
       limits.max += increment
     }
 
-    if (limits.min - increment > min) {
+    if (limits.min - increment > MIN) {
       limits.min -= increment
     }
 
-    return getDividableWidth(limits, width, increment)
+    return getDividableWidth(width, limits)
   }
-  return -1
+  throw new Error(`Could not find dividable width for ${width}`)
 }
+
+/**
+ * @param {string} path the path of video/image
+ * @return {{isVideo: boolean, isImage:boolean}} Returns an object with isImage and isVideo
+ */
+const getFileType = (path: string): { isVideo: boolean; isImage: boolean } => {
+  if (process.env.NODE_ENV === 'production') {
+    return { isImage: false, isVideo: false }
+  }
+
+  const isVideo = extOnly(path) === '.mp4'
+  const isImage = ['.jpg', '.png'].includes(extOnly(path))
+  if (isVideo && isImage) throw new Error('Invalid image/video type')
+
+  return { isVideo, isImage }
+}
+
+const getSampleFiles = () => ({ video: './public/video.mp4', image: './public/image.jpg' })
 
 export const sendFile = async (res: NextApiResponse, path: string) => {
   if (!(await fileExists(path))) {
-    res.status(404).end()
-  } else {
-    res.writeHead(200)
-    fs.createReadStream(path).pipe(res)
+    const { isImage, isVideo } = getFileType(path)
+
+    if (isVideo) {
+      path = getSampleFiles().video
+    } else if (isImage) {
+      path = getSampleFiles().image
+    } else {
+      res.status(404).end()
+      return
+    }
   }
+
+  res.writeHead(200)
+  fs.createReadStream(path).pipe(res)
 }
 
 export const sendPartial = async (req: NextApiRequest, res: NextApiResponse, path: string, mb = 2): Promise<void> => {
-  // res.shouldKeepAlive = true
-
   const chunkSize = 1024 * 1024 * mb
 
   if (!(await fileExists(path))) {
-    res.status(404).end()
-  } else {
-    fs.stat(path, (err, data) => {
-      if (err) {
-        throw err
-      }
+    const { isVideo } = getFileType(path)
 
-      if (req.headers.range !== undefined) {
-        const range = req.headers.range
-
-        // extract start and end / empty
-        const ranges = range.match(/^bytes=(\d+)-(.*)$/)?.slice(1, 2)
-        if (ranges !== undefined) {
-          const start = parseInt(ranges[0])
-          const end = Math.min(start + chunkSize, data.size - 1)
-
-          res.writeHead(206, {
-            'Accept-Ranges': 'bytes',
-            'Content-Range': `bytes ${start}-${end}/${data.size}`,
-            'Content-Length': end - start + 1,
-            'Content-Type': 'video/mp4'
-          })
-
-          fs.createReadStream(path, { start, end }).pipe(res)
-        }
-      }
-    })
+    if (isVideo) {
+      path = getSampleFiles().video
+    } else {
+      res.status(404).end()
+      return
+    }
   }
+
+  fs.stat(path, (err, data) => {
+    if (err) {
+      throw err
+    }
+
+    if (req.headers.range !== undefined) {
+      const range = req.headers.range
+
+      // extract start and end / empty
+      const ranges = range.match(/^bytes=(\d+)-(.*)$/)?.slice(1, 2)
+      if (ranges !== undefined) {
+        const start = parseInt(ranges[0])
+        const end = Math.min(start + chunkSize, data.size - 1)
+
+        res.writeHead(206, {
+          'Accept-Ranges': 'bytes',
+          'Content-Range': `bytes ${start}-${end}/${data.size}`,
+          'Content-Length': end - start + 1,
+          'Content-Type': 'video/mp4'
+        })
+
+        fs.createReadStream(path, { start, end }).pipe(res)
+      }
+    }
+  })
 }

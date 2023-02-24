@@ -1,10 +1,10 @@
 import { useFetch } from 'usehooks-ts'
 
 import { serverConfig } from '@config'
-import { IOutfit } from '@interfaces'
+import { Outfit } from '@interfaces'
 
 const baseURL = `${serverConfig.api}/outfit`
 
 export default {
-  useOutfits: () => useFetch<IOutfit[]>(baseURL)
+  useOutfits: () => useFetch<Outfit[]>(baseURL)
 }

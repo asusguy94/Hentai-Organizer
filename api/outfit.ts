@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import { IGeneral } from '@interfaces'
+import { General } from '@interfaces'
 
 import { serverConfig } from '@config'
 
@@ -9,5 +9,5 @@ const api = axios.create({
 })
 
 export default {
-  getAll: () => api.get<IGeneral[]>('/')
+  getAll: () => api.get<General[]>('/')
 }

@@ -1,21 +1,21 @@
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/navigation'
 
 import { Button, Grid, TextField, Typography } from '@mui/material'
 
 import { ContextMenu, ContextMenuTrigger, MenuItem } from 'react-contextmenu'
 
-import { IModalHandler } from '../modal'
+import { ModalHandler } from '../modal'
 import Icon from '../icon'
 
-import { IVideo, ISetState } from '@interfaces'
+import { Video, SetState } from '@interfaces'
 import { videoService } from '@service'
 
 import styles from './header.module.scss'
 
-interface HeaderProps {
-  video: IVideo
-  onModal: IModalHandler
-  update: ISetState<IVideo | undefined>
+type HeaderProps = {
+  video: Video
+  onModal: ModalHandler
+  update: SetState<Video | undefined>
 }
 const Header = ({ video, update, onModal }: HeaderProps) => (
   <Grid container component='header' id={styles.header}>
@@ -28,9 +28,9 @@ const Header = ({ video, update, onModal }: HeaderProps) => (
   </Grid>
 )
 
-interface HeaderTitleProps {
-  video: IVideo
-  onModal: IModalHandler
+type HeaderTitleProps = {
+  video: Video
+  onModal: ModalHandler
 }
 const HeaderTitle = ({ video, onModal }: HeaderTitleProps) => {
   const router = useRouter()
@@ -39,13 +39,13 @@ const HeaderTitle = ({ video, onModal }: HeaderTitleProps) => {
 
   const renameFranchise = (value: string) => {
     videoService.renameFranchise(video.id, value).then(() => {
-      router.reload()
+      router.refresh()
     })
   }
 
   const renameTitle = (value: string) => {
     videoService.renameTitle(video.id, value).then(() => {
-      router.reload()
+      router.refresh()
     })
   }
 
@@ -121,10 +121,10 @@ const HeaderTitle = ({ video, onModal }: HeaderTitleProps) => {
   )
 }
 
-interface HeaderDateProps {
-  video: IVideo
-  update: ISetState<IVideo | undefined>
-  onModal: IModalHandler
+type HeaderDateProps = {
+  video: Video
+  update: SetState<Video | undefined>
+  onModal: ModalHandler
 }
 const HeaderDate = ({ video, update, onModal }: HeaderDateProps) => {
   const handleDate = (value: string) => {
@@ -171,10 +171,10 @@ const HeaderDate = ({ video, update, onModal }: HeaderDateProps) => {
   )
 }
 
-interface HeaderNetworkProps {
-  video: IVideo
-  update: ISetState<IVideo | undefined>
-  onModal: IModalHandler
+type HeaderNetworkProps = {
+  video: Video
+  update: SetState<Video | undefined>
+  onModal: ModalHandler
 }
 const HeaderNetwork = ({ video, update, onModal }: HeaderNetworkProps) => {
   const handleNetwork = (value: string) => {

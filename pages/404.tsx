@@ -1,4 +1,5 @@
-import { NextPage } from 'next/types'
+import type { NextPage } from 'next/types'
+
 import { Button, Grid, Typography } from '@mui/material'
 
 import Link from '@components/link'

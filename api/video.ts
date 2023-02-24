@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import { IBookmark, IVideo, IVideoStar } from '@interfaces'
+import { Bookmark, Video, VideoStar } from '@interfaces'
 import { serverConfig } from '@config'
 
 const api = axios.create({
@@ -8,7 +8,7 @@ const api = axios.create({
 })
 
 export default {
-  get: (id: number) => api.get<IVideo>(`/${id}`),
-  getStars: (id: number) => api.get<IVideoStar[]>(`/${id}/star`),
-  getBookmarks: (id: number) => api.get<IBookmark[]>(`/${id}/bookmark`)
+  get: (id: number) => api.get<Video>(`/${id}`),
+  getStars: (id: number) => api.get<VideoStar[]>(`/${id}/star`),
+  getBookmarks: (id: number) => api.get<Bookmark[]>(`/${id}/bookmark`)
 }

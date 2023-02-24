@@ -13,7 +13,7 @@ import { serverConfig } from '@config'
 
 import classes from './home.module.scss'
 
-interface ColumnProps {
+type ColumnProps = {
   enabled?: boolean
   label: string
   limit?: number
@@ -21,7 +21,7 @@ interface ColumnProps {
   colSize?: number
 }
 export const Column = ({ label, rows = 1, colSize = 16 }: ColumnProps) => {
-  interface IVideo {
+  type Video = {
     id: number
     name: string
     image: string | null
@@ -30,7 +30,7 @@ export const Column = ({ label, rows = 1, colSize = 16 }: ColumnProps) => {
 
   const limit = rows * colSize
 
-  const { data } = useFetch<IVideo[]>(`${serverConfig.api}/home/${label}/${limit}`)
+  const { data } = useFetch<Video[]>(`${serverConfig.api}/home/${label}/${limit}`)
   if (data === undefined) return null
 
   return (

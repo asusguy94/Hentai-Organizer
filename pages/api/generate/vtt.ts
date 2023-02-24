@@ -11,7 +11,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     console.log('Generating VTT')
     for await (const video of videos) {
       const videoPath = `videos/${video.path}`
-      const imagePath = `vtt//${video.id}.jpg`
+      const imagePath = `vtt/${video.id}.jpg`
       const vttPath = `vtt/${video.id}.vtt`
 
       const absoluteVideoPath = `./media/${videoPath}`

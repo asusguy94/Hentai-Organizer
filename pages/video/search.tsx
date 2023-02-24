@@ -1,5 +1,5 @@
 import { NextPage } from 'next/types'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 
 import {
   Button,
@@ -20,57 +20,31 @@ import capitalize from 'capitalize'
 
 import { ImageCard } from '@components/image'
 import Ribbon, { RibbonContainer } from '@components/ribbon'
-import LabelCount from '@components/labelcount'
 import { RegularHandlerProps, RegularItem } from '@components/indeterminate'
-import { getVisible } from '@components/search/helper'
-import { FilterButton } from '@components/search/sidebar'
+import { getVisible, HiddenVideo as Hidden, VideoSearch as Video } from '@components/search/helper'
 import VGrid from '@components/virtualized/virtuoso'
-import Loader from '@components/loader'
+import Spinner from '@components/spinner'
 import Link from '@components/link'
 import SortObj from '@components/search/sort'
 
-import { IAttribute as IAttributeRef, ICategory, IGeneral, IOutfit, ISetState } from '@interfaces'
+import { Attribute as AttributeRef, Category, General, Outfit, SetState } from '@interfaces'
 import { attributeService, brandService, categoryService, outfitService, searchService } from '@service'
 
 import { serverConfig } from '@config'
 
 import styles from './search.module.scss'
 
-interface IVideo {
-  id: number
-  name: string
-  franchise: string
-  brand: string | null
-  noStar: boolean
-  cen: boolean
-  cover: string | null
-  published: string | null
-  quality: number
-  plays: number
-  attributes: string[]
-  categories: string[]
-  outfits: string[]
-  hidden: {
-    category: string[]
-    attribute: string[]
-    outfit: string[]
-    cen: boolean
-    brand: boolean
-    titleSearch: boolean
-  }
-}
-
-interface IAttribute extends IAttributeRef {
+type Attribute = {
   videoOnly: number
   starOnly: number
-}
+} & AttributeRef
 
-interface IVideoData {
-  categories: ICategory[]
-  attributes: IAttribute[]
+type VideoData = Partial<{
+  categories: Category[]
+  attributes: Attribute[]
   brands: string[]
-  outfits: IOutfit[]
-}
+  outfits: Outfit[]
+}>
 
 const VideoSearchPage: NextPage = () => {
   const { data } = searchService.useVideos<IVideo>()
@@ -130,14 +104,14 @@ const Videos = ({ videos }: VideosProps) => {
           />
         </>
       ) : (
-        <Loader />
+        <Spinner />
       )}
     </div>
   )
 }
 
-interface VideoCardProps {
-  video?: IVideo
+type VideoCardProps = {
+  video?: Video
 }
 const VideoCard = ({ video }: VideoCardProps) => {
   if (video === undefined) return null //FIXME cleanup is not working correctly
@@ -172,7 +146,7 @@ interface SidebarProps {
 }
 const Sidebar = ({ videos, update }: SidebarProps) => {
   const { data: categories } = categoryService.useCategories()
-  const { data: attributes } = attributeService.useAttributes<IAttribute>()
+  const { data: attributes } = attributeService.useAttributes<Attribute>()
   const { data: brands } = brandService.useBrands()
   const { data: outfits } = outfitService.useOutfits()
 
@@ -465,26 +439,21 @@ function FilterCheckBox<T extends IGeneral>({ data, label, labelPlural, obj, cal
 )
 }
 
-interface FilterDropdownProps {
-  data: string[]
+type FilterDropdownProps = {
+  data?: string[]
   label: string
   labelPlural?: string
   callback: (e: SelectChangeEvent) => void
   nullCallback?: (e: any) => void
 }
-const FilterDropdown = ({ data, label, labelPlural, callback, nullCallback }: FilterDropdownProps) => (
+const FilterDropdown = ({ data, label, labelPlural, callback }: FilterDropdownProps) => {
+  return (
   <>
     <h2>{capitalize(label, true)}</h2>
 
     <FormControl>
       <Select variant='standard' id={label} name={labelPlural ?? `${label}s`} defaultValue='ALL' onChange={callback}>
         <MenuItem value='ALL'>All</MenuItem>
-
-        {nullCallback !== undefined && (
-          <MenuItem value='NULL' onChange={nullCallback}>
-            NULL
-          </MenuItem>
-        )}
 
         {data.map(item => (
           <MenuItem key={item} value={item}>
@@ -495,4 +464,5 @@ const FilterDropdown = ({ data, label, labelPlural, callback, nullCallback }: Fi
     </FormControl>
   </>
 )
+}
 export default VideoSearchPage

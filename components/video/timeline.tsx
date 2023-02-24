@@ -7,28 +7,28 @@ import { ContextMenu, ContextMenuTrigger, MenuItem } from 'react-contextmenu'
 import { useWindowSize } from 'react-use'
 
 import Image from '../image'
-import { IModalHandler } from '../modal'
+import { ModalHandler } from '../modal'
 import Icon from '../icon'
 
-import type { IEventHandler } from '@hooks/star-event'
-import { IAttribute, IBookmark, ICategory, IVideoStar as IStar, IVideo, ISetState, IOutfit } from '@interfaces'
+import type { EventHandler } from '@hooks/star-event'
+import { Attribute, Bookmark, Category, VideoStar as Star, Video, SetState, Outfit } from '@interfaces'
 import { bookmarkService, outfitService } from '@service'
 import { serverConfig, settingsConfig } from '@config'
 
 import styles from './timeline.module.scss'
 
-interface TimelineProps {
-  video: IVideo
-  bookmarks: IBookmark[]
-  stars: IStar[]
-  attributes: IAttribute[]
-  categories: ICategory[]
+type TimelineProps = {
+  video: Video
+  bookmarks: Bookmark[]
+  stars: Star[]
+  attributes: Attribute[]
+  categories: Category[]
   playVideo: (time?: number | null) => void
   setTime: (bookmarkID: number, time?: number) => void
-  update: ISetState<IBookmark[]>
+  update: SetState<Bookmark[]>
   duration: number
-  onModal: IModalHandler
-  setStarEvent: IEventHandler
+  onModal: ModalHandler
+  setStarEvent: EventHandler
 }
 const Timeline = ({
   video,
@@ -63,8 +63,8 @@ const Timeline = ({
     }
   }, [duration, video.duration])
 
-  const isActive = (bookmark: IBookmark) => bookmark.active
-  const hasStar = (bookmark: IBookmark) => bookmark.starID > 0
+  const isActive = (bookmark: Bookmark) => bookmark.active
+  const hasStar = (bookmark: Bookmark) => bookmark.starID > 0
   const attributesFromStar = (starID: number) => stars.filter(star => star.id === starID)[0]?.attributes ?? []
   const isStarAttribute = (starID: number, attributeID: number) => {
     return attributesFromStar(starID).some(attr => attr.id === attributeID)
@@ -76,7 +76,7 @@ const Timeline = ({
     })
   }
 
-  const setCategory = (category: ICategory, bookmark: IBookmark) => {
+  const setCategory = (category: Category, bookmark: Bookmark) => {
     bookmarkService.setCategory(bookmark.id, category.id).then(() => {
       update(
         bookmarks.map(bookmarkItem => {
@@ -90,7 +90,7 @@ const Timeline = ({
     })
   }
 
-  const setOutfit = (outfit: IOutfit, bookmark: IBookmark) => {
+  const setOutfit = (outfit: Outfit, bookmark: Bookmark) => {
     bookmarkService.setOutfit(bookmark.id, outfit.id).then(() => {
       update(
         bookmarks.map(bookmarkItem => {
@@ -104,7 +104,7 @@ const Timeline = ({
     })
   }
 
-  const removeOutfit = (bookmark: IBookmark) => {
+  const removeOutfit = (bookmark: Bookmark) => {
     bookmarkService.removeOutfit(bookmark.id).then(() => {
       update(
         bookmarks.map(bookmarkItem => {
@@ -118,7 +118,7 @@ const Timeline = ({
     })
   }
 
-  const addAttribute = (attribute: IAttribute, bookmark: IBookmark) => {
+  const addAttribute = (attribute: Attribute, bookmark: Bookmark) => {
     bookmarkService.addAttribute(bookmark.id, attribute.id).then(() => {
       update(
         bookmarks.map(bookmarkItem => {
@@ -135,7 +135,7 @@ const Timeline = ({
     })
   }
 
-  const removeAttribute = (bookmark: IBookmark, attribute: IAttribute) => {
+  const removeAttribute = (bookmark: Bookmark, attribute: Attribute) => {
     bookmarkService.removeAttribute(bookmark.id, attribute.id).then(() => {
       update(
         bookmarks.map(item => {
@@ -151,7 +151,7 @@ const Timeline = ({
     })
   }
 
-  const clearAttributes = (bookmark: IBookmark) => {
+  const clearAttributes = (bookmark: Bookmark) => {
     bookmarkService.clearAttributes(bookmark.id).then(() => {
       update(
         bookmarks.map(bookmarkItem => {
@@ -178,7 +178,7 @@ const Timeline = ({
     })
   }
 
-  const removeStar = (bookmark: IBookmark) => {
+  const removeStar = (bookmark: Bookmark) => {
     bookmarkService.removeStar(bookmark.id).then(() => {
       update(
         bookmarks.map(item => {

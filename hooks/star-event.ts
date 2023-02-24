@@ -1,13 +1,13 @@
 import { useState } from 'react'
 
-export interface IEvent {
+export type Event = {
   event: boolean
-  data: IEventData
+  data: EventData
 }
 
-export type IEventHandler = (event: boolean, data?: IEventData) => void
+export type EventHandler = (event: boolean, data?: EventData) => void
 
-export interface IEventData {
+export type EventData = {
   id: number
   name: string
   starID: number
@@ -26,12 +26,12 @@ const useStarEvent = () => {
     attributes: []
   }
 
-  const [starEvent, setStarEvent] = useState<IEvent>({
+  const [starEvent, setStarEvent] = useState<Event>({
     event: false,
     data: starEventData
   })
 
-  const handleAddStarEvent = (event: boolean, data: IEventData = starEvent.data) => {
+  const handleAddStarEvent = (event: boolean, data: EventData = starEvent.data) => {
     setStarEvent({ event, data })
   }
 

@@ -19,16 +19,17 @@ import { ContextMenu, ContextMenuTrigger, MenuItem } from 'react-contextmenu'
 import { Flipped, Flipper } from 'react-flip-toolkit'
 
 import { ImageCard, ResponsiveImage } from '@components/image'
-import Modal, { IModal, IModalHandler, useModal } from '@components/modal'
+import ModalComponent, { Modal, ModalHandler, useModal } from '@components/modal'
 import { Header, Player, Timeline } from '@components/video'
 import Icon from '@components/icon'
 import Ribbon, { RibbonContainer } from '@components/ribbon'
 import Link from '@components/link'
+import Spinner from '@components/spinner'
 
-import useStarEvent, { type IEvent, type IEventData, type IEventHandler } from '@hooks/star-event'
+import useStarEvent, { type Event, type EventData, type EventHandler } from '@hooks/star-event'
 import { attributeService, bookmarkService, categoryService, videoService } from '@service'
 import { serverConfig } from '@config'
-import { IAttribute, IBookmark, ICategory, ISetState, IVideoStar as IStar, IVideo } from '@interfaces'
+import { Attribute, Bookmark, Category, SetState, VideoStar as Star, Video } from '@interfaces'
 
 import styles from './video.module.scss'
 
@@ -43,9 +44,9 @@ const VideoPage: NextPage = () => {
   const { data: categories } = categoryService.useCategories()
   const { data: attributes } = attributeService.useAttributes()
 
-  const [video, setVideo] = useState<IVideo>()
-  const [stars, setStars] = useState<IStar[]>([])
-  const [bookmarks, setBookmarks] = useState<IBookmark[]>([])
+  const [video, setVideo] = useState<Video>()
+  const [stars, setStars] = useState<Star[]>([])
+  const [bookmarks, setBookmarks] = useState<Bookmark[]>([])
 
   const { modal, setModal } = useModal()
   const { setEvent, getEvent, getDefault } = useStarEvent()
@@ -102,9 +103,9 @@ const VideoPage: NextPage = () => {
         </>
       )}
 
-      <Modal visible={modal.visible} title={modal.title} filter={modal.filter} onClose={setModal}>
+      <ModalComponent visible={modal.visible} title={modal.title} filter={modal.filter} onClose={setModal}>
         {modal.data}
-      </Modal>
+      </ModalComponent>
     </Grid>
   )
 }
@@ -220,7 +221,7 @@ const Sidebar = ({ video, stars, bookmarks, attributes, categories, update, onMo
   }
 
   const getAttributes = () => {
-    const attributeArr: IAttribute[] = []
+    const attributeArr: Attribute[] = []
     bookmarks.forEach(({ attributes }) => {
       attributes
         .sort((a, b) => a.name.localeCompare(b.name))
@@ -279,19 +280,19 @@ const Sidebar = ({ video, stars, bookmarks, attributes, categories, update, onMo
   )
 }
 
-interface StarsProps {
-  video: IVideo
-  stars: IStar[]
-  bookmarks: IBookmark[]
-  attributes: IAttribute[]
-  categories: ICategory[]
+type StarsProps = {
+  video: Video
+  stars: Star[]
+  bookmarks: Bookmark[]
+  attributes: Attribute[]
+  categories: Category[]
   clearActive: () => void
   update: {
-    stars: ISetState<IStar[]>
-    bookmarks: ISetState<IBookmark[]>
+    stars: SetState<Star[]>
+    bookmarks: SetState<Bookmark[]>
   }
-  onModal: IModalHandler
-  starEvent: { getEvent: IEvent; getDefault: IEventData; setEvent: IEventHandler }
+  onModal: ModalHandler
+  starEvent: { getEvent: Event; getDefault: EventData; setEvent: EventHandler }
 }
 const Stars = ({
   video,
@@ -313,7 +314,7 @@ const Stars = ({
   useEffect(() => {
     update.stars(
       [...stars].sort((a, b) => {
-        const bookmarkTime = (star: IStar) => bookmarks.find(bookmark => bookmark.starID === star.id)?.start ?? Infinity
+        const bookmarkTime = (star: Star) => bookmarks.find(bookmark => bookmark.starID === star.id)?.start ?? Infinity
 
         return bookmarkTime(a) - bookmarkTime(b)
       })
@@ -342,20 +343,20 @@ const Stars = ({
   )
 }
 
-interface StarProps {
-  video: IVideo
-  star: IStar
-  bookmarks: IBookmark[]
-  attributes: IAttribute[]
-  categories: ICategory[]
+type StarProps = {
+  video: Video
+  star: Star
+  bookmarks: Bookmark[]
+  attributes: Attribute[]
+  categories: Category[]
   clearActive: () => void
-  update: ISetState<IBookmark[]>
+  update: SetState<Bookmark[]>
   removeStar: (id: number) => void
-  onModal: IModalHandler
+  onModal: ModalHandler
   starEvent: {
-    getEvent: IEvent
-    setEvent: IEventHandler
-    getDefault: IEvent['data']
+    getEvent: Event
+    setEvent: EventHandler
+    getDefault: Event['data']
   }
 }
 const Star = ({
@@ -372,7 +373,7 @@ const Star = ({
 }: StarProps) => {
   const [border, setBorder] = useState(false)
 
-  const handleRibbon = (star: IStar) => {
+  const handleRibbon = (star: Star) => {
     const hasBookmark = bookmarks.some(bookmark => bookmark.starID === star.id)
 
     if (hasBookmark) return null
@@ -380,7 +381,7 @@ const Star = ({
     return <Ribbon label='NEW' />
   }
 
-  const addBookmark = (category: ICategory, star: IStar) => {
+  const addBookmark = (category: Category, star: Star) => {
     const player = document.getElementsByTagName('video')[0]
 
     const time = Math.round(player.currentTime)
@@ -404,7 +405,7 @@ const Star = ({
     }
   }
 
-  const addAttribute = (star: IStar, attribute: IAttribute) => {
+  const addAttribute = (star: Star, attribute: Attribute) => {
     bookmarkService.addStarAttribute(video.id, star.id, attribute.id).then(() => {
       update(
         bookmarks.map(bookmark => {
@@ -420,7 +421,7 @@ const Star = ({
     })
   }
 
-  const setActive = (star: IStar) => {
+  const setActive = (star: Star) => {
     update(
       bookmarks.map(bookmark => {
         if (bookmark.starID === star.id) bookmark.active = true
@@ -431,7 +432,7 @@ const Star = ({
   }
 
   // TODO auto-run if only 1 star
-  const addStar = (star: IStar) => {
+  const addStar = (star: Star) => {
     const bookmark = starEvent.getEvent.data
 
     // Remove Border
@@ -571,14 +572,14 @@ const Star = ({
   )
 }
 
-interface StarInputProps {
-  video: IVideo
-  stars: IStar[]
-  bookmarks: IBookmark[]
-  getAttributes: () => IAttribute[]
+type StarInputProps = {
+  video: Video
+  stars: Star[]
+  bookmarks: Bookmark[]
+  getAttributes: () => Attribute[]
   update: {
-    video: ISetState<IVideo | undefined>
-    stars: ISetState<IStar[]>
+    video: SetState<Video | undefined>
+    stars: SetState<Star[]>
   }
 }
 const StarInput = ({ video, stars, bookmarks, getAttributes, update }: StarInputProps) => {
@@ -673,11 +674,11 @@ const StarInput = ({ video, stars, bookmarks, getAttributes, update }: StarInput
   )
 }
 
-interface AddRelatedStarsProps {
-  video: IVideo
+type AddRelatedStarsProps = {
+  video: Video
   stars: any[]
   disabled: boolean
-  update: ISetState<IStar[]>
+  update: SetState<Star[]>
 }
 const AddRelatedStars = ({ video, stars, disabled, update }: AddRelatedStarsProps) => {
   const { data: relatedStars } = videoService.useRelatedStars(video.id)
@@ -709,12 +710,12 @@ const AddRelatedStars = ({ video, stars, disabled, update }: AddRelatedStarsProp
   )
 }
 
-interface RemoveUnusedStarsProps {
-  video: IVideo
-  bookmarks: IBookmark[]
-  stars: IStar[]
+type RemoveUnusedStarsProps = {
+  video: Video
+  bookmarks: Bookmark[]
+  stars: Star[]
   disabled: boolean
-  update: ISetState<IStar[]>
+  update: SetState<Star[]>
 }
 const RemoveUnusedStars = ({ video, bookmarks, stars, disabled, update }: RemoveUnusedStarsProps) => {
   if (disabled || !stars.some(star => bookmarks.every(bookmark => bookmark.starID !== star.id))) {
@@ -746,8 +747,8 @@ const RemoveUnusedStars = ({ video, bookmarks, stars, disabled, update }: Remove
   )
 }
 
-interface FranchiseProps {
-  video: IVideo
+type FranchiseProps = {
+  video: Video
 }
 const Franchise = ({ video }: FranchiseProps) => {
   if (video.related.length === 1) return null
@@ -779,15 +780,15 @@ const Franchise = ({ video }: FranchiseProps) => {
   )
 }
 
-interface AttributesProps {
-  video: IVideo
-  bookmarks: IBookmark[]
+type AttributesProps = {
+  video: Video
+  bookmarks: Bookmark[]
   clearActive: () => void
-  update: ISetState<IBookmark[]>
-  getAttributes: () => IAttribute[]
+  update: SetState<Bookmark[]>
+  getAttributes: () => Attribute[]
 }
 const Attributes = ({ video, bookmarks, clearActive, update, getAttributes }: AttributesProps) => {
-  const attribute_setActive = (attribute: IAttribute) => {
+  const attribute_setActive = (attribute: Attribute) => {
     update(
       bookmarks.map(bookmark => {
         if (bookmark.attributes.some(bookmarkAttribute => bookmarkAttribute.id === attribute.id)) bookmark.active = true
@@ -797,7 +798,7 @@ const Attributes = ({ video, bookmarks, clearActive, update, getAttributes }: At
     )
   }
 
-  const removeAttribute = (attribute: IAttribute) => {
+  const removeAttribute = (attribute: Attribute) => {
     videoService.removeAttribute(video.id, attribute.id).then(() => {
       update(
         bookmarks.map(bookmark => ({
@@ -836,10 +837,10 @@ const Attributes = ({ video, bookmarks, clearActive, update, getAttributes }: At
   )
 }
 
-interface OutfitProps {
-  bookmarks: IBookmark[]
+type OutfitProps = {
+  bookmarks: Bookmark[]
   clearActive: () => void
-  update: ISetState<IBookmark[]>
+  update: SetState<Bookmark[]>
 }
 const Outfits = ({ bookmarks, clearActive, update }: OutfitProps) => {
   const getOutfits = () => [

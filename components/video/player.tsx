@@ -1,5 +1,5 @@
 import { RefObject, useEffect, useRef, useState } from 'react'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/navigation'
 
 import { Button, TextField } from '@mui/material'
 
@@ -8,28 +8,28 @@ import HlsJS, { ErrorDetails } from 'hls.js'
 import { useKey } from 'react-use'
 import { useSessionStorage } from 'usehooks-ts'
 
-import type { IModal, IModalHandler } from '../modal'
+import type { Modal, ModalHandler } from '../modal'
 import Icon from '../icon'
 import Plyr from '../plyr'
 
-import { IBookmark, ICategory, IVideo, IVideoStar, ISetState } from '@interfaces'
+import { Bookmark, Category, Video, VideoStar, SetState } from '@interfaces'
 import { videoService } from '@service'
 import { serverConfig } from '@config'
 
-interface VideoPlayerProps {
-  video: IVideo
-  bookmarks: IBookmark[]
-  categories: ICategory[]
-  stars: IVideoStar[]
+type VideoPlayerProps = {
+  video: Video
+  bookmarks: Bookmark[]
+  categories: Category[]
+  stars: VideoStar[]
   update: {
-    video: ISetState<IVideo | undefined>
-    bookmarks: ISetState<IBookmark[]>
+    video: SetState<Video | undefined>
+    bookmarks: SetState<Bookmark[]>
   }
   updateDuration: (duration: number) => void
   plyrRef: RefObject<any>
   modal: {
-    handler: IModalHandler
-    data: IModal
+    handler: ModalHandler
+    data: Modal
   }
 }
 const VideoPlayer = ({
@@ -82,7 +82,7 @@ const VideoPlayer = ({
             player.currentTime += getSeekTime()
             break
           case 'ArrowUp':
-            player.volume = Math.ceil((player.volume + 0.1) * 10) / 10
+            player.volume = Math.ceil(((player.volume as number) + 0.1) * 10) / 10
             break
           case 'ArrowDown':
             player.volume = Math.floor((player.volume - 0.1) * 10) / 10
@@ -188,7 +188,7 @@ const VideoPlayer = ({
 
   const resetPlays = () => {
     videoService.resetPlays(video.id).then(() => {
-      router.reload()
+      router.refresh()
     })
   }
 
@@ -200,7 +200,7 @@ const VideoPlayer = ({
 
   const renameVideo = (path: string) => {
     videoService.renameVideo(video.id, path).then(() => {
-      router.reload()
+      router.refresh()
     })
   }
 
@@ -212,17 +212,17 @@ const VideoPlayer = ({
 
   const updateVideo = () => {
     videoService.updateVideo(video.id).then(() => {
-      router.reload()
+      router.refresh()
     })
   }
 
   const setCover = (url: string) => {
     videoService.setCover(video.id, url).then(() => {
-      router.reload()
+      router.refresh()
     })
   }
 
-  const addBookmark = (category: ICategory) => {
+  const addBookmark = (category: Category) => {
     const time = Math.round(getPlayer().currentTime)
     if (time) {
       videoService.addBookmark(video.id, category.id, time).then(({ data }) => {

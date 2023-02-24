@@ -1,6 +1,6 @@
 import { NextPage } from 'next/types'
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/navigation'
 
 import {
   Grid,
@@ -19,20 +19,20 @@ import {
 import axios from 'axios'
 import capitalize from 'capitalize'
 
-import { IGeneral } from '@interfaces'
+import { General } from '@interfaces'
 import { serverConfig } from '@config'
 
 import styles from './editor.module.scss'
 
-interface IUpdateRef {
+type UpdateRef = {
   id: number
   name: string
   videoOnly?: boolean
   starOnly?: boolean
 }
 
-type IOnlyType = 'starOnly' | 'videoOnly'
-type IWithOnlyType = IGeneral & { videoOnly?: boolean; starOnly?: boolean }
+type OnlyType = 'starOnly' | 'videoOnly'
+type WithOnlyType = General & { videoOnly?: boolean; starOnly?: boolean }
 
 const EditorPage: NextPage = () => (
   <Grid container justifyContent='center'>
@@ -42,7 +42,7 @@ const EditorPage: NextPage = () => (
   </Grid>
 )
 
-const Wrapper = ({ label, name, obj = [] }: { label: string; name: string; obj?: IOnlyType[] }) => {
+const Wrapper = ({ label, name, obj = [] }: { label: string; name: string; obj?: OnlyType[] }) => {
   const router = useRouter()
 
   const [input, setInput] = useState('')
@@ -54,7 +54,7 @@ const Wrapper = ({ label, name, obj = [] }: { label: string; name: string; obj?:
       if (input.toLowerCase() === input) return
 
       axios.post(`${serverConfig.api}/${name}`, { name: input }).then(() => {
-        router.reload()
+        router.refresh()
       })
     }
   }
@@ -92,20 +92,20 @@ const Wrapper = ({ label, name, obj = [] }: { label: string; name: string; obj?:
   )
 }
 
-interface TableWrapperProps {
+type TableWrapperProps = {
   label: string
-  obj: IOnlyType[]
+  obj: OnlyType[]
 }
 const TableWrapper = ({ label, obj = [] }: TableWrapperProps) => {
-  const [data, setData] = useState<IWithOnlyType[]>([])
+  const [data, setData] = useState<WithOnlyType[]>([])
 
   useEffect(() => {
-    axios.get<IWithOnlyType[]>(`${serverConfig.api}/${label}`).then(({ data }) => {
+    axios.get<WithOnlyType[]>(`${serverConfig.api}/${label}`).then(({ data }) => {
       setData(data.sort((a, b) => a.id - b.id))
     })
   }, [label])
 
-  const updateItem = (ref: IUpdateRef, value: string) => {
+  const updateItem = (ref: UpdateRef, value: string) => {
     axios.put(`${serverConfig.api}/${label}/${ref.id}`, { value }).then(() => {
       setData(data.map(item => ({ ...item, name: ref.id === item.id ? value : item.name })))
     })
@@ -127,12 +127,7 @@ const TableWrapper = ({ label, obj = [] }: TableWrapperProps) => {
 
         <TableBody>
           {data.map(item => (
-            <TableItem
-              key={item.id}
-              obj={obj}
-              data={item}
-              update={(ref: IUpdateRef, value: string) => updateItem(ref, value)}
-            />
+            <TableItem key={item.id} obj={obj} data={item} update={updateItem} />
           ))}
         </TableBody>
       </Table>
@@ -140,10 +135,10 @@ const TableWrapper = ({ label, obj = [] }: TableWrapperProps) => {
   )
 }
 
-interface TableItemProps {
-  update: (ref: IUpdateRef, value: string) => void
-  data: IWithOnlyType
-  obj: IOnlyType[]
+type TableItemProps = {
+  update: (ref: UpdateRef, value: string) => void
+  data: WithOnlyType
+  obj: OnlyType[]
 }
 const TableItem = ({ update, data, obj }: TableItemProps) => {
   const [edit, setEdit] = useState(false)
@@ -155,7 +150,7 @@ const TableItem = ({ update, data, obj }: TableItemProps) => {
     if (value) update(data, value)
   }
 
-  const setCondition = (ref: IUpdateRef, prop: string, value: boolean, checkbox: HTMLInputElement) => {
+  const setCondition = (ref: UpdateRef, prop: string, value: boolean, checkbox: HTMLInputElement) => {
     axios.put(`${serverConfig.api}/attribute/${ref.id}`, { label: prop, value }).catch(() => {
       checkbox.checked = !value
     })

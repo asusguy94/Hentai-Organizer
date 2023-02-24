@@ -1,5 +1,5 @@
 import { NextPage } from 'next/types'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 
 import {
   Grid,
@@ -18,26 +18,24 @@ import capitalize from 'capitalize'
 
 import { ImageCard } from '@components/image'
 import { RegularHandlerProps, RegularItem } from '@components/indeterminate'
-import LabelCount from '@components/labelcount'
 import { getVisible } from '@components/search/helper'
-import { FilterButton } from '@components/search/sidebar'
 import VGrid from '@components/virtualized/virtuoso'
-import Loader from '@components/loader'
+import Spinner from '@components/spinner'
 import Link from '@components/link'
 import SortObj from '@components/search/sort'
 
-import { IStar, ISetState } from '@interfaces'
+import { SetState } from '@interfaces'
 import { searchService, starService } from '@service'
 import { serverConfig } from '@config'
 
 import styles from './search.module.scss'
 
-interface IStarData {
+type StarData = Partial<{
   breasts: string[]
   haircolors: string[]
   hairstyles: string[]
   attributes: string[]
-}
+}>
 
 const StarSearchPage: NextPage = () => {
   const { data } = searchService.useStars()
@@ -79,9 +77,9 @@ const StarSearchPage: NextPage = () => {
   )
 }
 
-interface SidebarProps {
-  stars: IStar[]
-  update: ISetState<IStar[]>
+type SidebarProps = {
+  setHidden: SetState<Hidden>
+  setSort: SetState<StarSort>
 }
 const Sidebar = ({ stars, update }: SidebarProps) => {
   const { breast, haircolor, hairstyle, attribute } = starService.useInfo().data ?? {}
@@ -106,35 +104,31 @@ const Sidebar = ({ stars, update }: SidebarProps) => {
   )
 }
 
-interface StarsProps {
-  stars: IStar[]
+type StarsProps = {
+  stars?: Star[]
+  hidden: Hidden
+  sortMethod: SortMethodStar
 }
 const Stars = ({ stars }: StarsProps) => {
   const visibleStars = getVisible(stars)
 
   return (
     <div id={styles.stars}>
-      {stars.length > 0 ? (
-        <>
           <Typography variant='h6' className='text-center'>
             <span id={styles.count}>{visibleStars.length}</span> Stars
           </Typography>
 
-          <VGrid
-            itemHeight={333}
-            total={visibleStars.length}
-            renderData={(idx: number) => <StarCard star={visibleStars[idx]} />}
-          />
-        </>
+      {stars.length !== 0 ? (
+        <VGrid itemHeight={333} total={visible.length} renderData={(idx: number) => <StarCard star={visible[idx]} />} />
       ) : (
-        <Loader />
+        <Spinner />
       )}
     </div>
   )
 }
 
-interface StarCardProps {
-  star?: IStar
+type StarCardProps = {
+  star?: Star
 }
 const StarCard = ({ star }: StarCardProps) => {
   if (star === undefined) return null //FIXME cleanup is not working correctly
@@ -161,9 +155,8 @@ const StarCard = ({ star }: StarCardProps) => {
   )
 }
 
-interface SortProps {
-  stars: IStar[]
-  update: ISetState<IStar[]>
+type SortProps = {
+  setSort: SetState<StarSort>
 }
 const Sort = ({ stars, update }: SortProps) => {
   const sortDefault = (reverse = false) => {
@@ -390,7 +383,8 @@ interface FilterRadioProps {
   globalCallback?: () => void
   count?: boolean
 }
-const FilterRadio = ({ data, label, obj, callback, globalCallback, count = true }: FilterRadioProps) => (
+const FilterRadio = ({ data, label, callback, globalCallback }: FilterRadioProps) => {
+  return (
   <>
     <h2>{capitalize(label, true)}</h2>
 
@@ -410,11 +404,7 @@ const FilterRadio = ({ data, label, obj, callback, globalCallback, count = true 
             key={item}
             value={item}
             onChange={() => callback(item)}
-            label={
-              <>
-                {item} {count && <LabelCount prop={label} label={item} obj={obj} />}
-              </>
-            }
+              label={item}
             control={<Radio />}
           />
         ))}
@@ -422,32 +412,21 @@ const FilterRadio = ({ data, label, obj, callback, globalCallback, count = true 
     </FormControl>
   </>
 )
+}
 
-interface FilterCheckBoxProps {
-  data: string[]
+type FilterCheckBoxProps = {
+  data?: string[]
   label: string
-  labelPlural: string
-  obj: IStar[]
   callback: (ref: RegularHandlerProps, item: string | undefined) => void
 }
-const FilterCheckBox = ({ data, label, labelPlural, obj, callback }: FilterCheckBoxProps) => {
+const FilterCheckBox = ({ data, label, callback }: FilterCheckBoxProps) => {
   return (
     <>
       <h2>{capitalize(label, true)}</h2>
 
       <FormControl>
         {data.map(item => (
-          <RegularItem
-            key={item}
-            label={
-              <>
-                {item} <LabelCount prop={labelPlural} label={item} obj={obj} />
-              </>
-            }
-            value={item}
-            item={item}
-            callback={(ref, item) => callback(ref, item)}
-          />
+          <RegularItem key={item} label={item} value={item} item={item} callback={callback} />
         ))}
       </FormControl>
     </>

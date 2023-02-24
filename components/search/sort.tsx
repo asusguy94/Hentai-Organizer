@@ -1,6 +1,6 @@
 import { FormControlLabel, Radio } from '@mui/material'
 
-interface SortObjProps {
+type SortObjProps = {
   label: {
     asc: string
     desc: string

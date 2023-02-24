@@ -1,6 +1,6 @@
 import { NextPage } from 'next/types'
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/navigation'
 
 import {
   Grid,
@@ -17,11 +17,11 @@ import {
 
 import axios from 'axios'
 
-import Loader from '@components/loader'
+import Spinner from '@components/spinner'
 
 import { serverConfig } from '@config'
 
-interface IVideo {
+type Video = {
   path: string
   franchise: string
   episode: number
@@ -30,7 +30,7 @@ interface IVideo {
 const AddVideoPage: NextPage = () => {
   const router = useRouter()
 
-  const [videos, setVideos] = useState<IVideo[]>([])
+  const [videos, setVideos] = useState<Video[]>([])
   const [loaded, setLoaded] = useState(false)
 
   useEffect(() => {
@@ -81,7 +81,7 @@ const AddVideoPage: NextPage = () => {
                 label='Add Videos'
                 callback={() =>
                   void axios.post(`${serverConfig.api}/video/add`, { videos }).then(() => {
-                    router.reload()
+                    router.refresh()
                   })
                 }
               />
@@ -89,13 +89,13 @@ const AddVideoPage: NextPage = () => {
           </>
         )
       ) : (
-        <Loader />
+        <Spinner />
       )}
     </Grid>
   )
 }
 
-interface ButtonProps {
+type ButtonProps = {
   label: string
   callback?: () => void
   disabled?: boolean

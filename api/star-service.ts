@@ -12,14 +12,14 @@ export default {
   useStar: <T>(id: number = defaultNumber) => useFetch<T>(`${baseURL}/${id}`),
   useVideos: <T>(id: number = defaultNumber) => useFetch<T[]>(`${baseURL}/${id}/video`),
   useInfo: () => {
-    interface IStarInfo {
+    type StarInfo = {
       breast: string[]
       haircolor: string[]
       hairstyle: string[]
       attribute: string[]
     }
 
-    return useFetch<IStarInfo>(baseURL)
+    return useFetch<StarInfo>(baseURL)
   },
   addAttribute: (id: number, name: string) => api.put(`/${id}/attribute`, { name }),
   removeAttribute: (id: number, name: string) => api.put(`/${id}/attribute`, { name, remove: true }),
@@ -27,6 +27,6 @@ export default {
   addImage: (id: number, url: string) => api.post(`/${id}/image`, { url }),
   removeImage: (id: number) => api.delete(`/${id}/image`),
   removeStar: (id: number) => api.delete(`/${id}`),
-  renameStar: (id: number, name: string) => axios.put(`/${id}`, { name }),
+  renameStar: (id: number, name: string) => api.put(`/${id}`, { name }),
   setLink: (id: number, value: string) => api.put(`/${id}`, { label: 'starLink', value })
 }

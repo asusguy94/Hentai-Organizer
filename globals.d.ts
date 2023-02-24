@@ -1,12 +1,15 @@
 declare module 'react-contextmenu' {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
   interface ContextMenuProps {
     children: React.ReactNode
   }
 
+  // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
   interface ContextMenuTriggerProps {
     children: React.ReactNode
   }
 
+  // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
   interface MenuItemProps {
     children?: React.ReactNode
   }
@@ -18,7 +21,7 @@ declare module 'get-video-dimensions' {
 }
 
 declare module 'ffmpeg-generate-video-preview' {
-  interface IArgs {
+  type Args = {
     input: string
     output: string
     width?: number
@@ -39,7 +42,7 @@ declare module 'ffmpeg-generate-video-preview' {
     log?: (message: string) => void
   }
 
-  function placeholder(args: IArgs): Promise<{
+  function placeholder(args: Args): Promise<{
     output: string
     numFrames: number
     width: number
@@ -47,18 +50,5 @@ declare module 'ffmpeg-generate-video-preview' {
     rows: number
     cols: number
   }>
-  export = placeholder
-}
-
-declare module 'ffmpeg-extract-frame' {
-  interface IArgs {
-    input: string
-    output: string
-    offset?: number
-    quality?: number
-    log?: (message: string) => void
-  }
-
-  function placeholder(args: IArgs): Promise<void>
   export = placeholder
 }

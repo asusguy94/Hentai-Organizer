@@ -1,6 +1,6 @@
 import styles from './ribbon.module.scss'
 
-interface RibbonProps {
+type RibbonProps = {
   label: string
 }
 const Ribbon = ({ label }: RibbonProps) => {
@@ -9,7 +9,7 @@ const Ribbon = ({ label }: RibbonProps) => {
   return <span className={`${styles.ribbon} unselectable`}>{label}</span>
 }
 
-interface ContainerProps {
+type ContainerProps = {
   children: React.ReactNode
   component?: React.ElementType
   className?: string

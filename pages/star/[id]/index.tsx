@@ -18,24 +18,24 @@ import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu'
 
 import Image from '@components/image'
 import Link from '@components/link'
-import Modal, { IModalHandler, useModal } from '@components/modal'
-import Loader from '@components/loader'
+import ModalComponent, { ModalHandler, useModal } from '@components/modal'
+import Spinner from '@components/spinner'
 import Dropbox from '@components/dropbox'
 import Icon from '@components/icon'
 
-import { ISetState } from '@interfaces'
+import { SetState } from '@interfaces'
 import { starService } from '@service'
 import { serverConfig } from '@config'
 
 import styles from './star.module.scss'
 
-interface IStarVideo {
+type StarVideo = {
   id: number
   name: string
   fname: string
 }
 
-interface IStar {
+type Star = {
   id: number
   name: string
   image: string | null
@@ -52,11 +52,11 @@ const StarPage: NextPage = () => {
   const { query, isReady } = useRouter()
 
   const starID = isReady && typeof query.id === 'string' ? parseInt(query.id) : undefined
-  const { data: starData } = starService.useStar<IStar>(starID)
-  const { data: videoData } = starService.useVideos<IStarVideo>(starID)
+  const { data: starData } = starService.useStar<Star>(starID)
+  const { data: videoData } = starService.useVideos<StarVideo>(starID)
 
-  const [star, setStar] = useState<IStar>()
-  const [videos, setVideos] = useState<IStarVideo[]>([])
+  const [star, setStar] = useState<Star>()
+  const [videos, setVideos] = useState<StarVideo[]>([])
 
   const { modal, setModal } = useModal()
 
@@ -85,16 +85,16 @@ const StarPage: NextPage = () => {
           <Loader />
         )}
 
-        <Modal visible={modal.visible} title={modal.title} filter={modal.filter} onClose={setModal}>
+        <ModalComponent visible={modal.visible} title={modal.title} filter={modal.filter} onClose={setModal}>
           {modal.data}
-        </Modal>
+        </ModalComponent>
       </Grid>
     </Grid>
   )
 }
 
-interface StarVideosProps {
-  videos: IStarVideo[]
+type StarVideosProps = {
+  videos: StarVideo[]
 }
 const StarVideos = ({ videos }: StarVideosProps) => {
   if (videos.length === 0) return null
@@ -112,9 +112,9 @@ const StarVideos = ({ videos }: StarVideosProps) => {
   )
 }
 
-interface StarFormProps {
-  star: IStar
-  update: ISetState<IStar | undefined>
+type StarFormProps = {
+  star: Star
+  update: SetState<Star | undefined>
 }
 const StarForm = ({ star, update }: StarFormProps) => {
   const { data: starData } = starService.useInfo()
@@ -166,10 +166,10 @@ const StarForm = ({ star, update }: StarFormProps) => {
   )
 }
 
-interface StarImageDropboxProps {
-  star: IStar
-  videos: IStarVideo[]
-  update: ISetState<IStar | undefined>
+type StarImageDropboxProps = {
+  star: Star
+  videos: StarVideo[]
+  update: SetState<Star | undefined>
 }
 const StarImageDropbox = ({ star, videos, update }: StarImageDropboxProps) => {
   const router = useRouter()
@@ -229,7 +229,7 @@ const StarImageDropbox = ({ star, videos, update }: StarImageDropboxProps) => {
   )
 }
 
-const StarVideo = ({ video }: { video: IStarVideo }) => {
+const StarVideo = ({ video }: { video: StarVideo }) => {
   const [src, setSrc] = useState('')
 
   // FIXME this is not working as intended
@@ -319,7 +319,7 @@ const StarVideo = ({ video }: { video: IStarVideo }) => {
   )
 }
 
-interface StarInputFormProps {
+type StarInputFormProps = {
   update: (value: string, label: string) => void
   value: string
   name: string
@@ -401,7 +401,7 @@ const StarInputForm = ({ value, emptyByDefault = false, update, name, list, chil
   )
 }
 
-interface StarAttributesProps {
+type StarAttributesProps = {
   remove: (name: string) => void
   data: any
 }
@@ -425,10 +425,10 @@ const StarAttributes = ({ remove, data }: StarAttributesProps) => {
   ))
 }
 
-interface StarTitleProps {
-  star: IStar
-  onModal: IModalHandler
-  update: ISetState<IStar | undefined>
+type StarTitleProps = {
+  star: Star
+  onModal: ModalHandler
+  update: SetState<Star | undefined>
 }
 const StarTitle = ({ star, onModal: handleModal, update }: StarTitleProps) => {
   const renameStar = (name: string) => {

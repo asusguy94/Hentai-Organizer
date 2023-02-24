@@ -6,23 +6,23 @@ import { useKey } from 'react-use'
 
 import styles from './modal.module.scss'
 
-export interface IModal {
+export type Modal = {
   visible: boolean
   title: string
   data: React.ReactNode
   filter: boolean
 }
-export type IModalHandler = (title?: IModal['title'], data?: IModal['data'], filter?: IModal['filter']) => void
+export type ModalHandler = (title?: Modal['title'], data?: Modal['data'], filter?: Modal['filter']) => void
 
 export const useModal = () => {
-  const [modal, setModal] = useState<IModal>({
+  const [modal, setModal] = useState<Modal>({
     visible: false,
     title: '',
     data: null,
     filter: false
   })
 
-  const handleModal: IModalHandler = (title = '', data = null, filter = false) => {
+  const handleModal: ModalHandler = (title = '', data = null, filter = false) => {
     setModal(prevModal => ({
       title,
       data,
@@ -34,7 +34,7 @@ export const useModal = () => {
   return { modal, setModal: handleModal }
 }
 
-interface ModalProps {
+type ModalProps = {
   title: string
   visible: boolean
   filter: boolean
@@ -42,7 +42,7 @@ interface ModalProps {
   onClose: () => void
 }
 
-const Modal = ({ title, visible, filter, children, onClose }: ModalProps) => {
+const ModalComponent = ({ title, visible, filter, children, onClose }: ModalProps) => {
   const [query, setQuery] = useState('')
 
   const isLetter = (e: KeyboardEvent) => /^Key([A-Z])$/.test(e.code)
@@ -71,7 +71,7 @@ const Modal = ({ title, visible, filter, children, onClose }: ModalProps) => {
   )
 }
 
-interface ModalChildProps {
+type ModalChildProps = {
   title: string
   children: React.ReactNode
   query: string
@@ -123,4 +123,4 @@ const ModalChild = ({ title, filter, children, query, onClose }: ModalChildProps
   )
 }
 
-export default Modal
+export default ModalComponent

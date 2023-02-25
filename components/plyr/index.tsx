@@ -5,7 +5,7 @@ import Plyr from 'plyr'
 import { settingsConfig } from '@config'
 
 type PlyrProps = {
-  plyrRef: React.MutableRefObject<any>
+  plyrRef: React.MutableRefObject<Plyr | null>
   source: string
   thumbnail: string
 }

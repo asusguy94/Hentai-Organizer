@@ -114,11 +114,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const video = await prisma.video.findFirstOrThrow({ where: { id: parseInt(id) } })
         await downloader(cover, `media/images/videos/${video.id}.png`)
 
-        await prisma.video.update({ where: { id: parseInt(id) }, data: { cover: `${video.id}.png` } })
+        await prisma.video.update({
+          where: { id: video.id },
+          data: { cover: `${video.id}.png` }
+        })
       } else {
         // Refresh Video
         // Update Database
-        await prisma.video.update({ where: { id: parseInt(id) }, data: { duration: 0, height: 0 } })
+        await prisma.video.update({
+          where: { id: parseInt(id) },
+          data: { duration: 0, height: 0 }
+        })
 
         // DEBUG only used for updating quality >> will require some time to refresh
         // removeStreamFolder(`./media/videos/${dirOnly(video.path)}`)

@@ -26,7 +26,7 @@ type VideoPlayerProps = {
     bookmarks: SetState<Bookmark[]>
   }
   updateDuration: (duration: number) => void
-  plyrRef: RefObject<any>
+  plyrRef: RefObject<HTMLVideoElement | Plyr | undefined>
   modal: {
     handler: ModalHandler
     data: Modal
@@ -56,7 +56,7 @@ const VideoPlayer = ({
   const isMute = (e: KeyboardEvent) => e.code === 'KeyM'
   const isSpace = (e: KeyboardEvent) => e.code === 'Space'
 
-  const getPlayer = () => plyrRef.current
+  const getPlayer = () => plyrRef.current as unknown as Plyr
 
   useKey(
     e => !modal.data.visible && (isArrow(e) || isMute(e) || isSpace(e)),
@@ -82,7 +82,7 @@ const VideoPlayer = ({
             player.currentTime += getSeekTime()
             break
           case 'ArrowUp':
-            player.volume = Math.ceil(((player.volume as number) + 0.1) * 10) / 10
+            player.volume = Math.ceil((player.volume + 0.1) * 10) / 10
             break
           case 'ArrowDown':
             player.volume = Math.floor((player.volume - 0.1) * 10) / 10
@@ -136,7 +136,7 @@ const VideoPlayer = ({
 
   useEffect(() => {
     if (events) {
-      const player = getPlayer()
+      const player = getPlayer() as Plyr & { media: HTMLVideoElement }
 
       if (HlsJS.isSupported()) {
         const hls = new HlsJS({
@@ -171,9 +171,9 @@ const VideoPlayer = ({
 
   useEffect(() => {
     if (fallback) {
-      const player = getPlayer()
+      const player = getPlayer() as unknown as HTMLVideoElement & { media: HTMLVideoElement }
 
-      player.media.source = `${serverConfig.api}/video/${video.id}`
+      player.media.src = `${serverConfig.api}/video/${video.id}`
       player.media.ondurationchange = () => updateDuration(player.media.duration)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -248,7 +248,7 @@ const VideoPlayer = ({
     <div className='video-container' onWheel={handleWheel}>
       <ContextMenuTrigger id='video' holdToDisplay={-1}>
         <Plyr
-          plyrRef={plyrRef}
+          plyrRef={plyrRef as React.MutableRefObject<Plyr>}
           source={`${serverConfig.api}/video/${video.id}/file`}
           thumbnail={`${serverConfig.api}/video/${video.id}/vtt`}
         />

@@ -73,7 +73,7 @@ export function RegularItem<T>({ label, value, item, callback }: RegularItemProp
             setChecked(checked => {
               const status = !checked
 
-              callback({ checked: status }, item!)
+              callback({ checked: status }, item as T)
               return status
             })
           }}

@@ -35,7 +35,8 @@ const getClosest = (search: number, arr: number[]) => {
  */
 export const downloader = async (url: string, path: string) => {
   const response = await fetch(url)
-  const buffer = await response.buffer()
+  const buffer = new Uint8Array(await response.arrayBuffer())
+
   await fs.promises.writeFile(`./${path}`, buffer)
 }
 

@@ -325,7 +325,7 @@ type StarInputFormProps = {
   update: (value: string, label: string) => void
   value: string
   name: string
-  list: any
+  list: string[]
   emptyByDefault?: boolean
   children?: React.ReactNode
 }
@@ -372,7 +372,7 @@ const StarInputForm = ({ value, emptyByDefault = false, update, name, list, chil
           onKeyPress={handleKeyPress}
           //
           // OPTIONS
-          options={list.filter((item: any) => (emptyByDefault && value.includes(item) ? null : item))}
+          options={list.filter(item => (emptyByDefault && value.includes(item) ? null : item))}
           renderInput={params => (
             <TextField
               {...params}

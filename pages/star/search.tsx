@@ -106,7 +106,7 @@ const Stars = ({ stars = [], hidden, sortMethod }: StarsProps) => {
       </Typography>
 
       {stars.length !== 0 ? (
-        <VGrid itemHeight={333} total={visible.length} renderData={(idx: number) => <StarCard star={visible[idx]} />} />
+        <VGrid itemHeight={333} total={visible.length} renderData={idx => <StarCard star={visible[idx]} />} />
       ) : (
         <Spinner />
       )}

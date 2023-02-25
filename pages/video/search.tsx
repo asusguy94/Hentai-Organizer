@@ -89,11 +89,7 @@ const Videos = ({ videos = [], hidden, sortMethod }: VideosProps) => {
       </Typography>
 
       {videos.length > 0 ? (
-        <VGrid
-          itemHeight={385.375}
-          total={visible.length}
-          renderData={(idx: number) => <VideoCard video={visible[idx]} />}
-        />
+        <VGrid itemHeight={385.375} total={visible.length} renderData={idx => <VideoCard video={visible[idx]} />} />
       ) : (
         <Spinner />
       )}
@@ -269,13 +265,7 @@ function FilterCheckBox<T extends General>({ data, label, callback }: FilterChec
 
       <FormControl>
         {data.map(item => (
-          <RegularItem
-            key={item.id}
-            label={item.name}
-            value={item.name}
-            item={item}
-            callback={(ref, item) => callback(ref, item)}
-          />
+          <RegularItem key={item.id} label={item.name} value={item.name} item={item} callback={callback} />
         ))}
       </FormControl>
     </>

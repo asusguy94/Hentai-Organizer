@@ -79,11 +79,11 @@ const AddVideoPage: NextPage = () => {
             <div style={{ marginTop: 8 }}>
               <Action
                 label='Add Videos'
-                callback={() =>
-                  void axios.post(`${serverConfig.api}/video/add`, { videos }).then(() => {
+                callback={() => {
+                  return void axios.post(`${serverConfig.api}/video/add`, { videos }).then(() => {
                     router.refresh()
                   })
-                }
+                }}
               />
             </div>
           </>

@@ -52,7 +52,7 @@ const Timeline = ({
 
   useEffect(() => {
     if (duration && video.duration) {
-      if (Math.abs(duration - video.duration) > settingsConfig.maxDurationDiff) {
+      if (Math.abs(duration - video.duration) > settingsConfig.player.maxDurationDiff) {
         alert('invalid video-duration')
 
         console.log('vDur', duration)

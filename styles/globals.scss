@@ -3,6 +3,10 @@
 @import 'util';
 @import 'variables';
 
+:root {
+  font-family: Roboto, Helvetica, sans-serif;
+}
+
 $initialHeight: 86vh;
 
 .plyr {
@@ -17,10 +21,6 @@ $initialHeight: 86vh;
       color: rgb(0, 200, 0);
     }
   }
-}
-
-body {
-  font-family: Roboto, Helvetica, sans-serif;
 }
 
 h1,

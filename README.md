@@ -10,7 +10,7 @@
    - username
    - password
    - database
-5. Docker application (eg. Docker Desktop)
+5. Docker application (eg. Docker Desktop) (optional)
 
 ## Installation
 
@@ -25,12 +25,27 @@ Any setting ending with `*` is required
 | NEXT_PUBLIC_TIMELINE_OFFSET     | The left offset of the timeline (default=`1`)                                                      |
 | NEXT_PUBLIC_TIMELINE_SPACING    | The max allowed horizontal spacing between bookmarks (default=`0`)                                 |
 | NEXT_PUBLIC_PLAYER_DURATIONDIFF | The max allowed difference of a video's duration and the reported duration (default=`1`)           |
-| NEXT_PUBLIC_THUMBNAILS          | Weather generated thumbnails should be used (default=`false`)                                      |
+| NEXT_PUBLIC_PLAYER_THUMBNAILS   | Weather generated thumbnails should be used (default=`false`)                                      |
 | THUMBNAIL_RES                   | The height used for thumbnails (default=`290`)                                                     |
 | PORT\*                          | _Only required for docker._ The port used for the application (default=`3000`)                     |
 | PATH\*                          | _Only docker._ The path to map to `app/media` (this directory should contain a `videos`-directory) |
 
 ### With Docker
+
+Since variables are saved when the program is built, there is currently no easy way to change settings.
+
+#### Variables that starts with NEXT_PUBLIC\_
+
+The following workaround is only required for settings that starts with `NEXT_PUBLIC_`.
+While I work on a solution, you can open the devtools (on one of the pages of the running app) in your browser and go to `console`, and then write the following command
+
+```js
+localStorage['NEXT_PUBLIC_TIMELINE_OFFSET'] = '4'
+```
+
+This will set the variable `NEXT_PUBLIC_TIMELINE_OFFSET` to `4`
+
+#### Other Variables
 
 Map the required path, port, and variables, [see the table above](#list-of-settings)
 

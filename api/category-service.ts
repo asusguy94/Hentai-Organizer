@@ -3,8 +3,8 @@ import { useFetch } from 'usehooks-ts'
 import { serverConfig } from '@config'
 import { Category } from '@interfaces'
 
-const baseUrl = `${serverConfig.api}/category`
+const baseURL = `${serverConfig.api}/category`
 
 export default {
-  useCategories: () => useFetch<Category[]>(baseUrl)
+  useCategories: () => useFetch<Category[]>(baseURL)
 }

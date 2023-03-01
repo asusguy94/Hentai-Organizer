@@ -35,5 +35,7 @@ export default {
   toggleNoStar: <T = any>(id: number, checked: boolean) => api.put<T>(`/${id}`, { noStar: checked }),
   addStar: <T = any>(id: number, name: string) => api.post<T>(`/${id}/star`, { name }),
   useRelatedStars: (id: number) => useFetch<General[]>(`${baseURL}/${id}/related/star`),
-  removeAttribute: (id: number, attributeID: number) => api.delete(`/${id}/attribute/${attributeID}`)
+  removeAttribute: (id: number, attributeID: number) => api.delete(`/${id}/attribute/${attributeID}`),
+  useNewVideos: <T = any>() => useFetch<T[]>(baseURL, { method: 'POST' }),
+  addVideos: <T = any>(videos: T[]) => api.post('/add', { videos })
 }

@@ -1,4 +1,4 @@
-import type { NextApiRequest, NextApiResponse } from 'next/types'
+import { NextApiRequest, NextApiResponse } from 'next/types'
 
 import { prisma } from '@utils/server'
 import { getUnique } from '@utils/server/helper'

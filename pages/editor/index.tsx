@@ -42,7 +42,13 @@ const EditorPage: NextPage = () => (
   </Grid>
 )
 
-const Wrapper = ({ label, name, obj = [] }: { label: string; name: string; obj?: OnlyType[] }) => {
+type WrapperProps = {
+  label: string
+  name: string
+  obj?: OnlyType[]
+}
+
+const Wrapper = ({ label, name, obj = [] }: WrapperProps) => {
   const router = useRouter()
 
   const [input, setInput] = useState('')

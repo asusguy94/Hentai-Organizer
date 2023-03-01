@@ -1,4 +1,4 @@
-import type { NextApiRequest, NextApiResponse } from 'next/types'
+import { NextApiRequest, NextApiResponse } from 'next/types'
 
 import fs from 'fs'
 

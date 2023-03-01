@@ -1,4 +1,4 @@
-import type { NextApiRequest, NextApiResponse } from 'next/types'
+import { NextApiRequest, NextApiResponse } from 'next/types'
 
 import ffmpeg from 'fluent-ffmpeg'
 import fs from 'fs'

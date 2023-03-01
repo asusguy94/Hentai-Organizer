@@ -502,6 +502,7 @@ const StarTitle = ({ star, onModal: handleModal, update }: StarTitleProps) => {
                     e.preventDefault()
 
                     handleModal()
+
                     //@ts-expect-error: target is missing from MUI
                     setLink(e.target.value)
                   }

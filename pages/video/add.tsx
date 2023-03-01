@@ -1,5 +1,5 @@
 import { NextPage } from 'next/types'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 import {
@@ -15,11 +15,9 @@ import {
   Paper
 } from '@mui/material'
 
-import axios from 'axios'
-
 import Spinner from '@components/spinner'
 
-import { serverConfig } from '@config'
+import { generateService, videoService } from '@service'
 
 type Video = {
   path: string
@@ -30,25 +28,17 @@ type Video = {
 const AddVideoPage: NextPage = () => {
   const router = useRouter()
 
-  const [videos, setVideos] = useState<Video[]>([])
-  const [loaded, setLoaded] = useState(false)
-
-  useEffect(() => {
-    axios
-      .post(`${serverConfig.api}/video`)
-      .then(({ data }) => setVideos(data))
-      .finally(() => setLoaded(true))
-  }, [])
+  const { data: videos } = videoService.useNewVideos<Video>()
 
   return (
     <Grid className='text-center'>
       <Typography style={{ marginBottom: 8 }}>Import Videos</Typography>
 
-      {loaded ? (
+      {videos !== undefined ? (
         !videos.length ? (
           <div className='text-center'>
-            <Action label='Generate Metadata' callback={() => void axios.post(`${serverConfig.api}/generate/meta`)} />
-            <Action label='Generate VTT' callback={() => void axios.post(`${serverConfig.api}/generate/vtt`)} />
+            <Action label='Generate Metadata' callback={() => void generateService.meta()} />
+            <Action label='Generate VTT' callback={() => void generateService.vtt()} />
           </div>
         ) : (
           <>
@@ -80,7 +70,7 @@ const AddVideoPage: NextPage = () => {
               <Action
                 label='Add Videos'
                 callback={() => {
-                  return void axios.post(`${serverConfig.api}/video/add`, { videos }).then(() => {
+                  videoService.addVideos(videos).then(() => {
                     router.refresh()
                   })
                 }}

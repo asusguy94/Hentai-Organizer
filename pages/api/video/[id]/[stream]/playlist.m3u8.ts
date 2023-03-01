@@ -1,4 +1,4 @@
-import type { NextApiRequest, NextApiResponse } from 'next/types'
+import { NextApiRequest, NextApiResponse } from 'next/types'
 
 import { prisma } from '@utils/server'
 import { noExt, sendFile } from '@utils/server/helper'

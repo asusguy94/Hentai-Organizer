@@ -1,6 +1,6 @@
 import { useFetch } from 'usehooks-ts'
 
-import type { StarSearch, VideoSearch } from '@components/search/helper'
+import { StarSearch, VideoSearch } from '@components/search/helper'
 
 import { serverConfig } from '@config'
 

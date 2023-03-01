@@ -8,7 +8,7 @@ import HlsJS, { ErrorDetails } from 'hls.js'
 import { useKey } from 'react-use'
 import { useSessionStorage } from 'usehooks-ts'
 
-import type { Modal, ModalHandler } from '../modal'
+import { Modal, ModalHandler } from '../modal'
 import Icon from '../icon'
 import Plyr from '../plyr'
 

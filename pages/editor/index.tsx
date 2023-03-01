@@ -23,6 +23,7 @@ import { General } from '@interfaces'
 import { serverConfig } from '@config'
 
 import styles from './editor.module.scss'
+import { attributeService } from '@service'
 
 type UpdateRef = {
   id: number
@@ -157,7 +158,7 @@ const TableItem = ({ update, data, obj }: TableItemProps) => {
   }
 
   const setCondition = (ref: UpdateRef, prop: string, value: boolean, checkbox: HTMLInputElement) => {
-    axios.put(`${serverConfig.api}/attribute/${ref.id}`, { label: prop, value }).catch(() => {
+    attributeService.setCondition(ref.id, prop, value).catch(() => {
       checkbox.checked = !value
     })
   }

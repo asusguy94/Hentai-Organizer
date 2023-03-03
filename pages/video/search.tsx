@@ -47,8 +47,6 @@ type VideoData = Partial<{
 }>
 
 const VideoSearchPage: NextPage = () => {
-  const { data: videos } = searchService.useVideos()
-
   const [sort, setSort] = useState<VideoSort>({ type: 'alphabetically', reverse: false })
   const [hidden, setHidden] = useState<Hidden>({
     titleSearch: '',
@@ -66,7 +64,7 @@ const VideoSearchPage: NextPage = () => {
       </Grid>
 
       <Grid item xs={10}>
-        <Videos videos={videos} hidden={hidden} sortMethod={getVideoSort(sort)} />
+        <Videos hidden={hidden} sortMethod={getVideoSort(sort)} />
       </Grid>
 
       <ScrollToTop smooth />
@@ -75,11 +73,14 @@ const VideoSearchPage: NextPage = () => {
 }
 
 type VideosProps = {
-  videos?: Video[]
   hidden: Hidden
   sortMethod: SortMethodVideo
 }
-const Videos = ({ videos = [], hidden, sortMethod }: VideosProps) => {
+const Videos = ({ hidden, sortMethod }: VideosProps) => {
+  const { data: videos } = searchService.useVideos()
+
+  if (videos === undefined) return <Spinner />
+
   const visible = getVisible(videos.sort(sortMethod), hidden)
 
   return (
@@ -88,11 +89,7 @@ const Videos = ({ videos = [], hidden, sortMethod }: VideosProps) => {
         <span id={styles.count}>{visible.length}</span> Videos
       </Typography>
 
-      {videos.length > 0 ? (
-        <VGrid itemHeight={385.375} total={visible.length} renderData={idx => <VideoCard video={visible[idx]} />} />
-      ) : (
-        <Spinner />
-      )}
+      <VGrid itemHeight={385.375} total={visible.length} renderData={idx => <VideoCard video={visible[idx]} />} />
     </div>
   )
 }

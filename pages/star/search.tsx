@@ -39,8 +39,6 @@ type StarData = Partial<{
 }>
 
 const StarSearchPage: NextPage = () => {
-  const { data: stars } = searchService.useStars()
-
   const [sort, setSort] = useState<StarSort>({ type: 'alphabetically', reverse: false })
   const [hidden, setHidden] = useState<Hidden>({
     titleSearch: '',
@@ -57,7 +55,7 @@ const StarSearchPage: NextPage = () => {
       </Grid>
 
       <Grid item xs={10}>
-        <Stars stars={stars} hidden={hidden} sortMethod={getStarSort(sort)} />
+        <Stars hidden={hidden} sortMethod={getStarSort(sort)} />
       </Grid>
 
       <ScrollToTop smooth />
@@ -92,11 +90,14 @@ const Sidebar = ({ setHidden, setSort }: SidebarProps) => {
 }
 
 type StarsProps = {
-  stars?: Star[]
   hidden: Hidden
   sortMethod: SortMethodStar
 }
-const Stars = ({ stars = [], hidden, sortMethod }: StarsProps) => {
+const Stars = ({ hidden, sortMethod }: StarsProps) => {
+  const { data: stars } = searchService.useStars()
+
+  if (stars === undefined) return <Spinner />
+
   const visible = getVisible(stars.sort(sortMethod), hidden)
 
   return (
@@ -105,11 +106,7 @@ const Stars = ({ stars = [], hidden, sortMethod }: StarsProps) => {
         <span id={styles.count}>{visible.length}</span> Stars
       </Typography>
 
-      {stars.length !== 0 ? (
-        <VGrid itemHeight={333} total={visible.length} renderData={idx => <StarCard star={visible[idx]} />} />
-      ) : (
-        <Spinner />
-      )}
+      <VGrid itemHeight={333} total={visible.length} renderData={idx => <StarCard star={visible[idx]} />} />
     </div>
   )
 }

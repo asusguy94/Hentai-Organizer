@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import { Button, Card, Modal as MUIModal, Typography } from '@mui/material'
 
@@ -80,25 +80,21 @@ type ModalChildProps = {
 }
 
 const ModalChild = ({ title, filter, children, query, onClose }: ModalChildProps) => {
-  const handleFilter = () => {
-    return (
-      children
-        //@ts-expect-error: ReactNode mapped to any[]
-        ?.filter((item: any) => item.props.children.toLowerCase().includes(query))
-        .sort((a: any, b: any) => {
-          const valA = a.props.children.toLowerCase()
-          const valB = b.props.children.toLowerCase()
+  const handleFilter = () =>
+    React.Children.toArray(children)
+      .filter((item: any) => item.props.children.toLowerCase().includes(query))
+      .sort((a: any, b: any) => {
+        const valA = a.props.children.toLowerCase()
+        const valB = b.props.children.toLowerCase()
 
-          if (query.length > 0) {
-            if (valA.startsWith(query) && valB.startsWith(query)) return 0
-            else if (valA.startsWith(query)) return -1
-            else if (valB.startsWith(query)) return 1
-          }
+        if (query.length > 0) {
+          if (valA.startsWith(query) && valB.startsWith(query)) return 0
+          else if (valA.startsWith(query)) return -1
+          else if (valB.startsWith(query)) return 1
+        }
 
-          return valA.localeCompare(valB)
-        })
-    )
-  }
+        return valA.localeCompare(valB)
+      })
 
   return (
     <MUIModal open={true} onClose={onClose}>

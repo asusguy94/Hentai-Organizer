@@ -272,7 +272,7 @@ const Timeline = ({
                         data-star-id={bookmark.starID}
                         width={200}
                         height={275}
-                        missing={stars.find(s => s.id === bookmark.starID)?.image === undefined}
+                        missing={stars.find(s => s.id === bookmark.starID)?.image === null}
                         alt='star'
                       />
                     )}

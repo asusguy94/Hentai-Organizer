@@ -24,8 +24,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           star.videos.length > 0
             ? star.videos
                 .map(({ video }) => video)
-                .filter(v => v.date_published !== null)
-                .sort((a, b) => b.date_published!.getTime() - a.date_published!.getTime())[0].date_published
+                .flatMap(v => (v.date_published !== null ? [v.date_published] : []))
+                .sort((a, b) => b.getTime() - a.getTime())[0]
             : null
 
         return {

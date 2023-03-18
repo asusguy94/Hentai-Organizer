@@ -25,6 +25,7 @@ import Icon from '@components/icon'
 import Ribbon, { RibbonContainer } from '@components/ribbon'
 import Link from '@components/link'
 import Spinner from '@components/spinner'
+import { PlyrWithMetadata } from '@components/plyr'
 
 import useStarEvent, { type Event, type EventData, type EventHandler } from '@hooks/star-event'
 import { attributeService, bookmarkService, categoryService, videoService } from '@service'
@@ -128,9 +129,7 @@ type SectionProps = {
   setStarEvent: EventHandler
 }
 const Section = ({ video, bookmarks, categories, attributes, stars, update, modal, setStarEvent }: SectionProps) => {
-  // const [playerRef, ref] = useRefWithEffect()
-  const [duration, setDuration] = useState(0)
-  const plyrRef = useRef<HTMLVideoElement>()
+  const plyrRef = useRef<PlyrWithMetadata | null>(null)
 
   // Helper script for getting the player
   const getPlayer = () => plyrRef.current
@@ -138,7 +137,7 @@ const Section = ({ video, bookmarks, categories, attributes, stars, update, moda
   const playVideo = (time: number | null = null) => {
     const player = getPlayer()
 
-    if (player !== undefined) {
+    if (player !== null) {
       if (time === null) time = player.currentTime
       player.currentTime = Number(time)
       player.play()
@@ -146,7 +145,7 @@ const Section = ({ video, bookmarks, categories, attributes, stars, update, moda
   }
 
   const setTime = (bookmarkID: number) => {
-    if (plyrRef.current !== undefined) {
+    if (plyrRef.current !== null) {
       const time = Math.round(plyrRef.current.currentTime)
 
       bookmarkService.setTime(bookmarkID, time).then(() => {
@@ -176,7 +175,6 @@ const Section = ({ video, bookmarks, categories, attributes, stars, update, moda
         categories={categories}
         stars={stars}
         update={{ video: update.video, bookmarks: update.bookmarks }}
-        updateDuration={setDuration}
         modal={modal}
       />
 
@@ -189,7 +187,6 @@ const Section = ({ video, bookmarks, categories, attributes, stars, update, moda
         playVideo={playVideo}
         setTime={setTime}
         update={update.bookmarks}
-        duration={duration}
         onModal={modal.handler}
         setStarEvent={setStarEvent}
       />
@@ -498,6 +495,7 @@ const Star = ({
               alt='star'
               priority
               responsive
+              sizes={`${(100 / 12) * 4}vw`}
             />
 
             <Link href={{ pathname: `/star/[id]`, query: { id: star.id } }}>
@@ -773,6 +771,7 @@ const Franchise = ({ video }: FranchiseProps) => {
                 height={130}
                 missing={v.image === null}
                 alt='video'
+                sizes={`${(((100 / 12) * 3) / 12) * 2}vw`}
               />
             </Grid>
 

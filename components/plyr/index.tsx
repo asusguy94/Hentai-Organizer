@@ -37,4 +37,5 @@ export const PlyrComponent = ({ plyrRef, source, thumbnail }: PlyrProps) => {
   return <video className='plyr-js' src={source} />
 }
 
+export type PlyrWithMetadata = Plyr & { media: HTMLVideoElement }
 export default PlyrComponent

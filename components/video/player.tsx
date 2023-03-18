@@ -4,17 +4,117 @@ import { useRouter } from 'next/navigation'
 import { Button, TextField } from '@mui/material'
 
 import { ContextMenu, ContextMenuTrigger, MenuItem } from 'react-contextmenu'
-import HlsJS, { ErrorDetails } from 'hls.js'
+import Hls, { ErrorDetails, HlsConfig, HlsListeners } from 'hls.js'
 import { useKey } from 'react-use'
 import { useSessionStorage } from 'usehooks-ts'
 
 import { Modal, ModalHandler } from '../modal'
 import Icon from '../icon'
-import Plyr from '../plyr'
+import Plyr, { PlyrWithMetadata } from '../plyr'
 
 import { Bookmark, Category, Video, VideoStar, SetState } from '@interfaces'
 import { videoService } from '@service'
 import { serverConfig } from '@config'
+
+const useHls = (
+  video: Video,
+  plyrRef: React.MutableRefObject<PlyrWithMetadata | null>,
+  hlsConfig: Partial<HlsConfig>
+) => {
+  const playAddedRef = useRef(false)
+  const newVideoRef = useRef(false)
+
+  const [localVideo, setLocalVideo] = useSessionStorage('video', 0)
+  const [localBookmark, setLocalBookmark] = useSessionStorage('bookmark', 0)
+
+  const [events, setEvents] = useState(false)
+  const [fallback, setFallback] = useState(false)
+
+  useEffect(() => {
+    if (plyrRef.current !== null) {
+      newVideoRef.current = localVideo !== video.id
+      if (localVideo !== video.id) {
+        setLocalVideo(video.id)
+        setLocalBookmark(0)
+      }
+      setEvents(true)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [plyrRef])
+
+  useEffect(() => {
+    if (plyrRef.current === null) return
+
+    if (events) {
+      const player = plyrRef.current
+
+      const onTimeupdate = () => {
+        if (player.currentTime > 0) {
+          setLocalBookmark(Math.round(player.currentTime))
+        }
+      }
+
+      const onPlay = () => {
+        if (newVideoRef.current && !playAddedRef.current) {
+          playAddedRef.current = true
+
+          videoService
+            .addPlays(video.id)
+            .then(() => {
+              console.log('Play Added')
+            })
+            .catch(() => {
+              playAddedRef.current = false
+            })
+        }
+      }
+
+      player.on('timeupdate', onTimeupdate)
+      player.on('play', onPlay)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [events])
+
+  useEffect(() => {
+    if (plyrRef.current === null) return
+
+    if (events) {
+      const player = plyrRef.current
+
+      if (Hls.isSupported()) {
+        const hls = new Hls(hlsConfig)
+
+        hls.loadSource(`${serverConfig.api}/video/${video.id}/hls`)
+        hls.attachMedia(player.media)
+
+        const onLoad: HlsListeners[typeof Hls.Events.MANIFEST_PARSED] = () => {
+          hls.startLoad(localBookmark)
+        }
+
+        const onError: HlsListeners[typeof Hls.Events.ERROR] = (e, { details }) => {
+          if (details === ErrorDetails.MANIFEST_LOAD_ERROR) {
+            setFallback(true)
+          }
+        }
+
+        hls.once(Hls.Events.MANIFEST_PARSED, onLoad)
+        hls.on(Hls.Events.ERROR, onError)
+      } else {
+        setFallback(true)
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [events])
+
+  useEffect(() => {
+    if (plyrRef.current === null) return
+
+    if (fallback) {
+      plyrRef.current.media.src = `${serverConfig.api}/video/${video.id}/file`
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fallback])
+}
 
 type VideoPlayerProps = {
   video: Video
@@ -25,47 +125,32 @@ type VideoPlayerProps = {
     video: SetState<Video | undefined>
     bookmarks: SetState<Bookmark[]>
   }
-  updateDuration: (duration: number) => void
-  plyrRef: RefObject<HTMLVideoElement | Plyr | undefined>
+  plyrRef: RefObject<PlyrWithMetadata | null>
   modal: {
     handler: ModalHandler
     data: Modal
   }
 }
-const VideoPlayer = ({
-  video,
-  bookmarks,
-  categories,
-  stars,
-  update,
-  updateDuration,
-  plyrRef,
-  modal
-}: VideoPlayerProps) => {
+const VideoPlayer = ({ video, bookmarks, categories, stars, update, plyrRef, modal }: VideoPlayerProps) => {
   const router = useRouter()
 
-  const playAddedRef = useRef(false)
-  const [localVideo, setLocalVideo] = useSessionStorage('video', 0)
-  const [localBookmark, setLocalBookmark] = useSessionStorage('bookmark', 0)
-
-  const [newVideo, setNewVideo] = useState<boolean>()
-  const [events, setEvents] = useState(false)
-  const [fallback, setFallback] = useState(false)
+  useHls(video, plyrRef, { maxBufferLength: Infinity, autoStartLoad: false })
 
   const isArrow = (e: KeyboardEvent) => /^Arrow(Left|Right|Up|Down)$/.test(e.code)
   const isMute = (e: KeyboardEvent) => e.code === 'KeyM'
   const isSpace = (e: KeyboardEvent) => e.code === 'Space'
 
-  const getPlayer = () => plyrRef.current as unknown as Plyr
+  const getPlayer = () => plyrRef.current
 
   useKey(
     e => !modal.data.visible && (isArrow(e) || isMute(e) || isSpace(e)),
     e => {
-      if ((e.target as HTMLElement).tagName === 'INPUT') return
+      const player = getPlayer()
+
+      if (player === null || (e.target as HTMLElement).tagName === 'INPUT') return
 
       e.preventDefault()
 
-      const player = getPlayer()
       const getSeekTime = (multiplier = 1) => 1 * multiplier
 
       if (isMute(e)) {
@@ -92,97 +177,10 @@ const VideoPlayer = ({
     }
   )
 
-  useEffect(() => {
-    if (plyrRef.current !== undefined) {
-      if (localVideo === video.id) {
-        setNewVideo(false)
-      } else {
-        setNewVideo(true)
-        setLocalVideo(video.id)
-        setLocalBookmark(0)
-      }
-      setEvents(true)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [plyrRef.current, video.id])
-
-  useEffect(() => {
-    if (events) {
-      const player = getPlayer()
-
-      player.on('timeupdate', () => {
-        if (player.currentTime > 0) {
-          setLocalBookmark(Math.round(player.currentTime))
-        }
-      })
-      player.on('play', () => {
-        if (newVideo && !playAddedRef.current) {
-          playAddedRef.current = true
-
-          videoService
-            .addPlays(video.id)
-            .then(() => {
-              console.log('Play Added')
-              playAddedRef.current = true
-            })
-            .catch(() => {
-              playAddedRef.current = true
-            })
-        }
-      })
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [events])
-
-  useEffect(() => {
-    if (events) {
-      const player = getPlayer() as Plyr & { media: HTMLVideoElement }
-
-      if (HlsJS.isSupported()) {
-        const hls = new HlsJS({
-          maxBufferLength: Infinity,
-          autoStartLoad: false
-        })
-
-        hls.loadSource(`${serverConfig.api}/video/${video.id}/hls`)
-        hls.attachMedia(player.media)
-
-        hls.on(HlsJS.Events.MANIFEST_PARSED, () => {
-          if (!newVideo) {
-            hls.startLoad(localBookmark)
-          } else {
-            hls.startLoad()
-          }
-        })
-
-        hls.on(HlsJS.Events.ERROR, (e, { details }) => {
-          if (details === ErrorDetails.MANIFEST_LOAD_ERROR) {
-            setFallback(true)
-          }
-        })
-
-        hls.on(HlsJS.Events.LEVEL_LOADED, (e, data) => updateDuration(data.details.totalduration))
-      } else {
-        setFallback(true)
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [events])
-
-  useEffect(() => {
-    if (fallback) {
-      const player = getPlayer() as unknown as HTMLVideoElement & { media: HTMLVideoElement }
-
-      player.media.src = `${serverConfig.api}/video/${video.id}`
-      player.media.ondurationchange = () => updateDuration(player.media.duration)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fallback])
-
   const handleWheel = (e: React.WheelEvent) => {
-    const multiplier = 10
+    if (plyrRef.current === null) return
 
-    getPlayer().currentTime += multiplier * Math.sign(e.deltaY) * -1
+    plyrRef.current.currentTime += 10 * Math.sign(e.deltaY) * -1
   }
   const copy = async () => await navigator.clipboard.writeText(video.path.file.slice(0, -4))
 
@@ -223,7 +221,9 @@ const VideoPlayer = ({
   }
 
   const addBookmark = (category: Category) => {
-    const time = Math.round(getPlayer().currentTime)
+    if (plyrRef.current === null) return
+
+    const time = Math.round(plyrRef.current.currentTime)
     if (time) {
       videoService.addBookmark(video.id, category.id, time).then(({ data }) => {
         update.bookmarks(

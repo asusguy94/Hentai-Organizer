@@ -26,7 +26,6 @@ type TimelineProps = {
   playVideo: (time?: number | null) => void
   setTime: (bookmarkID: number, time?: number) => void
   update: SetState<Bookmark[]>
-  duration: number
   onModal: ModalHandler
   setStarEvent: EventHandler
 }
@@ -39,7 +38,6 @@ const Timeline = ({
   playVideo,
   setTime,
   update,
-  duration,
   onModal,
   setStarEvent
 }: TimelineProps) => {
@@ -49,19 +47,6 @@ const Timeline = ({
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const bookmarksArr: HTMLElement[] = []
-
-  useEffect(() => {
-    if (duration && video.duration) {
-      if (Math.abs(duration - video.duration) > settingsConfig.player.maxDurationDiff) {
-        alert('invalid video-duration')
-
-        console.log('vDur', duration)
-        console.log('dbDur', video.duration)
-
-        console.log('Re-Transcode to fix this issue')
-      }
-    }
-  }, [duration, video.duration])
 
   const isActive = (bookmark: Bookmark) => bookmark.active
   const hasStar = (bookmark: Bookmark) => bookmark.starID > 0
@@ -254,7 +239,7 @@ const Timeline = ({
                 color={hasStar(bookmark) ? 'primary' : 'secondary'}
                 className={styles.bookmark}
                 style={{
-                  left: `${((bookmark.start * 100) / duration) * settingsConfig.timeline.offset}%`
+                  left: `${((bookmark.start * 100) / video.duration) * settingsConfig.timeline.offset}%`
                 }}
                 onClick={() => playVideo(bookmark.start)}
                 ref={(item: HTMLButtonElement) => (bookmarksArr[idx] = item)}

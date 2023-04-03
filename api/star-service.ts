@@ -1,14 +1,11 @@
-import axios from 'axios'
 import { useFetch } from 'usehooks-ts'
 
-import { serverConfig } from '@config'
+import { createApi } from '@config'
+const { api, baseURL } = createApi('/star')
 
-const baseURL = `${serverConfig.api}/star`
-const api = axios.create({ baseURL })
-
-// handle this number on the server
 const defaultNumber = 0
 export default {
+  //TODO handle defaultNumber=0 on the server
   useStar: <T>(id: number = defaultNumber) => useFetch<T>(`${baseURL}/${id}`),
   useVideos: <T>(id: number = defaultNumber) => useFetch<T[]>(`${baseURL}/${id}/video`),
   useInfo: () => {

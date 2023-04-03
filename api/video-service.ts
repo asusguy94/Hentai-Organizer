@@ -1,15 +1,13 @@
-import axios from 'axios'
 import { useFetch } from 'usehooks-ts'
 
-import { serverConfig } from '@config'
 import { Bookmark, General, Video, VideoStar } from '@interfaces'
+import { createApi } from '@config'
 
-const baseURL = `${serverConfig.api}/video`
-const api = axios.create({ baseURL })
+const { api, baseURL } = createApi('/video')
 
-// handle this number on the server
 const defaultNumber = 0
 export default {
+  // TODO handle defaultNumber=0 on the server
   useVideo: (id: number = defaultNumber) => useFetch<Video>(`${baseURL}/${id}`),
   useStars: (id: number = defaultNumber) => useFetch<VideoStar[]>(`${baseURL}/${id}/star`),
   useBookmarks: (id: number = defaultNumber) => useFetch<Bookmark[]>(`${baseURL}/${id}/bookmark`),
@@ -33,7 +31,7 @@ export default {
   useMissingStar: () => useFetch<General[]>(`${baseURL}/missing-star`),
   removeStar: (id: number, starID: number) => api.delete(`/${id}/star/${starID}`),
   toggleNoStar: <T = any>(id: number, checked: boolean) => api.put<T>(`/${id}`, { noStar: checked }),
-  addStar: <T = any>(id: number, name: string) => api.post<T>(`/${id}/star`, { name }),
+  addStar: (id: number, name: string) => api.post<VideoStar>(`/${id}/star`, { name }),
   useRelatedStars: (id: number) => useFetch<General[]>(`${baseURL}/${id}/related/star`),
   removeAttribute: (id: number, attributeID: number) => api.delete(`/${id}/attribute/${attributeID}`),
   useNewVideos: <T = any>() => useFetch<T[]>(baseURL, { method: 'POST' }),

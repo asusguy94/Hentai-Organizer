@@ -1,11 +1,9 @@
-import axios from 'axios'
 import { useFetch } from 'usehooks-ts'
 
-import { serverConfig } from '@config'
 import { Attribute } from '@interfaces'
 
-const baseURL = `${serverConfig.api}/attribute`
-const api = axios.create({ baseURL })
+import { createApi } from '@config'
+const { api, baseURL } = createApi('/attribute')
 
 export default {
   useAttributes: <T extends Attribute>() => useFetch<T[]>(baseURL),

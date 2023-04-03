@@ -1,9 +1,5 @@
-import axios from 'axios'
-
-import { serverConfig } from '@config'
-
-const baseURL = `${serverConfig.api}/bookmark`
-const api = axios.create({ baseURL })
+import { createApi } from '@config'
+const { api } = createApi('/bookmark')
 
 export default {
   removeBookmark: (id: number) => api.delete(`/${id}`),

@@ -1,9 +1,5 @@
-import axios from 'axios'
-
-import { serverConfig } from '@config'
-
-const baseURL = `${serverConfig.api}/generate`
-const api = axios.create({ baseURL })
+import { createApi } from '@config'
+const { api } = createApi('/generate')
 
 export default {
   meta: () => api.post('/meta'),

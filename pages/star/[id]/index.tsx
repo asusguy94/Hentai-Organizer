@@ -43,7 +43,7 @@ type Star = {
     breast: string
     haircolor: string
     hairstyle: string
-    attribute: any[]
+    attribute: string[]
   }
   link: string | null
 }
@@ -339,7 +339,7 @@ const StarInputForm = ({ value, emptyByDefault = false, update, name, list, chil
     setInputValue(value)
   }
 
-  const handleKeyPress = (e: React.KeyboardEvent<any>) => {
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (!open && e.key === 'Enter') {
       update(inputValue, name.toLowerCase())
 
@@ -405,27 +405,29 @@ const StarInputForm = ({ value, emptyByDefault = false, update, name, list, chil
 
 type StarAttributesProps = {
   remove: (name: string) => void
-  data: any
+  data: string[]
 }
-const StarAttributes = ({ remove, data }: StarAttributesProps) => {
-  return data.map((attribute: any, idx: number) => (
-    <Fragment key={attribute}>
-      <ContextMenuTrigger id={`attribute-${idx}`} renderTag='span'>
-        <span className={styles.attribute}>
-          <Button size='small' variant='outlined' color='primary'>
-            {attribute}
-          </Button>
-        </span>
-      </ContextMenuTrigger>
+const StarAttributes = ({ remove, data }: StarAttributesProps) => (
+  <>
+    {data.map((attribute, idx) => (
+      <Fragment key={attribute}>
+        <ContextMenuTrigger id={`attribute-${idx}`} renderTag='span'>
+          <span className={styles.attribute}>
+            <Button size='small' variant='outlined' color='primary'>
+              {attribute}
+            </Button>
+          </span>
+        </ContextMenuTrigger>
 
-      <ContextMenu id={`attribute-${idx}`}>
-        <MenuItem onClick={() => remove(attribute)}>
-          <Icon code='trash' /> Remove
-        </MenuItem>
-      </ContextMenu>
-    </Fragment>
-  ))
-}
+        <ContextMenu id={`attribute-${idx}`}>
+          <MenuItem onClick={() => remove(attribute)}>
+            <Icon code='trash' /> Remove
+          </MenuItem>
+        </ContextMenu>
+      </Fragment>
+    ))}
+  </>
+)
 
 type StarTitleProps = {
   star: Star

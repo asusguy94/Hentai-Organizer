@@ -678,9 +678,9 @@ const StarInput = ({ video, stars, bookmarks, getAttributes, update }: StarInput
 
 type AddRelatedStarsProps = {
   video: Video
-  stars: any[]
-  disabled: boolean
+  stars: Star[]
   update: SetState<Star[]>
+  disabled: boolean
 }
 const AddRelatedStars = ({ video, stars, disabled, update }: AddRelatedStarsProps) => {
   const { data: relatedStars } = videoService.useRelatedStars(video.id)
@@ -688,7 +688,7 @@ const AddRelatedStars = ({ video, stars, disabled, update }: AddRelatedStarsProp
   if (disabled || relatedStars === undefined || relatedStars.length === 0) return null
 
   const addStar = async (name: string) => {
-    return new Promise(resolve => {
+    return new Promise<Star>(resolve => {
       videoService.addStar(video.id, name).then(({ data }) => {
         resolve({ ...data, name })
       })

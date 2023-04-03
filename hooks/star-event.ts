@@ -13,7 +13,7 @@ export type EventData = {
   starID: number
   start: number
   active: boolean
-  attributes: any[]
+  attributes: unknown[]
 }
 
 const useStarEvent = () => {

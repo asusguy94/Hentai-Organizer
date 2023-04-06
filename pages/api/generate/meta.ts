@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next/types'
 
 import { prisma } from '@utils/server'
 import { fileExists, getClosestQ, rebuildVideoFile } from '@utils/server/helper'
-import { getDuration as videoDuration, getHeight as videoHeight } from 'utils/server/ffmpeg'
+import { getDuration as videoDuration, getHeight as videoHeight } from '@utils/server/ffmpeg'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {

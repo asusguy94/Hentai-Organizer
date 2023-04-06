@@ -6,11 +6,7 @@
       "@config": ["./config"], // only index-page
       "@pages/*": ["./pages/*"],
       "@styles/*": ["./styles/*"],
-      "@utils/shared": ["./utils/shared"],
-      "@utils/client": ["./utils/client"],
-      "@utils/server": ["./utils/server"],
-      "@utils/server/helper": ["./utils/server/helper"],
-      "@utils/server/generate": ["./utils/server/generate"],
+      "@utils/*": ["./utils/*"],
       "@hooks/*": ["./hooks/*"],
       "@interfaces": ["./interfaces"] // only 1-file
     }

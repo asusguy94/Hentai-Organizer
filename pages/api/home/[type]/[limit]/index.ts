@@ -17,7 +17,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 orderBy: { id: 'desc' },
                 take: parseInt(limit)
               })
-            ).map(({ id, name, cover }) => ({ id, name, image: cover }))
+            ).map(({ cover, ...video }) => ({
+              ...video,
+              image: cover
+            }))
           )
           break
 
@@ -30,7 +33,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 orderBy: { date_published: 'desc' },
                 take: parseInt(limit)
               })
-            ).map(({ id, name, cover }) => ({ id, name, image: cover }))
+            ).map(({ cover, ...video }) => ({
+              ...video,
+              image: cover
+            }))
           )
           break
 
@@ -43,7 +49,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 orderBy: [{ plays: { _count: 'desc' } }, { date: 'desc' }],
                 take: parseInt(limit)
               })
-            ).map(({ id, name, cover, _count }) => ({ id, name, image: cover, total: _count.plays }))
+            ).map(({ cover, _count, ...video }) => ({
+              ...video,
+              image: cover,
+              total: _count.plays
+            }))
           )
           break
 

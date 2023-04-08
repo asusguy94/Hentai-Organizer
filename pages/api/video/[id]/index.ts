@@ -40,9 +40,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           await prisma.video.findMany({
             where: { franchise: video.franchise },
             orderBy: { episode: 'asc' },
-            include: { _count: { select: { plays: true } } }
+            select: {
+              id: true,
+              name: true,
+              cover: true,
+              _count: { select: { plays: true } }
+            }
           })
-        ).map(({ id, name, cover, _count }) => ({ id, name, image: cover, plays: _count.plays }))
+        ).map(({ cover, _count, ...video }) => ({
+          ...video,
+          image: cover,
+          plays: _count.plays
+        }))
       })
     }
   } else if (req.method === 'PUT') {

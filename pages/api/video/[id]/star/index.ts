@@ -20,10 +20,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
               attributes: { select: { attribute: { select: { id: true, name: true } } } }
             }
           })
-        ).map(({ id, name, image, attributes }) => ({
-          id,
-          name,
-          image,
+        ).map(({ attributes, ...star }) => ({
+          ...star,
           attributes: attributes.map(({ attribute }) => attribute)
         }))
       )
@@ -47,7 +45,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       })
       await prisma.videoStars.create({ data: { starID: star.id, videoID: parseInt(id) } })
 
-      res.json({ ...star, attributes: star.attributes.map(({ attribute }) => attribute) })
+      res.json({
+        ...star,
+        attributes: star.attributes.map(({ attribute }) => attribute)
+      })
     }
   }
 

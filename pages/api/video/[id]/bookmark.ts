@@ -15,7 +15,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           await prisma.bookmark.findMany({
             where: { videoID: parseInt(id) },
             orderBy: { start: 'asc' },
-            include: {
+            select: {
+              id: true,
+              start: true,
               category: true,
               outfit: true,
               attributes: { include: { attribute: { select: { id: true, name: true } } } },
@@ -24,18 +26,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
               }
             }
           })
-        ).map(({ id, category, outfit, star, attributes, start }) => {
+        ).map(({ category, outfit, star, attributes, ...bookmark }) => {
           const starAttributes = star?.attributes.map(({ attribute }) => attribute) ?? []
           const bookmarkAttributes = attributes.map(({ attribute }) => attribute)
 
           return {
-            id,
+            ...bookmark,
             name: category.name,
             outfit: outfit?.name ?? null,
             attributes: getUnique([...starAttributes, ...bookmarkAttributes], 'id'),
             starID: star?.id ?? 0,
-            starImage: star?.image ?? null,
-            start
+            starImage: star?.image ?? null
           }
         })
       )

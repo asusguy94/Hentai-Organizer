@@ -8,10 +8,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method === 'POST') {
     const { bookmarkID, attributeID, starID, videoID } = validate(
       z.object({
-        bookmarkID: z.number().int().min(1).optional(),
-        attributeID: z.number().int().min(1),
-        starID: z.number().int().min(1).optional(),
-        videoID: z.number().int().min(1).optional()
+        bookmarkID: z.number().int().positive().optional(),
+        attributeID: z.number().int().positive(),
+        starID: z.number().int().positive().optional(),
+        videoID: z.number().int().positive().optional()
       }),
       req.body
     )

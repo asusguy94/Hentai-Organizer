@@ -46,9 +46,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (typeof id === 'string') {
       const { categoryID, time, starID } = validate(
         z.object({
-          categoryID: z.number().int().min(1),
-          time: z.number().int().min(1),
-          starID: z.number().int().min(1).optional()
+          categoryID: z.number().int().positive(),
+          time: z.number().int().positive(),
+          starID: z.number().int().positive().optional()
         }),
         req.body
       )

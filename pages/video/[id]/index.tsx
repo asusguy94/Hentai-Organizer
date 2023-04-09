@@ -165,7 +165,7 @@ const Section = ({ video, bookmarks, categories, attributes, stars, update, moda
   if (video === undefined || categories === undefined || attributes === undefined) return <Spinner />
 
   return (
-    <Grid item xs={9}>
+    <Grid item xs={9} component='section'>
       <Header video={video} update={update.video} onModal={modal.handler} />
 
       <Player
@@ -235,7 +235,7 @@ const Sidebar = ({ video, stars, bookmarks, attributes, categories, update, onMo
   if (video === undefined || categories === undefined || attributes === undefined) return <Spinner />
 
   return (
-    <Grid item xs={3} id={styles.sidebar}>
+    <Grid item xs={3} id={styles.sidebar} component='aside'>
       <Grid container justifyContent='center' style={{ marginTop: 6, marginBottom: 18 }}>
         {/* <HeaderNetwork video={video} update={update} /> */}
 

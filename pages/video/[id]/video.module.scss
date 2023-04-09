@@ -34,7 +34,10 @@
       }
 
       .thumbnail {
-        padding: 3px 0;
+        // why is this needed?
+        img {
+          margin-bottom: -7px; // 10-3
+        }
       }
 
       .title {

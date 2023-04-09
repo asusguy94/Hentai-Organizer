@@ -2,7 +2,7 @@ import { useRouter } from 'next/navigation'
 
 import { Button, Grid, TextField, Typography } from '@mui/material'
 
-import { ContextMenu, ContextMenuTrigger, MenuItem } from 'react-contextmenu'
+import { ContextMenu, ContextMenuTrigger, ContextMenuItem as MenuItem } from 'rctx-contextmenu'
 
 import { ModalHandler } from '../modal'
 import Icon from '../icon'
@@ -54,9 +54,7 @@ const HeaderTitle = ({ video, onModal }: HeaderTitleProps) => {
   return (
     <Typography variant='h4' id={styles.title}>
       <div className='d-inline-block'>
-        <ContextMenuTrigger id='title' holdToDisplay={-1}>
-          {video.name}
-        </ContextMenuTrigger>
+        <ContextMenuTrigger id='title'>{video.name}</ContextMenuTrigger>
       </div>
 
       <ContextMenu id='title'>
@@ -140,8 +138,8 @@ const HeaderDate = ({ video, update, onModal }: HeaderDateProps) => {
 
   return (
     <>
-      <ContextMenuTrigger id='menu__date' renderTag='span' holdToDisplay={-1}>
-        <Button size='small' variant='outlined' id={styles.date}>
+      <ContextMenuTrigger id='menu__date' className='d-inline-block'>
+        <Button size='small' variant='outlined'>
           <Icon code='calendar' />
           <span className={video.date.published === null ? styles['no-label'] : ''}>{video.date.published}</span>
         </Button>
@@ -187,8 +185,8 @@ const HeaderNetwork = ({ video, update, onModal }: HeaderNetworkProps) => {
 
   return (
     <>
-      <ContextMenuTrigger id='menu_network' renderTag='span' holdToDisplay={-1}>
-        <Button size='small' variant='outlined' id={styles.network}>
+      <ContextMenuTrigger id='menu_network' className='d-inline-block'>
+        <Button size='small' variant='outlined'>
           <Icon code='brand' />
           <span className={video.brand === null ? styles['no-label'] : ''}>{video.brand}</span>
         </Button>
@@ -218,6 +216,20 @@ const HeaderNetwork = ({ video, update, onModal }: HeaderNetworkProps) => {
         </MenuItem>
       </ContextMenu>
     </>
+  )
+}
+
+type HeaderQualityProps = {
+  video: Video
+}
+const HeaderQuality = ({ video }: HeaderQualityProps) => {
+  if (video.quality >= 1080) return null
+
+  return (
+    <Button size='small' variant='outlined' id={styles.quality}>
+      <Icon code='film' />
+      {video.quality}
+    </Button>
   )
 }
 

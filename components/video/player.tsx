@@ -3,7 +3,7 @@ import { useRouter } from 'next/navigation'
 
 import { Button, TextField } from '@mui/material'
 
-import { ContextMenu, ContextMenuTrigger, MenuItem } from 'react-contextmenu'
+import { ContextMenu, ContextMenuTrigger, ContextMenuItem as MenuItem } from 'rctx-contextmenu'
 import Hls, { ErrorDetails, HlsConfig, HlsListeners } from 'hls.js'
 import { useKey } from 'react-use'
 import { useSessionStorage } from 'usehooks-ts'
@@ -246,7 +246,7 @@ const VideoPlayer = ({ video, bookmarks, categories, stars, update, plyrRef, mod
 
   return (
     <div className='video-container' onWheel={handleWheel}>
-      <ContextMenuTrigger id='video' holdToDisplay={-1}>
+      <ContextMenuTrigger id='video'>
         <Plyr
           plyrRef={plyrRef as React.MutableRefObject<Plyr>}
           source={`${serverConfig.api}/video/${video.id}/file`}

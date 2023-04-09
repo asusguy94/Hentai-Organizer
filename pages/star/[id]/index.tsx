@@ -14,7 +14,7 @@ import {
   Autocomplete
 } from '@mui/material'
 
-import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu'
+import { ContextMenuTrigger, ContextMenu, ContextMenuItem as MenuItem } from 'rctx-contextmenu'
 
 import Image from '@components/image'
 import Link from '@components/link'
@@ -411,7 +411,7 @@ const StarAttributes = ({ remove, data }: StarAttributesProps) => (
   <>
     {data.map((attribute, idx) => (
       <Fragment key={attribute}>
-        <ContextMenuTrigger id={`attribute-${idx}`} renderTag='span'>
+        <ContextMenuTrigger id={`attribute-${idx}`} className='d-inline-block'>
           <span className={styles.attribute}>
             <Button size='small' variant='outlined' color='primary'>
               {attribute}

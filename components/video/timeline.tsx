@@ -3,7 +3,7 @@ import { Fragment, useEffect } from 'react'
 import { Button } from '@mui/material'
 
 import ReactTooltip from 'react-tooltip'
-import { ContextMenu, ContextMenuTrigger, MenuItem } from 'react-contextmenu'
+import { ContextMenu, ContextMenuTrigger, ContextMenuItem as MenuItem } from 'rctx-contextmenu'
 import { useWindowSize } from 'react-use'
 
 import Image from '../image'
@@ -232,7 +232,7 @@ const Timeline = ({
 
         return (
           <Fragment key={bookmark.id}>
-            <ContextMenuTrigger id={`bookmark-${bookmark.id}`} holdToDisplay={-1}>
+            <ContextMenuTrigger id={`bookmark-${bookmark.id}`}>
               <Button
                 size='small'
                 variant={isActive(bookmark) ? 'contained' : 'outlined'}

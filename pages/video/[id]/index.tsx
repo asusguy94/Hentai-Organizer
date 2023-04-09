@@ -15,7 +15,7 @@ import {
   Typography
 } from '@mui/material'
 
-import { ContextMenu, ContextMenuTrigger, MenuItem } from 'react-contextmenu'
+import { ContextMenu, ContextMenuTrigger, ContextMenuItem as MenuItem } from 'rctx-contextmenu'
 import { Flipped, Flipper } from 'react-flip-toolkit'
 
 import { ImageCard, ResponsiveImage } from '@components/image'
@@ -30,7 +30,7 @@ import { PlyrWithMetadata } from '@components/plyr'
 import useStarEvent, { type Event, type EventData, type EventHandler } from '@hooks/star-event'
 import { attributeService, bookmarkService, categoryService, videoService } from '@service'
 import { serverConfig } from '@config'
-import { Attribute, Bookmark, Category, SetState, VideoStar as Star, Video } from '@interfaces'
+import { Attribute, Bookmark, Category, SetState, VideoStar, Video } from '@interfaces'
 
 import styles from './video.module.scss'
 
@@ -46,7 +46,7 @@ const VideoPage: NextPage = () => {
   const { data: attributes } = attributeService.useAttributes()
 
   const [video, setVideo] = useState<Video>()
-  const [stars, setStars] = useState<Star[]>([])
+  const [stars, setStars] = useState<VideoStar[]>([])
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([])
 
   const { modal, setModal } = useModal()
@@ -116,9 +116,9 @@ type SectionProps = {
   bookmarks: Bookmark[]
   categories?: Category[]
   attributes?: Attribute[]
-  stars: Star[]
+  stars: VideoStar[]
   update: {
-    stars: SetState<Star[]>
+    stars: SetState<VideoStar[]>
     bookmarks: SetState<Bookmark[]>
     video: SetState<Video | undefined>
   }
@@ -196,12 +196,12 @@ const Section = ({ video, bookmarks, categories, attributes, stars, update, moda
 
 type SidebarProps = {
   video?: Video
-  stars: Star[]
+  stars: VideoStar[]
   bookmarks: Bookmark[]
   attributes?: Attribute[]
   categories?: Category[]
   update: {
-    stars: SetState<Star[]>
+    stars: SetState<VideoStar[]>
     bookmarks: SetState<Bookmark[]>
     video: SetState<Video | undefined>
   }
@@ -283,13 +283,13 @@ const Sidebar = ({ video, stars, bookmarks, attributes, categories, update, onMo
 
 type StarsProps = {
   video: Video
-  stars: Star[]
+  stars: VideoStar[]
   bookmarks: Bookmark[]
   attributes: Attribute[]
   categories: Category[]
   clearActive: () => void
   update: {
-    stars: SetState<Star[]>
+    stars: SetState<VideoStar[]>
     bookmarks: SetState<Bookmark[]>
   }
   onModal: ModalHandler
@@ -315,7 +315,8 @@ const Stars = ({
   useEffect(() => {
     update.stars(
       [...stars].sort((a, b) => {
-        const bookmarkTime = (star: Star) => bookmarks.find(bookmark => bookmark.starID === star.id)?.start ?? Infinity
+        const bookmarkTime = (star: VideoStar) =>
+          bookmarks.find(bookmark => bookmark.starID === star.id)?.start ?? Infinity
 
         return bookmarkTime(a) - bookmarkTime(b)
       })
@@ -346,7 +347,7 @@ const Stars = ({
 
 type StarProps = {
   video: Video
-  star: Star
+  star: VideoStar
   bookmarks: Bookmark[]
   attributes: Attribute[]
   categories: Category[]
@@ -374,7 +375,7 @@ const Star = ({
 }: StarProps) => {
   const [border, setBorder] = useState(false)
 
-  const handleRibbon = (star: Star) => {
+  const handleRibbon = (star: VideoStar) => {
     const hasBookmark = bookmarks.some(bookmark => bookmark.starID === star.id)
 
     if (hasBookmark) return null
@@ -382,7 +383,7 @@ const Star = ({
     return <Ribbon label='NEW' />
   }
 
-  const addBookmark = (category: Category, star: Star) => {
+  const addBookmark = (category: Category, star: VideoStar) => {
     const player = document.getElementsByTagName('video')[0]
 
     const time = Math.round(player.currentTime)
@@ -406,7 +407,7 @@ const Star = ({
     }
   }
 
-  const addAttribute = (star: Star, attribute: Attribute) => {
+  const addAttribute = (star: VideoStar, attribute: Attribute) => {
     bookmarkService.addStarAttribute(video.id, star.id, attribute.id).then(() => {
       update(
         bookmarks.map(bookmark => {
@@ -422,7 +423,7 @@ const Star = ({
     })
   }
 
-  const setActive = (star: Star) => {
+  const setActive = (star: VideoStar) => {
     update(
       bookmarks.map(bookmark => {
         if (bookmark.starID === star.id) bookmark.active = true
@@ -433,7 +434,7 @@ const Star = ({
   }
 
   // TODO auto-run if only 1 star
-  const addStar = (star: Star) => {
+  const addStar = (star: VideoStar) => {
     const bookmark = starEvent.getEvent.data
 
     // Remove Border
@@ -479,7 +480,7 @@ const Star = ({
         onMouseEnter={starEvent.getEvent.event ? () => setBorder(true) : () => setActive(star)}
         onMouseLeave={starEvent.getEvent.event ? () => setBorder(false) : clearActive}
       >
-        <ContextMenuTrigger id={`star-${star.id}`} holdToDisplay={-1}>
+        <ContextMenuTrigger id={`star-${star.id}`}>
           <RibbonContainer
             component={Card}
             className={`${styles.star} ${border ? styles.active : ''}`}
@@ -576,12 +577,12 @@ const Star = ({
 
 type StarInputProps = {
   video: Video
-  stars: Star[]
+  stars: VideoStar[]
   bookmarks: Bookmark[]
   getAttributes: () => Attribute[]
   update: {
     video: SetState<Video | undefined>
-    stars: SetState<Star[]>
+    stars: SetState<VideoStar[]>
   }
 }
 const StarInput = ({ video, stars, bookmarks, getAttributes, update }: StarInputProps) => {
@@ -678,8 +679,8 @@ const StarInput = ({ video, stars, bookmarks, getAttributes, update }: StarInput
 
 type AddRelatedStarsProps = {
   video: Video
-  stars: Star[]
-  update: SetState<Star[]>
+  stars: VideoStar[]
+  update: SetState<VideoStar[]>
   disabled: boolean
 }
 const AddRelatedStars = ({ video, stars, disabled, update }: AddRelatedStarsProps) => {
@@ -688,7 +689,7 @@ const AddRelatedStars = ({ video, stars, disabled, update }: AddRelatedStarsProp
   if (disabled || relatedStars === undefined || relatedStars.length === 0) return null
 
   const addStar = async (name: string) => {
-    return new Promise<Star>(resolve => {
+    return new Promise<VideoStar>(resolve => {
       videoService.addStar(video.id, name).then(({ data }) => {
         resolve({ ...data, name })
       })
@@ -715,9 +716,9 @@ const AddRelatedStars = ({ video, stars, disabled, update }: AddRelatedStarsProp
 type RemoveUnusedStarsProps = {
   video: Video
   bookmarks: Bookmark[]
-  stars: Star[]
+  stars: VideoStar[]
   disabled: boolean
-  update: SetState<Star[]>
+  update: SetState<VideoStar[]>
 }
 const RemoveUnusedStars = ({ video, bookmarks, stars, disabled, update }: RemoveUnusedStarsProps) => {
   if (disabled || !stars.some(star => bookmarks.every(bookmark => bookmark.starID !== star.id))) {

@@ -117,7 +117,7 @@ const VideoCard = ({ video }: VideoCardProps) => {
             <Typography className='text-center'>{video.name}</Typography>
           </Grid>
 
-          <Ribbon label={video.quality.toString()} />
+          {video.quality < 1080 && <Ribbon label={video.quality.toString()} />}
         </CardActionArea>
       </RibbonContainer>
     </Link>

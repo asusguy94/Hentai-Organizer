@@ -5,7 +5,7 @@ import { Button, Grid, TextField, Typography } from '@mui/material'
 import { ContextMenu, ContextMenuTrigger, ContextMenuItem as MenuItem } from 'rctx-contextmenu'
 
 import { ModalHandler } from '../modal'
-import Icon from '../icon'
+import Icon, { IconWithText } from '../icon'
 
 import { Video, SetState } from '@interfaces'
 import { videoService } from '@service'
@@ -18,15 +18,13 @@ type HeaderProps = {
   update: SetState<Video | undefined>
 }
 const Header = ({ video, update, onModal }: HeaderProps) => (
-  <Grid container component='header' id={styles.header}>
-    <Grid item>
-      <HeaderTitle video={video} onModal={onModal} />
+  <Grid container item alignItems='center' component='header' id={styles.header}>
+    <HeaderTitle video={video} onModal={onModal} />
 
-      <HeaderDate video={video} update={update} onModal={onModal} />
-      <HeaderNetwork video={video} update={update} onModal={onModal} />
+    <HeaderDate video={video} update={update} onModal={onModal} />
+    <HeaderNetwork video={video} update={update} onModal={onModal} />
 
-      <HeaderQuality video={video} />
-    </Grid>
+    <HeaderQuality video={video} />
   </Grid>
 )
 
@@ -52,13 +50,16 @@ const HeaderTitle = ({ video, onModal }: HeaderTitleProps) => {
   }
 
   return (
-    <Typography variant='h4' id={styles.title}>
+    <Typography variant='h4'>
       <div className='d-inline-block'>
         <ContextMenuTrigger id='title'>{video.name}</ContextMenuTrigger>
       </div>
 
       <ContextMenu id='title'>
-        <MenuItem
+        <IconWithText
+          component={MenuItem}
+          icon='edit'
+          text='Rename Title'
           onClick={() => {
             onModal(
               'Change Title',
@@ -76,11 +77,12 @@ const HeaderTitle = ({ video, onModal }: HeaderTitleProps) => {
               />
             )
           }}
-        >
-          <Icon code='edit' /> Rename Title
-        </MenuItem>
+        />
 
-        <MenuItem
+        <IconWithText
+          component={MenuItem}
+          icon='edit'
+          text='Rename Franchise'
           onClick={() => {
             onModal(
               'Change Franchise',
@@ -98,15 +100,11 @@ const HeaderTitle = ({ video, onModal }: HeaderTitleProps) => {
               />
             )
           }}
-        >
-          <Icon code='edit' /> Rename Franchise
-        </MenuItem>
+        />
 
-        <MenuItem divider />
+        <hr />
 
-        <MenuItem onClick={() => void copyFranchise()}>
-          <Icon code='copy' /> Copy Franchise
-        </MenuItem>
+        <IconWithText component={MenuItem} icon='edit' text='Copy Franchise' onClick={() => void copyFranchise()} />
       </ContextMenu>
 
       <span id={styles.censored}>
@@ -146,7 +144,10 @@ const HeaderDate = ({ video, update, onModal }: HeaderDateProps) => {
       </ContextMenuTrigger>
 
       <ContextMenu id='menu__date'>
-        <MenuItem
+        <IconWithText
+          component={MenuItem}
+          icon='edit'
+          text='Edit Date'
           onClick={() => {
             onModal(
               'Change Date',
@@ -163,9 +164,7 @@ const HeaderDate = ({ video, update, onModal }: HeaderDateProps) => {
               />
             )
           }}
-        >
-          <Icon code='edit' /> Edit Date
-        </MenuItem>
+        />
       </ContextMenu>
     </>
   )
@@ -193,7 +192,10 @@ const HeaderNetwork = ({ video, update, onModal }: HeaderNetworkProps) => {
       </ContextMenuTrigger>
 
       <ContextMenu id='menu_network'>
-        <MenuItem
+        <IconWithText
+          component={MenuItem}
+          icon='edit'
+          text='Edit Network'
           onClick={() => {
             onModal(
               'Change Network',
@@ -211,9 +213,7 @@ const HeaderNetwork = ({ video, update, onModal }: HeaderNetworkProps) => {
               />
             )
           }}
-        >
-          <Icon code='edit' /> Edit Network
-        </MenuItem>
+        />
       </ContextMenu>
     </>
   )

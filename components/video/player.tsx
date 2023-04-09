@@ -9,7 +9,7 @@ import { useKey } from 'react-use'
 import { useSessionStorage } from 'usehooks-ts'
 
 import { Modal, ModalHandler } from '../modal'
-import Icon from '../icon'
+import { IconWithText } from '../icon'
 import Plyr, { PlyrWithMetadata } from '../plyr'
 
 import { Bookmark, Category, Video, VideoStar, SetState } from '@interfaces'
@@ -255,7 +255,10 @@ const VideoPlayer = ({ video, bookmarks, categories, stars, update, plyrRef, mod
       </ContextMenuTrigger>
 
       <ContextMenu id='video'>
-        <MenuItem
+        <IconWithText
+          component={MenuItem}
+          icon='add'
+          text='Add Bookmark'
           disabled={video.noStar}
           onClick={() => {
             modal.handler(
@@ -278,26 +281,21 @@ const VideoPlayer = ({ video, bookmarks, categories, stars, update, plyrRef, mod
               true
             )
           }}
-        >
-          <Icon code='add' /> Add Bookmark
-        </MenuItem>
+        />
 
-        <MenuItem onClick={censorToggle}>
-          {video.censored ? (
-            <>
-              <Icon code='toggle-yes' /> UnCensor
-            </>
-          ) : (
-            <>
-              <Icon code='toggle-no' /> Censor
-            </>
-          )}
-        </MenuItem>
-        <MenuItem onClick={resetPlays}>
-          <Icon code='trash' /> Remove Plays
-        </MenuItem>
+        <IconWithText
+          component={MenuItem}
+          icon={video.censored ? 'check-circle' : 'warn-cirlce'}
+          text={video.censored ? 'UnCensor' : 'Censor'}
+          onClick={censorToggle}
+        />
 
-        <MenuItem
+        <IconWithText component={MenuItem} icon='delete' text='Remove Plays' onClick={resetPlays} />
+
+        <IconWithText
+          component={MenuItem}
+          icon='edit'
+          text='Rename Video'
           onClick={() => {
             modal.handler(
               'Rename Video',
@@ -315,19 +313,18 @@ const VideoPlayer = ({ video, bookmarks, categories, stars, update, plyrRef, mod
               />
             )
           }}
-        >
-          <Icon code='edit' /> Rename Video
-        </MenuItem>
+        />
 
-        <MenuItem divider />
+        <hr />
 
-        <MenuItem onClick={() => void copy()}>
-          <Icon code='copy' /> Copy Filename
-        </MenuItem>
+        <IconWithText component={MenuItem} icon='copy' text='Copy Filename' onClick={() => void copy()} />
 
-        <MenuItem divider />
+        <hr />
 
-        <MenuItem
+        <IconWithText
+          component={MenuItem}
+          icon='edit'
+          text='Set Cover'
           onClick={() => {
             modal.handler(
               'Set Cover',
@@ -344,19 +341,19 @@ const VideoPlayer = ({ video, bookmarks, categories, stars, update, plyrRef, mod
               />
             )
           }}
-        >
-          <Icon code='edit' /> Set Cover
-        </MenuItem>
+        />
 
-        <MenuItem onClick={updateVideo}>
-          <Icon code='edit' /> Update Video
-        </MenuItem>
+        <IconWithText component={MenuItem} icon='edit' text='Update Video' onClick={updateVideo} />
 
-        <MenuItem divider />
+        <hr />
 
-        <MenuItem disabled={stars.length !== 0} onClick={deleteVideo}>
-          <Icon code='trash' /> Delete Video
-        </MenuItem>
+        <IconWithText
+          component={MenuItem}
+          icon='delete'
+          text='Delete Video'
+          disabled={stars.length !== 0}
+          onClick={deleteVideo}
+        />
       </ContextMenu>
     </div>
   )

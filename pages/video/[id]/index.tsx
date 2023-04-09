@@ -21,7 +21,7 @@ import { Flipped, Flipper } from 'react-flip-toolkit'
 import { ImageCard, ResponsiveImage } from '@components/image'
 import ModalComponent, { Modal, ModalHandler, useModal } from '@components/modal'
 import { Header, Player, Timeline } from '@components/video'
-import Icon from '@components/icon'
+import { IconWithText } from '@components/icon'
 import Ribbon, { RibbonContainer } from '@components/ribbon'
 import Link from '@components/link'
 import Spinner from '@components/spinner'
@@ -508,7 +508,10 @@ const Star = ({
         </ContextMenuTrigger>
 
         <ContextMenu id={`star-${star.id}`}>
-          <MenuItem
+          <IconWithText
+            component={MenuItem}
+            icon='add'
+            text='Add Bookmark'
             onClick={() => {
               onModal(
                 'Add Bookmark',
@@ -528,11 +531,12 @@ const Star = ({
                 true
               )
             }}
-          >
-            <Icon code='add' /> Add Bookmark
-          </MenuItem>
+          />
 
-          <MenuItem
+          <IconWithText
+            component={MenuItem}
+            icon='add'
+            text='Add Attribute'
             disabled={!bookmarks.some(bookmark => bookmark.starID === star.id)}
             onClick={() => {
               onModal(
@@ -559,16 +563,15 @@ const Star = ({
                 true
               )
             }}
-          >
-            <Icon code='add' /> Add Attribute
-          </MenuItem>
+          />
 
-          <MenuItem
+          <IconWithText
+            component={MenuItem}
+            icon='delete'
+            text='Remove'
             disabled={bookmarks.some(bookmark => bookmark.starID === star.id)}
             onClick={() => removeStar(star.id)}
-          >
-            <Icon code='trash' /> Remove
-          </MenuItem>
+          />
         </ContextMenu>
       </Grid>
     </Flipped>
@@ -831,9 +834,7 @@ const Attributes = ({ video, bookmarks, clearActive, update, getAttributes }: At
           </ContextMenuTrigger>
 
           <ContextMenu id={`attribute-${attribute.id}`}>
-            <MenuItem onClick={() => removeAttribute(attribute)}>
-              <Icon code='trash' /> Remove
-            </MenuItem>
+            <IconWithText component={MenuItem} icon='delete' text='Remove' onClick={() => removeAttribute(attribute)} />
           </ContextMenu>
         </Fragment>
       ))}

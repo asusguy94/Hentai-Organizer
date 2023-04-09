@@ -3,21 +3,6 @@ $spacing: 5px;
 #header {
   margin-bottom: 15px;
 
-  #title {
-    vertical-align: middle;
-  }
-
-  #date,
-  #network {
-    min-width: 0;
-  }
-
-  #title,
-  #date,
-  #network {
-    display: inline-block;
-  }
-
   #censored {
     #divider {
       color: black;
@@ -36,7 +21,6 @@ $spacing: 5px;
     margin-left: 15px;
     color: black;
 
-    i,
     svg {
       margin-right: $spacing;
 

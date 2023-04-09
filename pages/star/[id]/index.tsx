@@ -21,7 +21,7 @@ import Link from '@components/link'
 import ModalComponent, { ModalHandler, useModal } from '@components/modal'
 import Spinner from '@components/spinner'
 import Dropbox from '@components/dropbox'
-import Icon from '@components/icon'
+import { IconWithText } from '@components/icon'
 
 import { SetState } from '@interfaces'
 import { starService } from '@service'
@@ -209,9 +209,7 @@ const StarImageDropbox = ({ star, videos, update }: StarImageDropboxProps) => {
           </ContextMenuTrigger>
 
           <ContextMenu id='star__image'>
-            <MenuItem onClick={removeImage}>
-              <Icon code='trash' /> Delete Image
-            </MenuItem>
+            <IconWithText component={MenuItem} icon='delete' text='Delete Image' onClick={removeImage} />
           </ContextMenu>
         </>
       ) : (
@@ -221,9 +219,13 @@ const StarImageDropbox = ({ star, videos, update }: StarImageDropboxProps) => {
           </ContextMenuTrigger>
 
           <ContextMenu id='star__dropbox'>
-            <MenuItem onClick={removeStar} disabled={videos.length > 0}>
-              <Icon code='trash' /> Remove Star
-            </MenuItem>
+            <IconWithText
+              component={MenuItem}
+              icon='delete'
+              text='Remove Star'
+              onClick={removeStar}
+              disabled={videos.length > 0}
+            />
           </ContextMenu>
         </>
       )}
@@ -420,9 +422,7 @@ const StarAttributes = ({ remove, data }: StarAttributesProps) => (
         </ContextMenuTrigger>
 
         <ContextMenu id={`attribute-${idx}`}>
-          <MenuItem onClick={() => remove(attribute)}>
-            <Icon code='trash' /> Remove
-          </MenuItem>
+          <IconWithText component={MenuItem} icon='delete' text='Remove' onClick={() => remove(attribute)} />
         </ContextMenu>
       </Fragment>
     ))}
@@ -468,7 +468,10 @@ const StarTitle = ({ star, onModal: handleModal, update }: StarTitleProps) => {
       </div>
 
       <ContextMenu id='title'>
-        <MenuItem
+        <IconWithText
+          component={MenuItem}
+          icon='edit'
+          text='Rename'
           onClick={() => {
             handleModal(
               'Rename',
@@ -488,11 +491,12 @@ const StarTitle = ({ star, onModal: handleModal, update }: StarTitleProps) => {
               />
             )
           }}
-        >
-          <Icon code='edit' /> Rename
-        </MenuItem>
+        />
 
-        <MenuItem
+        <IconWithText
+          component={MenuItem}
+          icon='edit'
+          text='Set Link'
           onClick={() => {
             handleModal(
               'Set Link',
@@ -512,9 +516,7 @@ const StarTitle = ({ star, onModal: handleModal, update }: StarTitleProps) => {
               />
             )
           }}
-        >
-          <Icon code='edit' /> Set Link
-        </MenuItem>
+        />
       </ContextMenu>
     </div>
   )

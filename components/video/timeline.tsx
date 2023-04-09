@@ -8,7 +8,7 @@ import { useWindowSize } from 'react-use'
 
 import Image from '../image'
 import { ModalHandler } from '../modal'
-import Icon from '../icon'
+import { IconWithText } from '../icon'
 
 import { EventHandler } from '@hooks/star-event'
 import { Attribute, Bookmark, Category, VideoStar as Star, Video, SetState, Outfit } from '@interfaces'
@@ -302,20 +302,28 @@ const Timeline = ({
             </ContextMenuTrigger>
 
             <ContextMenu id={`bookmark-${bookmark.id}`}>
-              <MenuItem
+              <IconWithText
+                component={MenuItem}
+                icon='add'
+                text='Add Star'
                 disabled={bookmark.starID !== 0 || stars.length === 0}
                 onClick={() => setStarEvent(true, bookmark)}
-              >
-                <Icon code='add' /> Add Star
-              </MenuItem>
+              />
 
-              <MenuItem disabled={bookmark.starID === 0} onClick={() => removeStar(bookmark)}>
-                <Icon code='trash' /> Remove Star
-              </MenuItem>
+              <IconWithText
+                component={MenuItem}
+                icon='delete'
+                text='Remove Star'
+                disabled={bookmark.starID === 0}
+                onClick={() => removeStar(bookmark)}
+              />
 
-              <MenuItem divider />
+              <hr />
 
-              <MenuItem
+              <IconWithText
+                component={MenuItem}
+                icon='add'
+                text='Add Attribute'
                 onClick={() => {
                   onModal(
                     'Add Attribute',
@@ -343,11 +351,12 @@ const Timeline = ({
                     true
                   )
                 }}
-              >
-                <Icon code='add' /> Add Attribute
-              </MenuItem>
+              />
 
-              <MenuItem
+              <IconWithText
+                component={MenuItem}
+                icon='delete'
+                text='Remove Attribute'
                 disabled={attributesFromStar(bookmark.starID).length >= bookmark.attributes.length}
                 onClick={() => {
                   onModal(
@@ -375,20 +384,22 @@ const Timeline = ({
                     true
                   )
                 }}
-              >
-                <Icon code='trash' /> Remove Attribute
-              </MenuItem>
+              />
 
-              <MenuItem
+              <IconWithText
+                component={MenuItem}
+                icon='delete'
+                text='Clear Attributes'
                 disabled={attributesFromStar(bookmark.starID).length >= bookmark.attributes.length}
                 onClick={() => clearAttributes(bookmark)}
-              >
-                <Icon code='trash' /> Clear Attributes
-              </MenuItem>
+              />
 
-              <MenuItem divider />
+              <hr />
 
-              <MenuItem
+              <IconWithText
+                component={MenuItem}
+                icon='add'
+                text='Set Outfit'
                 onClick={() => {
                   onModal(
                     'Set Outfit',
@@ -410,17 +421,22 @@ const Timeline = ({
                     true
                   )
                 }}
-              >
-                <Icon code='add' /> Set Outfit
-              </MenuItem>
+              />
 
-              <MenuItem disabled={bookmark.outfit === null} onClick={() => removeOutfit(bookmark)}>
-                <Icon code='trash' /> Remove Outfit
-              </MenuItem>
+              <IconWithText
+                component={MenuItem}
+                icon='delete'
+                text='Remove Outfit'
+                disabled={bookmark.outfit === null}
+                onClick={() => removeOutfit(bookmark)}
+              />
 
-              <MenuItem divider />
+              <hr />
 
-              <MenuItem
+              <IconWithText
+                component={MenuItem}
+                icon='edit'
+                text='Change Category'
                 onClick={() => {
                   onModal(
                     'Change Category',
@@ -442,17 +458,16 @@ const Timeline = ({
                     true
                   )
                 }}
-              >
-                <Icon code='edit' /> Change Category
-              </MenuItem>
+              />
 
-              <MenuItem onClick={() => setTime(bookmark.id)}>
-                <Icon code='clock' /> Change Time
-              </MenuItem>
+              <IconWithText component={MenuItem} icon='time' text='Change Time' onClick={() => setTime(bookmark.id)} />
 
-              <MenuItem onClick={() => removeBookmark(bookmark.id)}>
-                <Icon code='trash' /> Delete
-              </MenuItem>
+              <IconWithText
+                component={MenuItem}
+                icon='delete'
+                text='Delete'
+                onClick={() => removeBookmark(bookmark.id)}
+              />
             </ContextMenu>
           </Fragment>
         )

@@ -24,6 +24,8 @@ const Header = ({ video, update, onModal }: HeaderProps) => (
 
       <HeaderDate video={video} update={update} onModal={onModal} />
       <HeaderNetwork video={video} update={update} onModal={onModal} />
+
+      <HeaderQuality video={video} />
     </Grid>
   </Grid>
 )

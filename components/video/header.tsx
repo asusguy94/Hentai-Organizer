@@ -104,7 +104,7 @@ const HeaderTitle = ({ video, onModal }: HeaderTitleProps) => {
 
         <hr />
 
-        <IconWithText component={MenuItem} icon='edit' text='Copy Franchise' onClick={() => void copyFranchise()} />
+        <IconWithText component={MenuItem} icon='copy' text='Copy Franchise' onClick={() => void copyFranchise()} />
       </ContextMenu>
 
       <span id={styles.censored}>

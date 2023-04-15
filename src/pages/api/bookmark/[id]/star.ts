@@ -1,8 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next/types'
 
-import { z } from 'zod'
-
-import { prisma, validate } from '@utils/server'
+import validate, { z } from '@utils/server/validation'
+import prisma from '@utils/server/prisma'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
@@ -16,7 +15,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         req.body
       )
 
-      res.json(await prisma.bookmark.update({ where: { id: parseInt(id) }, data: { starID: starID } }))
+      res.json(
+        await prisma.bookmark.update({
+          where: { id: parseInt(id) },
+          data: { starID: starID }
+        })
+      )
     }
   } else if (req.method === 'DELETE') {
     const { id } = req.query

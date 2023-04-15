@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next/types'
 
 import fs from 'fs'
 
-import { prisma } from '@utils/server'
+import prisma from '@utils/server/prisma'
 import { extOnly } from '@utils/server/helper'
 import { generateEpisode, generateFranchise, generateName } from '@utils/server/generate'
 

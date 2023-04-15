@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next/types'
 
-import { prisma } from '@utils/server'
+import prisma from '@utils/server/prisma'
 import { fileExists, getClosestQ, rebuildVideoFile } from '@utils/server/helper'
 import { getDuration as videoDuration, getHeight as videoHeight } from '@utils/server/ffmpeg'
 

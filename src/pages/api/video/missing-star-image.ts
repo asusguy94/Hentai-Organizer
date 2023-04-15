@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next/types'
 
-import { prisma } from '@utils/server'
+import prisma from '@utils/server/prisma'
 
 //TODO add this to search-page
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {

@@ -1,14 +1,16 @@
 {
   "compilerOptions": {
     "paths": {
-      "@service": ["./service"], // only index-page
-      "@components/*": ["./components/*"],
-      "@config": ["./config"], // only index-page
-      "@pages/*": ["./pages/*"],
-      "@styles/*": ["./styles/*"],
-      "@utils/*": ["./utils/*"],
-      "@hooks/*": ["./hooks/*"],
-      "@interfaces": ["./interfaces"] // only 1-file
+      "@service": ["./src/service"], // only index-page
+      "@components/*": ["./src/components/*"],
+      "@config": ["./src/config"], // only index-page
+      "@pages/*": ["./src/pages/*"],
+      "@styles/*": ["./src/styles/*"],
+      "@utils/client/*": ["./src/utils/client/*"],
+      "@utils/server/*": ["./src/utils/server/*"],
+      "@utils/shared": ["./src/utils/shared"],
+      "@hooks/*": ["./src/hooks/*"],
+      "@interfaces": ["./src/interfaces"] // only 1-file
     }
   }
 }

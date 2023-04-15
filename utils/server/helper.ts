@@ -209,38 +209,17 @@ export const getDividableWidth = (width: number, limits = { min: 120, max: 240 }
   throw new Error(`Could not find dividable width for ${width}`)
 }
 
-/**
- * @param {string} path the path of video/image
- * @return {{isVideo: boolean, isImage:boolean}} Returns an object with isImage and isVideo
- */
-const getFileType = (path: string): { isVideo: boolean; isImage: boolean } => {
-  if (process.env.NODE_ENV === 'production') {
-    return { isImage: false, isVideo: false }
-  }
-
-  const isVideo = extOnly(path) === '.mp4'
-  const isImage = ['.jpg', '.png'].includes(extOnly(path))
-  if (isVideo && isImage) throw new Error('Invalid image/video type')
-
-  return { isVideo, isImage }
+const setCache = (res: NextApiResponse, ageInSeconds: number) => {
+  res.setHeader('Cache-Control', `public, max-age=${ageInSeconds}`)
 }
-
-const getSampleFiles = () => ({ video: './public/video.mp4', image: './public/image.jpg' })
 
 export const sendFile = async (res: NextApiResponse, path: string) => {
   if (!(await fileExists(path))) {
-    const { isImage, isVideo } = getFileType(path)
-
-    if (isVideo) {
-      path = getSampleFiles().video
-    } else if (isImage) {
-      path = getSampleFiles().image
-    } else {
-      res.status(404).end()
-      return
-    }
+    res.status(404).end()
+    return
   }
 
+  setCache(res, 1)
   res.writeHead(200)
   fs.createReadStream(path).pipe(res)
 }
@@ -249,14 +228,8 @@ export const sendPartial = async (req: NextApiRequest, res: NextApiResponse, pat
   const chunkSize = 1024 * 1024 * mb
 
   if (!(await fileExists(path))) {
-    const { isVideo } = getFileType(path)
-
-    if (isVideo) {
-      path = getSampleFiles().video
-    } else {
-      res.status(404).end()
-      return
-    }
+    res.status(404).end()
+    return
   }
 
   fs.stat(path, (err, data) => {
@@ -264,24 +237,18 @@ export const sendPartial = async (req: NextApiRequest, res: NextApiResponse, pat
       throw err
     }
 
-    if (req.headers.range !== undefined) {
-      const range = req.headers.range
+    // extract start and end / empty
+    const ranges = req.headers.range?.match(/^bytes=(\d+)-(.*)$/)?.slice(1, 2)
+    const start = parseInt(ranges?.[0] ?? '0')
+    const end = Math.min(start + chunkSize, data.size - 1)
 
-      // extract start and end / empty
-      const ranges = range.match(/^bytes=(\d+)-(.*)$/)?.slice(1, 2)
-      if (ranges !== undefined) {
-        const start = parseInt(ranges[0])
-        const end = Math.min(start + chunkSize, data.size - 1)
+    res.writeHead(206, {
+      'Accept-Ranges': 'bytes',
+      'Content-Range': `bytes ${start}-${end}/${data.size - 1}`,
+      'Content-Length': end - start + 1,
+      'Content-Type': 'video/mp4'
+    })
 
-        res.writeHead(206, {
-          'Accept-Ranges': 'bytes',
-          'Content-Range': `bytes ${start}-${end}/${data.size}`,
-          'Content-Length': end - start + 1,
-          'Content-Type': 'video/mp4'
-        })
-
-        fs.createReadStream(path, { start, end }).pipe(res)
-      }
-    }
+    fs.createReadStream(path, { start, end }).pipe(res)
   })
 }

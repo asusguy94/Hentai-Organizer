@@ -1,4 +1,4 @@
-import { Grid } from '@mui/material'
+import { Grid, SvgIconTypeMap } from '@mui/material'
 import {
   AccessTimeOutlined,
   AddOutlined,
@@ -13,7 +13,7 @@ import {
 } from '@mui/icons-material'
 import { ContextMenuItem } from 'rctx-contextmenu'
 
-type IconProps = {
+type IconProps = Omit<SvgIconTypeMap['props'], 'children'> & {
   code: 'edit' | 'add' | 'warn-cirlce' | 'check-circle' | 'delete' | 'copy' | 'time' | 'calendar' | 'brand' | 'film'
   style?: React.CSSProperties
 }

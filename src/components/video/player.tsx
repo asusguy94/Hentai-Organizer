@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 import { Button, TextField } from '@mui/material'
 
 import { ContextMenu, ContextMenuTrigger, ContextMenuItem as MenuItem } from 'rctx-contextmenu'
-import Hls, { ErrorDetails, HlsConfig, HlsListeners } from 'hls.js'
+import Hls, { HlsConfig, HlsListeners } from 'hls.js'
 import { useKey } from 'react-use'
 import { useSessionStorage } from 'usehooks-ts'
 
@@ -91,8 +91,10 @@ const useHls = (
           hls.startLoad(localBookmark)
         }
 
-        const onError: HlsListeners[typeof Hls.Events.ERROR] = (e, { details }) => {
-          if (details === ErrorDetails.MANIFEST_LOAD_ERROR) {
+        const onError: HlsListeners[typeof Hls.Events.ERROR] = (e, data) => {
+          if (data.fatal) {
+            hls.off(Hls.Events.ERROR, onError)
+            hls.off(Hls.Events.MANIFEST_PARSED, onLoad)
             setFallback(true)
           }
         }

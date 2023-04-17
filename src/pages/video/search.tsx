@@ -1,5 +1,5 @@
 import { NextPage } from 'next/types'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import {
   Button,
@@ -26,6 +26,7 @@ import VGrid from '@components/virtualized/virtuoso'
 import Spinner from '@components/spinner'
 import Link from '@components/link'
 import SortObj, { getVideoSort, type SortMethodVideo, type SortTypeVideo as VideoSort } from '@components/search/sort'
+import { useReadLocalStorage } from 'usehooks-ts'
 
 import { Attribute as AttributeRef, Category, General, Outfit, SetState } from '@interfaces'
 import { attributeService, brandService, categoryService, outfitService, searchService } from '@service'
@@ -78,10 +79,20 @@ type VideosProps = {
 }
 const Videos = ({ hidden, sortMethod }: VideosProps) => {
   const { data: videos } = searchService.useVideos()
+  const { total_videos: total } = useReadLocalStorage<Record<string, number>>('settings') ?? {}
 
-  if (videos === undefined) return <Spinner />
+  const filtered = useMemo(() => {
+    if (videos === undefined) return
 
-  const visible = getVisible(videos.sort(sortMethod), hidden)
+    return videos
+      .sort(getVideoSort({ type: 'alphabetically' }))
+      .slice(0, total)
+      .filter(v => !v.noStar)
+  }, [total, videos])
+
+  if (filtered === undefined) return <Spinner />
+
+  const visible = getVisible(filtered.sort(sortMethod), hidden)
 
   return (
     <div id={styles.videos}>

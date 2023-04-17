@@ -224,7 +224,7 @@ export const sendFile = async (res: NextApiResponse, path: string) => {
   fs.createReadStream(path).pipe(res)
 }
 
-export const sendPartial = async (req: NextApiRequest, res: NextApiResponse, path: string, mb = 2): Promise<void> => {
+export const sendPartial = async (req: NextApiRequest, res: NextApiResponse, path: string, mb = 2) => {
   const chunkSize = 1024 * 1024 * mb
 
   if (!(await fileExists(path))) {
@@ -238,15 +238,14 @@ export const sendPartial = async (req: NextApiRequest, res: NextApiResponse, pat
     }
 
     // extract start and end / empty
-    const ranges = req.headers.range?.match(/^bytes=(\d+)-(.*)$/)?.slice(1, 2)
+    const ranges = req.headers.range?.match(/^bytes=(\d+)-/)?.slice(1)
     const start = parseInt(ranges?.[0] ?? '0')
     const end = Math.min(start + chunkSize, data.size - 1)
 
     res.writeHead(206, {
       'Accept-Ranges': 'bytes',
-      'Content-Range': `bytes ${start}-${end}/${data.size - 1}`,
-      'Content-Length': end - start + 1,
-      'Content-Type': 'video/mp4'
+      'Content-Range': `bytes ${start}-${end}/${data.size}`,
+      'Content-Length': end - start + 1
     })
 
     fs.createReadStream(path, { start, end }).pipe(res)

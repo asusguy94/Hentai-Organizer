@@ -16,7 +16,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     )
 
     const insertHandler = async (bookmarkID: number, attributeID: number): Promise<void> => {
-      await prisma.bookmarkAttributes.create({ data: { attributeID, bookmarkID } })
+      await prisma.bookmarkAttributes.upsert({
+        where: {
+          attributeID_bookmarkID: {
+            attributeID,
+            bookmarkID
+          }
+        },
+        create: { attributeID, bookmarkID },
+        update: {}
+      })
     }
 
     if (starID !== undefined && videoID !== undefined) {

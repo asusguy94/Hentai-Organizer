@@ -210,7 +210,7 @@ export const getDividableWidth = (width: number, limits = { min: 120, max: 240 }
 }
 
 const setCache = (res: NextApiResponse, ageInSeconds: number) => {
-  res.setHeader('Cache-Control', `public, max-age=${ageInSeconds}`)
+  res.setHeader('Cache-Control', `public, max-age=${ageInSeconds}, s-maxage=${ageInSeconds}, must-revalidate`)
 }
 
 export const sendFile = async (res: NextApiResponse, path: string) => {
@@ -219,7 +219,7 @@ export const sendFile = async (res: NextApiResponse, path: string) => {
     return
   }
 
-  setCache(res, 1)
+  setCache(res, 60 * 60)
   res.writeHead(200)
   fs.createReadStream(path).pipe(res)
 }

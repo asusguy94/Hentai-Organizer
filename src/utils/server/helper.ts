@@ -209,8 +209,16 @@ export const getDividableWidth = (width: number, limits = { min: 120, max: 240 }
   throw new Error(`Could not find dividable width for ${width}`)
 }
 
-const setCache = (res: NextApiResponse, ageInSeconds: number) => {
-  res.setHeader('Cache-Control', `public, max-age=${ageInSeconds}, s-maxage=${ageInSeconds}, must-revalidate`)
+const setCache = (res: NextApiResponse, ageInSeconds: number, delay = 100) => {
+  const cacheArr = [
+    'public',
+    `max-age=${ageInSeconds}`,
+    `s-maxage=${ageInSeconds}`,
+    'must-revalidate',
+    `stale-while-revalidate=${delay}`
+  ]
+
+  res.setHeader('Cache-Control', cacheArr.join(','))
 }
 
 export const sendFile = async (res: NextApiResponse, path: string) => {

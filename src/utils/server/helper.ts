@@ -6,6 +6,7 @@ import fetch from 'node-fetch'
 import path from 'path'
 
 import dayjs from 'dayjs'
+import type { Server } from 'socket.io'
 
 import { settingsConfig } from '@config'
 
@@ -258,4 +259,11 @@ export const sendPartial = async (req: NextApiRequest, res: NextApiResponse, pat
 
     fs.createReadStream(path, { start, end }).pipe(res)
   })
+}
+
+export function logger(message: string, event?: string, socket?: Server) {
+  if (socket && event) {
+    socket.emit(event, message)
+  }
+  console.log(message)
 }

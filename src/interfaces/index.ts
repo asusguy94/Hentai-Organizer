@@ -23,7 +23,7 @@ export type Video = {
   duration: number
   noStar: boolean
   censored: boolean
-  attributes: Attribute[]
+  // attributes: Attribute[]
   path: { file: string; stream: string }
   date: { added: string; published: string | null }
   quality: number

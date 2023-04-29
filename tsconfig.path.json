@@ -10,7 +10,8 @@
       "@utils/server/*": ["./src/utils/server/*"],
       "@utils/shared": ["./src/utils/shared"],
       "@hooks/*": ["./src/hooks/*"],
-      "@interfaces": ["./src/interfaces"] // only 1-file
+      "@interfaces": ["./src/interfaces"],
+      "@interfaces/*": ["./src/interfaces/*"]
     }
   }
 }

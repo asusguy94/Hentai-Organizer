@@ -10,7 +10,7 @@ import Image from '../image'
 import { ModalHandler } from '../modal'
 import { IconWithText } from '../icon'
 
-import { EventHandler } from '@hooks/star-event'
+import { EventHandler } from '@hooks/useStarEvent'
 import { Attribute, Bookmark, Category, VideoStar as Star, Video, SetState, Outfit } from '@interfaces'
 import { bookmarkService } from '@service'
 import { serverConfig, settingsConfig } from '@config'

@@ -1,4 +1,4 @@
-import { NextPage } from 'next/types'
+import { GetServerSideProps, InferGetServerSidePropsType, NextPage } from 'next/types'
 import { Fragment, useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/router'
 
@@ -26,13 +26,14 @@ import { IconWithText } from '@components/icon'
 import { SetState } from '@interfaces'
 import { starService } from '@service'
 import { serverConfig } from '@config'
+import prisma from '@utils/server/prisma'
 
 import styles from './star.module.scss'
 
 type StarVideo = {
   id: number
   name: string
-  fname: string
+  path: string
 }
 
 type Star = {
@@ -48,29 +49,53 @@ type Star = {
   link: string | null
 }
 
-const StarPage: NextPage = () => {
-  const { query, isReady } = useRouter()
+export const getServerSideProps: GetServerSideProps<
+  { star: Star; videos: StarVideo[] },
+  { id: string }
+> = async context => {
+  const id = context.params?.id
+  if (id === undefined) throw new Error("'id' is missing")
 
-  const starID = isReady && typeof query.id === 'string' ? parseInt(query.id) : undefined
-  const { data: starData } = starService.useStar<Star>(starID)
-  const { data: videoData } = starService.useVideos<StarVideo>(starID)
+  const star = await prisma.star.findFirstOrThrow({ where: { id: parseInt(id) } })
 
-  const [star, setStar] = useState<Star>()
-  const [videos, setVideos] = useState<StarVideo[]>([])
+  const videos = await prisma.video.findMany({
+    select: { id: true, name: true, path: true },
+    where: { stars: { some: { starID: parseInt(id) } } },
+    orderBy: [{ franchise: 'asc' }, { episode: 'asc' }]
+  })
 
+  return {
+    props: {
+      star: {
+        id: star.id,
+        name: star.name,
+        image: star.image,
+
+        info: {
+          breast: star.breast ?? '',
+          haircolor: star.haircolor ?? '',
+          hairstyle: star.hairstyle ?? '',
+          attribute: (
+            await prisma.starAttributes.findMany({
+              where: { starID: star.id },
+              include: { attribute: true }
+            })
+          ).map(({ attribute }) => attribute.name)
+        },
+        link: star.starLink
+      },
+      videos
+    }
+  }
+}
+
+const StarPage: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = ({ videos, star: starData }) => {
+  const [star, setStar] = useState<typeof starData>() //FIXME cannot be set directly
   const { modal, setModal } = useModal()
 
   useEffect(() => {
-    if (starData !== undefined) {
-      setStar(starData)
-    }
+    setStar(starData)
   }, [starData])
-
-  useEffect(() => {
-    if (videoData !== undefined) {
-      setVideos(videoData)
-    }
-  }, [videoData])
 
   if (star === undefined) return <Spinner />
 

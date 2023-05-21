@@ -1,6 +1,5 @@
-import { NextPage } from 'next/types'
+import { GetServerSideProps, InferGetServerSidePropsType, NextPage } from 'next/types'
 import { Fragment, useEffect, useRef, useState } from 'react'
-import { useRouter } from 'next/router'
 
 import {
   Button,
@@ -27,46 +26,138 @@ import Link from '@components/link'
 import Spinner from '@components/spinner'
 import { PlyrWithMetadata } from '@components/plyr'
 
-import useStarEvent, { type Event, type EventData, type EventHandler } from '@hooks/star-event'
-import { attributeService, bookmarkService, categoryService, videoService } from '@service'
+import useStarEvent, { type Event, type EventData, type EventHandler } from '@hooks/useStarEvent'
+import { bookmarkService, videoService } from '@service'
 import { serverConfig } from '@config'
 import { Attribute, Bookmark, Category, SetState, VideoStar, Video } from '@interfaces'
+import prisma from '@utils/server/prisma'
 
 import styles from './video.module.scss'
+import { getUnique } from '@utils/shared'
+import { formatDate, noExt } from '@utils/server/helper'
+import { Outfit } from '@prisma/client'
 
-const VideoPage: NextPage = () => {
-  const { query, isReady } = useRouter()
+export const getServerSideProps: GetServerSideProps<
+  {
+    categories: Category[]
+    attributes: Attribute[]
+    stars: VideoStar[]
+    bookmarks: Bookmark[]
+    video: Video
+    outfits: Outfit[]
+  },
+  { id: string }
+> = async ctx => {
+  const id = ctx.params?.id
+  if (typeof id !== 'string') throw new Error("'id' is missing")
 
-  const videoID = isReady && typeof query.id === 'string' ? parseInt(query.id) : undefined
-  const { data: starData } = videoService.useStars(videoID)
-  const { data: videoData } = videoService.useVideo(videoID)
-  const { data: bookmarksData } = videoService.useBookmarks(videoID)
+  const video = await prisma.video.findFirstOrThrow({ where: { id: parseInt(id) } })
+  const outfits = await prisma.outfit.findMany({ orderBy: { name: 'asc' } })
 
-  const { data: categories } = categoryService.useCategories()
-  const { data: attributes } = attributeService.useAttributes()
+  const stars = await prisma.star.findMany({
+    where: { videos: { some: { videoID: parseInt(id) } } },
+    select: {
+      id: true,
+      name: true,
+      image: true,
+      attributes: { select: { attribute: { select: { id: true, name: true } } } }
+    }
+  })
 
-  const [video, setVideo] = useState<Video>()
-  const [stars, setStars] = useState<VideoStar[]>([])
-  const [bookmarks, setBookmarks] = useState<Bookmark[]>([])
+  const bookmarks = await prisma.bookmark.findMany({
+    where: { videoID: parseInt(id) },
+    orderBy: { start: 'asc' },
+    select: {
+      id: true,
+      start: true,
+      category: true,
+      outfit: true,
+      attributes: { include: { attribute: { select: { id: true, name: true } } } },
+      star: {
+        include: { attributes: { include: { attribute: { select: { id: true, name: true } } } } }
+      }
+    }
+  })
+
+  const categories = await prisma.category.findMany({ orderBy: { name: 'asc' } })
+  const attributes = await prisma.attribute.findMany({ select: { id: true, name: true } })
+
+  return {
+    props: {
+      categories,
+      attributes,
+      outfits,
+      stars: stars.map(({ attributes, ...star }) => ({
+        ...star,
+        attributes: attributes.map(({ attribute }) => attribute)
+      })),
+      bookmarks: bookmarks.map(({ category, star, ...bookmark }) => {
+        const starAttributes = star?.attributes.map(({ attribute }) => attribute) ?? []
+        const bookmarkAttributes = bookmark.attributes.map(({ attribute }) => attribute)
+
+        return {
+          ...bookmark,
+          name: category.name,
+          outfit: bookmark.outfit?.name ?? null,
+          attributes: getUnique([...starAttributes, ...bookmarkAttributes], 'id'),
+          starID: star?.id ?? 0,
+          starImage: star?.image ?? undefined,
+          active: false
+        }
+      }),
+      video: {
+        id: video.id,
+        name: video.name,
+        episode: video.episode,
+        path: {
+          file: video.path,
+          stream: `${noExt(video.path)}/master.m3u8`
+        },
+        franchise: video.franchise,
+        noStar: video.noStar,
+        duration: video.duration,
+        date: {
+          added: formatDate(video.date),
+          published: video.date_published ? formatDate(video.date_published) : null
+        },
+        brand: video.brand,
+        quality: video.height,
+        censored: video.cen,
+        related: (
+          await prisma.video.findMany({
+            where: { franchise: video.franchise },
+            orderBy: { episode: 'asc' },
+            select: {
+              id: true,
+              name: true,
+              cover: true,
+              _count: { select: { plays: true } }
+            }
+          })
+        ).map(({ cover, _count, ...video }) => ({
+          ...video,
+          image: cover,
+          plays: _count.plays
+        }))
+      }
+    }
+  }
+}
+
+const VideoPage: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = ({
+  categories,
+  attributes,
+  outfits,
+  stars: starData,
+  bookmarks: bookmarksData,
+  video: videoData
+}) => {
+  const [video, setVideo] = useState<typeof videoData>() //FIXME cannot be set directly
+  const [stars, setStars] = useState(starData)
+  const [bookmarks, setBookmarks] = useState(bookmarksData)
 
   const { modal, setModal } = useModal()
   const { setEvent, getEvent, getDefault } = useStarEvent()
-
-  useEffect(() => {
-    if (starData !== undefined) {
-      setStars(starData)
-    }
-  }, [starData])
-
-  useEffect(() => {
-    if (bookmarksData !== undefined) {
-      setBookmarks(
-        bookmarksData.map(bookmark => {
-          return { ...bookmark, active: false }
-        })
-      )
-    }
-  }, [bookmarksData])
 
   useEffect(() => {
     setVideo(videoData)
@@ -79,6 +170,7 @@ const VideoPage: NextPage = () => {
         bookmarks={bookmarks}
         categories={categories}
         attributes={attributes}
+        outfits={outfits}
         stars={stars}
         update={{
           bookmarks: setBookmarks,
@@ -114,8 +206,9 @@ const VideoPage: NextPage = () => {
 type SectionProps = {
   video?: Video
   bookmarks: Bookmark[]
-  categories?: Category[]
-  attributes?: Attribute[]
+  categories: Category[]
+  attributes: Attribute[]
+  outfits: Outfit[]
   stars: VideoStar[]
   update: {
     stars: SetState<VideoStar[]>
@@ -128,7 +221,17 @@ type SectionProps = {
   }
   setStarEvent: EventHandler
 }
-const Section = ({ video, bookmarks, categories, attributes, stars, update, modal, setStarEvent }: SectionProps) => {
+const Section = ({
+  video,
+  bookmarks,
+  categories,
+  attributes,
+  outfits,
+  stars,
+  update,
+  modal,
+  setStarEvent
+}: SectionProps) => {
   const plyrRef = useRef<PlyrWithMetadata | null>(null)
 
   // Helper script for getting the player
@@ -162,7 +265,7 @@ const Section = ({ video, bookmarks, categories, attributes, stars, update, moda
     }
   }
 
-  if (video === undefined || categories === undefined || attributes === undefined) return <Spinner />
+  if (video === undefined) return <Spinner />
 
   return (
     <Grid item xs={9} component='section'>
@@ -184,6 +287,7 @@ const Section = ({ video, bookmarks, categories, attributes, stars, update, moda
         stars={stars}
         attributes={attributes}
         categories={categories}
+        outfits={outfits}
         playVideo={playVideo}
         setTime={setTime}
         update={update.bookmarks}

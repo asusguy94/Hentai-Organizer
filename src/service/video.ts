@@ -1,16 +1,12 @@
 import { useFetch } from 'usehooks-ts'
 
-import { Bookmark, General, Video, VideoStar } from '@interfaces'
+import { General, Video, VideoStar } from '@interfaces'
 import { createApi } from '@config'
 
 const { api, baseURL } = createApi('/video')
 
-const defaultNumber = 0
 export default {
   // TODO handle defaultNumber=0 on the server
-  useVideo: (id: number = defaultNumber) => useFetch<Video>(`${baseURL}/${id}`),
-  useStars: (id: number = defaultNumber) => useFetch<VideoStar[]>(`${baseURL}/${id}/star`),
-  useBookmarks: (id: number = defaultNumber) => useFetch<Bookmark[]>(`${baseURL}/${id}/bookmark`),
   addPlays: (id: number) => api.put(`/${id}`, { plays: 1 }),
   resetPlays: (id: number) => api.put(`/${id}`, { plays: 0 }),
   renameVideo: (id: number, path: string) => api.put(`/${id}`, { path }),
@@ -28,12 +24,10 @@ export default {
   setDate: <T extends { date_published: Video['date']['published'] }>(id: number, date: string) => {
     return api.put<T>(`/${id}`, { date })
   },
-  useMissingStar: () => useFetch<General[]>(`${baseURL}/missing-star`),
   removeStar: (id: number, starID: number) => api.delete(`/${id}/star/${starID}`),
   toggleNoStar: <T = any>(id: number, checked: boolean) => api.put<T>(`/${id}`, { noStar: checked }),
   addStar: (id: number, name: string) => api.post<VideoStar>(`/${id}/star`, { name }),
   useRelatedStars: (id: number) => useFetch<General[]>(`${baseURL}/${id}/related/star`),
   removeAttribute: (id: number, attributeID: number) => api.delete(`/${id}/attribute/${attributeID}`),
-  useNewVideos: <T = any>() => useFetch<T[]>(baseURL, { method: 'POST' }),
   addVideos: <T = any>(videos: T[]) => api.post('/add', { videos })
 }

@@ -12,7 +12,7 @@ import { IconWithText } from '../icon'
 
 import { EventHandler } from '@hooks/star-event'
 import { Attribute, Bookmark, Category, VideoStar as Star, Video, SetState, Outfit } from '@interfaces'
-import { bookmarkService, outfitService } from '@service'
+import { bookmarkService } from '@service'
 import { serverConfig, settingsConfig } from '@config'
 
 import styles from './timeline.module.scss'
@@ -23,6 +23,7 @@ type TimelineProps = {
   stars: Star[]
   attributes: Attribute[]
   categories: Category[]
+  outfits: Outfit[]
   playVideo: (time?: number | null) => void
   setTime: (bookmarkID: number, time?: number) => void
   update: SetState<Bookmark[]>
@@ -35,6 +36,7 @@ const Timeline = ({
   stars,
   attributes,
   categories,
+  outfits,
   playVideo,
   setTime,
   update,
@@ -42,8 +44,6 @@ const Timeline = ({
   setStarEvent
 }: TimelineProps) => {
   const windowSize = useWindowSize()
-
-  const { data: outfits } = outfitService.useOutfits()
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const bookmarksArr: HTMLElement[] = []
@@ -222,8 +222,6 @@ const Timeline = ({
       setDataLevel(item, level)
     })
   }, [bookmarksArr, windowSize.width])
-
-  if (outfits === undefined) return null
 
   return (
     <div className='col-12' id={styles.timeline}>

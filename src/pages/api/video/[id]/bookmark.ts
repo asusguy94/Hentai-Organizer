@@ -5,42 +5,7 @@ import validate, { z } from '@utils/server/validation'
 import { getUnique } from '@utils/shared'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method === 'GET') {
-    const { id } = req.query
-
-    if (typeof id === 'string') {
-      res.json(
-        (
-          await prisma.bookmark.findMany({
-            where: { videoID: parseInt(id) },
-            orderBy: { start: 'asc' },
-            select: {
-              id: true,
-              start: true,
-              category: true,
-              outfit: true,
-              attributes: { include: { attribute: { select: { id: true, name: true } } } },
-              star: {
-                include: { attributes: { include: { attribute: { select: { id: true, name: true } } } } }
-              }
-            }
-          })
-        ).map(({ category, outfit, star, attributes, ...bookmark }) => {
-          const starAttributes = star?.attributes.map(({ attribute }) => attribute) ?? []
-          const bookmarkAttributes = attributes.map(({ attribute }) => attribute)
-
-          return {
-            ...bookmark,
-            name: category.name,
-            outfit: outfit?.name ?? null,
-            attributes: getUnique([...starAttributes, ...bookmarkAttributes], 'id'),
-            starID: star?.id ?? 0,
-            starImage: star?.image ?? null
-          }
-        })
-      )
-    }
-  } else if (req.method === 'POST') {
+  if (req.method === 'POST') {
     const { id } = req.query
 
     if (typeof id === 'string') {

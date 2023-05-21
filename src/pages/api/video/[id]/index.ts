@@ -4,57 +4,10 @@ import fs from 'fs'
 
 import prisma from '@utils/server/prisma'
 import validate, { z } from '@utils/server/validation'
-import { dirOnly, downloader, formatDate, noExt, removeCover, removePreviews } from '@utils/server/helper'
+import { dirOnly, downloader, formatDate, removeCover, removePreviews } from '@utils/server/helper'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method === 'GET') {
-    const { id } = req.query
-
-    if (typeof id === 'string') {
-      if (id === '0') {
-        res.end()
-        return
-      }
-
-      const video = await prisma.video.findFirstOrThrow({ where: { id: parseInt(id) } })
-
-      res.json({
-        id: video.id,
-        name: video.name,
-        episode: video.episode,
-        path: {
-          file: video.path,
-          stream: `${noExt(video.path)}/master.m3u8`
-        },
-        franchise: video.franchise,
-        noStar: video.noStar,
-        duration: video.duration,
-        date: {
-          added: formatDate(video.date),
-          published: video.date_published ? formatDate(video.date_published) : null
-        },
-        brand: video.brand,
-        quality: video.height,
-        censored: video.cen,
-        related: (
-          await prisma.video.findMany({
-            where: { franchise: video.franchise },
-            orderBy: { episode: 'asc' },
-            select: {
-              id: true,
-              name: true,
-              cover: true,
-              _count: { select: { plays: true } }
-            }
-          })
-        ).map(({ cover, _count, ...video }) => ({
-          ...video,
-          image: cover,
-          plays: _count.plays
-        }))
-      })
-    }
-  } else if (req.method === 'PUT') {
+  if (req.method === 'PUT') {
     const { id } = req.query
 
     if (typeof id === 'string') {

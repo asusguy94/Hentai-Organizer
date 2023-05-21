@@ -3,11 +3,7 @@ import { useFetch } from 'usehooks-ts'
 import { createApi } from '@config'
 const { api, baseURL } = createApi('/star')
 
-const defaultNumber = 0
 export default {
-  //TODO handle defaultNumber=0 on the server
-  useStar: <T>(id: number = defaultNumber) => useFetch<T>(`${baseURL}/${id}`),
-  useVideos: <T>(id: number = defaultNumber) => useFetch<T[]>(`${baseURL}/${id}/video`),
   useInfo: () => {
     type StarInfo = {
       breast: string[]

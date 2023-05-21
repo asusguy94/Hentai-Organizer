@@ -4,37 +4,7 @@ import prisma from '@utils/server/prisma'
 import validate, { z } from '@utils/server/validation'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method === 'GET') {
-    const { id } = req.query
-
-    if (typeof id === 'string') {
-      if (id === '0') {
-        res.end()
-        return
-      }
-
-      const star = await prisma.star.findFirstOrThrow({ where: { id: parseInt(id) } })
-
-      res.json({
-        id: star.id,
-        name: star.name,
-        image: star.image,
-
-        info: {
-          breast: star.breast ?? '',
-          haircolor: star.haircolor ?? '',
-          hairstyle: star.hairstyle ?? '',
-          attribute: (
-            await prisma.starAttributes.findMany({
-              where: { starID: star.id },
-              include: { attribute: true }
-            })
-          ).map(({ attribute }) => attribute.name)
-        },
-        link: star.starLink
-      })
-    }
-  } else if (req.method === 'PUT') {
+  if (req.method === 'PUT') {
     const { id } = req.query
 
     if (typeof id === 'string') {

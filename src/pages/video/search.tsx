@@ -123,7 +123,7 @@ const VideoSearchPage: NextPage<InferGetServerSidePropsType<typeof getServerSide
     titleSearch: '',
     cen: null,
     brand: '',
-    category: [],
+    category: [null],
     attribute: [],
     outfit: []
   })
@@ -301,6 +301,14 @@ const Filter = ({ videoData, setHidden }: FilterProps) => {
     }
   }
 
+  const category_NULL = (ref: RegularHandlerProps) => {
+    if (!ref.checked) {
+      setHidden(prev => ({ ...prev, category: prev.category.filter(category => category !== null) }))
+    } else {
+      setHidden(prev => ({ ...prev, category: [...prev.category, null] }))
+    }
+  }
+
   const outfits = (ref: RegularHandlerProps, target: Outfit) => {
     const targetLower = target.name.toLowerCase()
 
@@ -315,7 +323,13 @@ const Filter = ({ videoData, setHidden }: FilterProps) => {
     <>
       <FilterDropdown data={videoData.brands} label='network' callback={brand} />
 
-      <FilterCheckBox data={videoData.categories} label='category' callback={category} />
+      <FilterCheckBox
+        data={videoData.categories}
+        label='category'
+        callback={category}
+        nullCallback={category_NULL}
+        defaultNull
+      />
       <FilterCheckBox data={videoData.outfits} label='outfit' callback={outfits} />
       <FilterCheckBox data={videoData.attributes} label='attribute' callback={attribute} />
     </>
@@ -326,8 +340,16 @@ type FilterCheckboxProps<T extends General> = {
   data?: T[]
   label: string
   callback: (ref: RegularHandlerProps, item: T) => void
+  nullCallback?: (e: RegularHandlerProps) => void
+  defaultNull?: boolean
 }
-function FilterCheckBox<T extends General>({ data, label, callback }: FilterCheckboxProps<T>) {
+function FilterCheckBox<T extends General>({
+  data,
+  label,
+  callback,
+  nullCallback,
+  defaultNull = false
+}: FilterCheckboxProps<T>) {
   if (data === undefined) return <Spinner />
 
   return (
@@ -335,6 +357,15 @@ function FilterCheckBox<T extends General>({ data, label, callback }: FilterChec
       <h2>{capitalize(label, true)}</h2>
 
       <FormControl>
+        {nullCallback !== undefined && (
+          <RegularItem
+            label={<div className={styles.global}>NULL</div>}
+            value='NULL'
+            callback={nullCallback}
+            defaultChecked={defaultNull}
+          />
+        )}
+
         {data.map(item => (
           <RegularItem key={item.id} label={item.name} value={item.name} item={item} callback={callback} />
         ))}

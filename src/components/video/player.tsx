@@ -265,8 +265,7 @@ const VideoPlayer = ({ video, bookmarks, categories, stars, update, plyrRef, mod
           onClick={() => {
             modal.handler(
               'Add Bookmark',
-              categories.map(category => {
-                return (
+              categories.map(category => (
                   <Button
                     variant='outlined'
                     color='primary'
@@ -278,8 +277,7 @@ const VideoPlayer = ({ video, bookmarks, categories, stars, update, plyrRef, mod
                   >
                     {category.name}
                   </Button>
-                )
-              }),
+              )),
               true
             )
           }}

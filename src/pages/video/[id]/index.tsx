@@ -32,10 +32,11 @@ import { serverConfig } from '@config'
 import { Attribute, Bookmark, Category, SetState, VideoStar, Video } from '@interfaces'
 import prisma from '@utils/server/prisma'
 
-import styles from './video.module.scss'
 import { getUnique } from '@utils/shared'
 import { formatDate, noExt } from '@utils/server/helper'
 import { Outfit } from '@prisma/client'
+
+import styles from './video.module.scss'
 
 export const getServerSideProps: GetServerSideProps<
   {
@@ -548,9 +549,9 @@ const Star = ({
     // Check if bookmark already contains one of the attributes from the star
     bookmarks.forEach(item => {
       if (item.id === bookmark.id) {
-        const overlappingAttributes = item.attributes.some(bookmarkAttr =>
-          star.attributes.some(starAttr => starAttr.id === bookmarkAttr.id)
-        )
+        const overlappingAttributes = item.attributes.some(bAttr => {
+          return star.attributes.some(starAttr => starAttr.id === bAttr.id)
+        })
 
         // Bookmark has ZERO Overlapping Attributes
         if (!overlappingAttributes) {
@@ -560,10 +561,7 @@ const Star = ({
               bookmarks.map(item => {
                 if (item.id === bookmark.id) {
                   // MERGE bookmark-attributes with star-attributes
-                  item.attributes = item.attributes.concat(star.attributes)
-
-                  // SET starID
-                  item.starID = star.id
+                  return { ...item, starID: star.id, attributes: [...item.attributes, ...star.attributes] }
                 }
 
                 return item
@@ -646,11 +644,7 @@ const Star = ({
               onModal(
                 'Add Attribute',
                 attributes
-                  .filter(attribute => {
-                    const match = star.attributes.some(attr => attr.id === attribute.id)
-
-                    return !match ? attribute : null
-                  })
+                  .filter(attribute => !star.attributes.some(sAttr => sAttr.id === attribute.id))
                   .map(attribute => (
                     <Button
                       key={attribute.id}
@@ -902,7 +896,9 @@ const Attributes = ({ video, bookmarks, clearActive, update, getAttributes }: At
   const attribute_setActive = (attribute: Attribute) => {
     update(
       bookmarks.map(bookmark => {
-        if (bookmark.attributes.some(bookmarkAttribute => bookmarkAttribute.id === attribute.id)) bookmark.active = true
+        if (bookmark.attributes.some(bookmarkAttribute => bookmarkAttribute.id === attribute.id)) {
+          return { ...bookmark, active: true }
+        }
 
         return bookmark
       })
@@ -952,15 +948,15 @@ type OutfitProps = {
   update: SetState<Bookmark[]>
 }
 const Outfits = ({ bookmarks, clearActive, update }: OutfitProps) => {
-  const getOutfits = () => [
-    ...new Set(bookmarks.filter(bookmark => bookmark.outfit !== null).map(bookmark => bookmark.outfit))
-  ]
+  const getOutfits = () => {
+    return getUnique(bookmarks.flatMap(bookmark => (bookmark.outfit !== null ? [bookmark.outfit] : [])))
+  }
 
   const outfit_setActive = (outfit: string) => {
     update(
       bookmarks.map(bookmark => {
         if (bookmark.outfit === outfit) {
-          bookmark.active = true
+          return { ...bookmark, active: true }
         }
 
         return bookmark
@@ -970,10 +966,7 @@ const Outfits = ({ bookmarks, clearActive, update }: OutfitProps) => {
 
   return (
     <Grid container justifyContent='center' id={styles.outfits}>
-      {getOutfits().map(outfit => {
-        if (outfit === null) return null
-
-        return (
+      {getOutfits().map(outfit => (
           <Button
             key={outfit}
             size='small'
@@ -985,8 +978,7 @@ const Outfits = ({ bookmarks, clearActive, update }: OutfitProps) => {
           >
             {outfit}
           </Button>
-        )
-      })}
+      ))}
     </Grid>
   )
 }

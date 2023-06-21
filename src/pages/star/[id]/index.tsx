@@ -399,7 +399,7 @@ const StarInputForm = ({ value, emptyByDefault = false, update, name, list, chil
           onKeyPress={handleKeyPress}
           //
           // OPTIONS
-          options={list.filter(item => (emptyByDefault && value.includes(item) ? null : item))}
+          options={list.filter(item => !(emptyByDefault && value.includes(item)))}
           renderInput={params => (
             <TextField
               {...params}

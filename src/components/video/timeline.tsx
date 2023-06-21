@@ -65,12 +65,12 @@ const Timeline = ({
   const setCategory = (category: Category, bookmark: Bookmark) => {
     bookmarkService.setCategory(bookmark.id, category.id).then(() => {
       update(
-        bookmarks.map(bookmarkItem => {
-          if (bookmarkItem.id === bookmark.id) {
-            bookmarkItem.name = category.name
+        bookmarks.map(item => {
+          if (item.id === bookmark.id) {
+            return { ...item, name: category.name }
           }
 
-          return bookmarkItem
+          return item
         })
       )
     })
@@ -79,12 +79,12 @@ const Timeline = ({
   const setOutfit = (outfit: Outfit, bookmark: Bookmark) => {
     bookmarkService.setOutfit(bookmark.id, outfit.id).then(() => {
       update(
-        bookmarks.map(bookmarkItem => {
-          if (bookmarkItem.id === bookmark.id) {
-            bookmarkItem.outfit = outfit.name
+        bookmarks.map(item => {
+          if (item.id === bookmark.id) {
+            return { ...item, outfit: outfit.name }
           }
 
-          return bookmarkItem
+          return item
         })
       )
     })
@@ -93,12 +93,12 @@ const Timeline = ({
   const removeOutfit = (bookmark: Bookmark) => {
     bookmarkService.removeOutfit(bookmark.id).then(() => {
       update(
-        bookmarks.map(bookmarkItem => {
-          if (bookmarkItem.id === bookmark.id) {
-            bookmarkItem.outfit = null
+        bookmarks.map(item => {
+          if (item.id === bookmark.id) {
+            return { ...item, outfit: null }
           }
 
-          return bookmarkItem
+          return item
         })
       )
     })
@@ -107,15 +107,15 @@ const Timeline = ({
   const addAttribute = (attribute: Attribute, bookmark: Bookmark) => {
     bookmarkService.addAttribute(bookmark.id, attribute.id).then(() => {
       update(
-        bookmarks.map(bookmarkItem => {
-          if (bookmarkItem.id === bookmark.id) {
-            bookmarkItem.attributes.push({
-              id: attribute.id,
-              name: attribute.name
-            })
+        bookmarks.map(item => {
+          if (item.id === bookmark.id) {
+            return {
+              ...item,
+              attributes: [...item.attributes, { id: attribute.id, name: attribute.name }]
+            }
           }
 
-          return bookmarkItem
+          return item
         })
       )
     })
@@ -126,9 +126,10 @@ const Timeline = ({
       update(
         bookmarks.map(item => {
           if (item.id === bookmark.id) {
-            item.attributes = item.attributes.filter(itemAttribute =>
-              itemAttribute.id === attribute.id ? null : itemAttribute
-            )
+            return {
+              ...item,
+              attributes: item.attributes.filter(attribute => !attribute.id)
+            }
           }
 
           return item
@@ -140,25 +141,24 @@ const Timeline = ({
   const clearAttributes = (bookmark: Bookmark) => {
     bookmarkService.clearAttributes(bookmark.id).then(() => {
       update(
-        bookmarks.map(bookmarkItem => {
-          if (bookmarkItem.id === bookmark.id) {
+        bookmarks.map(item => {
+          if (item.id === bookmark.id) {
             const starID = bookmark.starID
 
             if (starID !== 0) {
               const starAttribute = attributesFromStar(starID)
 
-              bookmarkItem.attributes = bookmarkItem.attributes.filter(bookmarkAttribute => {
-                const match = starAttribute.some(starAttribute => starAttribute.name === bookmarkAttribute.name)
-
-                return match ? bookmarkAttribute : null
-              })
+              return {
+                ...item,
+                attributes: item.attributes.filter(bAttr => starAttribute.some(sAttr => sAttr.name === bAttr.name))
+              }
             } else {
               // Bookmark does not have a star
-              bookmarkItem.attributes = []
+              return { ...item, attributes: [] }
             }
           }
 
-          return bookmarkItem
+          return item
         })
       )
     })
@@ -173,18 +173,15 @@ const Timeline = ({
 
             if (item.attributes.length > attributes.length) {
               // Bookmark have at least 1 attribute not from star
-              item.attributes = item.attributes.filter(attribute => {
-                const match = attributes.some(starAttribute => starAttribute.name === attribute.name)
-
-                return !match ? attribute : null
-              })
+              return {
+                ...item,
+                starID: 0,
+                attributes: item.attributes.filter(attr => !attributes.some(sAttr => sAttr.name === attr.name))
+              }
             } else {
               // Bookmark has only attributes from star
-              item.attributes = []
+              return { ...item, starID: 0, attributes: [] }
             }
-
-            // RESET starID
-            item.starID = 0
           }
 
           return item
@@ -216,8 +213,8 @@ const Timeline = ({
         if (levels[j] === level && collisionCheck(bookmarksArr[j], bookmarksArr[i])) {
           level++
           j = -1
-    }
-  }
+        }
+      }
 
       levels[i] = level
       if (level > maxLevel) maxLevel = level
@@ -229,7 +226,7 @@ const Timeline = ({
     if (videoPlayer) {
       const videoTop = videoPlayer.getBoundingClientRect().top
       videoPlayer.style.maxHeight = `calc(100vh - (${spacing.bookmark}px * ${maxLevel}) - ${videoTop}px - ${spacing.top}px)`
-      }
+    }
   }, [bookmarks, windowSize.width])
 
   return (
@@ -335,13 +332,7 @@ const Timeline = ({
                   onModal(
                     'Add Attribute',
                     attributes
-                      .filter(attribute => {
-                        const match = bookmark.attributes.some(
-                          bookmarkAttribute => attribute.name === bookmarkAttribute.name
-                        )
-
-                        return !match ? attribute : null
-                      })
+                      .filter(attr => !bookmark.attributes.some(bAttr => attr.name === bAttr.name))
                       .map(attribute => (
                         <Button
                           key={attribute.id}
@@ -369,12 +360,8 @@ const Timeline = ({
                   onModal(
                     'Remove Attribute',
                     bookmark.attributes
-                      .filter(attribute => {
-                        // only show attribute, if not from star
-                        if (isStarAttribute(bookmark.starID, attribute.id)) return null
-
-                        return attribute
-                      })
+                      // only show attribute, if not from star
+                      .filter(attribute => !isStarAttribute(bookmark.starID, attribute.id))
                       .map(attribute => (
                         <Button
                           key={attribute.id}

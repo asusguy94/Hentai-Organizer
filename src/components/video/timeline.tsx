@@ -1,4 +1,4 @@
-import { Fragment, useEffect } from 'react'
+import { Fragment, useEffect, useRef, useState } from 'react'
 
 import { Button } from '@mui/material'
 
@@ -16,6 +16,8 @@ import { bookmarkService } from '@service'
 import { serverConfig, settingsConfig } from '@config'
 
 import styles from './timeline.module.scss'
+
+const spacing = { top: 3, bookmark: 36 }
 
 type TimelineProps = {
   video: Video
@@ -44,9 +46,8 @@ const Timeline = ({
   setStarEvent
 }: TimelineProps) => {
   const windowSize = useWindowSize()
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const bookmarksArr: HTMLElement[] = []
+  const bookmarksRef = useRef<HTMLButtonElement[]>([])
+  const [bookmarkLevels, setBookmarkLevels] = useState<number[]>([])
 
   const isActive = (bookmark: Bookmark) => bookmark.active
   const hasStar = (bookmark: Bookmark) => bookmark.starID > 0
@@ -192,39 +193,47 @@ const Timeline = ({
     })
   }
 
-  const collisionCheck = (a: HTMLElement, b: HTMLElement) => {
-    const valA = a.getBoundingClientRect()
-    const valB = b.getBoundingClientRect()
+  const collisionCheck = (a: HTMLElement | null, b: HTMLElement | null) => {
+    if (a === null || b === null) return false
 
-    return !(
-      valA.x + valA.width < valB.x - settingsConfig.timeline.spacing ||
-      valA.x + settingsConfig.timeline.spacing > valB.x + valB.width
+    const aRect = a.getBoundingClientRect()
+    const bRect = b.getBoundingClientRect()
+
+    return (
+      aRect.x + aRect.width >= bRect.x - settingsConfig.timeline.spacing &&
+      aRect.x - settingsConfig.timeline.spacing <= bRect.x + bRect.width
     )
   }
 
-  const setDataLevel = (item: HTMLElement, level: number) => {
-    if (level > 0) {
-      item.setAttribute('data-level', level.toString())
+  useEffect(() => {
+    const bookmarksArr = bookmarks.length > 0 ? bookmarksRef.current : []
+    const levels: number[] = new Array(bookmarks.length).fill(0)
+    let maxLevel = 0
+
+    for (let i = 0; i < bookmarksArr.length; i++) {
+      let level = 1
+      for (let j = 0; j < i; j++) {
+        if (levels[j] === level && collisionCheck(bookmarksArr[j], bookmarksArr[i])) {
+          level++
+          j = -1
     }
   }
 
-  useEffect(() => {
-    const LEVEL_MIN = 1
+      levels[i] = level
+      if (level > maxLevel) maxLevel = level
+    }
 
-    let level = LEVEL_MIN
-    bookmarksArr.forEach((item, idx, arr) => {
-      if (idx > 0) {
-        const collision = arr.some((other, i) => i < idx && collisionCheck(other, item))
+    setBookmarkLevels(levels)
 
-        level = collision ? level + 1 : LEVEL_MIN
+    const videoPlayer = document.querySelector<HTMLElement>('.plyr')
+    if (videoPlayer) {
+      const videoTop = videoPlayer.getBoundingClientRect().top
+      videoPlayer.style.maxHeight = `calc(100vh - (${spacing.bookmark}px * ${maxLevel}) - ${videoTop}px - ${spacing.top}px)`
       }
-
-      setDataLevel(item, level)
-    })
-  }, [bookmarksArr, windowSize.width])
+  }, [bookmarks, windowSize.width])
 
   return (
-    <div className='col-12' id={styles.timeline}>
+    <div id={styles.timeline} style={bookmarks.length > 0 ? { marginTop: spacing.top } : {}}>
       {bookmarks.map((bookmark, idx) => {
         const tooltip = bookmark.starID > 0 || bookmark.attributes.length > 0 || bookmark.outfit !== null
 
@@ -237,11 +246,11 @@ const Timeline = ({
                 color={hasStar(bookmark) ? 'primary' : 'secondary'}
                 className={styles.bookmark}
                 style={{
-                  left: `${((bookmark.start * 100) / video.duration) * settingsConfig.timeline.offset}%`
+                  left: `${(bookmark.start / video.duration) * 100}%`,
+                  top: `${(bookmarkLevels[idx] - 1) * spacing.bookmark}px`
                 }}
                 onClick={() => playVideo(bookmark.start)}
-                ref={(item: HTMLButtonElement) => (bookmarksArr[idx] = item)}
-                data-level={1}
+                ref={(bookmark: HTMLButtonElement) => (bookmarksRef.current[idx] = bookmark)}
               >
                 <div data-tip={tooltip} data-for={`bookmark-info-${bookmark.id}`}>
                   {bookmark.name}

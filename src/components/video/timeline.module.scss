@@ -2,29 +2,13 @@
 
 #timeline {
   position: relative;
-  left: 95px;
-  margin-top: 5px;
+  margin-left: 95px;
+  margin-right: 95px;
 
   .bookmark {
     position: absolute;
     white-space: nowrap;
     border-width: 1px;
-
-    $spacing: 1;
-
-    $levelSelector: 1;
-    $margin: 0;
-
-    @for $i from 1 through ($bookmarkRows * $bookmarkCols) {
-      $modLevelSelector: (($levelSelector - 1) % $bookmarkCols);
-      $margin: $modLevelSelector * $bookmarkSpacing;
-
-      &[data-level='#{$i}'] {
-        margin-top: $margin;
-      }
-
-      $levelSelector: $levelSelector + 1;
-    }
 
     [id^='bookmark-info-'] {
       opacity: 1;

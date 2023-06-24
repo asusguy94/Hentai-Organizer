@@ -10,9 +10,6 @@ function getValue(label: string, defaultValue: string): string {
 
 export default {
   qualities: [1080, 720, 480, 360],
-  timeline: {
-    spacing: parseFloat(getValue('TIMELINE_SPACING', '0'))
-  },
   player: {
     thumbnails: getValue('PLAYER_THUMBNAILS', 'false') === 'true'
   },

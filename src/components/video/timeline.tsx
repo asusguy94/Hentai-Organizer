@@ -9,11 +9,12 @@ import { useWindowSize } from 'react-use'
 import Image from '../image'
 import { ModalHandler } from '../modal'
 import { IconWithText } from '../icon'
+import { defaultSettings, useSettings } from '@pages/settings'
 
 import { EventHandler } from '@hooks/useStarEvent'
 import { Attribute, Bookmark, Category, VideoStar as Star, Video, SetState, Outfit } from '@interfaces'
 import { bookmarkService } from '@service'
-import { serverConfig, settingsConfig } from '@config'
+import { serverConfig } from '@config'
 
 import styles from './timeline.module.scss'
 
@@ -48,6 +49,7 @@ const Timeline = ({
   const windowSize = useWindowSize()
   const bookmarksRef = useRef<HTMLButtonElement[]>([])
   const [bookmarkLevels, setBookmarkLevels] = useState<number[]>([])
+  const localSettings = useSettings()
 
   const isActive = (bookmark: Bookmark) => bookmark.active
   const hasStar = (bookmark: Bookmark) => bookmark.starID > 0
@@ -190,19 +192,18 @@ const Timeline = ({
     })
   }
 
+  useEffect(() => {
   const collisionCheck = (a: HTMLElement | null, b: HTMLElement | null) => {
     if (a === null || b === null) return false
+
+      const bookmarkSpacing = localSettings?.bookmark_spacing ?? defaultSettings.bookmark_spacing
 
     const aRect = a.getBoundingClientRect()
     const bRect = b.getBoundingClientRect()
 
-    return (
-      aRect.x + aRect.width >= bRect.x - settingsConfig.timeline.spacing &&
-      aRect.x - settingsConfig.timeline.spacing <= bRect.x + bRect.width
-    )
+      return aRect.x + aRect.width >= bRect.x - bookmarkSpacing && aRect.x - bookmarkSpacing <= bRect.x + bRect.width
   }
 
-  useEffect(() => {
     const bookmarksArr = bookmarks.length > 0 ? bookmarksRef.current : []
     const levels: number[] = new Array(bookmarks.length).fill(0)
     let maxLevel = 0
@@ -227,7 +228,7 @@ const Timeline = ({
       const videoTop = videoPlayer.getBoundingClientRect().top
       videoPlayer.style.maxHeight = `calc(100vh - (${spacing.bookmark}px * ${maxLevel}) - ${videoTop}px - ${spacing.top}px)`
     }
-  }, [bookmarks, windowSize.width])
+  }, [bookmarks, localSettings?.bookmark_spacing, windowSize.width])
 
   return (
     <div id={styles.timeline} style={bookmarks.length > 0 ? { marginTop: spacing.top } : {}}>

@@ -156,7 +156,20 @@ type VideosProps = {
   sortMethod: SortMethodVideo
 }
 const Videos = ({ videos, hidden, sortMethod }: VideosProps) => {
-  const visible = getVisible(videos.filter(v => !v.noStar).sort(sortMethod), hidden)
+  const localSettings = useSettings()
+
+  const filtered = useMemo<Video[]>(() => {
+    const videoCount = localSettings?.video_count
+
+    if (videos === undefined) return []
+    if (videoCount === undefined || videoCount === defaultSettings.video_count) return videos
+
+    return videos.filter((_, idx) => idx < videoCount)
+  }, [localSettings?.video_count, videos])
+
+  if (videos === undefined) return <Spinner />
+
+  const visible = getVisible(filtered.filter(v => !v.noStar).sort(sortMethod), hidden)
 
   return (
     <div id={styles.videos}>

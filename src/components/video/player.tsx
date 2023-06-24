@@ -14,7 +14,7 @@ import Plyr, { PlyrWithMetadata } from '../plyr'
 
 import { Bookmark, Category, Video, VideoStar, SetState } from '@interfaces'
 import { videoService } from '@service'
-import { serverConfig } from '@config'
+import { serverConfig, settingsConfig } from '@config'
 
 const useHls = (
   video: Video,
@@ -87,11 +87,19 @@ const useHls = (
         hls.loadSource(`${serverConfig.api}/video/${video.id}/hls`)
         hls.attachMedia(player.media)
 
-        const onLoad: HlsListeners[typeof Hls.Events.MANIFEST_PARSED] = () => {
+        const onLoad: HlsListeners[typeof Hls.Events.MANIFEST_PARSED] = (e, data) => {
+          if (settingsConfig.debug) {
+            console.log(e, data)
+          }
+
           hls.startLoad(localBookmark)
         }
 
         const onError: HlsListeners[typeof Hls.Events.ERROR] = (e, data) => {
+          if (settingsConfig.debug) {
+            console.log(e, data)
+          }
+
           if (data.fatal) {
             hls.off(Hls.Events.ERROR, onError)
             hls.off(Hls.Events.MANIFEST_PARSED, onLoad)
@@ -266,17 +274,17 @@ const VideoPlayer = ({ video, bookmarks, categories, stars, update, plyrRef, mod
             modal.handler(
               'Add Bookmark',
               categories.map(category => (
-                  <Button
-                    variant='outlined'
-                    color='primary'
-                    key={category.id}
-                    onClick={() => {
-                      modal.handler()
-                      addBookmark(category)
-                    }}
-                  >
-                    {category.name}
-                  </Button>
+                <Button
+                  variant='outlined'
+                  color='primary'
+                  key={category.id}
+                  onClick={() => {
+                    modal.handler()
+                    addBookmark(category)
+                  }}
+                >
+                  {category.name}
+                </Button>
               )),
               true
             )

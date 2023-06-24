@@ -16,4 +16,5 @@ export default {
   player: {
     thumbnails: getValue('PLAYER_THUMBNAILS', 'false') === 'true'
   },
+  debug: getValue('DEBUG', 'false') === 'true'
 }

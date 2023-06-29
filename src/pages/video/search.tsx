@@ -1,5 +1,5 @@
 import { GetServerSideProps, InferGetServerSidePropsType, NextPage } from 'next/types'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import {
   Button,
@@ -21,62 +21,34 @@ import capitalize from 'capitalize'
 import { ImageCard } from '@components/image'
 import Ribbon, { RibbonContainer } from '@components/ribbon'
 import { RegularHandlerProps, RegularItem } from '@components/indeterminate'
-import { getVisible, HiddenVideo as Hidden, VideoSearch as Video, VideoSearch } from '@components/search/helper'
+import { getVisible, HiddenVideo as Hidden, VideoSearch as Video } from '@components/search/helper'
 import VGrid from '@components/virtualized/virtuoso'
 import Spinner from '@components/spinner'
 import Link from '@components/link'
 import SortObj, { getVideoSort, type SortMethodVideo, type SortTypeVideo as VideoSort } from '@components/search/sort'
 
 import { Attribute as AttributeRef, Category, General, Outfit, SetState } from '@interfaces'
+import { defaultSettings, useSettings } from '@pages/settings'
 
 import { serverConfig } from '@config'
 import prisma from '@utils/server/prisma'
+import { searchService } from '@service'
 
 import styles from './search.module.scss'
-import { getUnique } from '@utils/shared'
-import { formatDate } from '@utils/server/helper'
 
 type Attribute = {
   videoOnly: boolean
   starOnly: boolean
 } & AttributeRef
 
-type VideoData = Partial<{
-  categories: Category[]
-  attributes: Attribute[]
-  brands: string[]
-  outfits: Outfit[]
-}>
+type VideoData = InferGetServerSidePropsType<typeof getServerSideProps>
 
 export const getServerSideProps: GetServerSideProps<{
-  videos: VideoSearch[]
   categories: Category[]
   attributes: Attribute[]
   brands: string[]
   outfits: Outfit[]
 }> = async () => {
-  const videos = await prisma.video.findMany({
-    orderBy: { name: 'asc' },
-    select: {
-      id: true,
-      noStar: true,
-      cen: true,
-      height: true,
-      franchise: true,
-      brand: true,
-      name: true,
-      date_published: true,
-      plays: true,
-      cover: true,
-      bookmarks: {
-        select: { category: true, outfit: true, attributes: { select: { attribute: { select: { name: true } } } } }
-      },
-      stars: {
-        select: { star: { select: { attributes: { select: { attribute: { select: { name: true } } } } } } }
-      }
-    }
-  })
-
   const categories = await prisma.category.findMany()
   const outfits = await prisma.outfit.findMany({ orderBy: { name: 'asc' } })
   const attributes = await prisma.attribute.findMany({
@@ -91,18 +63,6 @@ export const getServerSideProps: GetServerSideProps<{
 
   return {
     props: {
-      videos: videos.map(({ date_published, height, bookmarks, stars, ...video }) => ({
-        ...video,
-        plays: video.plays.length,
-        quality: height,
-        attributes: getUnique([
-          ...stars.flatMap(({ star }) => star.attributes).map(({ attribute }) => attribute.name),
-          ...bookmarks.flatMap(({ attributes }) => attributes).map(({ attribute }) => attribute.name)
-        ]),
-        published: date_published !== null ? formatDate(date_published, true) : null,
-        categories: getUnique(bookmarks.map(({ category }) => category.name)),
-        outfits: getUnique(bookmarks.flatMap(({ outfit }) => (outfit !== null ? [outfit.name] : [])))
-      })),
       categories,
       attributes,
       brands: brands.flatMap(({ brand }) => (brand !== null ? [brand] : [])),
@@ -111,13 +71,7 @@ export const getServerSideProps: GetServerSideProps<{
   }
 }
 
-const VideoSearchPage: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = ({
-  videos,
-  attributes,
-  brands,
-  categories,
-  outfits
-}) => {
+const VideoSearchPage: NextPage<VideoData> = ({ attributes, brands, categories, outfits }) => {
   const [sort, setSort] = useState<VideoSort>({ type: 'alphabetically', reverse: false })
   const [hidden, setHidden] = useState<Hidden>({
     titleSearch: '',
@@ -142,7 +96,7 @@ const VideoSearchPage: NextPage<InferGetServerSidePropsType<typeof getServerSide
       </Grid>
 
       <Grid item xs={10}>
-        <Videos videos={videos} hidden={hidden} sortMethod={getVideoSort(sort)} />
+        <Videos hidden={hidden} sortMethod={getVideoSort(sort)} />
       </Grid>
 
       <ScrollToTop smooth />
@@ -151,12 +105,12 @@ const VideoSearchPage: NextPage<InferGetServerSidePropsType<typeof getServerSide
 }
 
 type VideosProps = {
-  videos: VideoSearch[]
   hidden: Hidden
   sortMethod: SortMethodVideo
 }
-const Videos = ({ videos, hidden, sortMethod }: VideosProps) => {
+const Videos = ({ hidden, sortMethod }: VideosProps) => {
   const localSettings = useSettings()
+  const { data: videos } = searchService.useVideos()
 
   const filtered = useMemo<Video[]>(() => {
     const videoCount = localSettings?.video_count
@@ -280,7 +234,7 @@ const Sort = ({ setSort }: SortProps) => {
 }
 
 type FilterProps = {
-  videoData: VideoData
+  videoData: Partial<VideoData>
   setHidden: SetState<Hidden>
 }
 const Filter = ({ videoData, setHidden }: FilterProps) => {

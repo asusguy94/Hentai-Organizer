@@ -18,20 +18,20 @@ import capitalize from 'capitalize'
 
 import { ImageCard } from '@components/image'
 import { RegularHandlerProps, RegularItem } from '@components/indeterminate'
-import { StarSearch, getVisible } from '@components/search/helper'
+import { StarSearch as Star, HiddenStar as Hidden, getVisible } from '@components/search/helper'
+import SortObj, { SortTypeStar as StarSort, SortMethodStar, getStarSort } from '@components/search/sort'
 import VGrid from '@components/virtualized/virtuoso'
 import Spinner from '@components/spinner'
 import Link from '@components/link'
-import SortObj, { type SortTypeStar as StarSort, type SortMethodStar, getStarSort } from '@components/search/sort'
-import { type StarSearch as Star, type HiddenStar as Hidden } from '@components/search/helper'
 
 import { SetState } from '@interfaces'
 import { serverConfig } from '@config'
 
-import styles from './search.module.scss'
 import prisma from '@utils/server/prisma'
 import { getUnique } from '@utils/shared'
-import { formatDate } from '@utils/server/helper'
+import { searchService } from '@service'
+
+import styles from './search.module.scss'
 
 type StarData = Partial<{
   breasts: string[]
@@ -41,26 +41,11 @@ type StarData = Partial<{
 }>
 
 export const getServerSideProps: GetServerSideProps<{
-  stars: StarSearch[]
   breasts: string[]
   haircolors: string[]
   hairstyles: string[]
   attributes: string[]
 }> = async () => {
-  const stars = await prisma.star.findMany({
-    orderBy: { name: 'asc' },
-    select: {
-      id: true,
-      name: true,
-      image: true,
-      breast: true,
-      haircolor: true,
-      hairstyle: true,
-      attributes: { select: { attribute: { select: { name: true } } } },
-      videos: { select: { video: { select: { date_published: true } } } }
-    }
-  })
-
   const breasts = await prisma.star.findMany({ where: { breast: { not: null } }, orderBy: { breast: 'asc' } })
   const haircolors = await prisma.star.findMany({ where: { haircolor: { not: null } }, orderBy: { haircolor: 'asc' } })
   const hairstyles = await prisma.star.findMany({ where: { hairstyle: { not: null } }, orderBy: { hairstyle: 'asc' } })
@@ -68,24 +53,6 @@ export const getServerSideProps: GetServerSideProps<{
 
   return {
     props: {
-      stars: stars.map(star => {
-        const published =
-          star.videos.length > 0
-            ? star.videos
-                .map(({ video }) => video)
-                .flatMap(v => (v.date_published !== null ? [v.date_published] : []))
-                .sort((a, b) => b.getTime() - a.getTime())[0]
-            : null
-
-        return {
-          ...star,
-          attributes: getUnique(star.attributes.map(({ attribute }) => attribute.name)),
-          videos: {
-            total: star.videos.length,
-            last: published ? formatDate(published, true) : null
-          }
-        }
-      }),
       breasts: getUnique(breasts.flatMap(({ breast }) => (breast !== null ? [breast] : []))),
       haircolors: getUnique(haircolors.flatMap(({ haircolor }) => (haircolor !== null ? [haircolor] : []))),
       hairstyles: getUnique(hairstyles.flatMap(({ hairstyle }) => (hairstyle !== null ? [hairstyle] : []))),
@@ -95,7 +62,6 @@ export const getServerSideProps: GetServerSideProps<{
 }
 
 const StarSearchPage: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = ({
-  stars,
   attributes,
   breasts,
   haircolors,
@@ -124,7 +90,7 @@ const StarSearchPage: NextPage<InferGetServerSidePropsType<typeof getServerSideP
       </Grid>
 
       <Grid item xs={10}>
-        <Stars stars={stars} hidden={hidden} sortMethod={getStarSort(sort)} />
+        <Stars hidden={hidden} sortMethod={getStarSort(sort)} />
       </Grid>
 
       <ScrollToTop smooth />
@@ -153,11 +119,14 @@ const Sidebar = ({ attributes, breasts, haircolors, hairstyles, setHidden, setSo
 }
 
 type StarsProps = {
-  stars: StarSearch[]
   hidden: Hidden
   sortMethod: SortMethodStar
 }
-const Stars = ({ stars, hidden, sortMethod }: StarsProps) => {
+const Stars = ({ hidden, sortMethod }: StarsProps) => {
+  const { data: stars } = searchService.useStars()
+
+  if (stars === undefined) return <Spinner />
+
   const visible = getVisible(stars.sort(sortMethod), hidden)
 
   return (

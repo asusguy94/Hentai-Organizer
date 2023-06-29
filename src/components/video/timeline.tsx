@@ -152,7 +152,9 @@ const Timeline = ({
 
               return {
                 ...item,
-                attributes: item.attributes.filter(bAttr => starAttribute.some(sAttr => sAttr.name === bAttr.name))
+                attributes: item.attributes.filter(attribute => {
+                  return starAttribute.some(attr => attr.name === attribute.name)
+                })
               }
             } else {
               // Bookmark does not have a star
@@ -178,7 +180,7 @@ const Timeline = ({
               return {
                 ...item,
                 starID: 0,
-                attributes: item.attributes.filter(attr => !attributes.some(sAttr => sAttr.name === attr.name))
+                attributes: item.attributes.filter(attribute => attributes.every(attr => attr.name !== attribute.name))
               }
             } else {
               // Bookmark has only attributes from star
@@ -193,16 +195,16 @@ const Timeline = ({
   }
 
   useEffect(() => {
-  const collisionCheck = (a: HTMLElement | null, b: HTMLElement | null) => {
-    if (a === null || b === null) return false
+    const collisionCheck = (a: HTMLElement | null, b: HTMLElement | null) => {
+      if (a === null || b === null) return false
 
       const bookmarkSpacing = localSettings?.bookmark_spacing ?? defaultSettings.bookmark_spacing
 
-    const aRect = a.getBoundingClientRect()
-    const bRect = b.getBoundingClientRect()
+      const aRect = a.getBoundingClientRect()
+      const bRect = b.getBoundingClientRect()
 
       return aRect.x + aRect.width >= bRect.x - bookmarkSpacing && aRect.x - bookmarkSpacing <= bRect.x + bRect.width
-  }
+    }
 
     const bookmarksArr = bookmarks.length > 0 ? bookmarksRef.current : []
     const levels: number[] = new Array(bookmarks.length).fill(0)
@@ -333,7 +335,7 @@ const Timeline = ({
                   onModal(
                     'Add Attribute',
                     attributes
-                      .filter(attr => !bookmark.attributes.some(bAttr => attr.name === bAttr.name))
+                      .filter(attribute => bookmark.attributes.every(attr => attribute.name !== attr.name))
                       .map(attribute => (
                         <Button
                           key={attribute.id}

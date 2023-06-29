@@ -325,16 +325,11 @@ const Sidebar = ({ video, stars, bookmarks, attributes, categories, update, onMo
   }
 
   const getAttributes = () => {
-    const attributeArr: Attribute[] = []
-    bookmarks.forEach(({ attributes }) => {
-      attributes
-        .sort((a, b) => a.name.localeCompare(b.name))
-        .forEach(attribute => {
-          if (!attributeArr.some(attr => attr.id === attribute.id)) attributeArr.push(attribute)
-        })
+    const sortedAttributes = bookmarks.flatMap(({ attributes }) => {
+      return attributes.sort((a, b) => a.name.localeCompare(b.name))
     })
 
-    return attributeArr
+    return getUnique(sortedAttributes, 'id')
   }
 
   if (video === undefined || categories === undefined || attributes === undefined) return <Spinner />
@@ -496,7 +491,7 @@ const Star = ({
       videoService.addBookmark(video.id, category.id, time, star.id).then(({ data }) => {
         update(
           [
-            ...bookmarks,
+            ...bookmarks.map(bookmark => ({ ...bookmark, active: false })),
             {
               id: data.id,
               name: category.name,
@@ -517,8 +512,8 @@ const Star = ({
       update(
         bookmarks.map(bookmark => {
           if (bookmark.starID === star.id) {
-            if (!bookmark.attributes.some(attr => attr.id === attribute.id)) {
-              bookmark.attributes.push(attribute)
+            if (bookmark.attributes.every(attr => attr.id !== attribute.id)) {
+              return { ...bookmark, attributes: [...bookmark.attributes, attribute] }
             }
           }
 
@@ -547,30 +542,29 @@ const Star = ({
     starEvent.setEvent(false, starEvent.getDefault)
 
     // Check if bookmark already contains one of the attributes from the star
-    bookmarks.forEach(item => {
-      if (item.id === bookmark.id) {
-        const overlappingAttributes = item.attributes.some(bAttr => {
-          return star.attributes.some(starAttr => starAttr.id === bAttr.id)
+    const bookmarkItem = bookmarks.find(item => item.id === bookmark.id)
+    if (bookmarkItem !== undefined) {
+      const overlappingAttributes = bookmarkItem.attributes.some(attr => {
+        return star.attributes.some(sAttr => sAttr.id === attr.id)
+      })
+
+      // Bookmark has ZERO Overlapping Attributes
+      if (!overlappingAttributes) {
+        // Request Bookmark Update
+        bookmarkService.addStar(bookmark.id, star.id).then(() => {
+          update(
+            bookmarks.map(item => {
+              if (item.id === bookmark.id) {
+                // MERGE bookmark-attributes with star-attributes
+                return { ...item, starID: star.id, attributes: [...item.attributes, ...star.attributes] }
+              }
+
+              return item
+            })
+          )
         })
-
-        // Bookmark has ZERO Overlapping Attributes
-        if (!overlappingAttributes) {
-          // Request Bookmark Update
-          bookmarkService.addStar(bookmark.id, star.id).then(() => {
-            update(
-              bookmarks.map(item => {
-                if (item.id === bookmark.id) {
-                  // MERGE bookmark-attributes with star-attributes
-                  return { ...item, starID: star.id, attributes: [...item.attributes, ...star.attributes] }
-                }
-
-                return item
-              })
-            )
-          })
-        }
       }
-    })
+    }
   }
 
   return (
@@ -639,12 +633,12 @@ const Star = ({
             component={MenuItem}
             icon='add'
             text='Add Attribute'
-            disabled={!bookmarks.some(bookmark => bookmark.starID === star.id)}
+            disabled={bookmarks.every(bookmark => bookmark.starID !== star.id)}
             onClick={() => {
               onModal(
                 'Add Attribute',
                 attributes
-                  .filter(attribute => !star.attributes.some(sAttr => sAttr.id === attribute.id))
+                  .filter(attribute => star.attributes.every(attr => attr.id !== attribute.id))
                   .map(attribute => (
                     <Button
                       key={attribute.id}
@@ -691,8 +685,8 @@ const StarInput = ({ video, stars, bookmarks, getAttributes, update }: StarInput
   const [noStarToggle, setNoStarToggle] = useState(false)
 
   const handleNoStar = (checked: boolean) => {
-    videoService.toggleNoStar(video.id, checked).then(({ data }) => {
-      update.video({ ...video, noStar: data.noStar })
+    videoService.toggleNoStar(video.id, checked).then(() => {
+      update.video({ ...video, noStar: checked })
     })
   }
 
@@ -822,7 +816,7 @@ type RemoveUnusedStarsProps = {
   update: SetState<VideoStar[]>
 }
 const RemoveUnusedStars = ({ video, bookmarks, stars, disabled, update }: RemoveUnusedStarsProps) => {
-  if (disabled || !stars.some(star => bookmarks.every(bookmark => bookmark.starID !== star.id))) {
+  if (disabled || stars.every(star => bookmarks.some(bookmark => bookmark.starID === star.id))) {
     return null
   }
 
@@ -967,17 +961,17 @@ const Outfits = ({ bookmarks, clearActive, update }: OutfitProps) => {
   return (
     <Grid container justifyContent='center' id={styles.outfits}>
       {getOutfits().map(outfit => (
-          <Button
-            key={outfit}
-            size='small'
-            variant='outlined'
-            color='primary'
-            className={styles.outfit}
-            onMouseEnter={() => outfit_setActive(outfit)}
-            onMouseLeave={clearActive}
-          >
-            {outfit}
-          </Button>
+        <Button
+          key={outfit}
+          size='small'
+          variant='outlined'
+          color='primary'
+          className={styles.outfit}
+          onMouseEnter={() => outfit_setActive(outfit)}
+          onMouseLeave={clearActive}
+        >
+          {outfit}
+        </Button>
       ))}
     </Grid>
   )

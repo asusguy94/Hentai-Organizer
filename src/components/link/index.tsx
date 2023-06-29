@@ -1,6 +1,6 @@
 /* eslint-disable react/display-name */
 import React from 'react'
-import { useRouter } from 'next/router'
+import { usePathname } from 'next/navigation'
 import NextLink, { LinkProps as NextLinkProps } from 'next/link'
 
 import MuiLink, { LinkProps as MuiLinkProps } from '@mui/material/Link'
@@ -43,10 +43,10 @@ const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(
     },
     ref
   ) => {
-    const router = useRouter()
+    const routerPath = usePathname()
     const pathname = typeof href === 'string' ? href : href.pathname
     const className = clsx(classNameProps, {
-      [activeClassName]: router.pathname === pathname && activeClassName
+      [activeClassName]: routerPath === pathname && activeClassName
     })
 
     const isExternal = typeof href === 'string' && (href.startsWith('http') || href.startsWith('mailto:'))

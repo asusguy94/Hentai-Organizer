@@ -18,9 +18,9 @@ type ColumnProps = {
   label: string
   limit?: number
   rows?: number
-  colSize?: number
+  cols?: number
 }
-export const Column = ({ label, rows = 1, colSize = 16 }: ColumnProps) => {
+export const Column = ({ label, rows = 1, cols = 16 }: ColumnProps) => {
   type Video = {
     id: number
     name: string
@@ -28,31 +28,22 @@ export const Column = ({ label, rows = 1, colSize = 16 }: ColumnProps) => {
     total?: number
   }
 
-  const limit = rows * colSize
-
-  const { data } = useFetch<Video[]>(`${serverConfig.api}/home/${label}/${limit}`)
-  if (data === undefined) return null
+  const { data: videos } = useFetch<Video[]>(`${serverConfig.api}/home/${label}/${rows * cols}`)
+  if (videos === undefined) return null
 
   return (
     <Grid container component='section' style={{ marginBottom: '0.5em' }}>
       <h2 style={{ marginTop: 0, marginBottom: 0 }}>
-        {capitalize(label)} (<span style={{ color: 'green' }}>{data.length}</span>)
+        {capitalize(label)} (<span style={{ color: 'green' }}>{videos.length}</span>)
       </h2>
 
-      <Grid container spacing={2} columns={colSize}>
-        {data.map((video, idx) => {
+      <Grid container spacing={2} columns={cols}>
+        {videos.map((video, idx) => {
           const isMissing = video.image === null
 
           return (
             <Grid item xs={1} key={video.id} style={isMissing ? { textAlign: 'center' } : {}}>
-              <Link
-                href={{
-                  pathname: '/video/[id]',
-                  query: {
-                    id: video.id
-                  }
-                }}
-              >
+              <Link href={`/video/${video.id}`}>
                 <RibbonContainer className={classes.video}>
                   <ResponsiveImage
                     src={`${serverConfig.api}/video/${video.id}/thumb`}
@@ -61,8 +52,8 @@ export const Column = ({ label, rows = 1, colSize = 16 }: ColumnProps) => {
                     missing={isMissing}
                     className={classes.thumb}
                     alt='video'
-                    priority={idx % colSize === 0}
-                    sizes={`${100 / colSize}vw`}
+                    priority={idx % cols === 0}
+                    sizes={`${100 / cols}vw`}
                   />
 
                   <div className={classes.title}>{video.name}</div>

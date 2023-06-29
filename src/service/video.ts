@@ -25,7 +25,7 @@ export default {
     return api.put<T>(`/${id}`, { date })
   },
   removeStar: (id: number, starID: number) => api.delete(`/${id}/star/${starID}`),
-  toggleNoStar: <T = any>(id: number, checked: boolean) => api.put<T>(`/${id}`, { noStar: checked }),
+  toggleNoStar: (id: number, checked: boolean) => api.put(`/${id}`, { noStar: checked }),
   addStar: (id: number, name: string) => api.post<VideoStar>(`/${id}/star`, { name }),
   useRelatedStars: (id: number) => useFetch<General[]>(`${baseURL}/${id}/related/star`),
   removeAttribute: (id: number, attributeID: number) => api.delete(`/${id}/attribute/${attributeID}`),

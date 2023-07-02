@@ -2,19 +2,19 @@ import { Fragment, useEffect, useRef, useState } from 'react'
 
 import { Button } from '@mui/material'
 
-import ReactTooltip from 'react-tooltip'
 import { ContextMenu, ContextMenuTrigger, ContextMenuItem as MenuItem } from 'rctx-contextmenu'
+import ReactTooltip from 'react-tooltip'
 import { useWindowSize } from 'react-use'
 
+import { defaultSettings, useSettings } from '../../app/settings/components'
+import { IconWithText } from '../icon'
 import Image from '../image'
 import { ModalHandler } from '../modal'
-import { IconWithText } from '../icon'
-import { defaultSettings, useSettings } from '@pages/settings'
 
+import { serverConfig } from '@config'
 import { EventHandler } from '@hooks/useStarEvent'
 import { Attribute, Bookmark, Category, VideoStar as Star, Video, SetState, Outfit } from '@interfaces'
 import { bookmarkService } from '@service'
-import { serverConfig } from '@config'
 
 import styles from './timeline.module.scss'
 

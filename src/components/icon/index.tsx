@@ -1,4 +1,3 @@
-import { Grid, SvgIconTypeMap } from '@mui/material'
 import {
   AccessTimeOutlined,
   AddOutlined,
@@ -11,6 +10,8 @@ import {
   EventAvailableOutlined,
   SlideshowOutlined
 } from '@mui/icons-material'
+import { Grid, SvgIconTypeMap } from '@mui/material'
+
 import { ContextMenuItem } from 'rctx-contextmenu'
 
 type IconProps = Omit<SvgIconTypeMap['props'], 'children'> & {

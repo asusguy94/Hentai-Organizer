@@ -4,8 +4,8 @@ import { Button, Grid, TextField, Typography } from '@mui/material'
 
 import { ContextMenu, ContextMenuTrigger, ContextMenuItem as MenuItem } from 'rctx-contextmenu'
 
-import { ModalHandler } from '../modal'
 import Icon, { IconWithText } from '../icon'
+import { ModalHandler } from '../modal'
 
 import { Video, SetState } from '@interfaces'
 import { videoService } from '@service'

@@ -1,4 +1,3 @@
-export { default as attributeService } from './attribute'
 export { default as bookmarkService } from './bookmark'
 export { default as generateService } from './generate'
 export { default as searchService } from './search'

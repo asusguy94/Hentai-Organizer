@@ -3,6 +3,7 @@ import { useFetch } from 'usehooks-ts'
 import { StarSearch, VideoSearch } from '@components/search/helper'
 
 import { createApi } from '@config'
+
 const { baseURL } = createApi('/search')
 
 export default {

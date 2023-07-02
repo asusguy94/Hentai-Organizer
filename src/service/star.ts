@@ -1,6 +1,7 @@
 import { useFetch } from 'usehooks-ts'
 
 import { createApi } from '@config'
+
 const { api, baseURL } = createApi('/star')
 
 export default {

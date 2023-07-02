@@ -1,7 +1,7 @@
 import { useFetch } from 'usehooks-ts'
 
-import { General, Video, VideoStar } from '@interfaces'
 import { createApi } from '@config'
+import { General, Video, VideoStar } from '@interfaces'
 
 const { api, baseURL } = createApi('/video')
 

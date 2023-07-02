@@ -1,10 +1,11 @@
 import { NextApiRequest } from 'next/types'
 
-import prisma from '@utils/server/prisma'
-import { fileExists, logger } from '@utils/server/helper'
-import { extractVtt } from '@utils/server/ffmpeg'
 import { NextApiResponseWithSocket } from '@interfaces/socket'
+import { extractVtt } from '@utils/server/ffmpeg'
+import { fileExists, logger } from '@utils/server/helper'
+import prisma from '@utils/server/prisma'
 
+//NEXT /video/add (SOCKET)
 export default async function handler(req: NextApiRequest, res: NextApiResponseWithSocket) {
   if (req.method === 'POST') {
     const videos = await prisma.video.findMany({ where: { duration: { gt: 0 }, height: { gt: 0 } } })

@@ -5,6 +5,11 @@ export type General = {
   id: number
   name: string
 }
+export type Params<T extends string | string[]> = {
+  params: Record<T extends string ? T : T[number], string>
+}
+
+export type StaticParams<T extends string | string[]> = Promise<Record<T extends string ? T : T[number], string>[]>
 
 // Other Types
 type Related = {

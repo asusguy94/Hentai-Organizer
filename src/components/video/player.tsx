@@ -1,20 +1,20 @@
-import { RefObject, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { RefObject, useEffect, useRef, useState } from 'react'
 
 import { Button, TextField } from '@mui/material'
 
-import { ContextMenu, ContextMenuTrigger, ContextMenuItem as MenuItem } from 'rctx-contextmenu'
 import Hls, { HlsConfig, HlsListeners } from 'hls.js'
+import { ContextMenu, ContextMenuTrigger, ContextMenuItem as MenuItem } from 'rctx-contextmenu'
 import { useKey } from 'react-use'
 import { useSessionStorage } from 'usehooks-ts'
 
-import { Modal, ModalHandler } from '../modal'
 import { IconWithText } from '../icon'
+import { Modal, ModalHandler } from '../modal'
 import Plyr, { PlyrWithMetadata } from '../plyr'
 
+import { serverConfig, settingsConfig } from '@config'
 import { Bookmark, Category, Video, VideoStar, SetState } from '@interfaces'
 import { videoService } from '@service'
-import { serverConfig, settingsConfig } from '@config'
 
 const useHls = (
   video: Video,

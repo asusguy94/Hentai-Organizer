@@ -1,6 +1,9 @@
 import generatePreview from 'ffmpeg-generate-video-preview'
-import getDimensions from 'get-video-dimensions'
 import ffmpeg from 'fluent-ffmpeg'
+import getDimensions from 'get-video-dimensions'
+
+import fs from 'fs'
+import path from 'path'
 
 import { generateVTTData, getDividableWidth } from './helper'
 
@@ -86,4 +89,23 @@ export const extractVtt = async (src: string, dest: string, videoID: number) => 
       height: calcHeight
     }
   )
+}
+
+// This requires a specific pipeline, as such it is using callbacks
+export const rebuildVideoFile = async (src: string) => {
+  const { dir, ext, name } = path.parse(src)
+  const newSrc = `${dir}/${name}_${ext}`
+
+  return new Promise<boolean>((resolve, reject) => {
+    // eslint-disable-next-line @typescript-eslint/require-await
+    fs.promises.rename(src, newSrc).then(async () => {
+      ffmpeg(newSrc)
+        .videoCodec('copy')
+        .audioCodec('copy')
+        .output(src)
+        .on('end', () => fs.unlink(newSrc, err => resolve(err !== null)))
+        .on('error', err => reject(err))
+        .run()
+    })
+  })
 }

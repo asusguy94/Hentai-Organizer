@@ -1,7 +1,7 @@
 /* eslint-disable react/display-name */
-import React from 'react'
-import { usePathname } from 'next/navigation'
 import NextLink, { LinkProps as NextLinkProps } from 'next/link'
+import { usePathname } from 'next/navigation'
+import React from 'react'
 
 import MuiLink, { LinkProps as MuiLinkProps } from '@mui/material/Link'
 

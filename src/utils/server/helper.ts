@@ -1,12 +1,11 @@
 import { NextApiRequest, NextApiResponse } from 'next/types'
 
-import ffmpeg from 'fluent-ffmpeg'
-import fs from 'fs'
-import fetch from 'node-fetch'
-import path from 'path'
-
 import dayjs from 'dayjs'
+import fetch from 'node-fetch'
 import type { Server } from 'socket.io'
+
+import fs from 'fs'
+import path from 'path'
 
 import { settingsConfig } from '@config'
 
@@ -39,14 +38,6 @@ export const downloader = async (url: string, path: string) => {
   const buffer = new Uint8Array(await response.arrayBuffer())
 
   await fs.promises.writeFile(`./${path}`, buffer)
-}
-
-export const getUnique = <T>(arr: T[], prop?: keyof T): T[] => {
-  if (prop !== undefined) {
-    return arr.filter((obj, idx) => arr.findIndex(item => item[prop] === obj[prop]) === idx)
-  }
-
-  return [...new Set(arr)]
 }
 
 /**
@@ -89,25 +80,6 @@ export const removePreviews = async (videoID: number) => {
     fs.promises.unlink(`./media/vtt/${videoID}.vtt`),
     fs.promises.unlink(`./media/vtt/${videoID}.jpg`)
   ])
-}
-
-// This requires a specific pipeline, as such it is using callbacks
-export const rebuildVideoFile = async (src: string) => {
-  const { dir, ext, name } = path.parse(src)
-  const newSrc = `${dir}/${name}_${ext}`
-
-  return new Promise<boolean>((resolve, reject) => {
-    // eslint-disable-next-line @typescript-eslint/require-await
-    fs.promises.rename(src, newSrc).then(async () => {
-      ffmpeg(newSrc)
-        .videoCodec('copy')
-        .audioCodec('copy')
-        .output(src)
-        .on('end', () => fs.unlink(newSrc, err => resolve(err !== null)))
-        .on('error', err => reject(err))
-        .run()
-    })
-  })
 }
 
 /**
@@ -210,7 +182,7 @@ export const getDividableWidth = (width: number, limits = { min: 120, max: 240 }
   throw new Error(`Could not find dividable width for ${width}`)
 }
 
-const setCache = (res: NextApiResponse, ageInSeconds: number, delay = 100) => {
+const setCache = (ageInSeconds: number, delay = 100) => {
   const cacheArr = [
     'public',
     `max-age=${ageInSeconds}`,
@@ -219,21 +191,62 @@ const setCache = (res: NextApiResponse, ageInSeconds: number, delay = 100) => {
     `stale-while-revalidate=${delay}`
   ]
 
-  res.setHeader('Cache-Control', cacheArr.join(','))
+  return { 'Cache-Control': cacheArr.join(',') }
 }
 
-export const sendFile = async (res: NextApiResponse, path: string) => {
+const errorResponse = new Response(null, { status: 404 })
+
+export const sendFile = async (path: string) => {
   if (!(await fileExists(path))) {
-    res.status(404).end()
-    return
+    return errorResponse
   }
 
-  setCache(res, 60 * 60)
-  res.writeHead(200)
-  fs.createReadStream(path).pipe(res)
+  return new Response(await fs.promises.readFile(path), {
+    headers: { ...setCache(60 * 60) }
+  })
 }
 
-export const sendPartial = async (req: NextApiRequest, res: NextApiResponse, path: string, mb = 2) => {
+export const sendPartial = async (req: Request, path: string, mb = 2) => {
+  const chunkSize = 1024 * 1024 * mb
+
+  if (!(await fileExists(path))) {
+    return errorResponse
+  }
+
+  return new Promise<Response>((resolve, reject) => {
+    fs.stat(path, (err, data) => {
+      if (err) throw err
+
+      // extract start and end / empty
+      const ranges = req.headers
+        .get('range')
+        ?.match(/^bytes=(\d+)-/)
+        ?.slice(1)
+      const start = parseInt(ranges?.[0] ?? '0')
+      const end = Math.min(start + chunkSize, data.size - 1)
+
+      const stream = fs.createReadStream(path, { start, end })
+      const buffer: Buffer[] = []
+
+      stream.on('data', (chunk: Buffer) => buffer.push(chunk))
+      stream.on('end', () => {
+        resolve(
+          new Response(Buffer.concat(buffer), {
+            status: 206,
+            headers: {
+              'Accept-Ranges': 'bytes',
+              'Content-Range': `bytes ${start}-${end}/${data.size}`,
+              'Content-Length': `${end - start + 1}`
+            }
+          })
+        )
+      })
+      stream.on('error', error => reject(error.cause))
+    })
+  })
+}
+
+export const sendPartialLegacy = async (req: NextApiRequest, res: NextApiResponse, path: string, mb = 2) => {
   const chunkSize = 1024 * 1024 * mb
 
   if (!(await fileExists(path))) {

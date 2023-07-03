@@ -130,7 +130,7 @@ const Timeline = ({
           if (item.id === bookmark.id) {
             return {
               ...item,
-              attributes: item.attributes.filter(attribute => !attribute.id)
+              attributes: item.attributes.filter(attr => attr.id !== attribute.id)
             }
           }
 

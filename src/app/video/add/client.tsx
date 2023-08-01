@@ -1,7 +1,6 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { NextPage } from 'next/types'
 import { useState } from 'react'
 
 import {
@@ -22,7 +21,7 @@ import { generateService, videoService } from '@service'
 type AddVideoProps = {
   videos: { path: string; franchise: string; episode: number; name: string }[]
 }
-const AddVideo: NextPage<AddVideoProps> = ({ videos }) => {
+export default function AddVideo({ videos }: AddVideoProps) {
   const router = useRouter()
 
   return (

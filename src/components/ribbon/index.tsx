@@ -3,7 +3,7 @@ import styles from './ribbon.module.scss'
 type RibbonProps = {
   label: string
 }
-const Ribbon = ({ label }: RibbonProps) => {
+export default function Ribbon({ label }: RibbonProps) {
   if (label.length === 0) return null
 
   return <span className={`${styles.ribbon} unselectable`}>{label}</span>
@@ -15,15 +15,10 @@ type ContainerProps = {
   className?: string
   style?: React.CSSProperties
 }
-export const RibbonContainer = ({
-  children,
-  component: Component = 'div',
-  className = '',
-  ...other
-}: ContainerProps) => (
-  <Component className={`${styles.container} ${className}`} {...other}>
-    {children}
-  </Component>
-)
-
-export default Ribbon
+export function RibbonContainer({ children, component: Component = 'div', className = '', ...other }: ContainerProps) {
+  return (
+    <Component className={`${styles.container} ${className}`} {...other}>
+      {children}
+    </Component>
+  )
+}

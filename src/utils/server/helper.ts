@@ -15,7 +15,7 @@ import { settingsConfig } from '@config'
  * @param arr the array of numbers to search
  * @return the closest number
  */
-const getClosest = (search: number, arr: number[]) => {
+function getClosest(search: number, arr: number[]) {
   return arr.reduce((a, b) => {
     const aDiff = Math.abs(a - search)
     const bDiff = Math.abs(b - search)
@@ -33,7 +33,7 @@ const getClosest = (search: number, arr: number[]) => {
  * @param url the source path
  * @param path the destination path
  */
-export const downloader = async (url: string, path: string) => {
+export async function downloader(url: string, path: string) {
   const response = await fetch(url)
   const buffer = new Uint8Array(await response.arrayBuffer())
 
@@ -74,7 +74,7 @@ export const removeCover = async (videoID: number) => {
   await fs.promises.unlink(`./media/images/videos/${videoID}.png`)
 }
 
-export const removePreviews = async (videoID: number) => {
+export async function removePreviews(videoID: number) {
   // Remove Previews
   await Promise.allSettled([
     fs.promises.unlink(`./media/vtt/${videoID}.vtt`),
@@ -87,7 +87,7 @@ export const removePreviews = async (videoID: number) => {
  * @param quality
  * @return the closest quality
  */
-export const getClosestQ = (quality: number) => {
+export function getClosestQ(quality: number) {
   if (quality === 396) {
     return 480
   }
@@ -99,7 +99,7 @@ export const getClosestQ = (quality: number) => {
  * Determine if a file exists
  * @param path the source path to check
  */
-export const fileExists = async (path: string): Promise<boolean> => {
+export async function fileExists(path: string): Promise<boolean> {
   return new Promise(resolve => fs.access(path, fs.constants.F_OK, err => resolve(!err)))
 }
 
@@ -108,7 +108,7 @@ export const fileExists = async (path: string): Promise<boolean> => {
  * @param dateStr a string containing a date
  * @param raw should the raw date be returned?
  */
-export const formatDate = (dateStr: string | Date, raw = false) => {
+export function formatDate(dateStr: string | Date, raw = false) {
   const date = dayjs(dateStr)
 
   return raw ? date.format('YYYY-MM-DD') : date.format('D MMMM YYYY')
@@ -119,16 +119,16 @@ const calculateTime = (secs: number) =>
     .hour(0)
     .millisecond(secs * 1000)
 
-export const generateVTTData = async (
+export async function generateVTTData(
   videoID: number,
   frameDelay: number,
   tiles: { rows: number; cols: number },
   dimension: { height: number; width: number }
-) => {
+) {
   const vtt = `./media/vtt/${videoID}.vtt`
 
   let nextTimeCode = 0
-  const generateTimeCodes = () => {
+  function generateTimeCodes() {
     const timeCodeFormat = 'HH:mm:ss.SSS'
 
     const start = calculateTime(nextTimeCode)
@@ -158,7 +158,7 @@ export const generateVTTData = async (
   }
 }
 
-export const getDividableWidth = (width: number, limits = { min: 120, max: 240 }): number => {
+export function getDividableWidth(width: number, limits = { min: 120, max: 240 }): number {
   const MIN = 10 * 2
   const MAX = width / 2
 
@@ -182,7 +182,7 @@ export const getDividableWidth = (width: number, limits = { min: 120, max: 240 }
   throw new Error(`Could not find dividable width for ${width}`)
 }
 
-const setCache = (ageInSeconds: number, delay = 100) => {
+function setCache(ageInSeconds: number, delay = 100) {
   const cacheArr = [
     'public',
     `max-age=${ageInSeconds}`,
@@ -196,7 +196,7 @@ const setCache = (ageInSeconds: number, delay = 100) => {
 
 const errorResponse = new Response(null, { status: 404 })
 
-export const sendFile = async (path: string) => {
+export async function sendFile(path: string) {
   if (!(await fileExists(path))) {
     return errorResponse
   }
@@ -206,7 +206,7 @@ export const sendFile = async (path: string) => {
   })
 }
 
-export const sendPartial = async (req: Request, path: string, mb = 2) => {
+export async function sendPartial(req: Request, path: string, mb = 2) {
   const chunkSize = 1024 * 1024 * mb
 
   if (!(await fileExists(path))) {
@@ -246,37 +246,6 @@ export const sendPartial = async (req: Request, path: string, mb = 2) => {
   })
 }
 
-export const sendPartialLegacy = async (req: NextApiRequest, res: NextApiResponse, path: string, mb = 2) => {
-  const chunkSize = 1024 * 1024 * mb
-
-  if (!(await fileExists(path))) {
-    res.status(404).end()
-    return
-  }
-
-  fs.stat(path, (err, data) => {
-    if (err) {
-      throw err
-    }
-
-    // extract start and end / empty
-    const ranges = req.headers.range?.match(/^bytes=(\d+)-/)?.slice(1)
-    const start = parseInt(ranges?.[0] ?? '0')
-    const end = Math.min(start + chunkSize, data.size - 1)
-
-    res.writeHead(206, {
-      'Accept-Ranges': 'bytes',
-      'Content-Range': `bytes ${start}-${end}/${data.size}`,
-      'Content-Length': end - start + 1
-    })
-
-    fs.createReadStream(path, { start, end }).pipe(res)
-  })
-}
-
-export function logger(message: string, event?: string, socket?: Server) {
-  if (socket && event) {
-    socket.emit(event, message)
-  }
+export function logger(message: string) {
   console.log(message)
 }

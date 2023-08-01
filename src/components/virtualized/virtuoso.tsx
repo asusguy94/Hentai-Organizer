@@ -8,14 +8,14 @@ type GridProps = {
   itemHeight: number
   itemRows?: number
 }
-const Grid = ({ renderData, total, itemHeight, itemRows = 1 }: GridProps) => (
-  <VirtuosoGrid
-    useWindowScroll
-    overscan={itemHeight * itemRows}
-    totalCount={total}
-    itemContent={renderData}
-    listClassName={styles['grid-list']}
-  />
-)
-
-export default Grid
+export default function Grid({ renderData, total, itemHeight, itemRows = 1 }: GridProps) {
+  return (
+    <VirtuosoGrid
+      useWindowScroll
+      overscan={itemHeight * itemRows}
+      totalCount={total}
+      itemContent={renderData}
+      listClassName={styles['grid-list']}
+    />
+  )
+}

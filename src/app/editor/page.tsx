@@ -37,13 +37,15 @@ type OnlyType = 'starOnly' | 'videoOnly'
 type WithOnlyType = General & { videoOnly?: boolean; starOnly?: boolean }
 
 //NEXT can be migrated to server-component
-const EditorPage: NextPage = () => (
+export default function EditorPage() {
+  return (
   <Grid container justifyContent='center'>
-    <Wrapper label='attributes' name='attribute' obj={['starOnly', 'videoOnly']} />
-    <Wrapper label='categories' name='category' />
-    <Wrapper label='outfits' name='outfit' />
+      <Wrapper name='attribute' obj={['starOnly', 'videoOnly']} />
+      <Wrapper name='category' />
+      <Wrapper name='outfit' />
   </Grid>
 )
+}
 
 type WrapperProps = {
   label: string

@@ -11,22 +11,24 @@ type SortObjProps = {
   callback: (reversed: boolean) => void
   reversed?: boolean
 }
-const SortObj = ({ id, label, callback, reversed = false }: SortObjProps) => (
-  <>
-    <FormControlLabel
-      label={reversed ? label.desc : label.asc}
-      value={id}
-      control={<Radio />}
-      onChange={() => callback(reversed)}
-    />
-    <FormControlLabel
-      label={reversed ? label.asc : label.desc}
-      value={`${id}_reverse`}
-      control={<Radio />}
-      onChange={() => callback(!reversed)}
-    />
-  </>
-)
+export default function SortObj({ id, label, callback, reversed = false }: SortObjProps) {
+  return (
+    <>
+      <FormControlLabel
+        label={reversed ? label.desc : label.asc}
+        value={id}
+        control={<Radio />}
+        onChange={() => callback(reversed)}
+      />
+      <FormControlLabel
+        label={reversed ? label.asc : label.desc}
+        value={`${id}_reverse`}
+        control={<Radio />}
+        onChange={() => callback(!reversed)}
+      />
+    </>
+  )
+}
 
 type Sort<T extends string> = { type: T; reverse?: boolean }
 
@@ -92,5 +94,3 @@ export function getStarSort(sort: SortTypeStar): SortMethodStar {
 
   return sort.reverse ? (a, b) => sortMethod(b, a) : sortMethod
 }
-
-export default SortObj

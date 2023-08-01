@@ -4,24 +4,26 @@ import { serverConfig } from '@config'
 
 import styles from './navbar.module.scss'
 
-const NavBar = () => (
-  <nav id={styles.navbar}>
-    <ul id={styles.main}>
-      <NavBarItem name='Home' path='/' />
+export default function NavBar() {
+  return (
+    <nav id={styles.navbar}>
+      <ul id={styles.main}>
+        <NavBarItem name='Home' path='/' />
 
-      <NavBarItem name='Video Search' path='/video/search'>
-        <NavBarItem name='Videos' path='/video' />
-      </NavBarItem>
+        <NavBarItem name='Video Search' path='/video/search'>
+          <NavBarItem name='Videos' path='/video' />
+        </NavBarItem>
 
-      <NavBarItem name='Star Search' path='/star/search' />
+        <NavBarItem name='Star Search' path='/star/search' />
 
-      <NavBarItem name='DB' path={serverConfig.db} />
-      <NavBarItem name='Import Videos' path='/video/add' />
-      <NavBarItem name='DB Editor' path='/editor' />
-      <NavBarItem name='Settings' path='/settings' />
-    </ul>
-  </nav>
-)
+        <NavBarItem name='DB' path={serverConfig.db} />
+        <NavBarItem name='Import Videos' path='/video/add' />
+        <NavBarItem name='DB Editor' path='/editor' />
+        <NavBarItem name='Settings' path='/settings' />
+      </ul>
+    </nav>
+  )
+}
 
 type NavBarItemProps = {
   name: string
@@ -29,7 +31,7 @@ type NavBarItemProps = {
   disabled?: boolean
   children?: React.ReactNode
 }
-const NavBarItem = ({ name, path, children, disabled = false }: NavBarItemProps) => {
+function NavBarItem({ name, path, children, disabled = false }: NavBarItemProps) {
   if (disabled) return null
 
   return (
@@ -40,5 +42,3 @@ const NavBarItem = ({ name, path, children, disabled = false }: NavBarItemProps)
     </li>
   )
 }
-
-export default NavBar

@@ -6,7 +6,7 @@ type DropboxProps = {
   onDrop: (str: string) => void
 }
 
-const Dropbox = ({ onDrop }: DropboxProps) => {
+export default function Dropbox({ onDrop }: DropboxProps) {
   const [hover, setHover] = useState(false)
 
   const handleDefault = (e: React.DragEvent) => {
@@ -45,5 +45,3 @@ const Dropbox = ({ onDrop }: DropboxProps) => {
     </div>
   )
 }
-
-export default Dropbox

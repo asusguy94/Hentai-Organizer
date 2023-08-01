@@ -14,7 +14,7 @@ export type Modal = {
 }
 export type ModalHandler = (title?: Modal['title'], data?: Modal['data'], filter?: Modal['filter']) => void
 
-export const useModal = () => {
+export function useModal() {
   const [modal, setModal] = useState<Modal>({
     visible: false,
     title: '',
@@ -42,7 +42,7 @@ type ModalProps = {
   onClose: () => void
 }
 
-const ModalComponent = ({ title, visible, filter, children, onClose }: ModalProps) => {
+export default function ModalComponent({ title, visible, filter, children, onClose }: ModalProps) {
   const [query, setQuery] = useState('')
 
   const isLetter = (e: KeyboardEvent) => /^Key([A-Z])$/.test(e.code)
@@ -79,7 +79,7 @@ type ModalChildProps = {
   onClose: () => void
 }
 
-const ModalChild = ({ title, filter, children, query, onClose }: ModalChildProps) => {
+function ModalChild({ title, filter, children, query, onClose }: ModalChildProps) {
   const handleFilter = () => {
     return React.Children.toArray(children)
       .flatMap(child => {
@@ -124,5 +124,3 @@ const ModalChild = ({ title, filter, children, query, onClose }: ModalChildProps
     </MUIModal>
   )
 }
-
-export default ModalComponent

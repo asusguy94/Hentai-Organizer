@@ -18,7 +18,7 @@ type IconProps = Omit<SvgIconTypeMap['props'], 'children'> & {
   code: 'edit' | 'add' | 'warn-cirlce' | 'check-circle' | 'delete' | 'copy' | 'time' | 'calendar' | 'brand' | 'film'
   style?: React.CSSProperties
 }
-export const Icon = ({ code, ...other }: IconProps) => {
+export default function Icon({ code, ...other }: IconProps) {
   switch (code) {
     case 'edit':
       return <BorderColorOutlined {...other} />
@@ -48,10 +48,10 @@ type IconWithTextProps = Omit<ContextMenuItem, 'className' | 'children'> & {
   text: string
   component: React.ElementType
 }
-export const IconWithText = ({ icon: code, text, component, ...other }: IconWithTextProps) => (
-  <Grid item component={component} alignItems='center' className='d-flex' {...other}>
-    <Icon code={code} style={{ marginRight: 6 }} /> {text}
-  </Grid>
-)
-
-export default Icon
+export function IconWithText({ icon: code, text, component, ...other }: IconWithTextProps) {
+  return (
+    <Grid item component={component} alignItems='center' className='d-flex' {...other}>
+      <Icon code={code} style={{ marginRight: 6 }} /> {text}
+    </Grid>
+  )
+}

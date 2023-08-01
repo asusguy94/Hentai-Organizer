@@ -50,7 +50,8 @@ type Star = {
   link: string | null
 }
 
-const StarPage: NextPage<{ star: Star; videos: StarVideo[] }> = ({ videos, star: starData }) => {
+type StarPageProps = { star: Star; videos: StarVideo[] }
+export default function StarPage({ videos, star: starData }: StarPageProps) {
   const [star, setStar] = useState<typeof starData>() //FIXME cannot be set directly
   const { modal, setModal } = useModal()
 
@@ -84,7 +85,7 @@ const StarPage: NextPage<{ star: Star; videos: StarVideo[] }> = ({ videos, star:
 type StarVideosProps = {
   videos: StarVideo[]
 }
-const StarVideos = ({ videos }: StarVideosProps) => {
+function StarVideos({ videos }: StarVideosProps) {
   if (videos.length === 0) return null
 
   return (
@@ -104,7 +105,7 @@ type StarFormProps = {
   star: Star
   update: SetState<Star | undefined>
 }
-const StarForm = ({ star, update }: StarFormProps) => {
+function StarForm({ star, update }: StarFormProps) {
   const { data: starData } = starService.useInfo()
 
   const addAttribute = (name: string) => {
@@ -159,7 +160,7 @@ type StarImageDropboxProps = {
   videos: StarVideo[]
   update: SetState<Star | undefined>
 }
-const StarImageDropbox = ({ star, videos, update }: StarImageDropboxProps) => {
+function StarImageDropbox({ star, videos, update }: StarImageDropboxProps) {
   const router = useRouter()
 
   const addImage = (image: string) => {
@@ -219,7 +220,7 @@ const StarImageDropbox = ({ star, videos, update }: StarImageDropboxProps) => {
   )
 }
 
-const StarVideo = ({ video }: { video: StarVideo }) => {
+function StarVideo({ video }: { video: StarVideo }) {
   const [src, setSrc] = useState('')
 
   // FIXME this is not working as intended
@@ -317,7 +318,7 @@ type StarInputFormProps = {
   emptyByDefault?: boolean
   children?: React.ReactNode
 }
-const StarInputForm = ({ value, emptyByDefault = false, update, name, list, children }: StarInputFormProps) => {
+function StarInputForm({ value, emptyByDefault = false, update, name, list, children }: StarInputFormProps) {
   const [open, setOpen] = useState(false)
   const [inputValue, setInputValue] = useState('')
 
@@ -395,7 +396,8 @@ type StarAttributesProps = {
   remove: (name: string) => void
   data: string[]
 }
-const StarAttributes = ({ remove, data }: StarAttributesProps) => (
+function StarAttributes({ remove, data }: StarAttributesProps) {
+  return (
   <>
     {data.map((attribute, idx) => (
       <Fragment key={attribute}>
@@ -414,6 +416,7 @@ const StarAttributes = ({ remove, data }: StarAttributesProps) => (
     ))}
   </>
 )
+}
 
 type StarTitleProps = {
   star: Star
@@ -507,5 +510,3 @@ const StarTitle = ({ star, onModal: handleModal, update }: StarTitleProps) => {
     </div>
   )
 }
-
-export default StarPage

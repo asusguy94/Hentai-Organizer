@@ -12,7 +12,7 @@ import { SettingKey, SettingValue, Settings, defaultSettings, keys, settingsKey 
 import { SetState } from '@interfaces'
 import { clamp } from '@utils/shared'
 
-const SettingsPage: NextPage = () => {
+export default function SettingsPage() {
   const [rawSettings, setRawSettings] = useLocalStorage<Settings>(settingsKey, defaultSettings)
   const [localSettings, setLocalSettings] = useState<Settings>(defaultSettings)
   const [changed, setChanged] = useState(false)
@@ -87,7 +87,7 @@ type InputProps = {
   max?: number
   onChange: () => void
 }
-const Input = ({ label, setting, update, max = 0, onChange }: InputProps) => {
+function Input({ label, setting, update, max = 0, onChange }: InputProps) {
   const [count, setCount] = useState<SettingValue>()
 
   useEffect(() => {
@@ -112,5 +112,3 @@ const Input = ({ label, setting, update, max = 0, onChange }: InputProps) => {
     </Grid>
   )
 }
-
-export default SettingsPage

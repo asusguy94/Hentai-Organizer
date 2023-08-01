@@ -4,7 +4,7 @@ import prisma from '@utils/server/prisma'
 
 export const dynamic = 'force-dynamic'
 
-const VideoSearchPage = async () => {
+export default async function VideoSearchPage() {
   const categories = await prisma.category.findMany()
   const outfits = await prisma.outfit.findMany({ orderBy: { name: 'asc' } })
   const attributes = await prisma.attribute.findMany({
@@ -26,5 +26,3 @@ const VideoSearchPage = async () => {
     />
   )
 }
-
-export default VideoSearchPage

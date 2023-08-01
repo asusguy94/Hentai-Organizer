@@ -4,7 +4,7 @@ import prisma from '@utils/server/prisma'
 
 export const dynamic = 'force-dynamic'
 
-const VideosPage = async () => {
+export default async function VideosPage() {
   const limit = 7
 
   const noBookmarkStar = await prisma.video.findMany({
@@ -36,5 +36,3 @@ const VideosPage = async () => {
     <Client video={{ noBookmarks, noStars }} stars={{ noImage: noStarImage }} bookmarks={{ noStar: noBookmarkStar }} />
   )
 }
-
-export default VideosPage

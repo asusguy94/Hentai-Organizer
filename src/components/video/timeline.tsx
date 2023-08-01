@@ -33,7 +33,7 @@ type TimelineProps = {
   onModal: ModalHandler
   setStarEvent: EventHandler
 }
-const Timeline = ({
+export default function Timeline({
   video,
   bookmarks,
   stars,
@@ -45,7 +45,7 @@ const Timeline = ({
   update,
   onModal,
   setStarEvent
-}: TimelineProps) => {
+}: TimelineProps) {
   const windowSize = useWindowSize()
   const bookmarksRef = useRef<HTMLButtonElement[]>([])
   const [bookmarkLevels, setBookmarkLevels] = useState<number[]>([])
@@ -472,5 +472,3 @@ const Timeline = ({
     </div>
   )
 }
-
-export default Timeline

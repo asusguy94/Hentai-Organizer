@@ -51,11 +51,11 @@ export const isHiddenStar = (hidden: HiddenVideo | HiddenStar): hidden is Hidden
 const isVideo = (video: VideoSearch | StarSearch): video is VideoSearch => 'cen' in video
 const isStar = (star: VideoSearch | StarSearch): star is StarSearch => 'videos' in star
 
-const isTitleVisible = (obj: ObjectType, hidden: HiddenType) => {
+function isTitleVisible(obj: ObjectType, hidden: HiddenType) {
   return obj.name.toLowerCase().includes(hidden.titleSearch)
 }
 
-const isBreastVisible = (star: StarSearch, hidden: HiddenStar) => {
+function isBreastVisible(star: StarSearch, hidden: HiddenStar) {
   // hidden is empty
   if (hidden.breast.length === 0) return true
 
@@ -66,7 +66,7 @@ const isBreastVisible = (star: StarSearch, hidden: HiddenStar) => {
   return hidden.breast === star.breast.toLowerCase()
 }
 
-const isHaircolorVisible = (star: StarSearch, hidden: HiddenStar) => {
+function isHaircolorVisible(star: StarSearch, hidden: HiddenStar) {
   // hidden is empty
   if (hidden.haircolor.length === 0) return true
 
@@ -77,7 +77,7 @@ const isHaircolorVisible = (star: StarSearch, hidden: HiddenStar) => {
   return hidden.haircolor === star.haircolor.toLowerCase()
 }
 
-const isHairstyleVisible = (star: StarSearch, hidden: HiddenStar) => {
+function isHairstyleVisible(star: StarSearch, hidden: HiddenStar) {
   // hidden is empty
   if (hidden.hairstyle.length === 0) return true
 
@@ -100,7 +100,7 @@ function isAttributeVisible(obj: ObjectType, hidden: HiddenType) {
   return hidden.attribute.every(attr => attributes.includes(attr))
 }
 
-const isCategoryVisible = (video: VideoSearch, hidden: HiddenVideo) => {
+function isCategoryVisible(video: VideoSearch, hidden: HiddenVideo) {
   const categories = video.categories.map(cat => cat.toLowerCase())
 
   // category is null
@@ -121,7 +121,7 @@ const isCategoryVisible = (video: VideoSearch, hidden: HiddenVideo) => {
   return hidden.category.every(cat => cat !== null && categories.includes(cat.toLowerCase()))
 }
 
-const isCenVisible = (video: VideoSearch, hidden: HiddenVideo) => {
+function isCenVisible(video: VideoSearch, hidden: HiddenVideo) {
   // hidden is empty
   if (hidden.cen === null) return true
 
@@ -129,7 +129,7 @@ const isCenVisible = (video: VideoSearch, hidden: HiddenVideo) => {
   return video.cen === hidden.cen
 }
 
-const isBrandVisible = (video: VideoSearch, hidden: HiddenVideo) => {
+function isBrandVisible(video: VideoSearch, hidden: HiddenVideo) {
   // hidden is empty
   if (hidden.brand.length === 0) return true
 
@@ -140,7 +140,7 @@ const isBrandVisible = (video: VideoSearch, hidden: HiddenVideo) => {
   return video.brand.toLowerCase() === hidden.brand
 }
 
-const isOutfitVisible = (video: VideoSearch, hidden: HiddenVideo) => {
+function isOutfitVisible(video: VideoSearch, hidden: HiddenVideo) {
   const outfits = video.outfits.map(outfit => outfit.toLowerCase())
 
   // hidden is empty
@@ -150,7 +150,7 @@ const isOutfitVisible = (video: VideoSearch, hidden: HiddenVideo) => {
   return hidden.outfit.every(outfit => outfits.includes(outfit))
 }
 
-const isStarHidden = (star: StarSearch, hidden: HiddenStar) => {
+function isStarHidden(star: StarSearch, hidden: HiddenStar) {
   return !(
     isTitleVisible(star, hidden) &&
     isBreastVisible(star, hidden) &&
@@ -160,7 +160,7 @@ const isStarHidden = (star: StarSearch, hidden: HiddenStar) => {
   )
 }
 
-const isVideoHidden = (video: VideoSearch, hidden: HiddenVideo) => {
+function isVideoHidden(video: VideoSearch, hidden: HiddenVideo) {
   return !(
     isTitleVisible(video, hidden) &&
     isCenVisible(video, hidden) &&
@@ -181,10 +181,10 @@ export function isHidden(obj: ObjectType, hidden: HiddenType) {
   }
 }
 
-const getVisibleStars = (stars: StarSearch[], hidden: HiddenStar) => {
+function getVisibleStars(stars: StarSearch[], hidden: HiddenStar) {
   return stars.filter(star => !isStarHidden(star, hidden))
 }
-const getVisibleVideos = (videos: VideoSearch[], hidden: HiddenVideo) => {
+function getVisibleVideos(videos: VideoSearch[], hidden: HiddenVideo) {
   return videos.filter(video => !isVideoHidden(video, hidden))
 }
 

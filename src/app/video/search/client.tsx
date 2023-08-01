@@ -1,6 +1,5 @@
 'use client'
 
-import { NextPage } from 'next/types'
 import { useMemo, useState } from 'react'
 
 import {
@@ -49,7 +48,7 @@ type VideoData = {
   outfits: Outfit[]
 }
 
-const VideoSearchPage: NextPage<VideoData> = ({ attributes, brands, categories, outfits }) => {
+export default function VideoSearchPage({ attributes, brands, categories, outfits }: VideoData) {
   const [sort, setSort] = useState<VideoSort>({ type: 'alphabetically', reverse: false })
   const [hidden, setHidden] = useState<Hidden>({
     titleSearch: '',
@@ -86,7 +85,7 @@ type VideosProps = {
   hidden: Hidden
   sortMethod: SortMethodVideo
 }
-const Videos = ({ hidden, sortMethod }: VideosProps) => {
+function Videos({ hidden, sortMethod }: VideosProps) {
   const localSettings = useSettings()
   const { data: videos } = searchService.useVideos()
 
@@ -117,7 +116,7 @@ const Videos = ({ hidden, sortMethod }: VideosProps) => {
 type VideoCardProps = {
   video?: Video
 }
-const VideoCard = ({ video }: VideoCardProps) => {
+function VideoCard({ video }: VideoCardProps) {
   if (video === undefined) return null //FIXME cleanup is not working correctly
 
   return (
@@ -152,18 +151,20 @@ type SidebarProps = {
   setHidden: SetState<Hidden>
   setSort: SetState<VideoSort>
 }
-const Sidebar = ({ attributes, brands, categories, outfits, setHidden, setSort }: SidebarProps) => (
+function Sidebar({ attributes, brands, categories, outfits, setHidden, setSort }: SidebarProps) {
+  return (
   <>
     <TitleSearch setHidden={setHidden} />
     <Sort setSort={setSort} />
     <Filter videoData={{ categories, attributes, brands, outfits }} setHidden={setHidden} />
   </>
 )
+}
 
 type TitleSearchProps = {
   setHidden: SetState<Hidden>
 }
-const TitleSearch = ({ setHidden }: TitleSearchProps) => {
+function TitleSearch({ setHidden }: TitleSearchProps) {
   const callback = (e: React.ChangeEvent<HTMLInputElement>) => {
     const searchValue = e.target.value.toLowerCase()
 
@@ -176,7 +177,7 @@ const TitleSearch = ({ setHidden }: TitleSearchProps) => {
 type SortProps = {
   setSort: SetState<VideoSort>
 }
-const Sort = ({ setSort }: SortProps) => {
+function Sort({ setSort }: SortProps) {
   const shuffle = () => setSort({ type: 'shuffle', reverse: false })
   const sortDefault = (reverse = false) => setSort({ type: 'alphabetically', reverse })
   const sortAdded = (reverse = false) => setSort({ type: 'added', reverse })
@@ -213,7 +214,7 @@ type FilterProps = {
   videoData: Partial<VideoData>
   setHidden: SetState<Hidden>
 }
-const Filter = ({ videoData, setHidden }: FilterProps) => {
+function Filter({ videoData, setHidden }: FilterProps) {
   const brand = (e: SelectChangeEvent) => {
     const targetLower = e.target.value.toLowerCase()
 
@@ -323,7 +324,7 @@ type FilterDropdownProps = {
   labelPlural?: string
   callback: (e: SelectChangeEvent) => void
 }
-const FilterDropdown = ({ data, label, labelPlural, callback }: FilterDropdownProps) => {
+function FilterDropdown({ data, label, labelPlural, callback }: FilterDropdownProps) {
   if (data === undefined) return <Spinner />
 
   return (
@@ -344,4 +345,3 @@ const FilterDropdown = ({ data, label, labelPlural, callback }: FilterDropdownPr
     </>
   )
 }
-export default VideoSearchPage

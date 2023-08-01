@@ -16,11 +16,7 @@ import { serverConfig, settingsConfig } from '@config'
 import { Bookmark, Category, Video, VideoStar, SetState } from '@interfaces'
 import { videoService } from '@service'
 
-const useHls = (
-  video: Video,
-  plyrRef: React.MutableRefObject<PlyrWithMetadata | null>,
-  hlsConfig: Partial<HlsConfig>
-) => {
+function useHls(video: Video, plyrRef: React.MutableRefObject<PlyrWithMetadata | null>, hlsConfig: Partial<HlsConfig>) {
   const playAddedRef = useRef(false)
   const newVideoRef = useRef(false)
 
@@ -141,7 +137,15 @@ type VideoPlayerProps = {
     data: Modal
   }
 }
-const VideoPlayer = ({ video, bookmarks, categories, stars, update, plyrRef, modal }: VideoPlayerProps) => {
+export default function VideoPlayer({
+  video,
+  bookmarks,
+  categories,
+  stars,
+  update,
+  plyrRef,
+  modal
+}: VideoPlayerProps) {
   const router = useRouter()
 
   useHls(video, plyrRef, { maxBufferLength: Infinity, autoStartLoad: false })
@@ -255,7 +259,7 @@ const VideoPlayer = ({ video, bookmarks, categories, stars, update, plyrRef, mod
   }
 
   return (
-    <div className='video-container' onWheel={handleWheel}>
+    <div onWheel={handleWheel}>
       <ContextMenuTrigger id='video'>
         <Plyr
           plyrRef={plyrRef as React.MutableRefObject<Plyr>}
@@ -366,5 +370,3 @@ const VideoPlayer = ({ video, bookmarks, categories, stars, update, plyrRef, mod
     </div>
   )
 }
-
-export default VideoPlayer

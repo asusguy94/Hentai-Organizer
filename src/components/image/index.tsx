@@ -3,11 +3,11 @@ import NextImage, { type ImageProps as NextImageProps } from 'next/image'
 import ImageNotSupportedOutlinedIcon from '@mui/icons-material/ImageNotSupportedOutlined'
 import { CardMedia as MUICardMedia } from '@mui/material'
 
-export const ResponsiveImage = ({ alt, ...other }: NextImageProps & MissingImage) => {
+export function ResponsiveImage({ alt, ...other }: NextImageProps & MissingImage) {
   return <Image style={{ width: '100%', height: 'auto' }} alt={alt} {...other} />
 }
 
-const Image = ({ missing, scale, renderStyle, ...nextProps }: NextImageProps & MissingImage) => {
+export default function Image({ missing, scale, renderStyle, ...nextProps }: NextImageProps & MissingImage) {
   if (missing) return <MissingImage scale={scale} renderStyle={renderStyle} />
 
   return <NextImage {...nextProps} />
@@ -20,22 +20,24 @@ type CardProps = {
 } & Omit<NextImageProps, 'alt' | 'height'> &
   MissingImage
 
-export const ImageCard = ({
+export function ImageCard({
   height,
   alt,
   missing = false,
   responsive = false,
   renderStyle = 'height',
   ...other
-}: CardProps) => (
-  <MUICardMedia style={missing ? { height, textAlign: 'center' } : {}}>
-    {responsive ? (
-      <ResponsiveImage alt={alt} height={height} missing={missing} renderStyle={renderStyle} {...other} />
-    ) : (
-      <Image alt={alt} height={height} missing={missing} renderStyle={renderStyle} {...other} />
-    )}
-  </MUICardMedia>
-)
+}: CardProps) {
+  return (
+    <MUICardMedia style={missing ? { height, textAlign: 'center' } : {}}>
+      {responsive ? (
+        <ResponsiveImage alt={alt} height={height} missing={missing} renderStyle={renderStyle} {...other} />
+      ) : (
+        <Image alt={alt} height={height} missing={missing} renderStyle={renderStyle} {...other} />
+      )}
+    </MUICardMedia>
+  )
+}
 
 type MissingImage = {
   missing?: boolean
@@ -46,7 +48,7 @@ type MissingImageProps = {
   renderStyle?: 'height' | 'transform'
 }
 
-const MissingImage = ({ scale = 1, renderStyle }: MissingImageProps) => {
+function MissingImage({ scale = 1, renderStyle }: MissingImageProps) {
   if (scale <= 0) throw new Error('Scale must be greater than zero')
 
   return (
@@ -64,5 +66,3 @@ const MissingImage = ({ scale = 1, renderStyle }: MissingImageProps) => {
     />
   )
 }
-
-export default Image

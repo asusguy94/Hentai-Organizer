@@ -1,5 +1,5 @@
 import styles from './loader.module.scss'
 
-const Spinner = () => <div id={styles.loader}></div>
-
-export default Spinner
+export default function Spinner() {
+  return <div id={styles.loader}></div>
+}

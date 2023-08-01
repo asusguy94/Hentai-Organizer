@@ -1,6 +1,5 @@
 'use client'
 
-import { NextPage } from 'next/types'
 import { useState } from 'react'
 
 import {
@@ -39,12 +38,7 @@ type StarData = Partial<{
   attributes: string[]
 }>
 
-const StarSearchPage: NextPage<{
-  breasts: string[]
-  haircolors: string[]
-  hairstyles: string[]
-  attributes: string[]
-}> = ({ attributes, breasts, haircolors, hairstyles }) => {
+export default function StarSearchPage({ attributes, breasts, haircolors, hairstyles }: Required<StarData>) {
   const [sort, setSort] = useState<StarSort>({ type: 'alphabetically', reverse: false })
   const [hidden, setHidden] = useState<Hidden>({
     titleSearch: '',
@@ -84,21 +78,23 @@ type SidebarProps = {
   setHidden: SetState<Hidden>
   setSort: SetState<StarSort>
 }
-const Sidebar = ({ attributes, breasts, haircolors, hairstyles, setHidden, setSort }: SidebarProps) => (
-  <>
-    <TitleSearch setHidden={setHidden} />
+function Sidebar({ attributes, breasts, haircolors, hairstyles, setHidden, setSort }: SidebarProps) {
+  return (
+    <>
+      <TitleSearch setHidden={setHidden} />
 
-    <Sort setSort={setSort} />
+      <Sort setSort={setSort} />
 
-    <Filter starData={{ breasts, haircolors, hairstyles, attributes }} setHidden={setHidden} />
-  </>
-)
+      <Filter starData={{ breasts, haircolors, hairstyles, attributes }} setHidden={setHidden} />
+    </>
+  )
+}
 
 type StarsProps = {
   hidden: Hidden
   sortMethod: SortMethodStar
 }
-const Stars = ({ hidden, sortMethod }: StarsProps) => {
+function Stars({ hidden, sortMethod }: StarsProps) {
   const { data: stars } = searchService.useStars()
 
   if (stars === undefined) return <Spinner />
@@ -119,7 +115,7 @@ const Stars = ({ hidden, sortMethod }: StarsProps) => {
 type StarCardProps = {
   star?: Star
 }
-const StarCard = ({ star }: StarCardProps) => {
+function StarCard({ star }: StarCardProps) {
   if (star === undefined) return null //FIXME cleanup is not working correctly
 
   return (
@@ -147,7 +143,7 @@ const StarCard = ({ star }: StarCardProps) => {
 type SortProps = {
   setSort: SetState<StarSort>
 }
-const Sort = ({ setSort }: SortProps) => {
+function Sort({ setSort }: SortProps) {
   const title = (reverse = false) => setSort({ type: 'alphabetically', reverse })
   const date = (reverse = false) => setSort({ type: 'added', reverse })
   const activity = (reverse = false) => setSort({ type: 'videos', reverse: !reverse })
@@ -178,7 +174,7 @@ type FilterProps = {
   starData: StarData
   setHidden: SetState<Hidden>
 }
-const Filter = ({ starData, setHidden }: FilterProps) => {
+function Filter({ starData, setHidden }: FilterProps) {
   const breast = (target: string) => {
     setHidden(prev => ({ ...prev, breast: target.toLowerCase() }))
   }
@@ -229,7 +225,7 @@ const Filter = ({ starData, setHidden }: FilterProps) => {
 type TitleSearchProps = {
   setHidden: SetState<Hidden>
 }
-const TitleSearch = ({ setHidden }: TitleSearchProps) => {
+function TitleSearch({ setHidden }: TitleSearchProps) {
   const callback = (e: React.ChangeEvent<HTMLInputElement>) => {
     const searchValue = e.currentTarget.value.toLowerCase()
 
@@ -245,7 +241,7 @@ type FilterRadioProps = {
   callback: (item: string) => void
   globalCallback?: () => void
 }
-const FilterRadio = ({ data, label, callback, globalCallback }: FilterRadioProps) => {
+function FilterRadio({ data, label, callback, globalCallback }: FilterRadioProps) {
   if (data === undefined) return <Spinner />
 
   return (
@@ -283,7 +279,7 @@ type FilterCheckBoxProps = {
   label: string
   callback: (ref: RegularHandlerProps, item: string | undefined) => void
 }
-const FilterCheckBox = ({ data, label, callback }: FilterCheckBoxProps) => {
+function FilterCheckBox({ data, label, callback }: FilterCheckBoxProps) {
   if (data === undefined) return <Spinner />
 
   return (
@@ -298,4 +294,3 @@ const FilterCheckBox = ({ data, label, callback }: FilterCheckBoxProps) => {
     </>
   )
 }
-export default StarSearchPage

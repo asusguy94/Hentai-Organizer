@@ -1,9 +1,11 @@
-import Client, { HomeProps } from './client'
+import Client, { HomePageProps } from './client'
 
 import prisma from '@utils/server/prisma'
 
-const HomePage = async () => {
-  type Props = HomeProps['data'][number]
+export const dynamic = 'force-dynamic'
+
+export default async function HomePage() {
+  type Props = HomePageProps['data'][number]
 
   const cols = 16
 
@@ -58,5 +60,3 @@ const HomePage = async () => {
 
   return <Client data={[recent, newest, popular]} />
 }
-
-export default HomePage

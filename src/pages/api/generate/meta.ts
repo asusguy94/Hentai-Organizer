@@ -1,12 +1,11 @@
-import { NextApiRequest } from 'next/types'
+import { NextApiRequest, NextApiResponse } from 'next/types'
 
-import { NextApiResponseWithSocket } from '@interfaces/socket'
 import { rebuildVideoFile, getDuration as videoDuration, getHeight as videoHeight } from '@utils/server/ffmpeg'
 import { fileExists, getClosestQ, logger } from '@utils/server/helper'
 import prisma from '@utils/server/prisma'
 
-//NEXT /video/add (SOCKET)
-export default async function handler(req: NextApiRequest, res: NextApiResponseWithSocket) {
+//NEXT /video/add
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
     const videos = await prisma.video.findMany({ where: { OR: [{ duration: 0 }, { height: 0 }] } })
 
@@ -21,7 +20,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseW
           const height = await videoHeight(absoluteVideoPath)
           const duration = await videoDuration(absoluteVideoPath)
 
-          logger(`Refreshing ${video.path}`, 'meta', res.socket.server.io)
+          logger(`Refreshing ${video.path}`)
           await prisma.video.update({
             where: { id: video.id },
             data: { duration, height: getClosestQ(height) }

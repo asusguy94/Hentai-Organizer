@@ -11,7 +11,7 @@ export type RegularHandlerProps = {
   checked: boolean
 }
 
-const Handler = ({ checked, indeterminate }: HandlerProps) => {
+function Handler({ checked, indeterminate }: HandlerProps) {
   if (checked) {
     return { indeterminate: true, checked: false }
   } else if (indeterminate) {
@@ -27,7 +27,7 @@ type ItemProps<T> = {
   item?: T
   callback: (result: HandlerProps, item?: T) => void
 }
-function Item<T>({ label, value, item, callback }: ItemProps<T>) {
+export default function Item<T>({ label, value, item, callback }: ItemProps<T>) {
   const [indeterminate, setIndeterminate] = useState(false)
   const [checked, setChecked] = useState(false)
 
@@ -83,5 +83,3 @@ export function RegularItem<T>({ label, value, item, callback, defaultChecked = 
     />
   )
 }
-
-export default Item

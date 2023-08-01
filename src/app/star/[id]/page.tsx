@@ -3,7 +3,7 @@ import Client from './client'
 import { Params } from '@interfaces'
 import prisma from '@utils/server/prisma'
 
-const StarPage = async ({ params }: Params<'id'>) => {
+export default async function StarPage({ params }: Params<'id'>) {
   const id = parseInt(params.id)
 
   const star = await prisma.star.findFirstOrThrow({ where: { id } })
@@ -38,5 +38,3 @@ const StarPage = async ({ params }: Params<'id'>) => {
     />
   )
 }
-
-export default StarPage

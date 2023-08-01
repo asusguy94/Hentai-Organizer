@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server'
 import fs from 'fs'
 
 import { Params } from '@interfaces'
-import { dirOnly, downloader, formatDate, removeCover, removePreviews } from '@utils/server/helper'
+import { dirOnly, formatDate, removeCover, removePoster, removePreviews } from '@utils/server/helper'
 import prisma from '@utils/server/prisma'
 import validate, { z } from '@utils/server/validation'
 
@@ -11,17 +11,15 @@ import validate, { z } from '@utils/server/validation'
 export async function PUT(req: Request, { params }: Params<'id'>) {
   const id = parseInt(params.id)
 
-  const { cen, noStar, plays, title, brand, franchise, date, path, cover } = validate(
+  const { cen, noStar, plays, title, franchise, date, path } = validate(
     z.object({
       cen: z.boolean().optional(),
       noStar: z.boolean().optional(),
       plays: z.number().int().nonnegative().optional(),
       title: z.string().optional(),
-      brand: z.string().optional(),
       franchise: z.string().optional(),
       date: z.string().optional(),
-      path: z.string().optional(),
-      cover: z.string().optional()
+      path: z.string().optional()
     }),
     await req.json()
   )
@@ -69,13 +67,6 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
         data: { franchise }
       })
     )
-  } else if (brand !== undefined) {
-    return NextResponse.json(
-      await prisma.video.update({
-        where: { id },
-        data: { brand }
-      })
-    )
   } else if (date !== undefined) {
     if (!date) {
       return NextResponse.json(
@@ -110,16 +101,6 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
         })
       )
     }
-  } else if (cover !== undefined) {
-    const video = await prisma.video.findFirstOrThrow({ where: { id } })
-    await downloader(cover, `media/images/videos/${video.id}.png`)
-
-    return NextResponse.json(
-      await prisma.video.update({
-        where: { id: video.id },
-        data: { cover: `${video.id}.png` }
-      })
-    )
   } else {
     // Refresh Video
     // Update Database
@@ -135,6 +116,7 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
     await removePreviews(id)
     // Remove Files
     await removeCover(id)
+    await removePoster(id)
 
     return NextResponse.json(result)
   }
@@ -148,6 +130,7 @@ export function DELETE(req: Request, { params }: Params<'id'>) {
 
   result.then(async video => {
     await removeCover(id)
+    await removePoster(id)
     await removePreviews(id)
 
     await Promise.allSettled([

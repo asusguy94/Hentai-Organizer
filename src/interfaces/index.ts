@@ -5,11 +5,11 @@ export type General = {
   id: number
   name: string
 }
+export type ServerAction = (data: FormData) => Promise<void>
+export type StaticParams<T extends string | string[]> = Promise<Record<T extends string ? T : T[number], string>[]>
 export type Params<T extends string | string[]> = {
   params: Record<T extends string ? T : T[number], string>
 }
-
-export type StaticParams<T extends string | string[]> = Promise<Record<T extends string ? T : T[number], string>[]>
 
 // Other Types
 type Related = {
@@ -24,11 +24,11 @@ export type Video = {
   name: string
   franchise: string
   brand: string | null
+  slug: string | null
   episode: number
   duration: number
   noStar: boolean
   censored: boolean
-  // attributes: Attribute[]
   path: { file: string; stream: string }
   date: { added: string; published: string | null }
   quality: number
@@ -66,4 +66,9 @@ export type Bookmark = {
   active: boolean
   attributes: Attribute[]
   outfit: string | null
+}
+
+export type Validity = {
+  title: boolean
+  fname: boolean
 }

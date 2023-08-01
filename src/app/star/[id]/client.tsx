@@ -1,22 +1,21 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { NextPage } from 'next/types'
-import { Fragment, useState, useRef, useEffect } from 'react'
+import { Fragment, useEffect, useRef, useState } from 'react'
 
 import {
-  Grid,
+  Autocomplete,
+  Button,
   Card,
   CardActionArea,
   CardContent,
   CardMedia,
-  Typography,
-  Button,
+  Grid,
   TextField,
-  Autocomplete
+  Typography
 } from '@mui/material'
 
-import { ContextMenuTrigger, ContextMenu, ContextMenuItem as MenuItem } from 'rctx-contextmenu'
+import { ContextMenu, ContextMenuTrigger, ContextMenuItem as MenuItem } from 'rctx-contextmenu'
 
 import Dropbox from '@components/dropbox'
 import { IconWithText } from '@components/icon'
@@ -294,11 +293,10 @@ function StarVideo({ video }: { video: StarVideo }) {
             src={src}
             data-src={dataSrc}
             preload='metadata'
-            poster={`${serverConfig.api}/video/${video.id}/thumb`}
+            poster={`${serverConfig.api}/video/${video.id}/poster`}
             muted
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
-            height='200' // fixed height to prevent resizing
           />
 
           <CardContent>
@@ -320,37 +318,39 @@ type StarInputFormProps = {
 }
 function StarInputForm({ value, emptyByDefault = false, update, name, list, children }: StarInputFormProps) {
   const [open, setOpen] = useState(false)
-  const [inputValue, setInputValue] = useState('')
+  const [input, setInput] = useState('')
 
   const updateValue = (value: string) => {
     if (value === '') setOpen(false)
 
-    setInputValue(value)
+    setInput(value)
   }
 
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (!open && e.key === 'Enter') {
-      update(inputValue, name.toLowerCase())
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
 
-      if (emptyByDefault) setInputValue('')
+    if (!open) {
+      update(input, name.toLowerCase())
+
+      if (emptyByDefault) setInput('')
     }
   }
 
-  const isChanged = inputValue.toLowerCase() !== (!emptyByDefault ? value : '').toLowerCase()
+  const isChanged = input.toLowerCase() !== (!emptyByDefault ? value : '').toLowerCase()
   const shouldShrink = isChanged || (typeof value === 'string' && value.length > 0)
 
   useEffect(() => {
     if (!emptyByDefault && value.length) {
-      setInputValue(value)
+      setInput(value)
     }
   }, [emptyByDefault, value])
 
   // FIXME excluding an item from dropdown causes a warning
   return (
     <Grid container style={{ marginBottom: 4 }}>
-      <Grid item xs={3}>
+      <Grid item xs={3} component='form' onSubmit={handleSubmit}>
         <Autocomplete
-          inputValue={inputValue}
+          inputValue={input}
           //
           // EVENTS
           onInputChange={(e, val, reason) => {
@@ -358,7 +358,6 @@ function StarInputForm({ value, emptyByDefault = false, update, name, list, chil
 
             updateValue(val)
           }}
-          onKeyPress={handleKeyPress}
           //
           // OPTIONS
           options={list.filter(item => !(emptyByDefault && value.includes(item)))}
@@ -398,24 +397,24 @@ type StarAttributesProps = {
 }
 function StarAttributes({ remove, data }: StarAttributesProps) {
   return (
-  <>
-    {data.map((attribute, idx) => (
-      <Fragment key={attribute}>
-        <ContextMenuTrigger id={`attribute-${idx}`} className='d-inline-block'>
-          <span className={styles.attribute}>
-            <Button size='small' variant='outlined' color='primary'>
-              {attribute}
-            </Button>
-          </span>
-        </ContextMenuTrigger>
+    <>
+      {data.map((attribute, idx) => (
+        <Fragment key={attribute}>
+          <ContextMenuTrigger id={`attribute-${idx}`} className='d-inline-block'>
+            <span className={styles.attribute}>
+              <Button size='small' variant='outlined' color='primary'>
+                {attribute}
+              </Button>
+            </span>
+          </ContextMenuTrigger>
 
-        <ContextMenu id={`attribute-${idx}`}>
-          <IconWithText component={MenuItem} icon='delete' text='Remove' onClick={() => remove(attribute)} />
-        </ContextMenu>
-      </Fragment>
-    ))}
-  </>
-)
+          <ContextMenu id={`attribute-${idx}`}>
+            <IconWithText component={MenuItem} icon='delete' text='Remove' onClick={() => remove(attribute)} />
+          </ContextMenu>
+        </Fragment>
+      ))}
+    </>
+  )
 }
 
 type StarTitleProps = {
@@ -423,7 +422,7 @@ type StarTitleProps = {
   onModal: ModalHandler
   update: SetState<Star | undefined>
 }
-const StarTitle = ({ star, onModal: handleModal, update }: StarTitleProps) => {
+function StarTitle({ star, onModal: handleModal, update }: StarTitleProps) {
   const renameStar = (name: string) => {
     starService.renameStar(star.id, name).then(() => {
       update({ ...star, name })
@@ -474,6 +473,7 @@ const StarTitle = ({ star, onModal: handleModal, update }: StarTitleProps) => {
                     handleModal()
 
                     //@ts-expect-error: target is missing from MUI
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
                     renameStar(e.target.value)
                   }
                 }}
@@ -499,6 +499,7 @@ const StarTitle = ({ star, onModal: handleModal, update }: StarTitleProps) => {
                     handleModal()
 
                     //@ts-expect-error: target is missing from MUI
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
                     setLink(e.target.value)
                   }
                 }}

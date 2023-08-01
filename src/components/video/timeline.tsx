@@ -29,6 +29,7 @@ type TimelineProps = {
   outfits: Outfit[]
   playVideo: (time?: number | null) => void
   setTime: (bookmarkID: number, time?: number) => void
+  playerRef: React.RefObject<HTMLVideoElement>
   update: SetState<Bookmark[]>
   onModal: ModalHandler
   setStarEvent: EventHandler
@@ -42,6 +43,7 @@ export default function Timeline({
   outfits,
   playVideo,
   setTime,
+  playerRef,
   update,
   onModal,
   setStarEvent
@@ -49,6 +51,7 @@ export default function Timeline({
   const windowSize = useWindowSize()
   const bookmarksRef = useRef<HTMLButtonElement[]>([])
   const [bookmarkLevels, setBookmarkLevels] = useState<number[]>([])
+  const [maxLevel, setMaxLevel] = useState(0)
   const localSettings = useSettings()
 
   const isActive = (bookmark: Bookmark) => bookmark.active
@@ -224,13 +227,25 @@ export default function Timeline({
     }
 
     setBookmarkLevels(levels)
+    setMaxLevel(maxLevel)
+  }, [bookmarks, localSettings?.bookmark_spacing, windowSize.width])
 
-    const videoPlayer = document.querySelector<HTMLElement>('.plyr')
+  useEffect(() => {
+    const setHeight = () => {
+      const videoPlayer = playerRef.current
     if (videoPlayer) {
       const videoTop = videoPlayer.getBoundingClientRect().top
       videoPlayer.style.maxHeight = `calc(100vh - (${spacing.bookmark}px * ${maxLevel}) - ${videoTop}px - ${spacing.top}px)`
+      }
     }
-  }, [bookmarks, localSettings?.bookmark_spacing, windowSize.width])
+
+    setHeight() // always run once
+    window.addEventListener('scroll', setHeight)
+
+    return () => {
+      window.removeEventListener('scroll', setHeight)
+    }
+  }, [maxLevel, playerRef])
 
   return (
     <div id={styles.timeline} style={bookmarks.length > 0 ? { marginTop: spacing.top } : {}}>
@@ -458,6 +473,8 @@ export default function Timeline({
               />
 
               <IconWithText component={MenuItem} icon='time' text='Change Time' onClick={() => setTime(bookmark.id)} />
+
+              <hr />
 
               <IconWithText
                 component={MenuItem}

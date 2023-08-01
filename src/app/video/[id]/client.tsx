@@ -1,6 +1,5 @@
 'use client'
 
-import { NextPage } from 'next/types'
 import { Fragment, useEffect, useRef, useState } from 'react'
 
 import {
@@ -16,7 +15,6 @@ import {
   Typography
 } from '@mui/material'
 
-import useStarEvent, { type Event, type EventData, type EventHandler } from '@hooks/useStarEvent'
 import { Outfit } from '@prisma/client'
 import { ContextMenu, ContextMenuTrigger, ContextMenuItem as MenuItem } from 'rctx-contextmenu'
 import { Flipped, Flipper } from 'react-flip-toolkit'
@@ -31,20 +29,32 @@ import Spinner from '@components/spinner'
 import { Header, Player, Timeline } from '@components/video'
 
 import { serverConfig } from '@config'
-import { Attribute, Bookmark, Category, SetState, VideoStar, Video } from '@interfaces'
+import useStarEvent, { type Event, type EventData, type EventHandler } from '@hooks/useStarEvent'
+import { Attribute, Bookmark, Category, SetState, VideoStar, Video, Validity } from '@interfaces'
 import { bookmarkService, videoService } from '@service'
-import { getUnique } from '@utils/shared'
+import { escapeRegExp, getUnique } from '@utils/shared'
 
 import styles from './video.module.scss'
 
-const VideoPage: NextPage<{
+type VideoPageProps = {
+  isValid: Validity
   categories: Category[]
   attributes: Attribute[]
   stars: VideoStar[]
   bookmarks: Bookmark[]
   video: Video
   outfits: Outfit[]
-}> = ({ categories, attributes, outfits, stars: starData, bookmarks: bookmarksData, video: videoData }) => {
+}
+
+export default function VideoPage({
+  categories,
+  attributes,
+  outfits,
+  stars: starData,
+  bookmarks: bookmarksData,
+  video: videoData,
+  isValid
+}: VideoPageProps) {
   const [video, setVideo] = useState<typeof videoData>() //FIXME cannot be set directly
   const [stars, setStars] = useState(starData)
   const [bookmarks, setBookmarks] = useState(bookmarksData)
@@ -72,6 +82,7 @@ const VideoPage: NextPage<{
         }}
         modal={{ handler: setModal, data: modal }}
         setStarEvent={setEvent}
+        isValid={isValid}
       />
 
       <Sidebar
@@ -113,6 +124,7 @@ type SectionProps = {
     data: Modal
   }
   setStarEvent: EventHandler
+  isValid: Validity
 }
 function Section({
   video,
@@ -123,8 +135,10 @@ function Section({
   stars,
   update,
   modal,
-  setStarEvent
-}: SectionProps) => {
+  setStarEvent,
+  isValid
+}: SectionProps) {
+  const playerRef = useRef<HTMLVideoElement>(null)
   const plyrRef = useRef<PlyrWithMetadata | null>(null)
 
   // Helper script for getting the player
@@ -162,9 +176,10 @@ function Section({
 
   return (
     <Grid item xs={9} component='section'>
-      <Header video={video} update={update.video} onModal={modal.handler} />
+      <Header video={video} onModal={modal.handler} isValid={isValid} />
 
       <Player
+        playerRef={playerRef}
         plyrRef={plyrRef}
         video={video}
         bookmarks={bookmarks}
@@ -183,6 +198,7 @@ function Section({
         outfits={outfits}
         playVideo={playVideo}
         setTime={setTime}
+        playerRef={playerRef}
         update={update.bookmarks}
         onModal={modal.handler}
         setStarEvent={setStarEvent}
@@ -369,7 +385,6 @@ function Star({
 
   const handleRibbon = (star: VideoStar) => {
     const hasBookmark = bookmarks.some(bookmark => bookmark.starID === star.id)
-
     if (hasBookmark) return null
 
     return <Ribbon label='NEW' />
@@ -390,8 +405,8 @@ function Star({
               start: time,
               starID: star.id,
               attributes: data.attributes,
-              active: false,
-              outfit: null
+              outfit: null,
+              active: false
             }
           ].sort((a, b) => a.start - b.start)
         )
@@ -405,11 +420,15 @@ function Star({
         bookmarks.map(bookmark => {
           if (bookmark.starID === star.id) {
             if (bookmark.attributes.every(attr => attr.id !== attribute.id)) {
-              return { ...bookmark, attributes: [...bookmark.attributes, attribute] }
+              return {
+                ...bookmark,
+                attributes: [...bookmark.attributes, attribute],
+                active: false
+              }
             }
           }
 
-          return bookmark
+          return { ...bookmark, active: false }
         })
       )
     })
@@ -459,6 +478,17 @@ function Star({
     }
   }
 
+  const getCommonAttributes = () => {
+    const starBookmarks = bookmarks.filter(b => b.starID === star.id)
+    const attributeIds = starBookmarks.map(bookmark => bookmark.attributes.map(attribute => attribute.id))
+    const commonAttributeIds = attributeIds.reduce(
+      (common, ids) => common.filter(id => ids.includes(id)),
+      attributeIds.shift() || []
+    )
+
+    return commonAttributeIds
+  }
+
   return (
     <Flipped key={star.id} flipId={star.id}>
       <Grid
@@ -469,11 +499,7 @@ function Star({
         onMouseLeave={starEvent.getEvent.event ? () => setBorder(false) : clearActive}
       >
         <ContextMenuTrigger id={`star-${star.id}`}>
-          <RibbonContainer
-            component={Card}
-            className={`${styles.star} ${border ? styles.active : ''}`}
-            // style={{ width: 200 }} // fixes issue with missing-image
-          >
+          <RibbonContainer component={Card} className={`${styles.star} ${border ? styles.active : ''}`}>
             <ImageCard
               src={`${serverConfig.api}/star/${star.id}/image`}
               width={200}
@@ -530,7 +556,7 @@ function Star({
               onModal(
                 'Add Attribute',
                 attributes
-                  .filter(attribute => star.attributes.every(attr => attr.id !== attribute.id))
+                  .filter(attribute => !getCommonAttributes().includes(attribute.id))
                   .map(attribute => (
                     <Button
                       key={attribute.id}
@@ -583,7 +609,7 @@ function StarInput({ video, stars, bookmarks, getAttributes, update }: StarInput
   }
 
   const addStar = (name: string) => {
-    if (input.length) {
+    if (input.length > 0) {
       videoService.addStar(video.id, name).then(({ data }) => {
         update.stars([...stars, { ...data, name }])
       })
@@ -693,7 +719,7 @@ function AddRelatedStars({ video, stars, disabled, update }: AddRelatedStarsProp
 
   return (
     <div style={{ width: '100%' }} className='text-center'>
-      <Button size='small' variant='outlined' color='primary' onClick={() => void handleClick()}>
+      <Button size='small' variant='outlined' color='primary' onClick={handleClick}>
         Add Related Stars ({relatedStars.length})
       </Button>
     </div>
@@ -754,7 +780,7 @@ function Franchise({ video }: FranchiseProps) {
 
             <Grid item xs={2} className={styles.thumbnail}>
               <ResponsiveImage
-                src={`${serverConfig.api}/video/${v.id}/thumb`}
+                src={`${serverConfig.api}/video/${v.id}/cover`}
                 width={90}
                 height={130}
                 missing={v.image === null}
@@ -763,7 +789,9 @@ function Franchise({ video }: FranchiseProps) {
               />
             </Grid>
 
-            <Grid className={styles.title}>{v.name}</Grid>
+            <Grid className={styles.title}>
+              {v.name.replace(new RegExp(`^${escapeRegExp(video.franchise)}\\s`), '')}
+            </Grid>
           </Grid>
         </a>
       ))}

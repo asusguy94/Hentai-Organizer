@@ -13,7 +13,7 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
       value: z.string().or(z.boolean()),
       label: z.string().optional()
     }),
-    req.body
+    await req.json()
   )
 
   if (label !== undefined) {

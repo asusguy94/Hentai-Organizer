@@ -1,5 +1,3 @@
-$spacing: 5px;
-
 #header {
   margin-bottom: 15px;
 
@@ -22,11 +20,7 @@ $spacing: 5px;
     color: black;
 
     svg {
-      margin-right: $spacing;
-
-      & + .no-label {
-        margin-left: -$spacing;
-      }
+      margin-right: 5px;
     }
   }
 }

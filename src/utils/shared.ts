@@ -15,3 +15,7 @@ export function clamp(value: number, minOrMax: number, max?: number): number {
   // min was supplied, use regular clamp
   return Math.min(Math.max(value, minOrMax), max)
 }
+
+export function escapeRegExp(input: string) {
+  return input.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}

@@ -23,6 +23,8 @@ export async function GET() {
           date_published: true,
           plays: true,
           cover: true,
+          poster: true,
+          slug: true,
           bookmarks: {
             select: {
               category: true,

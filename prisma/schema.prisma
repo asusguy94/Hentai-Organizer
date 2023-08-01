@@ -128,7 +128,10 @@ model Video {
   cen            Boolean   @default(true)
   date           DateTime  @default(now()) @db.Date
   date_published DateTime? @db.Date
-  cover          String?
+  cover          String?   @unique
+  poster         String?   @unique
+  slug           String?   @unique
+  validated      Boolean   @default(false)
 
   bookmarks Bookmark[]
   stars     VideoStars[]

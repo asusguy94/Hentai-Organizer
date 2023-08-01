@@ -1,47 +1,52 @@
 'use client'
 
-import { NextPage } from 'next/types'
-
 import { Grid, List, ListItemButton, ListItemText, Typography } from '@mui/material'
 
 import Link from '@components/link'
 
 import { General } from '@interfaces'
 
-const VideosPage: NextPage<{
-  video: { noBookmarks: General[]; noStars: General[] }
+type VideosPageProps = {
+  video: { noBookmarks: General[]; noStars: General[]; slugMissmatch: General[]; unusedStar: General[] }
   stars: { noImage: General[] }
   bookmarks: { noStar: General[] }
-}> = ({ bookmarks, video, stars }) => (
-  <Grid container spacing={2}>
-    <Grid item xs={6}>
-      <Typography variant='h4'>Missing BookmarkStar ({bookmarks.noStar.length})</Typography>
-      <List>
-        {bookmarks.noStar.map(video => (
-          <Link key={video.id} href={`/video/${video.id}`}>
-            <ListItemButton divider>
-              <ListItemText>{video.name}</ListItemText>
-            </ListItemButton>
-          </Link>
-        ))}
-      </List>
+}
 
-      <Typography variant='h4'>Missing StarImage ({stars.noImage.length})</Typography>
-      <List>
-        {stars.noImage.map(video => (
-          <Link key={video.id} href={`/video/${video.id}`}>
-            <ListItemButton divider>
-              <ListItemText>{video.name}</ListItemText>
-            </ListItemButton>
-          </Link>
-        ))}
-      </List>
+export default function VideosPage({ bookmarks, video, stars }: VideosPageProps) {
+  return (
+    <Grid container spacing={2}>
+      <Grid item xs={4}>
+        <View label='Missing BookmarkStar' data={bookmarks.noStar} />
+        <View label='Missing StarImage' data={stars.noImage} />
+      </Grid>
+
+      <Grid item xs={4}>
+        <View label='Missing Bookmarks' data={video.noBookmarks} />
+        <View label='Missing Stars' data={video.noStars} />
+      </Grid>
+
+      <Grid item xs={4}>
+        <View label='Slug/Fname Missmatch' data={video.slugMissmatch} />
+        <View label='Unused VideoStar' data={video.unusedStar} />
+      </Grid>
     </Grid>
+  )
+}
 
-    <Grid item xs={6}>
-      <Typography variant='h4'>Missing Bookmarks ({video.noBookmarks.length})</Typography>
+type ViewProps = {
+  data: General[]
+  label: string
+}
+function View({ data, label }: ViewProps) {
+  if (data.length === 0) return null
+
+  return (
+    <>
+      <Typography variant='h4'>
+        {label} ({data.length})
+      </Typography>
       <List>
-        {video.noBookmarks.map(video => (
+        {data.map(video => (
           <Link key={video.id} href={`/video/${video.id}`}>
             <ListItemButton divider>
               <ListItemText>{video.name}</ListItemText>
@@ -49,19 +54,6 @@ const VideosPage: NextPage<{
           </Link>
         ))}
       </List>
-
-      <Typography variant='h4'>Missing Stars ({video.noStars.length})</Typography>
-      <List>
-        {video.noStars.map(video => (
-          <Link key={video.id} href={`/video/${video.id}`}>
-            <ListItemButton divider>
-              <ListItemText>{video.name}</ListItemText>
-            </ListItemButton>
-          </Link>
-        ))}
-      </List>
-    </Grid>
-  </Grid>
-)
-
-export default VideosPage
+    </>
+  )
+}

@@ -30,8 +30,8 @@ export default function AddVideo({ videos }: AddVideoProps) {
 
       {videos.length === 0 ? (
         <div className='text-center'>
-          <Action label='Generate Metadata' callback={() => void generateService.meta()} />
-          <Action label='Generate VTT' callback={() => void generateService.vtt()} />
+          <Action label='Generate Metadata' callback={generateService.meta} />
+          <Action label='Generate VTT' callback={generateService.vtt} />
         </div>
       ) : (
         <>
@@ -62,11 +62,11 @@ export default function AddVideo({ videos }: AddVideoProps) {
           <div style={{ marginTop: 8 }}>
             <Action
               label='Add Videos'
-              callback={() => {
+              callback={() =>
                 videoService.addVideos(videos).then(() => {
                   router.refresh()
                 })
-              }}
+              }
             />
           </div>
         </>
@@ -77,10 +77,10 @@ export default function AddVideo({ videos }: AddVideoProps) {
 
 type ButtonProps = {
   label: string
-  callback?: () => void
+  callback?: () => Promise<unknown>
   disabled?: boolean
 }
-const Action = ({ label, callback, disabled = false }: ButtonProps) => {
+function Action({ label, callback, disabled = false }: ButtonProps) {
   const [isDisabled, setIsDisabled] = useState(disabled)
 
   const clickHandler = () => {
@@ -88,7 +88,7 @@ const Action = ({ label, callback, disabled = false }: ButtonProps) => {
       setIsDisabled(true)
 
       if (callback !== undefined) {
-        callback()
+        callback().then(() => setIsDisabled(false))
       }
     }
   }
@@ -105,5 +105,3 @@ const Action = ({ label, callback, disabled = false }: ButtonProps) => {
     </Button>
   )
 }
-
-export default AddVideo

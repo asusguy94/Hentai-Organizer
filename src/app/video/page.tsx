@@ -33,6 +33,10 @@ export default async function VideosPage() {
   })
 
   return (
-    <Client video={{ noBookmarks, noStars }} stars={{ noImage: noStarImage }} bookmarks={{ noStar: noBookmarkStar }} />
+    <Client
+      video={{ noBookmarks, noStars, slugMissmatch: [], unusedStar: [] }}
+      stars={{ noImage: noStarImage }}
+      bookmarks={{ noStar: noBookmarkStar }}
+    />
   )
 }

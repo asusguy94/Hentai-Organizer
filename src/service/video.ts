@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useFetch } from 'usehooks-ts'
 
 import { createApi } from '@config'
-import { General, Video, VideoStar } from '@interfaces'
+import { General, VideoStar } from '@interfaces'
 
 const { api, baseURL } = createApi('/video')
 
@@ -12,7 +13,6 @@ export default {
   renameVideo: (id: number, path: string) => api.put(`/${id}`, { path }),
   toggleCensor: (id: number, censored: boolean) => api.put(`/${id}`, { cen: !censored }),
   updateVideo: (id: number) => api.put(`/${id}`),
-  setCover: (id: number, url: string) => api.put(`/${id}`, { cover: url }),
   deleteVideo: (id: number) => api.delete(`/${id}`),
   addBookmark: (id: number, categoryID: number, time: number, starID?: number) => {
     if (starID !== undefined) return api.post<any>(`/${id}/bookmark`, { categoryID, time, starID })
@@ -20,14 +20,15 @@ export default {
   },
   renameFranchise: (id: number, value: string) => api.put(`/${id}`, { franchise: value }),
   renameTitle: (id: number, value: string) => api.put(`/${id}`, { title: value }),
-  setBrand: (id: number, brand: string) => api.put(`/${id}`, { brand }),
-  setDate: <T extends { date_published: Video['date']['published'] }>(id: number, date: string) => {
-    return api.put<T>(`/${id}`, { date })
-  },
   removeStar: (id: number, starID: number) => api.delete(`/${id}/star/${starID}`),
   toggleNoStar: (id: number, checked: boolean) => api.put(`/${id}`, { noStar: checked }),
   addStar: (id: number, name: string) => api.post<VideoStar>(`/${id}/star`, { name }),
   useRelatedStars: (id: number) => useFetch<General[]>(`${baseURL}/${id}/related/star`),
   removeAttribute: (id: number, attributeID: number) => api.delete(`/${id}/attribute/${attributeID}`),
-  addVideos: <T = any>(videos: T[]) => api.post('/add', { videos })
+  addVideos: <T = any>(videos: T[]) => api.post('/add', { videos }),
+  setSlug: (id: number, slug: string) => api.put(`/${id}/api`, { slug }),
+  setBrand: (id: number) => api.put(`/${id}/api`, { brand: true }),
+  setDate: (id: number) => api.put(`/${id}/api`, { date: true }),
+  setCover: (id: number) => api.put(`/${id}/api`, { cover: true }),
+  setPoster: (id: number) => api.put(`/${id}/api`, { poster: true })
 }

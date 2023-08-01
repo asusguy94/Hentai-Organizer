@@ -1,11 +1,12 @@
 import Client from './client'
 
 import { Params } from '@interfaces'
-import { formatDate, noExt } from '@utils/server/helper'
+import { getVideo } from '@utils/server/hanime'
+import { dirOnly, formatDate, noExt } from '@utils/server/helper'
 import prisma from '@utils/server/prisma'
-import { getUnique } from '@utils/shared'
+import { escapeRegExp, getUnique } from '@utils/shared'
 
-const VideoPage = async ({ params }: Params<'id'>) => {
+export default async function VideoPage({ params }: Params<'id'>) {
   const id = parseInt(params.id)
 
   const video = await prisma.video.findFirstOrThrow({ where: { id } })
@@ -39,8 +40,43 @@ const VideoPage = async ({ params }: Params<'id'>) => {
   const categories = await prisma.category.findMany({ orderBy: { name: 'asc' } })
   const attributes = await prisma.attribute.findMany({ select: { id: true, name: true }, where: { starOnly: false } })
 
+  // check if title matches api
+  const isValid = {
+    title: true,
+    fname: video.slug !== null && video.slug === dirOnly(video.path) // fname is invalid if slug=null, or slug!=path
+  }
+  if (!video.validated && video.slug !== null) {
+    try {
+      const apiResponse = await getVideo(video.slug)
+
+      const countChars = (str: string, char: string) =>
+        (str.match(new RegExp(`${escapeRegExp(char)}`, 'g')) ?? []).length
+
+      const specialChars = ['%', '*', '?', ':'] // "%" can be removed, when finished processing all files, as it not an illegal character
+
+      // check validity of title
+      isValid.title = !specialChars.some(char => {
+        const countApiTitle = countChars(apiResponse.name, char)
+        const countVideoTitle = countChars(video.name, char)
+
+        return countApiTitle !== countVideoTitle
+      })
+
+      // Update if title is valid
+      if (isValid.title) {
+        await prisma.video.update({
+          where: { id },
+          data: { validated: true }
+        })
+      }
+    } catch (e) {
+      //
+    }
+  }
+
   return (
     <Client
+      isValid={isValid}
       categories={categories}
       attributes={attributes}
       outfits={outfits}
@@ -64,6 +100,7 @@ const VideoPage = async ({ params }: Params<'id'>) => {
       })}
       video={{
         id: video.id,
+        slug: video.slug,
         name: video.name,
         episode: video.episode,
         path: {
@@ -100,5 +137,3 @@ const VideoPage = async ({ params }: Params<'id'>) => {
     />
   )
 }
-
-export default VideoPage

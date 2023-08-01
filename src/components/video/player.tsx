@@ -131,6 +131,7 @@ type VideoPlayerProps = {
     video: SetState<Video | undefined>
     bookmarks: SetState<Bookmark[]>
   }
+  playerRef: RefObject<HTMLVideoElement>
   plyrRef: RefObject<PlyrWithMetadata | null>
   modal: {
     handler: ModalHandler
@@ -143,6 +144,7 @@ export default function VideoPlayer({
   categories,
   stars,
   update,
+  playerRef,
   plyrRef,
   modal
 }: VideoPlayerProps) {
@@ -228,8 +230,14 @@ export default function VideoPlayer({
     })
   }
 
-  const setCover = (url: string) => {
-    videoService.setCover(video.id, url).then(() => {
+  const setCover = () => {
+    videoService.setCover(video.id).then(() => {
+      router.refresh()
+    })
+  }
+
+  const setPoster = () => {
+    videoService.setPoster(video.id).then(() => {
       router.refresh()
     })
   }
@@ -262,9 +270,11 @@ export default function VideoPlayer({
     <div onWheel={handleWheel}>
       <ContextMenuTrigger id='video'>
         <Plyr
+          playerRef={playerRef}
           plyrRef={plyrRef as React.MutableRefObject<Plyr>}
           source={`${serverConfig.api}/video/${video.id}/file`}
           thumbnail={`${serverConfig.api}/video/${video.id}/vtt`}
+          poster={`${serverConfig.api}/video/${video.id}/poster`}
         />
       </ContextMenuTrigger>
 
@@ -319,6 +329,7 @@ export default function VideoPlayer({
                     modal.handler()
 
                     //@ts-expect-error: target is undefined in MUI
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
                     renameVideo(e.target.value)
                   }
                 }}
@@ -329,29 +340,19 @@ export default function VideoPlayer({
 
         <hr />
 
-        <IconWithText component={MenuItem} icon='copy' text='Copy Filename' onClick={() => void copy()} />
+        <IconWithText component={MenuItem} icon='copy' text='Copy Filename' onClick={copy} />
 
         <hr />
 
+        <IconWithText component={MenuItem} icon='edit' text='Set Cover' onClick={setCover} />
+        <IconWithText component={MenuItem} icon='edit' text='Set Poster' onClick={setPoster} />
         <IconWithText
           component={MenuItem}
           icon='edit'
-          text='Set Cover'
+          text='Set Cover & Poster'
           onClick={() => {
-            modal.handler(
-              'Set Cover',
-              <TextField
-                autoFocus
-                onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-                  if (e.key === 'Enter') {
-                    modal.handler()
-
-                    //@ts-expect-error: target is undefined in MUI
-                    setCover(e.target.value)
-                  }
-                }}
-              />
-            )
+            setCover()
+            setPoster()
           }}
         />
 

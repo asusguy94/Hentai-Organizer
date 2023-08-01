@@ -124,7 +124,7 @@ function VideoCard({ video }: VideoCardProps) {
       <RibbonContainer component={Card} className={styles.video}>
         <CardActionArea>
           <ImageCard
-            src={`${serverConfig.api}/video/${video.id}/thumb`}
+            src={`${serverConfig.api}/video/${video.id}/cover`}
             width={210}
             height={275}
             missing={video.cover === null}
@@ -153,12 +153,12 @@ type SidebarProps = {
 }
 function Sidebar({ attributes, brands, categories, outfits, setHidden, setSort }: SidebarProps) {
   return (
-  <>
-    <TitleSearch setHidden={setHidden} />
-    <Sort setSort={setSort} />
-    <Filter videoData={{ categories, attributes, brands, outfits }} setHidden={setHidden} />
-  </>
-)
+    <>
+      <TitleSearch setHidden={setHidden} />
+      <Sort setSort={setSort} />
+      <Filter videoData={{ categories, attributes, brands, outfits }} setHidden={setHidden} />
+    </>
+  )
 }
 
 type TitleSearchProps = {

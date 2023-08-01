@@ -20,6 +20,8 @@ export type VideoSearch = {
   noStar: boolean
   cen: boolean
   cover: string | null
+  slug: string | null
+  poster: string | null
   published: string | null
   quality: number
   plays: number

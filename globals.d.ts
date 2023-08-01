@@ -35,3 +35,10 @@ declare module 'ffmpeg-generate-video-preview' {
   }>
   export = placeholder
 }
+
+declare module 'fake-useragent' {
+  class UserAgent {
+    random: string
+  }
+  export default UserAgent
+}

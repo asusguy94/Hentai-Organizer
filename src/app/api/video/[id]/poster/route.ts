@@ -1,9 +1,9 @@
 import { Params } from '@interfaces'
 import { sendFile } from '@utils/server/helper'
 
-//NEXT /(home) && /star/[id] && /video/id && /video/search
+//NEXT ???
 export async function GET(req: Request, { params }: Params<'id'>) {
   const id = parseInt(params.id)
 
-  return await sendFile(`./media/images/videos/${id}.png`)
+  return await sendFile(`./media/images/videos/poster/${id}.png`)
 }

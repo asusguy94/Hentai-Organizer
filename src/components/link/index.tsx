@@ -1,4 +1,3 @@
-/* eslint-disable react/display-name */
 import NextLink, { LinkProps as NextLinkProps } from 'next/link'
 import { usePathname } from 'next/navigation'
 import React from 'react'
@@ -17,6 +16,7 @@ export const NextLinkComposed = React.forwardRef<HTMLAnchorElement, NextLinkComp
     <NextLink href={to} passHref style={{ ...style, outline: 'none' }} {...other} ref={ref} />
   )
 )
+NextLinkComposed.displayName = 'NextLinkComposed'
 
 export type LinkProps = {
   activeClassName?: string
@@ -71,5 +71,6 @@ const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(
     return <MuiLink component={NextLinkComposed} className={className} ref={ref} {...nextjsProps} {...other} />
   }
 )
+Link.displayName = 'Link'
 
 export default Link

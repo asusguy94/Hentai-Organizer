@@ -1,6 +1,5 @@
 'use client'
 
-import { NextPage } from 'next/types'
 import { useEffect, useState } from 'react'
 
 import { Button, Grid, TextField } from '@mui/material'
@@ -31,9 +30,7 @@ export default function SettingsPage() {
     setChanged(false)
   }
 
-  const handleChanged = () => {
-    setChanged(true)
-  }
+  const handleChanged = () => setChanged(true)
 
   return (
     <Grid item className='text-center'>

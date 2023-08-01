@@ -1,8 +1,5 @@
-import { NextApiRequest, NextApiResponse } from 'next/types'
-
 import dayjs from 'dayjs'
 import fetch from 'node-fetch'
-import type { Server } from 'socket.io'
 
 import fs from 'fs'
 import path from 'path'
@@ -66,12 +63,33 @@ export const extOnly = (dir: string) => path.parse(dir).ext
 export const noExt = (dir: string) => path.parse(dir).name
 
 /**
- * Remove thumbnail from a given 'id'
+ * Remove horizontal thumbnail from a given 'id'
  * @param videoID
  */
-export const removeCover = async (videoID: number) => {
-  // Remove Images
-  await fs.promises.unlink(`./media/images/videos/${videoID}.png`)
+export async function removeCover(videoID: number) {
+  // Remove Cover
+  try {
+    await fs.promises.unlink(`./media/images/videos/cover/${videoID}.png`)
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code !== 'ENOENT') {
+      throw err
+    }
+  }
+}
+
+/**
+ * Remove vertical thumbnail from a given 'id'
+ * @param videoID
+ */
+export async function removePoster(videoID: number) {
+  // Remove Poster
+  try {
+    await fs.promises.unlink(`./media/images/videos/poster/${videoID}.png`)
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code !== 'ENOENT') {
+      throw err
+    }
+  }
 }
 
 export async function removePreviews(videoID: number) {

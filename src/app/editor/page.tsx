@@ -1,16 +1,14 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
-import { NextPage } from 'next/types'
 import { useState, useEffect } from 'react'
 
 import {
   Grid,
   Button,
-  Table,
+  Table as MuiTable,
   TableContainer,
   TableHead,
-  TableRow,
+  TableRow as MuiTableRow,
   TableCell,
   TableBody,
   TextField,
@@ -39,127 +37,112 @@ type WithOnlyType = General & { videoOnly?: boolean; starOnly?: boolean }
 //NEXT can be migrated to server-component
 export default function EditorPage() {
   return (
-  <Grid container justifyContent='center'>
+    <Grid container justifyContent='center'>
       <Wrapper name='attribute' obj={['starOnly', 'videoOnly']} />
       <Wrapper name='category' />
       <Wrapper name='outfit' />
-  </Grid>
-)
+    </Grid>
+  )
 }
 
 type WrapperProps = {
-  label: string
   name: string
   obj?: OnlyType[]
 }
 
-const Wrapper = ({ label, name, obj = [] }: WrapperProps) => {
-  const router = useRouter()
-
+function Wrapper({ name, obj = [] }: WrapperProps) {
   const [input, setInput] = useState('')
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => setInput(e.target.value)
 
-  const handleSubmit = () => {
-    if (input.length) {
-      if (input.toLowerCase() === input) return
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
 
+    if (input.length > 0 && input.toLowerCase() !== input) {
       axios.post(`${serverConfig.api}/${name}`, { name: input }).then(() => {
-        router.refresh()
+        location.reload()
       })
-    }
-  }
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      e.preventDefault()
-      handleSubmit()
     }
   }
 
   return (
     <Grid item xs={3} style={{ paddingLeft: 3 * 8, paddingRight: 3 * 8 }}>
       <Grid container justifyContent='center' style={{ marginBottom: 10 }}>
-        <Grid item component='h2'>
-          {capitalize(label)}
-        </Grid>
-
-        <Grid item>
+        <Grid item component='form' onSubmit={handleSubmit}>
           <TextField
             variant='standard'
+            label={name}
             onChange={handleChange}
-            //TODO deprecated
-            onKeyPress={handleKeyPress}
             style={{ marginLeft: 5, marginRight: 5 }}
           />
 
-          <Button variant='contained' color='primary' size='small' onClick={handleSubmit} style={{ marginTop: 2 }}>
+          <Button type='submit' variant='contained' color='primary' size='small' style={{ marginTop: 2 }}>
             Add {capitalize(name)}
           </Button>
         </Grid>
       </Grid>
 
-      <TableWrapper label={name} obj={obj} />
+      <Table name={name} obj={obj} />
     </Grid>
   )
 }
 
-type TableWrapperProps = {
-  label: string
+type TableProps = {
+  name: string
   obj: OnlyType[]
 }
-const TableWrapper = ({ label, obj = [] }: TableWrapperProps) => {
+function Table({ name, obj = [] }: TableProps) {
   const [data, setData] = useState<WithOnlyType[]>([])
 
   useEffect(() => {
-    axios.get<WithOnlyType[]>(`${serverConfig.api}/${label}`).then(({ data }) => {
+    axios.get<WithOnlyType[]>(`${serverConfig.api}/${name}`).then(({ data }) => {
       setData(data.sort((a, b) => a.id - b.id))
     })
-  }, [label])
+  }, [name])
 
   const updateItem = (ref: UpdateRef, value: string) => {
-    axios.put(`${serverConfig.api}/${label}/${ref.id}`, { value }).then(() => {
+    axios.put(`${serverConfig.api}/${name}/${ref.id}`, { value }).then(() => {
       setData(data.map(item => ({ ...item, name: ref.id === item.id ? value : item.name })))
     })
   }
 
   return (
     <TableContainer component={Paper} style={{ overflowX: 'visible' }}>
-      <Table size='small' className={styles['table-striped']} stickyHeader>
+      <MuiTable size='small' className={styles['table-striped']} stickyHeader>
         <TableHead>
-          <TableRow>
+          <MuiTableRow>
             <TableCell>ID</TableCell>
-            <TableCell>{capitalize(label)}</TableCell>
+            <TableCell>{capitalize(name)}</TableCell>
 
             {obj.map(label => (
               <TableCell key={label}>{label}</TableCell>
             ))}
-          </TableRow>
+          </MuiTableRow>
         </TableHead>
 
         <TableBody>
           {data.map(item => (
-            <TableItem key={item.id} obj={obj} data={item} update={updateItem} />
+            <TableRow key={item.id} obj={obj} data={item} update={updateItem} />
           ))}
         </TableBody>
-      </Table>
+      </MuiTable>
     </TableContainer>
   )
 }
 
-type TableItemProps = {
+type TableRowProps = {
   update: (ref: UpdateRef, value: string) => void
   data: WithOnlyType
   obj: OnlyType[]
 }
-const TableItem = ({ update, data, obj }: TableItemProps) => {
+function TableRow({ update, data, obj }: TableRowProps) {
   const [edit, setEdit] = useState(false)
-  const [value, setValue] = useState<null | string>(null)
+  const [input, setInput] = useState('')
 
   const save = () => {
     setEdit(false)
 
-    if (value) update(data, value)
+    if (input) update(data, input)
   }
 
   const setCondition = (ref: UpdateRef, prop: string, value: boolean, checkbox: HTMLInputElement) => {
@@ -169,21 +152,19 @@ const TableItem = ({ update, data, obj }: TableItemProps) => {
   }
 
   return (
-    <TableRow>
+    <MuiTableRow>
       <TableCell>{data.id}</TableCell>
       <TableCell>
         {edit ? (
-          <TextField
-            type='text'
-            defaultValue={data.name}
-            autoFocus
-            onBlur={save}
-            //TODO deprecated
-            onKeyPress={e => {
-              if (e.key === 'Enter') save()
-            }}
-            onChange={e => setValue(e.currentTarget.value)}
-          />
+          <form onSubmit={save}>
+            <TextField
+              type='text'
+              defaultValue={data.name}
+              onChange={e => setInput(e.target.value)}
+              autoFocus
+              onBlur={save}
+            />
+          </form>
         ) : (
           <span onClick={() => setEdit(true)}>{data.name}</span>
         )}
@@ -197,8 +178,6 @@ const TableItem = ({ update, data, obj }: TableItemProps) => {
           />
         </TableCell>
       ))}
-    </TableRow>
+    </MuiTableRow>
   )
 }
-
-export default EditorPage

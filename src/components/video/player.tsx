@@ -88,6 +88,11 @@ function useHls(video: Video, plyrRef: React.MutableRefObject<PlyrWithMetadata |
             console.log(e, data)
           }
 
+          const maxLevel = data.levels.filter(level => level.height <= settingsConfig.player.quality.max).length - 1
+
+          hls.startLevel = maxLevel - 1
+          hls.autoLevelCapping = maxLevel
+
           hls.startLoad(localBookmark)
         }
 

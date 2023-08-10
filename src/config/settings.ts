@@ -11,7 +11,11 @@ function getValue(label: string, defaultValue: string): string {
 export default {
   qualities: [1080, 720, 480, 360],
   player: {
-    thumbnails: getValue('PLAYER_THUMBNAILS', 'false') === 'true'
+    thumbnails: getValue('PLAYER_THUMBNAILS', 'false') === 'true',
+    quality: {
+      min: parseInt(getValue('PLAYER_QUALITY_MIN', '360')),
+      max: parseInt(getValue('PLAYER_QUALITY_MAX', '1080'))
+    }
   },
   debug: getValue('DEBUG', 'false') === 'true'
 }

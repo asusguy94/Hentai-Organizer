@@ -1,6 +1,6 @@
 import { VirtuosoGrid } from 'react-virtuoso'
 
-import styles from './virtuoso.module.scss'
+import styles from './virtuoso.module.css'
 
 type GridProps = {
   renderData: (id: number) => JSX.Element

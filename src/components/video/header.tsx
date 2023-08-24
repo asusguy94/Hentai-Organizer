@@ -2,7 +2,7 @@ import { useRouter } from 'next/navigation'
 
 import { Button, Grid, TextField, Typography } from '@mui/material'
 
-import { ContextMenu, ContextMenuTrigger, ContextMenuItem as MenuItem } from 'rctx-contextmenu'
+import { ContextMenu, ContextMenuTrigger, ContextMenuItem } from 'rctx-contextmenu'
 
 import Icon, { IconWithText } from '../icon'
 import { ModalHandler } from '../modal'
@@ -88,7 +88,7 @@ function HeaderTitle({ video, onModal, isValid }: HeaderTitleProps) {
 
       <ContextMenu id='title'>
         <IconWithText
-          component={MenuItem}
+          component={ContextMenuItem}
           icon='edit'
           text='Rename Title'
           onClick={() => {
@@ -112,7 +112,7 @@ function HeaderTitle({ video, onModal, isValid }: HeaderTitleProps) {
         />
 
         <IconWithText
-          component={MenuItem}
+          component={ContextMenuItem}
           icon='edit'
           text='Rename Franchise'
           onClick={() => {
@@ -138,10 +138,10 @@ function HeaderTitle({ video, onModal, isValid }: HeaderTitleProps) {
 
         <hr />
 
-        <IconWithText component={MenuItem} icon='copy' text='Copy Franchise' onClick={copyFranchise} />
+        <IconWithText component={ContextMenuItem} icon='copy' text='Copy Franchise' onClick={copyFranchise} />
 
         <IconWithText
-          component={MenuItem}
+          component={ContextMenuItem}
           icon='edit'
           text='Set Slug'
           onClick={() => {

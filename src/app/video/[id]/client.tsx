@@ -16,7 +16,7 @@ import {
 } from '@mui/material'
 
 import { Outfit } from '@prisma/client'
-import { ContextMenu, ContextMenuTrigger, ContextMenuItem as MenuItem } from 'rctx-contextmenu'
+import { ContextMenu, ContextMenuTrigger, ContextMenuItem } from 'rctx-contextmenu'
 import { Flipped, Flipper } from 'react-flip-toolkit'
 
 import { IconWithText } from '@components/icon'
@@ -523,7 +523,7 @@ function Star({
 
         <ContextMenu id={`star-${star.id}`}>
           <IconWithText
-            component={MenuItem}
+            component={ContextMenuItem}
             icon='add'
             text='Add Bookmark'
             onClick={() => {
@@ -548,7 +548,7 @@ function Star({
           />
 
           <IconWithText
-            component={MenuItem}
+            component={ContextMenuItem}
             icon='add'
             text='Add Attribute'
             disabled={bookmarks.every(bookmark => bookmark.starID !== star.id)}
@@ -576,7 +576,7 @@ function Star({
           />
 
           <IconWithText
-            component={MenuItem}
+            component={ContextMenuItem}
             icon='delete'
             text='Remove'
             disabled={bookmarks.some(bookmark => bookmark.starID === star.id)}
@@ -848,7 +848,12 @@ function Attributes({ video, bookmarks, clearActive, update, getAttributes }: At
           </ContextMenuTrigger>
 
           <ContextMenu id={`attribute-${attribute.id}`}>
-            <IconWithText component={MenuItem} icon='delete' text='Remove' onClick={() => removeAttribute(attribute)} />
+            <IconWithText
+              component={ContextMenuItem}
+              icon='delete'
+              text='Remove'
+              onClick={() => removeAttribute(attribute)}
+            />
           </ContextMenu>
         </Fragment>
       ))}
@@ -896,5 +901,3 @@ function Outfits({ bookmarks, clearActive, update }: OutfitProps) {
     </Grid>
   )
 }
-
-export default VideoPage

@@ -15,7 +15,7 @@ import {
   Typography
 } from '@mui/material'
 
-import { ContextMenu, ContextMenuTrigger, ContextMenuItem as MenuItem } from 'rctx-contextmenu'
+import { ContextMenu, ContextMenuTrigger, ContextMenuItem } from 'rctx-contextmenu'
 
 import Dropbox from '@components/dropbox'
 import { IconWithText } from '@components/icon'
@@ -139,14 +139,14 @@ function StarForm({ star, update }: StarFormProps) {
   return (
     <>
       <StarInputForm update={updateInfo} name='Breast' value={star.info.breast} list={starData.breast} />
-      <StarInputForm update={updateInfo} name='HairColor' value={star.info.haircolor} list={starData.haircolor} />
-      <StarInputForm update={updateInfo} name='HairStyle' value={star.info.hairstyle} list={starData.hairstyle} />
+      <StarInputForm update={updateInfo} name='Haircolor' value={star.info.haircolor} list={starData.haircolor} />
+      <StarInputForm update={updateInfo} name='Hairstyle' value={star.info.hairstyle} list={starData.hairstyle} />
       <StarInputForm
         update={addAttribute}
         name='Attribute'
-        emptyByDefault
-        value={star.info.attribute.toString()}
+        value={star.info.attribute}
         list={starData.attribute}
+        emptyByDefault
       >
         <StarAttributes data={star.info.attribute} remove={removeAttribute} />
       </StarInputForm>
@@ -195,7 +195,7 @@ function StarImageDropbox({ star, videos, update }: StarImageDropboxProps) {
           </ContextMenuTrigger>
 
           <ContextMenu id='star__image'>
-            <IconWithText component={MenuItem} icon='delete' text='Delete Image' onClick={removeImage} />
+            <IconWithText component={ContextMenuItem} icon='delete' text='Delete Image' onClick={removeImage} />
           </ContextMenu>
         </>
       ) : (
@@ -206,7 +206,7 @@ function StarImageDropbox({ star, videos, update }: StarImageDropboxProps) {
 
           <ContextMenu id='star__dropbox'>
             <IconWithText
-              component={MenuItem}
+              component={ContextMenuItem}
               icon='delete'
               text='Remove Star'
               onClick={removeStar}
@@ -310,13 +310,13 @@ function StarVideo({ video }: { video: StarVideo }) {
 
 type StarInputFormProps = {
   update: (value: string, label: string) => void
-  value: string
+  value: string | string[]
   name: string
   list: string[]
   emptyByDefault?: boolean
   children?: React.ReactNode
 }
-function StarInputForm({ value, emptyByDefault = false, update, name, list, children }: StarInputFormProps) {
+function StarInputForm({ value, update, name, list, children, emptyByDefault = false }: StarInputFormProps) {
   const [open, setOpen] = useState(false)
   const [input, setInput] = useState('')
 
@@ -336,13 +336,15 @@ function StarInputForm({ value, emptyByDefault = false, update, name, list, chil
     }
   }
 
-  const isChanged = input.toLowerCase() !== (!emptyByDefault ? value : '').toLowerCase()
+  const isChanged = input.toLowerCase() !== (typeof value === 'string' && !emptyByDefault ? value : '').toLowerCase()
   const shouldShrink = isChanged || (typeof value === 'string' && value.length > 0)
 
   useEffect(() => {
-    if (!emptyByDefault && value.length) {
+    if (!emptyByDefault && typeof value === 'string') {
       setInput(value)
     }
+
+    return () => setInput('')
   }, [emptyByDefault, value])
 
   // FIXME excluding an item from dropdown causes a warning
@@ -367,10 +369,7 @@ function StarInputForm({ value, emptyByDefault = false, update, name, list, chil
               variant='standard'
               label={name}
               color='primary'
-              InputLabelProps={{
-                shrink: shouldShrink,
-                className: styles['no-error']
-              }}
+              InputLabelProps={{ shrink: shouldShrink, className: styles['no-error'] }}
               className={isChanged ? styles.error : ''}
             />
           )}
@@ -398,9 +397,9 @@ type StarAttributesProps = {
 function StarAttributes({ remove, data }: StarAttributesProps) {
   return (
     <>
-      {data.map((attribute, idx) => (
+      {data.map(attribute => (
         <Fragment key={attribute}>
-          <ContextMenuTrigger id={`attribute-${idx}`} className='d-inline-block'>
+          <ContextMenuTrigger id={attribute} className='d-inline-block'>
             <span className={styles.attribute}>
               <Button size='small' variant='outlined' color='primary'>
                 {attribute}
@@ -408,8 +407,8 @@ function StarAttributes({ remove, data }: StarAttributesProps) {
             </span>
           </ContextMenuTrigger>
 
-          <ContextMenu id={`attribute-${idx}`}>
-            <IconWithText component={MenuItem} icon='delete' text='Remove' onClick={() => remove(attribute)} />
+          <ContextMenu id={attribute}>
+            <IconWithText component={ContextMenuItem} icon='delete' text='Remove' onClick={() => remove(attribute)} />
           </ContextMenu>
         </Fragment>
       ))}
@@ -457,7 +456,7 @@ function StarTitle({ star, onModal: handleModal, update }: StarTitleProps) {
 
       <ContextMenu id='title'>
         <IconWithText
-          component={MenuItem}
+          component={ContextMenuItem}
           icon='edit'
           text='Rename'
           onClick={() => {
@@ -483,7 +482,7 @@ function StarTitle({ star, onModal: handleModal, update }: StarTitleProps) {
         />
 
         <IconWithText
-          component={MenuItem}
+          component={ContextMenuItem}
           icon='edit'
           text='Set Link'
           onClick={() => {

@@ -2,7 +2,7 @@ import { Fragment, useEffect, useRef, useState } from 'react'
 
 import { Button } from '@mui/material'
 
-import { ContextMenu, ContextMenuTrigger, ContextMenuItem as MenuItem } from 'rctx-contextmenu'
+import { ContextMenu, ContextMenuTrigger, ContextMenuItem } from 'rctx-contextmenu'
 import ReactTooltip from 'react-tooltip'
 import { useWindowSize } from 'react-use'
 
@@ -13,7 +13,7 @@ import { ModalHandler } from '../modal'
 
 import { serverConfig } from '@config'
 import { EventHandler } from '@hooks/useStarEvent'
-import { Attribute, Bookmark, Category, VideoStar as Star, Video, SetState, Outfit } from '@interfaces'
+import { Attribute, Bookmark, Category, VideoStar, Video, SetState, Outfit } from '@interfaces'
 import { bookmarkService } from '@service'
 
 import styles from './timeline.module.scss'
@@ -23,7 +23,7 @@ const spacing = { top: 3, bookmark: 36 }
 type TimelineProps = {
   video: Video
   bookmarks: Bookmark[]
-  stars: Star[]
+  stars: VideoStar[]
   attributes: Attribute[]
   categories: Category[]
   outfits: Outfit[]
@@ -233,9 +233,11 @@ export default function Timeline({
   useEffect(() => {
     const setHeight = () => {
       const videoPlayer = playerRef.current
-    if (videoPlayer) {
-      const videoTop = videoPlayer.getBoundingClientRect().top
-      videoPlayer.style.maxHeight = `calc(100vh - (${spacing.bookmark}px * ${maxLevel}) - ${videoTop}px - ${spacing.top}px)`
+      if (videoPlayer) {
+        const videoTop = videoPlayer.getBoundingClientRect().top
+        videoPlayer.style.height = `calc(100vh - (${spacing.bookmark}px * ${maxLevel}) - ${videoTop}px - ${spacing.top}px)`
+        //maxHeight: whitespace bellow, allows scrolling beneath video
+        //height: no whitespace bellow, video always at bottom of screen
       }
     }
 
@@ -325,7 +327,7 @@ export default function Timeline({
 
             <ContextMenu id={`bookmark-${bookmark.id}`}>
               <IconWithText
-                component={MenuItem}
+                component={ContextMenuItem}
                 icon='add'
                 text='Add Star'
                 disabled={bookmark.starID !== 0 || stars.length === 0}
@@ -333,7 +335,7 @@ export default function Timeline({
               />
 
               <IconWithText
-                component={MenuItem}
+                component={ContextMenuItem}
                 icon='delete'
                 text='Remove Star'
                 disabled={bookmark.starID === 0}
@@ -343,7 +345,7 @@ export default function Timeline({
               <hr />
 
               <IconWithText
-                component={MenuItem}
+                component={ContextMenuItem}
                 icon='add'
                 text='Add Attribute'
                 onClick={() => {
@@ -370,7 +372,7 @@ export default function Timeline({
               />
 
               <IconWithText
-                component={MenuItem}
+                component={ContextMenuItem}
                 icon='delete'
                 text='Remove Attribute'
                 disabled={attributesFromStar(bookmark.starID).length >= bookmark.attributes.length}
@@ -399,7 +401,7 @@ export default function Timeline({
               />
 
               <IconWithText
-                component={MenuItem}
+                component={ContextMenuItem}
                 icon='delete'
                 text='Clear Attributes'
                 disabled={attributesFromStar(bookmark.starID).length >= bookmark.attributes.length}
@@ -409,7 +411,7 @@ export default function Timeline({
               <hr />
 
               <IconWithText
-                component={MenuItem}
+                component={ContextMenuItem}
                 icon='add'
                 text='Set Outfit'
                 onClick={() => {
@@ -436,7 +438,7 @@ export default function Timeline({
               />
 
               <IconWithText
-                component={MenuItem}
+                component={ContextMenuItem}
                 icon='delete'
                 text='Remove Outfit'
                 disabled={bookmark.outfit === null}
@@ -446,7 +448,7 @@ export default function Timeline({
               <hr />
 
               <IconWithText
-                component={MenuItem}
+                component={ContextMenuItem}
                 icon='edit'
                 text='Change Category'
                 onClick={() => {
@@ -472,12 +474,17 @@ export default function Timeline({
                 }}
               />
 
-              <IconWithText component={MenuItem} icon='time' text='Change Time' onClick={() => setTime(bookmark.id)} />
+              <IconWithText
+                component={ContextMenuItem}
+                icon='time'
+                text='Change Time'
+                onClick={() => setTime(bookmark.id)}
+              />
 
               <hr />
 
               <IconWithText
-                component={MenuItem}
+                component={ContextMenuItem}
                 icon='delete'
                 text='Delete'
                 onClick={() => removeBookmark(bookmark.id)}

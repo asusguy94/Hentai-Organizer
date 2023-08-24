@@ -10,7 +10,7 @@ import Ribbon, { RibbonContainer } from '@components/ribbon'
 
 import { serverConfig } from '@config'
 
-import classes from './home.module.scss'
+import classes from './home.module.css'
 
 type Video = {
   id: number

@@ -1,9 +1,7 @@
-@import '@styles/variables';
-
 #star {
   #profile {
-    max-height: $starHeight + px;
-    max-width: $starWidth + px;
+    max-height: var(--starHeight);
+    max-width: var(--starWidth);
   }
 
   .no-error {
@@ -26,5 +24,5 @@
 
 .video {
   margin: 0 10px 10px 5px !important;
-  width: $thumbnailWidth + px;
+  width: 240px;
 }

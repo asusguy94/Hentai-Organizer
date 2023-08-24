@@ -32,9 +32,17 @@ export default async function VideosPage() {
     take: limit
   })
 
+  const slugMissmatch = (
+    await prisma.video.findMany({
+      where: { slug: { not: null }, OR: [{ noStar: true }, { bookmarks: { some: {} } }] }
+    })
+  )
+    .filter(video => `${video.slug}.mp4` !== video.path)
+    .slice(0, limit)
+
   return (
     <Client
-      video={{ noBookmarks, noStars, slugMissmatch: [], unusedStar: [] }}
+      video={{ noBookmarks, noStars, slugMissmatch, unusedStar: [] }}
       stars={{ noImage: noStarImage }}
       bookmarks={{ noStar: noBookmarkStar }}
     />

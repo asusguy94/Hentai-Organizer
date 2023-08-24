@@ -13,7 +13,6 @@ export default {
   player: {
     thumbnails: getValue('PLAYER_THUMBNAILS', 'false') === 'true',
     quality: {
-      min: parseInt(getValue('PLAYER_QUALITY_MIN', '360')),
       max: parseInt(getValue('PLAYER_QUALITY_MAX', '1080'))
     }
   },

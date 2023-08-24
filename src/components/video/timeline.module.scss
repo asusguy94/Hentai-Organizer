@@ -1,5 +1,3 @@
-@import '@styles/variables';
-
 #timeline {
   position: relative;
   margin-left: 95px;
@@ -24,7 +22,7 @@
       }
 
       img {
-        width: $starWidth + px;
+        width: var(--starWidth);
       }
     }
   }

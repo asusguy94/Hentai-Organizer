@@ -22,7 +22,7 @@ import capitalize from 'capitalize'
 import { serverConfig } from '@config'
 import { General } from '@interfaces'
 
-import styles from './editor.module.scss'
+import styles from './editor.module.css'
 
 type UpdateRef = {
   id: number
@@ -38,9 +38,9 @@ type WithOnlyType = General & { videoOnly?: boolean; starOnly?: boolean }
 export default function EditorPage() {
   return (
     <Grid container justifyContent='center'>
-      <Wrapper name='attribute' obj={['starOnly', 'videoOnly']} />
-      <Wrapper name='category' />
-      <Wrapper name='outfit' />
+      <Wrapper name='Attribute' obj={['starOnly', 'videoOnly']} />
+      <Wrapper name='Category' />
+      <Wrapper name='Outfit' />
     </Grid>
   )
 }
@@ -59,7 +59,7 @@ function Wrapper({ name, obj = [] }: WrapperProps) {
     e.preventDefault()
 
     if (input.length > 0 && input.toLowerCase() !== input) {
-      axios.post(`${serverConfig.api}/${name}`, { name: input }).then(() => {
+      axios.post(`${serverConfig.api}/${name.toLowerCase()}`, { name: input }).then(() => {
         location.reload()
       })
     }
@@ -77,12 +77,12 @@ function Wrapper({ name, obj = [] }: WrapperProps) {
           />
 
           <Button type='submit' variant='contained' color='primary' size='small' style={{ marginTop: 2 }}>
-            Add {capitalize(name)}
+            Add {name}
           </Button>
         </Grid>
       </Grid>
 
-      <Table name={name} obj={obj} />
+      <Table name={name.toLowerCase()} obj={obj} />
     </Grid>
   )
 }

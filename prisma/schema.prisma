@@ -101,6 +101,9 @@ model Star {
   bookmarks  Bookmark[]
   videos     VideoStars[]
 
+  @@index([haircolor])
+  @@index([hairstyle])
+  @@index([breast])
   @@map("star")
 }
 
@@ -137,5 +140,9 @@ model Video {
   stars     VideoStars[]
   plays     Plays[]
 
+  @@index([franchise])
+  @@index([brand])
+  @@index([noStar])
+  @@index([height, duration])
   @@map("video")
 }

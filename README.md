@@ -18,15 +18,13 @@ Any setting ending with `*` is required
 
 ### List of settings
 
-| Keyword                       | Description                                                                                        |
-| ----------------------------- | -------------------------------------------------------------------------------------------------- |
-| DATABASE_URL\*                | The database URL for your chosen database                                                          |
-| NEXT_PUBLIC_DB_ADMIN          | The url for the DB-link in the navbar _(default=`/db`)_                                            |
-| NEXT_PUBLIC_TIMELINE_OFFSET   | The left offset of the timeline (default=`1`)                                                      |
-| NEXT_PUBLIC_TIMELINE_SPACING  | The max allowed horizontal spacing between bookmarks (default=`0`)                                 |
-| NEXT_PUBLIC_PLAYER_THUMBNAILS | Weather generated thumbnails should be used (default=`false`)                                      |
-| PORT\*                        | _Only required for docker._ The port used for the application (default=`3000`)                     |
-| PATH\*                        | _Only docker._ The path to map to `app/media` (this directory should contain a `videos`-directory) |
+| Keyword                        | Description                                                                                        |
+| ------------------------------ | -------------------------------------------------------------------------------------------------- |
+| DATABASE_URL\*                 | The database URL for your chosen database                                                          |
+| NEXT_PUBLIC_PLAYER_QUALITY_MAX | The max quality to use (default=`1080`)                                                            |
+| NEXT_PUBLIC_PLAYER_THUMBNAILS  | Weather generated thumbnails should be used (default=`false`)                                      |
+| PORT\*                         | _Only required for docker._ The port used for the application (default=`3000`)                     |
+| PATH\*                         | _Only docker._ The path to map to `app/media` (this directory should contain a `videos`-directory) |
 
 ### With Docker
 
@@ -38,10 +36,10 @@ The following workaround is only required for settings that starts with `NEXT_PU
 While I work on a solution, you can open the devtools (on one of the pages of the running app) in your browser and go to `console`, and then write the following command
 
 ```js
-localStorage['NEXT_PUBLIC_TIMELINE_OFFSET'] = '4'
+localStorage['NEXT_PUBLIC_QUALITY_MAX'] = '720'
 ```
 
-This will set the variable `NEXT_PUBLIC_TIMELINE_OFFSET` to `4`
+This will set the variable `NEXT_PUBLIC_QUALITY_MAX` to `720`
 
 #### Other Variables
 

@@ -16,7 +16,7 @@ export type EventData = {
   attributes: unknown[]
 }
 
-function useStarEvent() {
+export default function useStarEvent() {
   const starEventData = {
     id: 0,
     name: '',
@@ -31,11 +31,9 @@ function useStarEvent() {
     data: starEventData
   })
 
-  function handleAddStarEvent(event: boolean, data: EventData = starEvent.data) {
+  const handleAddStarEvent = (event: boolean, data: EventData = starEvent.data) => {
     setStarEvent({ event, data })
   }
 
   return { setEvent: handleAddStarEvent, getEvent: starEvent, getDefault: starEventData }
 }
-
-export default useStarEvent

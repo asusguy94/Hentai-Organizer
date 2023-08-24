@@ -33,12 +33,10 @@
         background-color: lightgray;
       }
 
-      .thumbnail {
+      .thumbnail img {
         // why is this needed?
-        img {
           margin-bottom: -7px; // 10-3
         }
-      }
 
       .title {
         padding: 12px;

@@ -59,14 +59,26 @@ type RegularItemProps<T> = {
   item?: T
   callback: (result: RegularHandlerProps, item: T) => void
   defaultChecked?: boolean
+  disabled?: boolean
+  softDisabled?: boolean
 }
-export function RegularItem<T>({ label, value, item, callback, defaultChecked = false }: RegularItemProps<T>) {
+export function RegularItem<T>({
+  label,
+  value,
+  item,
+  callback,
+  defaultChecked = false,
+  disabled = false,
+  softDisabled = false
+}: RegularItemProps<T>) {
   const [checked, setChecked] = useState(defaultChecked)
 
   return (
     <FormControlLabel
       label={label}
       value={value}
+      disabled={disabled}
+      style={softDisabled ? { opacity: 0.5 } : {}}
       control={
         <Checkbox
           checked={checked}

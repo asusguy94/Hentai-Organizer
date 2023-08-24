@@ -4,7 +4,7 @@ import UserAgent from 'fake-useragent'
 
 const BASE_URL = 'https://hanime.tv/api/v8'
 
-const jsongen = async <T>(url: string): Promise<T> => {
+async function jsongen<T>(url: string): Promise<T> {
   try {
     const headers = {
       'X-Signature-Version': 'web2',
@@ -22,6 +22,7 @@ const jsongen = async <T>(url: string): Promise<T> => {
 export async function getVideo(slug: string) {
   type Hentai = {
     hentai_video: {
+      id: number
       name: string
       brand: string
       released_at: string
@@ -44,14 +45,19 @@ export async function getVideo(slug: string) {
   const videoDataUrl = `${BASE_URL}/video?id=${slug}`
   const videoData = await jsongen<Hentai>(videoDataUrl)
 
+  const franchise = videoData.hentai_franchise_hentai_videos
+    .find(video => video.id === videoData.hentai_video.id)
+    ?.name.replace(/ \d+$/, '')
+
   const videoName = videoData.hentai_video.name
   const jsondata = {
+    raw: videoData,
     name: videoName,
     brand: videoData.hentai_video.brand,
     released: { date: videoData.hentai_video.released_at, unix: videoData.hentai_video.released_at_unix },
     poster: videoData.hentai_video.poster_url,
     cover: videoData.hentai_video.cover_url,
-    franchise: videoData.hentai_franchise.title,
+    franchise: franchise ?? videoData.hentai_franchise.title,
     related: videoData.hentai_franchise_hentai_videos
       .filter(video => video.name !== videoName) // filter out the current video
       .map(({ slug, cover_url: cover, poster_url: poster }) => ({ slug, cover, poster }))

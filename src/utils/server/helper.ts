@@ -132,10 +132,11 @@ export function formatDate(dateStr: string | Date, raw = false) {
   return raw ? date.format('YYYY-MM-DD') : date.format('D MMMM YYYY')
 }
 
-const calculateTime = (secs: number) =>
-  dayjs(0)
+function calculateTime(secs: number) {
+  return dayjs(0)
     .hour(0)
     .millisecond(secs * 1000)
+}
 
 export async function generateVTTData(
   videoID: number,
@@ -146,7 +147,7 @@ export async function generateVTTData(
   const vtt = `./media/vtt/${videoID}.vtt`
 
   let nextTimeCode = 0
-  function generateTimeCodes() {
+  const generateTimeCodes = () => {
     const timeCodeFormat = 'HH:mm:ss.SSS'
 
     const start = calculateTime(nextTimeCode)

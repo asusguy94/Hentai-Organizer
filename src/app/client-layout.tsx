@@ -6,7 +6,7 @@ import { Container, CssBaseline } from '@mui/material'
 
 import NavBar from '@components/navbar'
 
-import '@styles/globals.scss'
+import '@styles/globals.css'
 import 'plyr/dist/plyr.css'
 
 const roboto = Roboto({

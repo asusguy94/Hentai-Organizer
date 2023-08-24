@@ -20,7 +20,7 @@ export async function POST(req: Request) {
     await req.json()
   )
 
-  const insertHandler = async (bookmarkId: number, attributeId: number) => {
+  async function insertHandler(bookmarkId: number, attributeId: number) {
     return await prisma.bookmarkAttributes.upsert({
       where: {
         attributeID_bookmarkID: {

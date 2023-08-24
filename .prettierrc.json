@@ -17,5 +17,6 @@
     "^(@utils|@interfaces|@config|@service|@hooks)",
     ".(css|scss)$"
   ],
-  "importOrderSeparation": true
+  "importOrderSeparation": true,
+  "plugins": ["@trivago/prettier-plugin-sort-imports"]
 }

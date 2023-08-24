@@ -1,12 +1,6 @@
-@import '@styles/variables';
-
 #sidebar {
   h2 {
     margin-bottom: 0;
-  }
-
-  .global {
-    text-decoration: underline;
   }
 }
 
@@ -18,9 +12,10 @@
   .video {
     margin: 5px;
 
-    width: $thumbnailWidth + px;
+    min-width: 210px;
+    width: min-content;
     img {
-      height: $thumbnailHeight + px;
+      height: auto;
     }
 
     .title {

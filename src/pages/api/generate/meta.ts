@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next/types'
 
-import { rebuildVideoFile, getDuration as videoDuration, getHeight as videoHeight } from '@utils/server/ffmpeg'
+import { rebuildVideoFile, getDuration, getHeight } from '@utils/server/ffmpeg'
 import { fileExists, getClosestQ, logger } from '@utils/server/helper'
 import prisma from '@utils/server/prisma'
 
@@ -17,8 +17,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       if (await fileExists(absoluteVideoPath)) {
         logger(`Rebuilding: ${video.id}`)
         await rebuildVideoFile(absoluteVideoPath).then(async () => {
-          const height = await videoHeight(absoluteVideoPath)
-          const duration = await videoDuration(absoluteVideoPath)
+          const height = await getHeight(absoluteVideoPath)
+          const duration = await getDuration(absoluteVideoPath)
 
           logger(`Refreshing ${video.path}`)
           await prisma.video.update({

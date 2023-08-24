@@ -16,6 +16,7 @@
     // Common eslint
     "import/no-anonymous-default-export": "off",
     "eqeqeq": "warn",
+    "no-duplicate-imports": "warn",
 
     // Typescript Eslint
     "@typescript-eslint/no-unsafe-return": "off",

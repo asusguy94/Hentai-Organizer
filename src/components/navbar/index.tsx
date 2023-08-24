@@ -1,13 +1,11 @@
 import Link from '../link'
 
-import { serverConfig } from '@config'
-
 import styles from './navbar.module.scss'
 
 export default function NavBar() {
   return (
     <nav id={styles.navbar}>
-      <ul id={styles.main}>
+      <ul>
         <NavBarItem name='Home' path='/' />
 
         <NavBarItem name='Video Search' path='/video/search'>
@@ -15,11 +13,12 @@ export default function NavBar() {
         </NavBarItem>
 
         <NavBarItem name='Star Search' path='/star/search' />
+      </ul>
 
-        <NavBarItem name='DB' path={serverConfig.db} />
-        <NavBarItem name='Import Videos' path='/video/add' />
-        <NavBarItem name='DB Editor' path='/editor' />
+      <ul>
         <NavBarItem name='Settings' path='/settings' />
+        <NavBarItem name='DB Editor' path='/editor' />
+        <NavBarItem name='Import Videos' path='/video/add' />
       </ul>
     </nav>
   )

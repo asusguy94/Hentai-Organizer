@@ -4,7 +4,7 @@ import { RefObject, useEffect, useRef, useState } from 'react'
 import { Button, TextField } from '@mui/material'
 
 import Hls, { HlsConfig, HlsListeners } from 'hls.js'
-import { ContextMenu, ContextMenuTrigger, ContextMenuItem as MenuItem } from 'rctx-contextmenu'
+import { ContextMenu, ContextMenuTrigger, ContextMenuItem } from 'rctx-contextmenu'
 import { useKey } from 'react-use'
 import { useSessionStorage } from 'usehooks-ts'
 
@@ -276,7 +276,7 @@ export default function VideoPlayer({
       <ContextMenuTrigger id='video'>
         <Plyr
           playerRef={playerRef}
-          plyrRef={plyrRef as React.MutableRefObject<Plyr>}
+          plyrRef={plyrRef}
           source={`${serverConfig.api}/video/${video.id}/file`}
           thumbnail={`${serverConfig.api}/video/${video.id}/vtt`}
           poster={`${serverConfig.api}/video/${video.id}/poster`}
@@ -285,7 +285,7 @@ export default function VideoPlayer({
 
       <ContextMenu id='video'>
         <IconWithText
-          component={MenuItem}
+          component={ContextMenuItem}
           icon='add'
           text='Add Bookmark'
           disabled={video.noStar}
@@ -311,16 +311,16 @@ export default function VideoPlayer({
         />
 
         <IconWithText
-          component={MenuItem}
+          component={ContextMenuItem}
           icon={video.censored ? 'check-circle' : 'warn-cirlce'}
           text={video.censored ? 'UnCensor' : 'Censor'}
           onClick={censorToggle}
         />
 
-        <IconWithText component={MenuItem} icon='delete' text='Remove Plays' onClick={resetPlays} />
+        <IconWithText component={ContextMenuItem} icon='delete' text='Remove Plays' onClick={resetPlays} />
 
         <IconWithText
-          component={MenuItem}
+          component={ContextMenuItem}
           icon='edit'
           text='Rename Video'
           onClick={() => {
@@ -345,14 +345,14 @@ export default function VideoPlayer({
 
         <hr />
 
-        <IconWithText component={MenuItem} icon='copy' text='Copy Filename' onClick={copy} />
+        <IconWithText component={ContextMenuItem} icon='copy' text='Copy Filename' onClick={copy} />
 
         <hr />
 
-        <IconWithText component={MenuItem} icon='edit' text='Set Cover' onClick={setCover} />
-        <IconWithText component={MenuItem} icon='edit' text='Set Poster' onClick={setPoster} />
+        <IconWithText component={ContextMenuItem} icon='edit' text='Set Cover' onClick={setCover} />
+        <IconWithText component={ContextMenuItem} icon='edit' text='Set Poster' onClick={setPoster} />
         <IconWithText
-          component={MenuItem}
+          component={ContextMenuItem}
           icon='edit'
           text='Set Cover & Poster'
           onClick={() => {
@@ -361,12 +361,12 @@ export default function VideoPlayer({
           }}
         />
 
-        <IconWithText component={MenuItem} icon='edit' text='Update Video' onClick={updateVideo} />
+        <IconWithText component={ContextMenuItem} icon='edit' text='Update Video' onClick={updateVideo} />
 
         <hr />
 
         <IconWithText
-          component={MenuItem}
+          component={ContextMenuItem}
           icon='delete'
           text='Delete Video'
           disabled={stars.length !== 0}

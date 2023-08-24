@@ -1,8 +1,7 @@
 import { useQuery } from 'react-query'
 
-import { StarSearch, VideoSearch } from '@components/search/helper'
-
 import { createApi } from '@config'
+import { StarSearch, VideoSearch } from '@interfaces'
 
 const { baseURL } = createApi('/search')
 

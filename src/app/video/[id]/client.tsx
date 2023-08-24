@@ -329,6 +329,7 @@ function Stars({
         return bookmarkTime(a) - bookmarkTime(b)
       })
     )
+    //TODO stars can probably be included in the dep-array
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bookmarks])
 

@@ -1,3 +1,5 @@
+// TODO cannot be converted to .css, img,&:hover are not avaliable as modules
+
 #sidebar {
   #stars {
     margin-bottom: 3%;
@@ -35,8 +37,8 @@
 
       .thumbnail img {
         // why is this needed?
-          margin-bottom: -7px; // 10-3
-        }
+        margin-bottom: -7px; // 10-3
+      }
 
       .title {
         padding: 12px;

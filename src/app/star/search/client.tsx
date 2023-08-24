@@ -1,68 +1,41 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef } from 'react'
 
-import {
-  Grid,
-  Card,
-  CardActionArea,
-  Typography,
-  TextField,
-  FormControl,
-  RadioGroup,
-  FormControlLabel,
-  Radio
-} from '@mui/material'
+import { Grid, TextField, FormControl, RadioGroup } from '@mui/material'
 
-import capitalize from 'capitalize'
 import ScrollToTop from 'react-scroll-to-top'
 
-import { ImageCard } from '@components/image'
-import { RegularHandlerProps, RegularItem } from '@components/indeterminate'
-import Link from '@components/link'
-import { StarSearch as Star, HiddenStar as Hidden, getVisible } from '@components/search/helper'
-import SortObj, { SortTypeStar as StarSort, SortMethodStar, getStarSort } from '@components/search/sort'
-import Spinner from '@components/spinner'
-import VGrid from '@components/virtualized/virtuoso'
+import { RegularHandlerProps } from '@components/indeterminate'
+import { FilterCheckbox, FilterRadio } from '@components/search/filter'
+import { SortObjStar as SortObj, defaultStarObj as defaultObj } from '@components/search/sort'
 
-import { serverConfig } from '@config'
-import { SetState } from '@interfaces'
-import { searchService } from '@service'
+import Stars from './stars'
+
+import { useAllSearchParams, useDynamicSearchParam, useSearchParam } from '@hooks/search'
 
 import styles from './search.module.scss'
 
-type StarData = Partial<{
+type StarData = {
   breasts: string[]
   haircolors: string[]
   hairstyles: string[]
   attributes: string[]
-}>
+}
 
-export default function StarSearchPage({ attributes, breasts, haircolors, hairstyles }: Required<StarData>) {
-  const [sort, setSort] = useState<StarSort>({ type: 'alphabetically', reverse: false })
-  const [hidden, setHidden] = useState<Hidden>({
-    titleSearch: '',
-    breast: '',
-    haircolor: '',
-    hairstyle: '',
-    attribute: []
-  })
+type StarSearchProps = {
+  starData: StarData
+}
 
+export default function StarSearchPage({ starData }: StarSearchProps) {
   return (
     <Grid container>
       <Grid item xs={2} id={styles.sidebar}>
-        <Sidebar
-          attributes={attributes}
-          breasts={breasts}
-          haircolors={haircolors}
-          hairstyles={hairstyles}
-          setHidden={setHidden}
-          setSort={setSort}
-        />
+        <Sidebar starData={starData} />
       </Grid>
 
       <Grid item xs={10}>
-        <Stars hidden={hidden} sortMethod={getStarSort(sort)} />
+        <Stars />
       </Grid>
 
       <ScrollToTop smooth />
@@ -71,97 +44,89 @@ export default function StarSearchPage({ attributes, breasts, haircolors, hairst
 }
 
 type SidebarProps = {
-  attributes: string[]
-  breasts: string[]
-  haircolors: string[]
-  hairstyles: string[]
-  setHidden: SetState<Hidden>
-  setSort: SetState<StarSort>
+  starData: StarData
 }
-function Sidebar({ attributes, breasts, haircolors, hairstyles, setHidden, setSort }: SidebarProps) {
+function Sidebar({ starData }: SidebarProps) {
   return (
     <>
-      <TitleSearch setHidden={setHidden} />
-
-      <Sort setSort={setSort} />
-
-      <Filter starData={{ breasts, haircolors, hairstyles, attributes }} setHidden={setHidden} />
+      <TitleSearch />
+      <Sort />
+      <Filter starData={starData} />
     </>
   )
 }
 
-type StarsProps = {
-  hidden: Hidden
-  sortMethod: SortMethodStar
-}
-function Stars({ hidden, sortMethod }: StarsProps) {
-  const { data: stars } = searchService.useStars()
+function TitleSearch() {
+  const { setParam, update } = useDynamicSearchParam(defaultObj)
+  const { currentValue } = useSearchParam(defaultObj, 'query')
 
-  if (stars === undefined) return <Spinner />
+  const ref = useRef<HTMLInputElement>(null)
 
-  const visible = getVisible(stars.sort(sortMethod), hidden)
+  useEffect(() => {
+    if (ref.current !== null) {
+      ref.current.value = currentValue
+      ref.current.focus()
+    }
+  }, [currentValue])
 
-  return (
-    <div id={styles.stars}>
-      <Typography variant='h6' className='text-center'>
-        <span id={styles.count}>{visible.length}</span> Stars
-      </Typography>
+  const callback = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setParam('query', e.currentTarget.value)
+    update()
+  }
 
-      <VGrid itemHeight={333} total={visible.length} renderData={idx => <StarCard star={visible[idx]} />} />
-    </div>
-  )
-}
-
-type StarCardProps = {
-  star?: Star
-}
-function StarCard({ star }: StarCardProps) {
-  if (star === undefined) return null //FIXME cleanup is not working correctly
-
-  return (
-    <Link href={`/star/${star.id}`}>
-      <Card className={styles.star}>
-        <CardActionArea>
-          <ImageCard
-            src={`${serverConfig.api}/star/${star.id}/image`}
-            width={200}
-            height={275}
-            missing={star.image === null}
-            scale={5}
-            alt={star.name}
-          />
-
-          <Grid container justifyContent='center' className={styles.title}>
-            <Typography className='text-center'>{star.name}</Typography>
-          </Grid>
-        </CardActionArea>
-      </Card>
-    </Link>
-  )
+  return <TextField inputRef={ref} variant='standard' placeholder='Name' onChange={callback} />
 }
 
-type SortProps = {
-  setSort: SetState<StarSort>
-}
-function Sort({ setSort }: SortProps) {
-  const title = (reverse = false) => setSort({ type: 'alphabetically', reverse })
-  const date = (reverse = false) => setSort({ type: 'added', reverse })
-  const activity = (reverse = false) => setSort({ type: 'videos', reverse: !reverse })
-  const lastActivity = (reverse = false) => setSort({ type: 'activity', reverse })
+function Sort() {
+  const { setParam, update } = useDynamicSearchParam(defaultObj)
+  const { sort, reverseSort } = useAllSearchParams(defaultObj)
+
+  const sortAlphabetical = (reverse = false) => {
+    setParam('sort', 'alphabetical')
+    setParam('reverseSort', Number(reverse).toString())
+    update()
+  }
+
+  const sortAdded = (reverse = false) => {
+    setParam('sort', 'added')
+    setParam('reverseSort', Number(reverse).toString())
+    update()
+  }
+
+  const sortActivity = (reverse = false) => {
+    setParam('sort', 'videos')
+    setParam('reverseSort', Number(reverse).toString())
+    update()
+  }
+
+  const sortLastActivity = (reverse = false) => {
+    setParam('sort', 'activity')
+    setParam('reverseSort', Number(reverse).toString())
+    update()
+  }
 
   return (
     <>
       <h2>Sort</h2>
 
       <FormControl>
-        <RadioGroup name='sort' defaultValue='alphabetically'>
-          <SortObj id='alphabetically' label={{ asc: 'A-Z', desc: 'Z-A' }} callback={title} />
-          <SortObj id='added' label={{ asc: 'Oldest', desc: 'Newest' }} callback={date} reversed />
-          <SortObj id='videos' label={{ asc: 'Least Active', desc: 'Most Active' }} callback={activity} reversed />
+        <RadioGroup
+          name='sort'
+          defaultValue={
+            sort !== defaultObj.sort
+              ? reverseSort !== defaultObj.reverseSort
+                ? `${sort}_desc`
+                : sort
+              : defaultObj.sort
+          }
+        >
+          <SortObj id={defaultObj.sort} label={{ asc: 'A-Z', desc: 'Z-A' }} callback={sortAlphabetical} />
+          <SortObj id='added' label={{ asc: 'Oldest', desc: 'Newest' }} callback={sortAdded} reversed />
+          <SortObj id='videos' label={{ asc: 'Least Active', desc: 'Most Active' }} callback={sortActivity} reversed />
           <SortObj
             id='activity'
             label={{ asc: 'Oldest Activity', desc: 'Newest Activity' }}
-            callback={lastActivity}
+            callback={sortLastActivity}
             reversed
           />
         </RadioGroup>
@@ -172,125 +137,95 @@ function Sort({ setSort }: SortProps) {
 
 type FilterProps = {
   starData: StarData
-  setHidden: SetState<Hidden>
 }
-function Filter({ starData, setHidden }: FilterProps) {
+function Filter({ starData: { attributes, breasts, haircolors, hairstyles } }: FilterProps) {
+  const { setParam, update } = useDynamicSearchParam(defaultObj)
+  const { attribute: attributeParam } = useAllSearchParams(defaultObj)
+
   const breast = (target: string) => {
-    setHidden(prev => ({ ...prev, breast: target.toLowerCase() }))
+    if (target === defaultObj.breast) {
+      setParam('breast', defaultObj.breast)
+    } else {
+      setParam('breast', target)
+    }
+    update()
   }
 
   const haircolor = (target: string) => {
-    setHidden(prev => ({ ...prev, haircolor: target.toLowerCase() }))
+    if (target === defaultObj.haircolor) {
+      setParam('haircolor', defaultObj.haircolor)
+    } else {
+      setParam('haircolor', target)
+    }
+    update()
   }
 
   const hairstyle = (target: string) => {
-    setHidden(prev => ({ ...prev, hairstyle: target.toLowerCase() }))
+    if (target === defaultObj.hairstyle) {
+      setParam('hairstyle', defaultObj.hairstyle)
+    } else {
+      setParam('hairstyle', target)
+    }
+    update()
   }
 
-  const attribute = (ref: RegularHandlerProps, target: string | undefined) => {
-    if (target === undefined) throw new Error('target is undefined')
-
-    const targetLower = target.toLowerCase()
-
-    if (!ref.checked) {
-      setHidden(prev => ({ ...prev, attribute: prev.attribute.filter(attribute => attribute !== targetLower) }))
+  const attribute = (ref: RegularHandlerProps, target: string) => {
+    if (attributeParam === defaultObj.attribute) {
+      setParam('attribute', target)
     } else {
-      setHidden(prev => ({ ...prev, attribute: [...prev.attribute, targetLower] }))
+      const urlParam = attributeParam.split(',')
+
+      if (!ref.checked) {
+        const filtered = urlParam.filter(attribute => attribute !== target)
+        setParam('attribute', filtered.toString())
+      } else {
+        const merged = [...urlParam, target]
+        setParam('attribute', merged.toString())
+      }
     }
+    update()
   }
 
   const breast_ALL = () => {
-    setHidden(prev => ({ ...prev, breast: '' }))
+    setParam('breast', defaultObj.breast)
+    update()
   }
 
   const haircolor_ALL = () => {
-    setHidden(prev => ({ ...prev, haircolor: '' }))
+    setParam('haircolor', defaultObj.haircolor)
+    update()
   }
 
   const hairstyle_ALL = () => {
-    setHidden(prev => ({ ...prev, hairstyle: '' }))
+    setParam('hairstyle', defaultObj.hairstyle)
+    update()
   }
 
   return (
     <>
-      <FilterRadio data={starData.breasts} label='breast' callback={breast} globalCallback={breast_ALL} />
-      <FilterRadio data={starData.haircolors} label='haircolor' callback={haircolor} globalCallback={haircolor_ALL} />
-      <FilterRadio data={starData.hairstyles} label='hairstyle' callback={hairstyle} globalCallback={hairstyle_ALL} />
+      <FilterRadio
+        data={breasts}
+        label='breast'
+        callback={breast}
+        globalCallback={breast_ALL}
+        defaultObj={defaultObj}
+      />
+      <FilterRadio
+        data={haircolors}
+        label='haircolor'
+        callback={haircolor}
+        globalCallback={haircolor_ALL}
+        defaultObj={defaultObj}
+      />
+      <FilterRadio
+        data={hairstyles}
+        label='hairstyle'
+        callback={hairstyle}
+        globalCallback={hairstyle_ALL}
+        defaultObj={defaultObj}
+      />
 
-      <FilterCheckBox data={starData.attributes} label='attribute' callback={attribute} />
-    </>
-  )
-}
-
-type TitleSearchProps = {
-  setHidden: SetState<Hidden>
-}
-function TitleSearch({ setHidden }: TitleSearchProps) {
-  const callback = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const searchValue = e.currentTarget.value.toLowerCase()
-
-    setHidden(prev => ({ ...prev, titleSearch: searchValue }))
-  }
-
-  return <TextField variant='standard' autoFocus placeholder='Name' onChange={callback} />
-}
-
-type FilterRadioProps = {
-  data?: string[]
-  label: string
-  callback: (item: string) => void
-  globalCallback?: () => void
-}
-function FilterRadio({ data, label, callback, globalCallback }: FilterRadioProps) {
-  if (data === undefined) return <Spinner />
-
-  return (
-    <>
-      <h2>{capitalize(label, true)}</h2>
-
-      <FormControl>
-        <RadioGroup name={label} defaultValue='ALL'>
-          {globalCallback !== undefined && (
-            <FormControlLabel
-              value='ALL'
-              label={<div className={styles.global}>ALL</div>}
-              onChange={globalCallback}
-              control={<Radio />}
-            />
-          )}
-
-          {data.map(item => (
-            <FormControlLabel
-              key={item}
-              value={item}
-              onChange={() => callback(item)}
-              label={item}
-              control={<Radio />}
-            />
-          ))}
-        </RadioGroup>
-      </FormControl>
-    </>
-  )
-}
-
-type FilterCheckBoxProps = {
-  data?: string[]
-  label: string
-  callback: (ref: RegularHandlerProps, item: string | undefined) => void
-}
-function FilterCheckBox({ data, label, callback }: FilterCheckBoxProps) {
-  if (data === undefined) return <Spinner />
-
-  return (
-    <>
-      <h2>{capitalize(label, true)}</h2>
-
-      <FormControl>
-        {data.map(item => (
-          <RegularItem key={item} label={item} value={item} item={item} callback={callback} />
-        ))}
-      </FormControl>
+      <FilterCheckbox data={attributes} label='attribute' callback={attribute} defaultObj={defaultObj} />
     </>
   )
 }

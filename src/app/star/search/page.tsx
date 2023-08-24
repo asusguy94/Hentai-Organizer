@@ -13,10 +13,12 @@ export default async function StarSearchPage() {
 
   return (
     <Client
-      breasts={getUnique(breasts.flatMap(({ breast }) => (breast !== null ? [breast] : [])))}
-      haircolors={getUnique(haircolors.flatMap(({ haircolor }) => (haircolor !== null ? [haircolor] : [])))}
-      hairstyles={getUnique(hairstyles.flatMap(({ hairstyle }) => (hairstyle !== null ? [hairstyle] : [])))}
-      attributes={getUnique(attributes.map(({ name: attribute }) => attribute))}
+      starData={{
+        breasts: getUnique(breasts.flatMap(({ breast }) => (breast !== null ? [breast] : []))),
+        haircolors: getUnique(haircolors.flatMap(({ haircolor }) => (haircolor !== null ? [haircolor] : []))),
+        hairstyles: getUnique(hairstyles.flatMap(({ hairstyle }) => (hairstyle !== null ? [hairstyle] : []))),
+        attributes: getUnique(attributes.map(({ name: attribute }) => attribute))
+      }}
     />
   )
 }

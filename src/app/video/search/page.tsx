@@ -19,10 +19,12 @@ export default async function VideoSearchPage() {
 
   return (
     <Client
-      categories={categories}
-      attributes={attributes}
+      videoInfo={{
+        categories,
+        attributes,
+        outfits
+      }}
       brands={brands.flatMap(({ brand }) => (brand !== null ? [brand] : []))}
-      outfits={outfits}
     />
   )
 }

@@ -72,3 +72,35 @@ export type Validity = {
   title: boolean
   fname: boolean
 }
+
+export type StarSearch = {
+  id: number
+  name: string
+  image: string | null
+  breast: string | null
+  haircolor: string | null
+  hairstyle: string | null
+  attributes: string[]
+  videos: {
+    total: number
+    last: string | null
+  }
+}
+
+export type VideoSearch = {
+  id: number
+  name: string
+  franchise: string
+  brand: string | null
+  noStar: boolean
+  cen: boolean
+  cover: string | null
+  slug: string | null
+  poster: string | null
+  published: string | null
+  quality: number
+  plays: number
+  attributes: string[]
+  categories: string[]
+  outfits: string[]
+}

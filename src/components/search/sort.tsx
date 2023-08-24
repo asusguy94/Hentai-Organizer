@@ -1,17 +1,17 @@
 import { FormControlLabel, Radio } from '@mui/material'
 
-import { StarSearch as Star, VideoSearch as Video } from './helper'
+import { StarSearch, VideoSearch } from '@interfaces'
 
-type SortObjProps = {
+type SortObjProps<T extends DefaultObj> = {
   label: {
     asc: string
     desc: string
   }
-  id: string
+  id: T['sort']
   callback: (reversed: boolean) => void
   reversed?: boolean
 }
-export default function SortObj({ id, label, callback, reversed = false }: SortObjProps) {
+function SortObj<T extends DefaultObj>({ id, label, callback, reversed = false }: SortObjProps<T>) {
   return (
     <>
       <FormControlLabel
@@ -22,7 +22,7 @@ export default function SortObj({ id, label, callback, reversed = false }: SortO
       />
       <FormControlLabel
         label={reversed ? label.asc : label.desc}
-        value={`${id}_reverse`}
+        value={`${id}_desc`}
         control={<Radio />}
         onChange={() => callback(!reversed)}
       />
@@ -30,17 +30,66 @@ export default function SortObj({ id, label, callback, reversed = false }: SortO
   )
 }
 
-type Sort<T extends string> = { type: T; reverse?: boolean }
+export function SortObjVideo(params: SortObjProps<DefaultVideoObj>) {
+  return <SortObj {...params} />
+}
 
-export type SortTypeVideo = Sort<'alphabetically' | 'added' | 'published' | 'plays' | 'quality' | 'shuffle'>
-export type SortTypeStar = Sort<'alphabetically' | 'added' | 'videos' | 'activity'>
-export type SortMethodVideo = (a: Video, b: Video) => number
-export type SortMethodStar = (a: Star, b: Star) => number
+export function SortObjStar(params: SortObjProps<DefaultStarObj>) {
+  return <SortObj {...params} />
+}
 
-export function getVideoSort(sort: SortTypeVideo): SortMethodVideo {
+type SortMethod<T> = (a: T, b: T) => number
+export type SortMethodVideo = SortMethod<VideoSearch>
+export type SortMethodStar = SortMethod<StarSearch>
+
+type DefaultVideoObj = {
+  category: string
+  nullCategory: '0' | '1'
+  attribute: string
+  outfit: string
+  network: string
+  query: string
+  sort: 'alphabetical' | 'added' | 'plays' | 'published' | 'quality'
+  reverseSort: '0' | '1'
+}
+
+type DefaultStarObj = {
+  breast: string
+  haircolor: string
+  hairstyle: string
+  attribute: string
+  query: string
+  sort: 'alphabetical' | 'added' | 'videos' | 'activity'
+  reverseSort: '0' | '1'
+}
+
+export const defaultVideoObj: DefaultVideoObj = {
+  category: '',
+  nullCategory: '0',
+  attribute: '',
+  outfit: '',
+  network: 'ALL',
+  query: '',
+  sort: 'alphabetical',
+  reverseSort: '0'
+}
+
+export const defaultStarObj: DefaultStarObj = {
+  breast: 'ALL',
+  haircolor: 'ALL',
+  hairstyle: 'ALL',
+  attribute: '',
+  query: '',
+  sort: 'alphabetical',
+  reverseSort: '0'
+}
+
+export type DefaultObj = typeof defaultVideoObj | typeof defaultStarObj
+
+export function getVideoSort(type: DefaultVideoObj['sort'], reverse = false): SortMethodVideo {
   let sortMethod: SortMethodVideo
 
-  switch (sort.type) {
+  switch (type) {
     case 'added':
       sortMethod = (a, b) => a.id - b.id
       break
@@ -59,25 +108,22 @@ export function getVideoSort(sort: SortTypeVideo): SortMethodVideo {
     case 'quality':
       sortMethod = (a, b) => a.quality - b.quality
       break
-    case 'shuffle':
-      sortMethod = () => Math.random() - 0.5
-      break
     default:
-      sortMethod = (a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase(), 'en')
+      sortMethod = (a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'case' })
   }
 
-  return sort.reverse ? (a, b) => sortMethod(b, a) : sortMethod
+  return reverse ? (a, b) => sortMethod(b, a) : sortMethod
 }
 
-export function getStarSort(sort: SortTypeStar): SortMethodStar {
+export function getStarSort(type: DefaultStarObj['sort'], reverse = false): SortMethodStar {
   let sortMethod: SortMethodStar
 
-  switch (sort.type) {
+  switch (type) {
     case 'added':
       sortMethod = (a, b) => a.id - b.id
       break
     case 'videos':
-      sortMethod = (a, b) => b.videos.total - a.videos.total
+      sortMethod = (a, b) => a.videos.total - b.videos.total
       break
     case 'activity':
       sortMethod = (a, b) => {
@@ -89,8 +135,8 @@ export function getStarSort(sort: SortTypeStar): SortMethodStar {
       }
       break
     default:
-      sortMethod = (a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase(), 'en')
+      sortMethod = (a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'case' })
   }
 
-  return sort.reverse ? (a, b) => sortMethod(b, a) : sortMethod
+  return reverse ? (a, b) => sortMethod(b, a) : sortMethod
 }

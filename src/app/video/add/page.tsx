@@ -8,7 +8,7 @@ import prisma from '@utils/server/prisma'
 
 export const dynamic = 'force-dynamic'
 
-const AddVideoPage = async () => {
+export default async function AddVideoPage() {
   const filesDB = await prisma.video.findMany()
   const filesArray = filesDB.map(video => video.path)
 

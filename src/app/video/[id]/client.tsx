@@ -55,7 +55,7 @@ export default function VideoPage({
   video: videoData,
   isValid
 }: VideoPageProps) {
-  const [video, setVideo] = useState<typeof videoData>() //FIXME cannot be set directly
+  const [video, setVideo] = useState<typeof videoData>() //THROWS ReferenceError: document is not defined (if set directly)
   const [stars, setStars] = useState(starData)
   const [bookmarks, setBookmarks] = useState(bookmarksData)
 
@@ -322,7 +322,7 @@ function Stars({
 
   useEffect(() => {
     update.stars(
-      [...stars].sort((a, b) => {
+      stars.toSorted((a, b) => {
         const bookmarkTime = (star: VideoStar) =>
           bookmarks.find(bookmark => bookmark.starID === star.id)?.start ?? Infinity
 

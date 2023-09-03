@@ -22,7 +22,7 @@ import styles from './search.module.scss'
 export default function Videos() {
   const { sort, query, category, outfit, attribute, network, nullCategory, reverseSort } =
     useAllSearchParams(defaultObj)
-  const { data: videos } = searchService.useVideos()
+  const { data: videos, isLoading } = searchService.useVideos()
 
   const localSettings = useSettings()
 
@@ -35,7 +35,7 @@ export default function Videos() {
     return videos.filter((_, idx) => idx < videoCount)
   }, [localSettings?.video_count, videos])
 
-  if (videos === undefined) return <Spinner />
+  if (isLoading || videos === undefined) return <Spinner />
 
   const visible = filtered
     .filter(v => !v.noStar)

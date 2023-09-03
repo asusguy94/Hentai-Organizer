@@ -15,9 +15,9 @@ import styles from './search.module.scss'
 
 export default function Stars() {
   const { breast, haircolor, hairstyle, attribute, query, sort, reverseSort } = useAllSearchParams(defaultObj)
-  const { data: stars } = searchService.useStars()
+  const { data: stars, isLoading } = searchService.useStars()
 
-  if (stars === undefined) return <Spinner />
+  if (isLoading || stars === undefined) return <Spinner />
 
   const visible = stars
     .sort(getSort(sort, reverseSort !== defaultObj.reverseSort))

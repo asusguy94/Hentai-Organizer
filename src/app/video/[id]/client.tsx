@@ -1,6 +1,6 @@
 'use client'
 
-import { Fragment, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import {
   Button,
@@ -277,7 +277,6 @@ function Sidebar({ video, stars, bookmarks, attributes, categories, update, onMo
       />
 
       <Attributes
-        video={video}
         bookmarks={bookmarks}
         clearActive={clearActive}
         update={update.bookmarks}
@@ -787,6 +786,7 @@ function Franchise({ video }: FranchiseProps) {
                 missing={v.image === null}
                 alt='video'
                 sizes={`${(((100 / 12) * 3) / 12) * 2}vw`}
+                style={{ display: 'flex' }}
               />
             </Grid>
 
@@ -801,13 +801,12 @@ function Franchise({ video }: FranchiseProps) {
 }
 
 type AttributesProps = {
-  video: Video
   bookmarks: Bookmark[]
   clearActive: () => void
   update: SetState<Bookmark[]>
   getAttributes: () => Attribute[]
 }
-function Attributes({ video, bookmarks, clearActive, update, getAttributes }: AttributesProps) {
+function Attributes({ bookmarks, clearActive, update, getAttributes }: AttributesProps) {
   const attribute_setActive = (attribute: Attribute) => {
     update(
       bookmarks.map(bookmark => {
@@ -820,43 +819,20 @@ function Attributes({ video, bookmarks, clearActive, update, getAttributes }: At
     )
   }
 
-  const removeAttribute = (attribute: Attribute) => {
-    videoService.removeAttribute(video.id, attribute.id).then(() => {
-      update(
-        bookmarks.map(bookmark => ({
-          ...bookmark,
-          attributes: bookmark.attributes.filter(attributeItem => attributeItem.id !== attribute.id)
-        }))
-      )
-    })
-  }
-
   return (
     <Grid container justifyContent='center' id={styles.attributes}>
       {getAttributes().map(attribute => (
-        <Fragment key={attribute.id}>
-          <ContextMenuTrigger id={`attribute-${attribute.id}`}>
-            <Button
-              size='small'
-              variant='outlined'
-              color='primary'
-              className={styles.attribute}
-              onMouseEnter={() => attribute_setActive(attribute)}
-              onMouseLeave={clearActive}
-            >
-              {attribute.name}
-            </Button>
-          </ContextMenuTrigger>
-
-          <ContextMenu id={`attribute-${attribute.id}`}>
-            <IconWithText
-              component={ContextMenuItem}
-              icon='delete'
-              text='Remove'
-              onClick={() => removeAttribute(attribute)}
-            />
-          </ContextMenu>
-        </Fragment>
+        <Button
+          key={attribute.id}
+          size='small'
+          variant='outlined'
+          color='primary'
+          className={styles.attribute}
+          onMouseEnter={() => attribute_setActive(attribute)}
+          onMouseLeave={clearActive}
+        >
+          {attribute.name}
+        </Button>
       ))}
     </Grid>
   )

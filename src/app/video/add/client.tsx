@@ -19,7 +19,7 @@ import {
 import { generateService, videoService } from '@service'
 
 type AddVideoProps = {
-  videos: { path: string; franchise: string; episode: number; name: string }[]
+  videos: { path: string; franchise: string; episode: number; name: string; slug: string }[]
 }
 export default function AddVideo({ videos }: AddVideoProps) {
   const router = useRouter()
@@ -42,6 +42,7 @@ export default function AddVideo({ videos }: AddVideoProps) {
                   <TableCell>episode</TableCell>
                   <TableCell>franchise</TableCell>
                   <TableCell>title</TableCell>
+                  <TableCell>slug</TableCell>
                   <TableCell>path</TableCell>
                 </TableRow>
               </TableHead>
@@ -52,6 +53,7 @@ export default function AddVideo({ videos }: AddVideoProps) {
                     <TableCell>{video.episode}</TableCell>
                     <TableCell>{video.franchise}</TableCell>
                     <TableCell>{video.name}</TableCell>
+                    <TableCell>{video.slug}</TableCell>
                     <TableCell>{video.path}</TableCell>
                   </TableRow>
                 ))}

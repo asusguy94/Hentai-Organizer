@@ -1,6 +1,6 @@
 import axios from 'axios'
-import crypto from 'crypto'
 import UserAgent from 'fake-useragent'
+import crypto from 'node:crypto'
 
 const BASE_URL = 'https://hanime.tv/api/v8'
 

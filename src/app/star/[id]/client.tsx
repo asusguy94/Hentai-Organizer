@@ -51,7 +51,7 @@ type Star = {
 
 type StarPageProps = { star: Star; videos: StarVideo[] }
 export default function StarPage({ videos, star: starData }: StarPageProps) {
-  const [star, setStar] = useState<typeof starData>() //FIXME cannot be set directly
+  const [star, setStar] = useState<typeof starData>() //THROWS ReferenceError: document is not defined (if set directly)
   const { modal, setModal } = useModal()
 
   useEffect(() => {
@@ -65,11 +65,8 @@ export default function StarPage({ videos, star: starData }: StarPageProps) {
       <Grid item xs={6}>
         <div id={styles.star}>
           <StarImageDropbox star={star} videos={videos} update={setStar} />
-
           <StarTitle star={star} onModal={setModal} update={setStar} />
-
           <StarForm star={star} update={setStar} />
-
           <StarVideos videos={videos} />
         </div>
 

@@ -1,9 +1,21 @@
-function getValue(label: string, defaultValue: string): string {
-  if (!label.startsWith('NEXT_PUBLIC_')) label = `NEXT_PUBLIC_${label}`
-
+function getValueWithType<T>(label: string, defaultValue: T): T {
   try {
-    return process.env[label] ?? localStorage[label] ?? defaultValue
-  } catch (e) {
+    const value = process.env[label] ?? localStorage.getItem(`NEXT_PUBLIC_${label}`)
+
+    if (value !== null) {
+      try {
+        // Always attempt JSON parsing first
+        return JSON.parse(value) as T
+      } catch {
+        // If it fails, treat the value as a raw string
+        if (typeof defaultValue === 'string') {
+          return value as T
+        }
+      }
+    }
+
+    return defaultValue
+  } catch {
     return defaultValue
   }
 }
@@ -11,10 +23,13 @@ function getValue(label: string, defaultValue: string): string {
 export default {
   qualities: [1080, 720, 480, 360],
   player: {
-    thumbnails: getValue('PLAYER_THUMBNAILS', 'false') === 'true',
+    thumbnails: getValueWithType<boolean>('PLAYER_THUMBNAILS', false),
     quality: {
-      max: parseInt(getValue('PLAYER_QUALITY_MAX', '1080'))
+      max: getValueWithType<number>('PLAYER_QUALITY_MAX', 1080)
     }
   },
-  debug: getValue('DEBUG', 'false') === 'true'
+  addFiles: {
+    maxFiles: getValueWithType<number>('ADD_FILES_MAX', 10)
+  },
+  debug: getValueWithType<boolean>('DEBUG', false)
 }

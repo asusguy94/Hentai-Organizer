@@ -9,9 +9,7 @@
   ],
   "plugins": ["@typescript-eslint", "react"],
   "parser": "@typescript-eslint/parser",
-  "parserOptions": {
-    "project": true
-  },
+  "parserOptions": { "project": true },
   "rules": {
     // Common eslint
     "import/no-anonymous-default-export": "off",

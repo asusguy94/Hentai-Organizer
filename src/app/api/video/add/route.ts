@@ -12,7 +12,8 @@ export async function POST(req: Request) {
           name: z.string(),
           path: z.string(),
           episode: z.number().int(),
-          franchise: z.string()
+          franchise: z.string(),
+          slug: z.string()
         })
       )
     }),
@@ -23,7 +24,13 @@ export async function POST(req: Request) {
   for await (const video of videos) {
     res.push(
       await prisma.video.create({
-        data: { name: video.name, path: video.path, episode: video.episode, franchise: video.franchise }
+        data: {
+          name: video.name,
+          path: video.path,
+          episode: video.episode,
+          franchise: video.franchise,
+          slug: video.slug
+        }
       })
     )
   }

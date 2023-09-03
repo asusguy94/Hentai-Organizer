@@ -213,11 +213,15 @@ function setCache(ageInSeconds: number, delay = 100) {
   return { 'Cache-Control': cacheArr.join(',') }
 }
 
-const errorResponse = new Response(null, { status: 404 })
+function errorResponse(statusCode: number) {
+  return new Response(null, { status: statusCode })
+}
+
+const missingFileError = errorResponse(404)
 
 export async function sendFile(path: string) {
   if (!(await fileExists(path))) {
-    return errorResponse
+    return missingFileError
   }
 
   return new Response(await fs.promises.readFile(path), {
@@ -229,7 +233,7 @@ export async function sendPartial(req: Request, path: string, mb = 2) {
   const chunkSize = 1024 * 1024 * mb
 
   if (!(await fileExists(path))) {
-    return errorResponse
+    return missingFileError
   }
 
   return new Promise<Response>((resolve, reject) => {

@@ -261,7 +261,7 @@ export default function VideoPlayer({
               name: category.name,
               start: time,
               starID: 0,
-              attributes: typeof data.attributes !== 'undefined' ? data.attributes : [],
+              attributes: data.attributes ?? [],
               active: false,
               outfit: null
             }

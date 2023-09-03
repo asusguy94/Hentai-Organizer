@@ -89,19 +89,17 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
   } else if (path !== undefined) {
     const video = await prisma.video.findFirstOrThrow({ where: { id } })
 
-    if (typeof path === 'string') {
-      fs.promises.rename(`./media/videos/${video.path}`, `./media/videos/${path}`)
-      fs.promises.rename(`./media/videos/${dirOnly(video.path)}`, `./media/videos/${dirOnly(path)}`)
-      //TODO the last one throws if the folder doesn't exist
+    fs.promises.rename(`./media/videos/${video.path}`, `./media/videos/${path}`)
+    fs.promises.rename(`./media/videos/${dirOnly(video.path)}`, `./media/videos/${dirOnly(path)}`)
+    //TODO the last one throws if the folder doesn't exist
 
-      // UPDATE DATABASE
-      return NextResponse.json(
-        await prisma.video.update({
-          where: { id },
-          data: { path }
-        })
-      )
-    }
+    // UPDATE DATABASE
+    return NextResponse.json(
+      await prisma.video.update({
+        where: { id },
+        data: { path }
+      })
+    )
   } else {
     // Refresh Video
     // Update Database

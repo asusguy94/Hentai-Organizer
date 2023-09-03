@@ -7,7 +7,6 @@ import { General, VideoStar } from '@interfaces'
 const { api, baseURL } = createApi('/video')
 
 export default {
-  // TODO handle defaultNumber=0 on the server
   addPlays: (id: number) => api.put(`/${id}`, { plays: 1 }),
   resetPlays: (id: number) => api.put(`/${id}`, { plays: 0 }),
   renameVideo: (id: number, path: string) => api.put(`/${id}`, { path }),

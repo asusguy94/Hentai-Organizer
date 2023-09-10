@@ -3,7 +3,7 @@ import { Fragment, useEffect, useRef, useState } from 'react'
 import { Button } from '@mui/material'
 
 import { ContextMenu, ContextMenuTrigger, ContextMenuItem } from 'rctx-contextmenu'
-import ReactTooltip from 'react-tooltip'
+import { Tooltip } from 'react-tooltip'
 import { useWindowSize } from 'react-use'
 
 import { defaultSettings, useSettings } from '../../app/settings/components'
@@ -269,12 +269,10 @@ export default function Timeline({
                 onClick={() => playVideo(bookmark.start)}
                 ref={(bookmark: HTMLButtonElement) => (bookmarksRef.current[idx] = bookmark)}
               >
-                <div data-tip={tooltip} data-for={`bookmark-info-${bookmark.id}`}>
-                  {bookmark.name}
-                </div>
+                <div data-tooltip-id={bookmark.id.toString()}>{bookmark.name}</div>
 
                 {tooltip && (
-                  <ReactTooltip id={`bookmark-info-${bookmark.id}`} effect='solid'>
+                  <Tooltip id={bookmark.id.toString()} className={styles.tooltip}>
                     {bookmark.starID !== 0 && (
                       <Image
                         src={`${serverConfig.api}/star/${bookmark.starID}/image`}
@@ -320,7 +318,7 @@ export default function Timeline({
                         </Button>
                       </>
                     )}
-                  </ReactTooltip>
+                  </Tooltip>
                 )}
               </Button>
             </ContextMenuTrigger>

@@ -86,8 +86,6 @@ function StarVideos({ videos }: StarVideosProps) {
 
   return (
     <Grid container>
-      <Typography variant='h6'>Videos</Typography>
-
       <Grid container id={styles.videos}>
         {videos.map(video => (
           <StarVideo key={video.id} video={video} />

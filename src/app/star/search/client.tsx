@@ -8,7 +8,7 @@ import ScrollToTop from 'react-scroll-to-top'
 
 import { RegularHandlerProps } from '@components/indeterminate'
 import { FilterCheckbox, FilterRadio } from '@components/search/filter'
-import { SortObjStar as SortObj, defaultStarObj as defaultObj } from '@components/search/sort'
+import { SortObjStar as SortObj, defaultStarObj as defaultObj, getSortString } from '@components/search/sort'
 
 import Stars from './stars'
 
@@ -79,29 +79,41 @@ function TitleSearch() {
 
 function Sort() {
   const { setParam, update } = useDynamicSearchParam(defaultObj)
-  const { sort, reverseSort } = useAllSearchParams(defaultObj)
+  const { sort } = useAllSearchParams(defaultObj)
 
   const sortAlphabetical = (reverse = false) => {
+    if (reverse) {
+      setParam('sort', '-alphabetical')
+    } else {
     setParam('sort', 'alphabetical')
-    setParam('reverseSort', Number(reverse).toString())
+    }
     update()
   }
 
   const sortAdded = (reverse = false) => {
+    if (reverse) {
+      setParam('sort', '-added')
+    } else {
     setParam('sort', 'added')
-    setParam('reverseSort', Number(reverse).toString())
+    }
     update()
   }
 
   const sortActivity = (reverse = false) => {
+    if (reverse) {
+      setParam('sort', '-videos')
+    } else {
     setParam('sort', 'videos')
-    setParam('reverseSort', Number(reverse).toString())
+    }
     update()
   }
 
   const sortLastActivity = (reverse = false) => {
+    if (reverse) {
+      setParam('sort', '-activity')
+    } else {
     setParam('sort', 'activity')
-    setParam('reverseSort', Number(reverse).toString())
+    }
     update()
   }
 

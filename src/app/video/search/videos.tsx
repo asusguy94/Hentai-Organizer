@@ -20,8 +20,7 @@ import { searchService } from '@service'
 import styles from './search.module.scss'
 
 export default function Videos() {
-  const { sort, query, category, outfit, attribute, network, nullCategory, reverseSort } =
-    useAllSearchParams(defaultObj)
+  const { sort, query, category, outfit, attribute, network, nullCategory } = useAllSearchParams(defaultObj)
   const { data: videos, isLoading } = searchService.useVideos()
 
   const localSettings = useSettings()
@@ -39,7 +38,7 @@ export default function Videos() {
 
   const visible = filtered
     .filter(v => !v.noStar)
-    .sort(getSort(sort, reverseSort !== defaultObj.reverseSort))
+    .sort(getSort(sort))
     .filter(v => v.name.toLowerCase().includes(query.toLowerCase()) || isDefault(query, defaultObj.query))
     .filter(
       v => category.split(',').every(cat => v.categories.includes(cat)) || isDefault(category, defaultObj.category)

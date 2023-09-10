@@ -14,13 +14,13 @@ import { searchService } from '@service'
 import styles from './search.module.scss'
 
 export default function Stars() {
-  const { breast, haircolor, hairstyle, attribute, query, sort, reverseSort } = useAllSearchParams(defaultObj)
+  const { breast, haircolor, hairstyle, attribute, query, sort } = useAllSearchParams(defaultObj)
   const { data: stars, isLoading } = searchService.useStars()
 
   if (isLoading || stars === undefined) return <Spinner />
 
   const visible = stars
-    .sort(getSort(sort, reverseSort !== defaultObj.reverseSort))
+    .sort(getSort(sort))
     .filter(s => s.name.toLowerCase().includes(query.toLowerCase()) || isDefault(query, defaultObj.query))
     .filter(s => s.breast === breast || isDefault(breast, defaultObj.breast))
     .filter(s => s.haircolor === haircolor || isDefault(haircolor, defaultObj.haircolor))

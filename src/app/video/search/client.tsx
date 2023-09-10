@@ -8,7 +8,7 @@ import ScrollToTop from 'react-scroll-to-top'
 
 import { RegularHandlerProps } from '@components/indeterminate'
 import { FilterCheckbox, FilterDropdown } from '@components/search/filter'
-import { SortObjVideo as SortObj, defaultVideoObj as defaultObj } from '@components/search/sort'
+import { SortObjVideo as SortObj, defaultVideoObj as defaultObj, getSortString } from '@components/search/sort'
 
 import Videos from './videos'
 
@@ -80,35 +80,50 @@ function TitleSearch() {
 
 function Sort() {
   const { setParam, update } = useDynamicSearchParam(defaultObj)
-  const { sort, reverseSort } = useAllSearchParams(defaultObj)
+  const { sort } = useAllSearchParams(defaultObj)
 
   const sortAlphabetical = (reverse = false) => {
+    if (reverse) {
+      setParam('sort', '-alphabetical')
+    } else {
     setParam('sort', 'alphabetical')
-    setParam('reverseSort', Number(reverse).toString())
+    }
     update()
   }
 
   const sortAdded = (reverse = false) => {
+    if (reverse) {
+      setParam('sort', '-added')
+    } else {
     setParam('sort', 'added')
-    setParam('reverseSort', Number(reverse).toString())
+    }
     update()
   }
 
   const sortDate = (reverse = false) => {
+    if (reverse) {
+      setParam('sort', '-published')
+    } else {
     setParam('sort', 'published')
-    setParam('reverseSort', Number(reverse).toString())
+    }
     update()
   }
 
   const sortPlays = (reverse = false) => {
+    if (reverse) {
+      setParam('sort', '-plays')
+    } else {
     setParam('sort', 'plays')
-    setParam('reverseSort', Number(reverse).toString())
+    }
     update()
   }
 
   const sortQuality = (reverse = false) => {
+    if (reverse) {
+      setParam('sort', '-quality')
+    } else {
     setParam('sort', 'quality')
-    setParam('reverseSort', Number(reverse).toString())
+    }
     update()
   }
 

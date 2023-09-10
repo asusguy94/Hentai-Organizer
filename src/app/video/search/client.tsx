@@ -86,7 +86,7 @@ function Sort() {
     if (reverse) {
       setParam('sort', '-alphabetical')
     } else {
-    setParam('sort', 'alphabetical')
+      setParam('sort', 'alphabetical')
     }
     update()
   }
@@ -95,7 +95,7 @@ function Sort() {
     if (reverse) {
       setParam('sort', '-added')
     } else {
-    setParam('sort', 'added')
+      setParam('sort', 'added')
     }
     update()
   }
@@ -104,7 +104,7 @@ function Sort() {
     if (reverse) {
       setParam('sort', '-published')
     } else {
-    setParam('sort', 'published')
+      setParam('sort', 'published')
     }
     update()
   }
@@ -113,7 +113,7 @@ function Sort() {
     if (reverse) {
       setParam('sort', '-plays')
     } else {
-    setParam('sort', 'plays')
+      setParam('sort', 'plays')
     }
     update()
   }
@@ -122,7 +122,7 @@ function Sort() {
     if (reverse) {
       setParam('sort', '-quality')
     } else {
-    setParam('sort', 'quality')
+      setParam('sort', 'quality')
     }
     update()
   }
@@ -132,26 +132,12 @@ function Sort() {
       <h2>Sort</h2>
 
       <FormControl>
-        <RadioGroup
-          name='sort'
-          defaultValue={
-            sort !== defaultObj.sort
-              ? reverseSort !== defaultObj.reverseSort
-                ? `${sort}_desc`
-                : sort
-              : defaultObj.sort
-          }
-        >
-          <SortObj id='alphabetical' label={{ asc: 'A-Z', desc: 'Z-A' }} callback={sortAlphabetical} />
-          <SortObj id='added' label={{ asc: 'Old Upload', desc: 'Recent Upload' }} callback={sortAdded} reversed />
-          <SortObj id='published' label={{ asc: 'Oldest', desc: 'Newest' }} callback={sortDate} reversed />
-          <SortObj id='plays' label={{ asc: 'Least Popular', desc: 'Most Popular' }} callback={sortPlays} reversed />
-          <SortObj
-            id='quality'
-            label={{ asc: 'Lowest Quality', desc: 'Highest Quality' }}
-            callback={sortQuality}
-            reversed
-          />
+        <RadioGroup name='sort' defaultValue={getSortString(sort)}>
+          <SortObj id='alphabetical' labels={['A-Z', 'Z-A']} callback={sortAlphabetical} />
+          <SortObj id='added' labels={['Recent Upload', 'Old Upload']} callback={sortAdded} reversed />
+          <SortObj id='published' labels={['Newest', 'Oldest']} callback={sortDate} reversed />
+          <SortObj id='plays' labels={['Most Popular', 'Least Popular']} callback={sortPlays} reversed />
+          <SortObj id='quality' labels={['Highest Quality', 'Lowest Quality']} callback={sortQuality} reversed />
         </RadioGroup>
       </FormControl>
     </>

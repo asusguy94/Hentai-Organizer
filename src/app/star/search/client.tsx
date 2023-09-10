@@ -85,7 +85,7 @@ function Sort() {
     if (reverse) {
       setParam('sort', '-alphabetical')
     } else {
-    setParam('sort', 'alphabetical')
+      setParam('sort', 'alphabetical')
     }
     update()
   }
@@ -94,7 +94,7 @@ function Sort() {
     if (reverse) {
       setParam('sort', '-added')
     } else {
-    setParam('sort', 'added')
+      setParam('sort', 'added')
     }
     update()
   }
@@ -103,7 +103,7 @@ function Sort() {
     if (reverse) {
       setParam('sort', '-videos')
     } else {
-    setParam('sort', 'videos')
+      setParam('sort', 'videos')
     }
     update()
   }
@@ -112,7 +112,7 @@ function Sort() {
     if (reverse) {
       setParam('sort', '-activity')
     } else {
-    setParam('sort', 'activity')
+      setParam('sort', 'activity')
     }
     update()
   }
@@ -122,25 +122,11 @@ function Sort() {
       <h2>Sort</h2>
 
       <FormControl>
-        <RadioGroup
-          name='sort'
-          defaultValue={
-            sort !== defaultObj.sort
-              ? reverseSort !== defaultObj.reverseSort
-                ? `${sort}_desc`
-                : sort
-              : defaultObj.sort
-          }
-        >
-          <SortObj id={defaultObj.sort} label={{ asc: 'A-Z', desc: 'Z-A' }} callback={sortAlphabetical} />
-          <SortObj id='added' label={{ asc: 'Oldest', desc: 'Newest' }} callback={sortAdded} reversed />
-          <SortObj id='videos' label={{ asc: 'Least Active', desc: 'Most Active' }} callback={sortActivity} reversed />
-          <SortObj
-            id='activity'
-            label={{ asc: 'Oldest Activity', desc: 'Newest Activity' }}
-            callback={sortLastActivity}
-            reversed
-          />
+        <RadioGroup name='sort' defaultValue={getSortString(sort)}>
+          <SortObj id={defaultObj.sort} labels={['A-Z', 'Z-A']} callback={sortAlphabetical} />
+          <SortObj id='added' labels={['Newest', 'Oldest']} callback={sortAdded} reversed />
+          <SortObj id='videos' labels={['Most Active', 'Least Active']} callback={sortActivity} reversed />
+          <SortObj id='activity' labels={['Newest Activity', 'Oldest Activity']} callback={sortLastActivity} reversed />
         </RadioGroup>
       </FormControl>
     </>

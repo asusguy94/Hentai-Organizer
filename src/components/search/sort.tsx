@@ -8,31 +8,32 @@ function createReverse<T extends string>(sort: T) {
 }
 
 type SortObjProps<T extends DefaultObj> = {
-  label: {
-    asc: string
-    desc: string
-  }
+  labels: [string, string]
   id: T['sort']
   callback: (reversed: boolean) => void
   reversed?: boolean
 }
-function SortObj<T extends DefaultObj>({ id, label, callback, reversed = false }: SortObjProps<T>) {
+function SortObj<T extends DefaultObj>({ id, labels, callback, reversed = false }: SortObjProps<T>) {
   return (
     <>
       <FormControlLabel
-        label={reversed ? label.desc : label.asc}
-        value={id}
+        label={labels[0]}
+        value={getSortString(reversed ? createReverse(id) : id)}
         control={<Radio />}
         onChange={() => callback(reversed)}
       />
       <FormControlLabel
-        label={reversed ? label.asc : label.desc}
-        value={`${id}_desc`}
+        label={labels[1]}
+        value={getSortString(!reversed ? createReverse(id) : id)}
         control={<Radio />}
         onChange={() => callback(!reversed)}
       />
     </>
   )
+}
+
+export function getSortString(sort: string, reverseSort = isReverseSort(sort)) {
+  return reverseSort ? createReverse(sort) : sort
 }
 
 function isReverseSort(sort: string) {

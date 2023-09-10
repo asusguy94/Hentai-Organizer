@@ -12,15 +12,22 @@ import { General } from '@interfaces'
 
 import styles from './filter.module.css'
 
-type FilterRadioProps = {
+type FilterRadioProps<T extends DefaultObj> = {
   data?: string[]
-  label: string
+  label: string & keyof T
   callback: (item: string) => void
   globalCallback?: () => void
   nullCallback?: () => void
-  defaultObj: DefaultObj
+  defaultObj: T
 }
-export function FilterRadio({ data, label, callback, globalCallback, nullCallback, defaultObj }: FilterRadioProps) {
+export function FilterRadio<T extends DefaultObj>({
+  data,
+  label,
+  callback,
+  globalCallback,
+  nullCallback,
+  defaultObj
+}: FilterRadioProps<T>) {
   const { currentValue, defaultValue } = useSearchParam(defaultObj, label)
 
   if (data === undefined) return <Spinner />
@@ -30,7 +37,7 @@ export function FilterRadio({ data, label, callback, globalCallback, nullCallbac
       <h2>{capitalize(label, true)}</h2>
 
       <FormControl>
-        <RadioGroup name={label} defaultValue={currentValue !== '' ? currentValue : defaultValue}>
+        <RadioGroup name={label} defaultValue={currentValue}>
           {globalCallback !== undefined && (
             <FormControlLabel
               value={defaultValue}
@@ -64,22 +71,22 @@ export function FilterRadio({ data, label, callback, globalCallback, nullCallbac
   )
 }
 
-type FilterCheckboxProps<T extends string | General> = {
-  data?: T[]
-  label: string
-  callback: (ref: RegularHandlerProps, item: T) => void
+type FilterCheckboxProps<TData extends string | General, TObj extends DefaultObj> = {
+  data?: TData[]
+  label: string & keyof TObj
+  callback: (ref: RegularHandlerProps, item: TData) => void
   nullCallback?: (e: RegularHandlerProps) => void
   defaultNull?: boolean
-  defaultObj: DefaultObj
+  defaultObj: TObj
 }
-export function FilterCheckbox<T extends string | General>({
+export function FilterCheckbox<TData extends string | General, TObj extends DefaultObj>({
   data,
   label,
   callback,
   nullCallback,
   defaultNull = false,
   defaultObj
-}: FilterCheckboxProps<T>) {
+}: FilterCheckboxProps<TData, TObj>) {
   const { currentValue, defaultValue } = useSearchParam(defaultObj, label)
   const currentArrayValue = currentValue.split(',')
 
@@ -121,14 +128,14 @@ export function FilterCheckbox<T extends string | General>({
   )
 }
 
-type FilterDropdownProps = {
+type FilterDropdownProps<T extends DefaultObj> = {
   data?: string[]
-  label: string
+  label: string & keyof T
   callback: (e: SelectChangeEvent) => void
-  defaultObj: DefaultObj
+  defaultObj: T
 }
-export function FilterDropdown({ data, label, callback, defaultObj }: FilterDropdownProps) {
-  const { currentValue, defaultValue } = useSearchParam(defaultObj, label)
+export function FilterDropdown<T extends DefaultObj>({ data, label, callback, defaultObj }: FilterDropdownProps<T>) {
+  const { currentValue } = useSearchParam(defaultObj, label)
 
   if (data === undefined) return <Spinner />
 
@@ -137,12 +144,7 @@ export function FilterDropdown({ data, label, callback, defaultObj }: FilterDrop
       <h2>{capitalize(label, true)}</h2>
 
       <FormControl>
-        <Select
-          variant='standard'
-          id={label}
-          defaultValue={currentValue !== '' ? currentValue : defaultValue}
-          onChange={callback}
-        >
+        <Select variant='standard' id={label} defaultValue={currentValue} onChange={callback}>
           <MenuItem value='ALL'>All</MenuItem>
 
           {data.map(item => (

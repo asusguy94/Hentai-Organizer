@@ -1,3 +1,5 @@
+export function getUnique<T extends object>(arr: T[], prop: keyof T): T[]
+export function getUnique<T>(arr: T[]): T[]
 export function getUnique<T>(arr: T[], prop?: keyof T): T[] {
   if (prop !== undefined) {
     return arr.filter((obj, idx) => arr.findIndex(item => item[prop] === obj[prop]) === idx)

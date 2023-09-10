@@ -213,7 +213,13 @@ function setCache(ageInSeconds: number, delay = 100) {
   return { 'Cache-Control': cacheArr.join(',') }
 }
 
-function errorResponse(statusCode: number) {
+export function errorResponse(message: string, statusCode: number): Response
+export function errorResponse(statusCode: number): Response
+export function errorResponse(messageOrstatusCode: string | number, statusCode?: number): Response {
+  if (typeof messageOrstatusCode === 'string') {
+    return new Response(messageOrstatusCode, { status: statusCode })
+  }
+
   return new Response(null, { status: statusCode })
 }
 
@@ -271,4 +277,8 @@ export async function sendPartial(req: Request, path: string, mb = 2) {
 
 export function logger(message: string) {
   console.log(message)
+}
+
+export function isError(e: unknown) {
+  return e instanceof Error
 }

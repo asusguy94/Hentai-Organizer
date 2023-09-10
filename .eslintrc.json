@@ -23,6 +23,7 @@
     "@typescript-eslint/no-unsafe-call": "off",
     "@typescript-eslint/no-floating-promises": "off",
     "@typescript-eslint/consistent-type-definitions": ["warn", "type"],
+    "@typescript-eslint/unified-signatures": "off",
 
     // NextJS
     "@typescript-eslint/no-misused-promises": "off"

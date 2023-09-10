@@ -15,12 +15,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const absoluteVideoPath = `./media/${videoPath}`
 
       if (await fileExists(absoluteVideoPath)) {
-        logger(`Rebuilding: ${video.id}`)
+        logger(`Refreshing id=${video.id},path="${video.path}"`)
         await rebuildVideoFile(absoluteVideoPath).then(async () => {
           const height = await getHeight(absoluteVideoPath)
           const duration = await getDuration(absoluteVideoPath)
 
-          logger(`Refreshing ${video.path}`)
           await prisma.video.update({
             where: { id: video.id },
             data: { duration, height: getClosestQ(height) }

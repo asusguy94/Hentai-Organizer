@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { Params } from '@interfaces'
-import prisma from '@utils/server/prisma'
+import { db } from '@utils/server/prisma'
 
 //NEXT /video/[id]
 export async function DELETE(req: Request, { params }: Params<['id', 'attributeId']>) {
@@ -9,7 +9,7 @@ export async function DELETE(req: Request, { params }: Params<['id', 'attributeI
   const attributeId = parseInt(params.attributeId)
 
   return NextResponse.json(
-    await prisma.bookmarkAttributes.delete({
+    await db.bookmarkAttributes.delete({
       where: { attributeID_bookmarkID: { bookmarkID: bookmarkId, attributeID: attributeId } }
     })
   )

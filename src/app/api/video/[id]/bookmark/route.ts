@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { Params } from '@interfaces'
-import prisma from '@utils/server/prisma'
+import { db } from '@utils/server/prisma'
 import validate, { z } from '@utils/server/validation'
 import { getUnique } from '@utils/shared'
 
@@ -20,7 +20,7 @@ export async function POST(req: Request, { params }: Params<'id'>) {
 
   if (starID !== undefined) {
     // create or update bookmark with starID
-    const bookmark = await prisma.bookmark.upsert({
+    const bookmark = await db.bookmark.upsert({
       where: { videoID_start: { videoID: id, start: time } },
       create: {
         video: { connect: { id } },
@@ -64,7 +64,7 @@ export async function POST(req: Request, { params }: Params<'id'>) {
     })
   } else {
     // create bookmark without star
-    const bookmark = await prisma.bookmark.create({
+    const bookmark = await db.bookmark.create({
       data: {
         video: { connect: { id } },
         category: { connect: { id: categoryID } },

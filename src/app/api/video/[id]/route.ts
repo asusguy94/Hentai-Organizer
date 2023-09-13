@@ -4,7 +4,7 @@ import fs from 'fs'
 
 import { Params } from '@interfaces'
 import { dirOnly, formatDate, removeCover, removePoster, removePreviews } from '@utils/server/helper'
-import prisma from '@utils/server/prisma'
+import { db } from '@utils/server/prisma'
 import validate, { z } from '@utils/server/validation'
 
 //NEXT /video/[id]
@@ -26,14 +26,14 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
 
   if (cen !== undefined) {
     return NextResponse.json(
-      await prisma.video.update({
+      await db.video.update({
         where: { id },
         data: { cen }
       })
     )
   } else if (noStar !== undefined) {
     return NextResponse.json(
-      await prisma.video.update({
+      await db.video.update({
         where: { id },
         data: { noStar }
       })
@@ -41,28 +41,28 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
   } else if (plays !== undefined) {
     if (!plays) {
       return NextResponse.json(
-        await prisma.plays.deleteMany({
+        await db.plays.deleteMany({
           where: { id }
         })
       )
     } else {
       // Add PLAYS
       return NextResponse.json(
-        await prisma.plays.create({
+        await db.plays.create({
           data: { videoID: id }
         })
       )
     }
   } else if (title !== undefined) {
     return NextResponse.json(
-      await prisma.video.update({
+      await db.video.update({
         where: { id },
         data: { name: title }
       })
     )
   } else if (franchise !== undefined) {
     return NextResponse.json(
-      await prisma.video.update({
+      await db.video.update({
         where: { id },
         data: { franchise }
       })
@@ -70,13 +70,13 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
   } else if (date !== undefined) {
     if (!date) {
       return NextResponse.json(
-        await prisma.video.update({
+        await db.video.update({
           where: { id },
           data: { date_published: null }
         })
       )
     } else {
-      const video = await prisma.video.update({
+      const video = await db.video.update({
         where: { id },
         data: { date_published: new Date(formatDate(date, true)) }
       })
@@ -87,7 +87,7 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
       })
     }
   } else if (path !== undefined) {
-    const video = await prisma.video.findFirstOrThrow({ where: { id } })
+    const video = await db.video.findFirstOrThrow({ where: { id } })
 
     fs.promises.rename(`./media/videos/${video.path}`, `./media/videos/${path}`)
     fs.promises.rename(`./media/videos/${dirOnly(video.path)}`, `./media/videos/${dirOnly(path)}`)
@@ -95,7 +95,7 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
 
     // UPDATE DATABASE
     return NextResponse.json(
-      await prisma.video.update({
+      await db.video.update({
         where: { id },
         data: { path }
       })
@@ -103,7 +103,7 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
   } else {
     // Refresh Video
     // Update Database
-    const result = await prisma.video.update({
+    const result = await db.video.update({
       where: { id },
       data: { duration: 0, height: 0 }
     })
@@ -125,7 +125,7 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
 export function DELETE(req: Request, { params }: Params<'id'>) {
   const id = parseInt(params.id)
 
-  const result = prisma.video.delete({ where: { id } })
+  const result = db.video.delete({ where: { id } })
 
   result.then(async video => {
     await removeCover(id)

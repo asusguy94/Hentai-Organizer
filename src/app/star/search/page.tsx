@@ -1,15 +1,15 @@
 import Client from './client'
 
-import prisma from '@utils/server/prisma'
+import { db } from '@utils/server/prisma'
 import { getUnique } from '@utils/shared'
 
 export const dynamic = 'force-dynamic'
 
 export default async function StarSearchPage() {
-  const breasts = await prisma.star.findMany({ where: { breast: { not: null } }, orderBy: { breast: 'asc' } })
-  const haircolors = await prisma.star.findMany({ where: { haircolor: { not: null } }, orderBy: { haircolor: 'asc' } })
-  const hairstyles = await prisma.star.findMany({ where: { hairstyle: { not: null } }, orderBy: { hairstyle: 'asc' } })
-  const attributes = await prisma.attribute.findMany({ where: { videoOnly: false }, orderBy: { name: 'asc' } })
+  const breasts = await db.star.findMany({ where: { breast: { not: null } }, orderBy: { breast: 'asc' } })
+  const haircolors = await db.star.findMany({ where: { haircolor: { not: null } }, orderBy: { haircolor: 'asc' } })
+  const hairstyles = await db.star.findMany({ where: { hairstyle: { not: null } }, orderBy: { hairstyle: 'asc' } })
+  const attributes = await db.attribute.findMany({ where: { videoOnly: false }, orderBy: { name: 'asc' } })
 
   return (
     <Client

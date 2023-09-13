@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { formatDate } from '@utils/server/helper'
-import prisma from '@utils/server/prisma'
+import { db } from '@utils/server/prisma'
 import { getUnique } from '@utils/shared'
 
 export const dynamic = 'force-dynamic'
@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic'
 export async function GET() {
   return NextResponse.json(
     (
-      await prisma.video.findMany({
+      await db.video.findMany({
         orderBy: { name: 'asc' },
         select: {
           id: true,

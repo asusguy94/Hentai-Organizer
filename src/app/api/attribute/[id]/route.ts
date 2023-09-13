@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { Params } from '@interfaces'
-import prisma from '@utils/server/prisma'
+import { db } from '@utils/server/prisma'
 import validate, { z } from '@utils/server/validation'
 
 //NEXT /editor
@@ -19,7 +19,7 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
   if (label !== undefined) {
     if (typeof value === 'boolean') {
       return NextResponse.json(
-        await prisma.attribute.update({
+        await db.attribute.update({
           where: { id },
           data: { [label]: value }
         })
@@ -27,7 +27,7 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
     }
   } else if (typeof value === 'string') {
     return NextResponse.json(
-      await prisma.attribute.update({
+      await db.attribute.update({
         where: { id },
         data: { name: value }
       })

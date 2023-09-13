@@ -5,12 +5,12 @@ import Client from './client'
 import { settingsConfig } from '@config'
 import { getVideo } from '@utils/server/hanime'
 import { dirOnly, extOnly } from '@utils/server/helper'
-import prisma from '@utils/server/prisma'
+import { db } from '@utils/server/prisma'
 
 export const dynamic = 'force-dynamic'
 
 export default async function AddVideoPage() {
-  const filesDB = await prisma.video.findMany()
+  const filesDB = await db.video.findMany()
   const filesArray = filesDB.map(video => video.path)
 
   const files = await fs.promises.readdir('./media/videos')

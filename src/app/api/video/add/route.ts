@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 
-import prisma from '@utils/server/prisma'
+import { db } from '@utils/server/prisma'
 import validate, { z } from '@utils/server/validation'
 
 //NEXT /video/add
@@ -23,7 +23,7 @@ export async function POST(req: Request) {
   const res = []
   for await (const video of videos) {
     res.push(
-      await prisma.video.create({
+      await db.video.create({
         data: {
           name: video.name,
           path: video.path,

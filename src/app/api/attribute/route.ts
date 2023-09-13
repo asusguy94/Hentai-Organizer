@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server'
 
-import prisma from '@utils/server/prisma'
+import { db } from '@utils/server/prisma'
 import validate, { z } from '@utils/server/validation'
 
 //NEXT /editor
 export async function GET() {
   return NextResponse.json(
-    await prisma.attribute.findMany({
+    await db.attribute.findMany({
       orderBy: { name: 'asc' }
     })
   )
@@ -22,7 +22,7 @@ export async function POST(req: Request) {
   )
 
   return NextResponse.json(
-    await prisma.attribute.create({
+    await db.attribute.create({
       data: { name }
     })
   )

@@ -1,20 +1,20 @@
 import Client from './client'
 
 import { Params } from '@interfaces'
-import prisma from '@utils/server/prisma'
+import { db } from '@utils/server/prisma'
 
 export default async function StarPage({ params }: Params<'id'>) {
   const id = parseInt(params.id)
 
-  const star = await prisma.star.findFirstOrThrow({ where: { id } })
+  const star = await db.star.findFirstOrThrow({ where: { id } })
 
-  const videos = await prisma.video.findMany({
+  const videos = await db.video.findMany({
     select: { id: true, name: true, path: true },
     where: { stars: { some: { starID: id } } },
     orderBy: [{ franchise: 'asc' }, { episode: 'asc' }]
   })
 
-  const attributes = await prisma.starAttributes.findMany({
+  const attributes = await db.starAttributes.findMany({
     where: { starID: star.id },
     include: { attribute: { select: { name: true } } }
   })

@@ -1,6 +1,6 @@
 import Client, { HomePageProps } from './client'
 
-import prisma from '@utils/server/prisma'
+import { db } from '@utils/server/prisma'
 
 export const dynamic = 'force-dynamic'
 
@@ -13,7 +13,7 @@ export default async function HomePage() {
     cols,
     label: 'recent',
     videos: (
-      await prisma.video.findMany({
+      await db.video.findMany({
         where: { noStar: false },
         select: { id: true, name: true, cover: true },
         orderBy: { id: 'desc' },
@@ -29,7 +29,7 @@ export default async function HomePage() {
     cols,
     label: 'newest',
     videos: (
-      await prisma.video.findMany({
+      await db.video.findMany({
         where: { noStar: false },
         select: { id: true, name: true, cover: true },
         orderBy: { date_published: 'desc' },
@@ -45,7 +45,7 @@ export default async function HomePage() {
     cols,
     label: 'popular',
     videos: (
-      await prisma.video.findMany({
+      await db.video.findMany({
         where: { noStar: false },
         select: { id: true, name: true, cover: true, _count: { select: { plays: true } } },
         orderBy: [{ plays: { _count: 'desc' } }, { date: 'desc' }],

@@ -3,16 +3,16 @@ import Client from './client'
 import { Params } from '@interfaces'
 import { getVideo } from '@utils/server/hanime'
 import { dirOnly, formatDate, noExt } from '@utils/server/helper'
-import prisma from '@utils/server/prisma'
+import { db } from '@utils/server/prisma'
 import { escapeRegExp, getUnique } from '@utils/shared'
 
 export default async function VideoPage({ params }: Params<'id'>) {
   const id = parseInt(params.id)
 
-  const video = await prisma.video.findFirstOrThrow({ where: { id } })
-  const outfits = await prisma.outfit.findMany({ orderBy: { name: 'asc' } })
+  const video = await db.video.findFirstOrThrow({ where: { id } })
+  const outfits = await db.outfit.findMany({ orderBy: { name: 'asc' } })
 
-  const stars = await prisma.star.findMany({
+  const stars = await db.star.findMany({
     where: { videos: { some: { videoID: id } } },
     select: {
       id: true,
@@ -22,7 +22,7 @@ export default async function VideoPage({ params }: Params<'id'>) {
     }
   })
 
-  const bookmarks = await prisma.bookmark.findMany({
+  const bookmarks = await db.bookmark.findMany({
     where: { videoID: id },
     orderBy: { start: 'asc' },
     select: {
@@ -37,8 +37,8 @@ export default async function VideoPage({ params }: Params<'id'>) {
     }
   })
 
-  const categories = await prisma.category.findMany({ orderBy: { name: 'asc' } })
-  const attributes = await prisma.attribute.findMany({ select: { id: true, name: true }, where: { starOnly: false } })
+  const categories = await db.category.findMany({ orderBy: { name: 'asc' } })
+  const attributes = await db.attribute.findMany({ select: { id: true, name: true }, where: { starOnly: false } })
 
   // check if title matches api
   const isValid = {
@@ -64,7 +64,7 @@ export default async function VideoPage({ params }: Params<'id'>) {
 
       // Update if title is valid
       if (isValid.title) {
-        await prisma.video.update({
+        await db.video.update({
           where: { id },
           data: { validated: true }
         })
@@ -118,7 +118,7 @@ export default async function VideoPage({ params }: Params<'id'>) {
         quality: video.height,
         censored: video.cen,
         related: (
-          await prisma.video.findMany({
+          await db.video.findMany({
             where: { franchise: video.franchise },
             orderBy: { episode: 'asc' },
             select: {

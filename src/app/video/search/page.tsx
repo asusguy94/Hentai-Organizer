@@ -1,17 +1,17 @@
 import Client from './client'
 
-import prisma from '@utils/server/prisma'
+import { db } from '@utils/server/prisma'
 
 export const dynamic = 'force-dynamic'
 
 export default async function VideoSearchPage() {
-  const categories = await prisma.category.findMany()
-  const outfits = await prisma.outfit.findMany({ orderBy: { name: 'asc' } })
-  const attributes = await prisma.attribute.findMany({
+  const categories = await db.category.findMany()
+  const outfits = await db.outfit.findMany({ orderBy: { name: 'asc' } })
+  const attributes = await db.attribute.findMany({
     orderBy: { name: 'asc' },
     select: { id: true, name: true, videoOnly: true, starOnly: true }
   })
-  const brands = await prisma.video.groupBy({
+  const brands = await db.video.groupBy({
     where: { brand: { not: null } },
     by: ['brand'],
     orderBy: { brand: 'asc' }

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 
-import prisma from '@utils/server/prisma'
+import { db } from '@utils/server/prisma'
 import validate, { z } from '@utils/server/validation'
 
 //NEXT /video/[id]
@@ -21,7 +21,7 @@ export async function POST(req: Request) {
   )
 
   async function insertHandler(bookmarkId: number, attributeId: number) {
-    return await prisma.bookmarkAttributes.upsert({
+    return await db.bookmarkAttributes.upsert({
       where: {
         attributeID_bookmarkID: {
           attributeID: attributeId,
@@ -34,7 +34,7 @@ export async function POST(req: Request) {
   }
 
   if (starId !== undefined && videoId !== undefined) {
-    const result = await prisma.bookmark.findMany({ where: { videoID: videoId, starID: starId } })
+    const result = await db.bookmark.findMany({ where: { videoID: videoId, starID: starId } })
 
     const res = []
     for await (const data of result) {

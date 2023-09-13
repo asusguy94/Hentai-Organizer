@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server'
 import { Params } from '@interfaces'
 import { getVideo } from '@utils/server/hanime'
 import { downloader } from '@utils/server/helper'
-import prisma from '@utils/server/prisma'
+import { db } from '@utils/server/prisma'
 import validate, { z } from '@utils/server/validation'
 
 //NEXT /video/[id]
@@ -21,7 +21,7 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
     await req.json()
   )
 
-  const video = await prisma.video.findFirstOrThrow({ where: { id } })
+  const video = await db.video.findFirstOrThrow({ where: { id } })
 
   if (slug !== undefined) {
     // Update date and brand
@@ -29,7 +29,7 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
       const { released, brand } = await getVideo(slug)
 
       return NextResponse.json(
-        await prisma.video.update({
+        await db.video.update({
           data: { date_published: new Date(released.date), brand, slug },
           where: { id }
         })
@@ -44,7 +44,7 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
       const { brand } = await getVideo(video.slug)
 
       return NextResponse.json(
-        await prisma.video.update({
+        await db.video.update({
           data: { brand },
           where: { id }
         })
@@ -55,7 +55,7 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
       const { released } = await getVideo(video.slug)
 
       return NextResponse.json(
-        await prisma.video.update({
+        await db.video.update({
           data: { date_published: new Date(released.date) },
           where: { id }
         })
@@ -68,7 +68,7 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
       downloader(cover, `media/images/videos/cover/${video.id}.png`)
 
       return NextResponse.json(
-        await prisma.video.update({
+        await db.video.update({
           data: { cover },
           where: { id }
         })
@@ -81,7 +81,7 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
       downloader(poster, `media/images/videos/poster/${video.id}.png`)
 
       return NextResponse.json(
-        await prisma.video.update({
+        await db.video.update({
           data: { poster },
           where: { id }
         })

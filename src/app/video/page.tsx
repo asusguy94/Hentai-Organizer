@@ -1,39 +1,39 @@
 import Client from './client'
 
-import prisma from '@utils/server/prisma'
+import { db } from '@utils/server/prisma'
 
 export const dynamic = 'force-dynamic'
 
 export default async function VideosPage() {
   const limit = 7
 
-  const noBookmarkStar = await prisma.video.findMany({
+  const noBookmarkStar = await db.video.findMany({
     select: { id: true, name: true },
     where: { noStar: false, bookmarks: { some: { star: null } } },
     orderBy: [{ date_published: 'desc' }, { id: 'desc' }],
     take: limit
   })
 
-  const noStarImage = await prisma.video.findMany({
+  const noStarImage = await db.video.findMany({
     select: { id: true, name: true },
     where: { noStar: false, stars: { some: { star: { image: null } } } },
     take: limit
   })
 
-  const noBookmarks = await prisma.video.findMany({
+  const noBookmarks = await db.video.findMany({
     select: { id: true, name: true },
     where: { noStar: false, bookmarks: { none: {} } },
     take: limit
   })
 
-  const noStars = await prisma.video.findMany({
+  const noStars = await db.video.findMany({
     select: { id: true, name: true },
     where: { noStar: false, stars: { none: {} } },
     take: limit
   })
 
   const slugMissmatch = (
-    await prisma.video.findMany({
+    await db.video.findMany({
       where: { slug: { not: null }, OR: [{ noStar: true }, { bookmarks: { some: {} } }] }
     })
   )

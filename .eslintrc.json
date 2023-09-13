@@ -24,6 +24,7 @@
     "@typescript-eslint/no-floating-promises": "off",
     "@typescript-eslint/consistent-type-definitions": ["warn", "type"],
     "@typescript-eslint/unified-signatures": "off",
+    "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
 
     // NextJS
     "@typescript-eslint/no-misused-promises": "off"

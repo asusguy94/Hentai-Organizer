@@ -85,7 +85,7 @@ function StarVideos({ videos }: StarVideosProps) {
   if (videos.length === 0) return null
 
   return (
-    <Grid container>
+    <Grid container style={{ marginTop: 12 }}>
       <Grid container id={styles.videos}>
         {videos.map(video => (
           <StarVideo key={video.id} video={video} />

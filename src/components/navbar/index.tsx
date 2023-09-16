@@ -8,7 +8,7 @@ export default function NavBar() {
       <ul>
         <NavBarItem name='Home' path='/' />
 
-        <NavBarItem name='Video Search' path='/video/search'>
+        <NavBarItem name='Video Search' path='/video/search?nullCategory=1'>
           <NavBarItem name='Videos' path='/video' />
         </NavBarItem>
 

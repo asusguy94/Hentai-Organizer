@@ -6,7 +6,7 @@
       "@config": ["./src/config"], // only index-page
       "@pages/*": ["./src/pages/*"],
       "@styles/*": ["./src/styles/*"],
-      "@utils/client/*": ["./src/utils/client/*"],
+      "@utils/client": ["./src/utils/client"],
       "@utils/server/*": ["./src/utils/server/*"],
       "@utils/shared": ["./src/utils/shared"],
       "@hooks/*": ["./src/hooks/*"],

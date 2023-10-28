@@ -5,7 +5,6 @@ import { QueryClientProvider, QueryClient } from '@tanstack/react-query'
 const client = new QueryClient({
   defaultOptions: {
     queries: {
-      keepPreviousData: true,
       refetchOnMount: 'always',
       staleTime: Infinity
     }

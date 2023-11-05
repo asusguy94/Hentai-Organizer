@@ -272,7 +272,7 @@ export default function Timeline({
                 <div data-tooltip-id={bookmark.id.toString()}>{bookmark.name}</div>
 
                 {tooltip && (
-                  <Tooltip id={bookmark.id.toString()} className={styles.tooltip}>
+                  <Tooltip id={bookmark.id.toString()} className={styles.tooltip} opacity={1}>
                     {bookmark.starID !== 0 && (
                       <Image
                         src={`${serverConfig.api}/star/${bookmark.starID}/image`}

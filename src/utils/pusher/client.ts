@@ -16,6 +16,4 @@ function unsubscribe(channel: PusherChannel) {
   channel.unbind_all().unsubscribe()
 }
 
-subscribe('ffmpeg', { name: 'vtt', callback: () => {} })
-
 export default { subscribe, unsubscribe }

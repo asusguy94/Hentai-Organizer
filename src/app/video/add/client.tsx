@@ -16,6 +16,8 @@ import {
   Paper
 } from '@mui/material'
 
+import Progress from './progress'
+
 import { generateService, videoService } from '@service'
 
 type AddVideoProps = {
@@ -32,6 +34,8 @@ export default function AddVideo({ videos }: AddVideoProps) {
         <div className='text-center'>
           <Action label='Generate Metadata' callback={generateService.meta} />
           <Action label='Generate VTT' callback={generateService.vtt} />
+
+          <Progress />
         </div>
       ) : (
         <>

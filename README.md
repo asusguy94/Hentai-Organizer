@@ -18,13 +18,17 @@ Any setting ending with `*` is required
 
 ### List of settings
 
-| Keyword                        | Description                                                                                        |
-| ------------------------------ | -------------------------------------------------------------------------------------------------- |
-| DATABASE_URL\*                 | The database URL for your chosen database                                                          |
-| NEXT_PUBLIC_PLAYER_QUALITY_MAX | The max quality to use (default=`1080`)                                                            |
-| NEXT_PUBLIC_PLAYER_THUMBNAILS  | Weather generated thumbnails should be used (default=`false`)                                      |
-| PORT\*                         | _Only required for docker._ The port used for the application (default=`3000`)                     |
-| PATH\*                         | _Only docker._ The path to map to `app/media` (this directory should contain a `videos`-directory) |
+| Keyword                        | Description                                                   | Default |
+| ------------------------------ | ------------------------------------------------------------- | :-----: |
+| DATABASE_URL`*`                | The database URL for your chosen database                     |    -    |
+| NEXT_PUBLIC_PLAYER_QUALITY_MAX | The max quality to use                                        |  1080   |
+| NEXT_PUBLIC_PLAYER_THUMBNAILS  | Weather generated thumbnails should be used                   |  false  |
+| PORT                           | _Only required for docker._ The port used for the application |  3000   |
+| PATH`*`                        | _Only docker._ The path to map to `app/media`                 |    -    |
+| PUSHER_APP_ID`*`               | AppId from Pusher                                             |    -    |
+| NEXT_PUBLIC_PUSHER_KEY`*`      | Key from Pusher                                               |    -    |
+| PUSHER_SECRET`*`               | Secret from Pusher                                            |    -    |
+| NEXT_PUBLIC_PUSHER_CLUSTER     | Cluster code from Pusher                                      |   eu    |
 
 ### With Docker
 

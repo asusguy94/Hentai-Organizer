@@ -31,5 +31,11 @@ export default {
   addFiles: {
     maxFiles: getValueWithType<number>('ADD_FILES_MAX', 10)
   },
+  pusher: {
+    appId: process.env['PUSHER_APP_ID'] ?? '',
+    key: getValueWithType('PUSHER_KEY', ''),
+    secret: process.env['PUSHER_SECRET'] ?? '',
+    cluster: getValueWithType('PUSHER_CLUSTER', 'eu')
+  },
   debug: getValueWithType<boolean>('DEBUG', false)
 }

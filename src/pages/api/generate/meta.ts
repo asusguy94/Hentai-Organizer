@@ -1,21 +1,28 @@
 import { NextApiRequest, NextApiResponse } from 'next/types'
 
+import socket from '@utils/pusher/server'
 import { rebuildVideoFile, getDuration, getHeight } from '@utils/server/ffmpeg'
-import { fileExists, getClosestQ, logger } from '@utils/server/helper'
+import { fileExists, getClosestQ } from '@utils/server/helper'
 import { db } from '@utils/server/prisma'
+import { getProgress } from '@utils/shared'
 
 //NEXT /video/add
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
     const videos = await db.video.findMany({ where: { OR: [{ duration: 0 }, { height: 0 }] } })
+    if (videos.length > 0) {
+      socket.trigger('ffmpeg', 'generate-video', { progress: 0 })
+    }
+    for (let i = 0; i < videos.length; i++) {
+      const video = videos[i]
 
-    logger('Updating METADATA')
-    for await (const video of videos) {
+      const { progress } = getProgress(i, videos.length)
+
       const videoPath = `videos/${video.path}`
       const absoluteVideoPath = `./media/${videoPath}`
 
       if (await fileExists(absoluteVideoPath)) {
-        logger(`Refreshing id=${video.id},path="${video.path}"`)
+        socket.trigger('ffmpeg', 'generate-video', { progress })
         await rebuildVideoFile(absoluteVideoPath).then(async () => {
           const height = await getHeight(absoluteVideoPath)
           const duration = await getDuration(absoluteVideoPath)
@@ -27,7 +34,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         })
       }
     }
-    logger('Finished updating METADATA')
+    socket.trigger('ffmpeg', 'generate-video', { progress: 1 })
 
     res.end()
   }

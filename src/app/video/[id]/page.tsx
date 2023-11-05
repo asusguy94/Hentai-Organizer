@@ -47,7 +47,7 @@ export default async function VideoPage({ params }: Params<'id'>) {
   }
   if (!video.validated && video.slug !== null) {
     try {
-      const apiResponse = await getVideo(video.slug)
+      const { name } = await getVideo(video.slug)
 
       const countChars = (str: string, char: string) =>
         (str.match(new RegExp(`${escapeRegExp(char)}`, 'g')) ?? []).length
@@ -56,7 +56,7 @@ export default async function VideoPage({ params }: Params<'id'>) {
 
       // check validity of title
       isValid.title = !specialChars.some(char => {
-        const countApiTitle = countChars(apiResponse.name, char)
+        const countApiTitle = countChars(name, char)
         const countVideoTitle = countChars(video.name, char)
 
         return countApiTitle !== countVideoTitle

@@ -21,3 +21,10 @@ export function clamp(value: number, minOrMax: number, max?: number): number {
 export function escapeRegExp(input: string) {
   return input.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
+
+export function getProgress(index: number, total: number) {
+  return {
+    progress: clamp((index + 1) / (total + 1), 1),
+    buffer: clamp((index + 2) / (total + 1), 1)
+  }
+}

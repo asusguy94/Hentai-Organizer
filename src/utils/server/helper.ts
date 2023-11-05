@@ -275,7 +275,7 @@ export async function sendPartial(req: Request, path: string, mb = 2) {
   })
 }
 
-export function logger(message: string) {
+export function logger(message: unknown) {
   console.log(message)
 }
 

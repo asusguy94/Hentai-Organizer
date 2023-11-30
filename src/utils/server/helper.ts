@@ -274,11 +274,3 @@ export async function sendPartial(req: Request, path: string, mb = 2) {
     })
   })
 }
-
-export function logger(message: unknown) {
-  console.log(message)
-}
-
-export function isError(e: unknown) {
-  return e instanceof Error
-}

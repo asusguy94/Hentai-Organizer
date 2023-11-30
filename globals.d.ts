@@ -16,13 +16,6 @@ declare module 'ffmpeg-generate-video-preview' {
     cols?: number
     padding?: number
     margin?: number
-    color?: number
-    gifski?: {
-      fps?: number
-      quality?: number
-      fast?: boolean
-    }
-    log?: (message: string) => void
   }
 
   function placeholder(args: Args): Promise<{

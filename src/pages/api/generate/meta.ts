@@ -10,9 +10,8 @@ import { getProgress } from '@utils/shared'
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
     const videos = await db.video.findMany({ where: { OR: [{ duration: 0 }, { height: 0 }] } })
-    if (videos.length > 0) {
-      socket.trigger('ffmpeg', 'generate-video', { progress: 0 })
-    }
+
+    socket.trigger('ffmpeg', 'generate-video', { progress: 0 })
     for (let i = 0; i < videos.length; i++) {
       const video = videos[i]
 

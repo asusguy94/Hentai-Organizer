@@ -213,9 +213,9 @@ function setCache(ageInSeconds: number, delay = 100) {
   return { 'Cache-Control': cacheArr.join(',') }
 }
 
-export function errorResponse(message: string, statusCode: number): Response
-export function errorResponse(statusCode: number): Response
-export function errorResponse(messageOrstatusCode: string | number, statusCode?: number): Response {
+export function response(message: string, statusCode: number): Response
+export function response(statusCode: number): Response
+export function response(messageOrstatusCode: string | number, statusCode?: number): Response {
   if (typeof messageOrstatusCode === 'string') {
     return new Response(messageOrstatusCode, { status: statusCode })
   }
@@ -223,7 +223,7 @@ export function errorResponse(messageOrstatusCode: string | number, statusCode?:
   return new Response(null, { status: statusCode })
 }
 
-const missingFileError = errorResponse(404)
+const missingFileError = response(404)
 
 export async function sendFile(path: string) {
   if (!(await fileExists(path))) {

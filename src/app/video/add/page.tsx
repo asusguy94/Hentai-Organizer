@@ -19,35 +19,13 @@ export default async function AddVideoPage() {
   for (let i = 0; newFiles.length < settingsConfig.addFiles.maxFiles && i < files.length; i++) {
     const file = files[i]
 
-    //TODO slug might contain a invalid part, can be replaced but will still require separate slug-db-field
-    // .replace(/-\d{3,4}p-[^-]+/, '')
     const slug = dirOnly(file).replace(/-\d{3,4}p-[^-]+/, '')
     if (
       !filesArray.includes(file) &&
       (await fs.promises.lstat(`./media/videos/${file}`)).isFile() &&
       extOnly(`./media/videos/${file}`) === '.mp4' // prevent random files to be imported!
     ) {
-      const { related: relatedVideos, ...apiData } = await getVideo(slug)
-      let franchise = apiData.franchise
-
-      for (let j = 0; j < relatedVideos.length; j++) {
-        const relatedVideo = relatedVideos[j]
-
-        // check if a previous episode already exists in the database
-        const video = filesDB.find(video => {
-          return (
-            video.slug === relatedVideo.slug ||
-            video.path === `${relatedVideo.slug}.mp4` ||
-            video.cover === apiData.cover ||
-            video.poster === apiData.poster
-          )
-        })
-
-        if (video !== undefined) {
-          franchise = video.franchise
-          break
-        }
-      }
+      const { franchise } = await getVideo(slug)
 
       const generated = generate(file, slug, franchise)
       if (generated !== undefined) {

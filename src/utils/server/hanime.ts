@@ -57,10 +57,7 @@ export async function getVideo(slug: string) {
     released: { date: videoData.hentai_video.released_at, unix: videoData.hentai_video.released_at_unix },
     poster: videoData.hentai_video.poster_url,
     cover: videoData.hentai_video.cover_url,
-    franchise: franchise ?? videoData.hentai_franchise.title,
-    related: videoData.hentai_franchise_hentai_videos
-      .filter(video => video.name !== videoName) // filter out the current video
-      .map(({ slug, cover_url: cover, poster_url: poster }) => ({ slug, cover, poster }))
+    franchise: franchise ?? videoData.hentai_franchise.title
   }
 
   return jsondata

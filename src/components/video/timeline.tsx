@@ -6,6 +6,8 @@ import { ContextMenu, ContextMenuTrigger, ContextMenuItem } from 'rctx-contextme
 import { Tooltip } from 'react-tooltip'
 import { useWindowSize } from 'react-use'
 
+import { MediaPlayerInstance } from '@components/vidstack'
+
 import { defaultSettings, useSettings } from '../../app/settings/components'
 import { IconWithText } from '../icon'
 import Image from '../image'
@@ -27,9 +29,8 @@ type TimelineProps = {
   attributes: Attribute[]
   categories: Category[]
   outfits: Outfit[]
-  playVideo: (time?: number | null) => void
   setTime: (bookmarkID: number, time?: number) => void
-  playerRef: React.RefObject<HTMLVideoElement>
+  playerRef: React.RefObject<MediaPlayerInstance>
   update: SetState<Bookmark[]>
   onModal: ModalHandler
   setStarEvent: EventHandler
@@ -41,7 +42,6 @@ export default function Timeline({
   attributes,
   categories,
   outfits,
-  playVideo,
   setTime,
   playerRef,
   update,
@@ -197,6 +197,14 @@ export default function Timeline({
     })
   }
 
+  const playVideo = (time: number) => {
+    const player = playerRef.current
+    if (player !== null) {
+      player.currentTime = time
+      player.play()
+    }
+  }
+
   useEffect(() => {
     const collisionCheck = (a: HTMLElement | null, b: HTMLElement | null) => {
       if (a === null || b === null) return false
@@ -232,10 +240,10 @@ export default function Timeline({
 
   useEffect(() => {
     const setHeight = () => {
-      const videoPlayer = playerRef.current
-      if (videoPlayer) {
-        const videoTop = videoPlayer.getBoundingClientRect().top
-        videoPlayer.style.height = `calc(100vh - (${spacing.bookmark}px * ${maxLevel}) - ${videoTop}px - ${spacing.top}px)`
+      const videoElement = playerRef.current?.el ?? null
+      if (videoElement !== null) {
+        const videoTop = videoElement.getBoundingClientRect().top
+        videoElement.style.height = `calc(100vh - (${spacing.bookmark}px * ${maxLevel}) - ${videoTop}px - ${spacing.top}px)`
         //maxHeight: whitespace bellow, allows scrolling beneath video
         //height: no whitespace bellow, video always at bottom of screen
       }

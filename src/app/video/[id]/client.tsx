@@ -16,6 +16,7 @@ import {
 } from '@mui/material'
 
 import { Outfit } from '@prisma/client'
+import { MediaPlayerInstance } from '@vidstack/react'
 import { ContextMenu, ContextMenuTrigger, ContextMenuItem } from 'rctx-contextmenu'
 import { Flipped, Flipper } from 'react-flip-toolkit'
 
@@ -23,7 +24,6 @@ import { IconWithText } from '@components/icon'
 import { ImageCard, ResponsiveImage } from '@components/image'
 import Link from '@components/link'
 import ModalComponent, { Modal, ModalHandler, useModal } from '@components/modal'
-import { PlyrWithMetadata } from '@components/plyr'
 import Ribbon, { RibbonContainer } from '@components/ribbon'
 import Spinner from '@components/spinner'
 import { Header, Player, Timeline } from '@components/video'
@@ -138,31 +138,21 @@ function Section({
   setStarEvent,
   isValid
 }: SectionProps) {
-  const playerRef = useRef<HTMLVideoElement>(null)
-  const plyrRef = useRef<PlyrWithMetadata | null>(null)
-
-  // Helper script for getting the player
-  const getPlayer = () => plyrRef.current
-
-  const playVideo = (time: number | null = null) => {
-    const player = getPlayer()
-
-    if (player !== null) {
-      if (time === null) time = player.currentTime
-      player.currentTime = Number(time)
-      player.play()
-    }
-  }
+  const playerRef = useRef<MediaPlayerInstance>(null)
 
   const setTime = (bookmarkID: number) => {
-    if (plyrRef.current !== null) {
-      const time = Math.round(plyrRef.current.currentTime)
+    const player = playerRef.current
+
+    if (player !== null) {
+      const time = Math.round(player.currentTime)
 
       bookmarkService.setTime(bookmarkID, time).then(() => {
         update.bookmarks(
           bookmarks
             .map(bookmark => {
-              if (bookmark.id === bookmarkID) bookmark.start = time
+              if (bookmark.id === bookmarkID) {
+                return { ...bookmark, start: time }
+              }
 
               return bookmark
             })
@@ -180,7 +170,6 @@ function Section({
 
       <Player
         playerRef={playerRef}
-        plyrRef={plyrRef}
         video={video}
         bookmarks={bookmarks}
         categories={categories}
@@ -196,7 +185,6 @@ function Section({
         attributes={attributes}
         categories={categories}
         outfits={outfits}
-        playVideo={playVideo}
         setTime={setTime}
         playerRef={playerRef}
         update={update.bookmarks}

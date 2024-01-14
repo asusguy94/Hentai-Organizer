@@ -172,7 +172,13 @@ export async function generateVTTData(
       await writeToFile(vtt, '\n')
       await writeToFile(vtt, `\n${++counter}`)
       await writeToFile(vtt, `\n${start} --> ${end}`)
-      await writeToFile(vtt, `\nvtt/thumb#xywh=${posX},${posY},${dimension.width},${dimension.height}`)
+
+      // This is required for vidstack to work
+      await writeToFile(
+        vtt,
+        `\n/api/video/${videoID}/vtt/thumb#xywh=${posX},${posY},${dimension.width},${dimension.height}`
+      )
+      // await writeToFile(vtt, `\nvtt/thumb#xywh=${posX},${posY},${dimension.width},${dimension.height}`)
     }
   }
 }
@@ -223,7 +229,7 @@ export function response(messageOrstatusCode: string | number, statusCode?: numb
   return new Response(null, { status: statusCode })
 }
 
-const missingFileError = response(404)
+const missingFileError = response('File is missing', 404)
 
 export async function sendFile(path: string) {
   if (!(await fileExists(path))) {

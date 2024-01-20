@@ -1,3 +1,5 @@
+import NextTopLoader from 'nextjs-toploader'
+
 import ClientLayout from './client-layout'
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -8,6 +10,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
 
       <body>
+        <NextTopLoader />
+
         <ClientLayout>{children}</ClientLayout>
       </body>
     </html>

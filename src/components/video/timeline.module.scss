@@ -11,7 +11,7 @@
     border-width: 1px;
 
     .tooltip {
-      z-index: 1;
+      z-index: 11; // 10 is the z-index for the video controls
       padding-bottom: 12px;
 
       .btn {

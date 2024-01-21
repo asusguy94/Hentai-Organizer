@@ -6,12 +6,13 @@ import {
   MediaProvider,
   MediaProviderAdapter,
   MediaTimeUpdateEventDetail,
+  MediaVolumeChange,
   Poster,
   isHLSProvider
 } from '@vidstack/react'
 import { DefaultVideoLayout, defaultLayoutIcons } from '@vidstack/react/player/layouts/default'
 import Hls, { ErrorData, ManifestParsedData } from 'hls.js'
-import { useSessionStorage } from 'usehooks-ts'
+import { useLocalStorage, useSessionStorage } from 'usehooks-ts'
 
 import { Modal } from '@components/modal'
 
@@ -33,6 +34,7 @@ type PlayerProps = {
 
 export default function Player({ title, src, poster, thumbnails, video, playerRef, modal }: PlayerProps) {
   const hlsRef = useRef<Hls>()
+  const [config, setConfig] = useLocalStorage('config', { volume: 1 })
 
   const playAddedRef = useRef(false)
   const newVideoRef = useRef(false)
@@ -106,6 +108,10 @@ export default function Player({ title, src, poster, thumbnails, video, playerRe
     playerRef.current.currentTime += 10 * Math.sign(e.deltaY) * -1
   }
 
+  const onVolumeChange = (details: MediaVolumeChange) => {
+    setConfig({ ...config, volume: details.volume })
+  }
+
   return (
     <MediaPlayer
       ref={playerRef}
@@ -133,6 +139,8 @@ export default function Player({ title, src, poster, thumbnails, video, playerRe
         volumeUp: ['ArrowUp'],
         volumeDown: ['ArrowDown']
       }}
+      volume={config.volume}
+      onVolumeChange={onVolumeChange}
     >
       <MediaProvider>
         {poster !== undefined && <Poster className='vds-poster' src={poster} alt={title} />}

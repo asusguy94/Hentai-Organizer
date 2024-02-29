@@ -5,6 +5,7 @@ import fs from 'fs'
 import path from 'path'
 
 import { settingsConfig } from '@config'
+import { calculateTimeCode } from '@utils/shared'
 
 /**
  * Get the closest number from an array of numbers
@@ -132,12 +133,6 @@ export function formatDate(dateStr: string | Date, raw = false) {
   return raw ? date.format('YYYY-MM-DD') : date.format('D MMMM YYYY')
 }
 
-function calculateTime(secs: number) {
-  return dayjs(0)
-    .hour(0)
-    .millisecond(secs * 1000)
-}
-
 export async function generateVTTData(
   videoID: number,
   frameDelay: number,
@@ -150,15 +145,12 @@ export async function generateVTTData(
   const generateTimeCodes = () => {
     const timeCodeFormat = 'HH:mm:ss.SSS'
 
-    const start = calculateTime(nextTimeCode)
-    const end = calculateTime(nextTimeCode + frameDelay)
+    const start = calculateTimeCode(nextTimeCode, timeCodeFormat)
+    const end = calculateTimeCode(nextTimeCode + frameDelay, timeCodeFormat)
 
     nextTimeCode += frameDelay
 
-    return {
-      start: start.format(timeCodeFormat),
-      end: end.format(timeCodeFormat)
-    }
+    return { start, end }
   }
 
   await writeToFile(vtt, 'WEBVTT')

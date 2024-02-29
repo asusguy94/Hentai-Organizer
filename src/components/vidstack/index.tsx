@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useMemo, useRef } from 'react'
 
 import {
   MediaPlayer,
@@ -6,19 +6,20 @@ import {
   MediaProvider,
   MediaProviderAdapter,
   MediaTimeUpdateEventDetail,
-  MediaVolumeChange,
   Poster,
-  isHLSProvider
+  Track,
+  VTTContent,
+  isHLSProvider,
+  useMediaRemote
 } from '@vidstack/react'
 import { DefaultVideoLayout, defaultLayoutIcons } from '@vidstack/react/player/layouts/default'
-import Hls, { ErrorData, ManifestParsedData } from 'hls.js'
-import { useLocalStorage, useSessionStorage } from 'usehooks-ts'
+import Hls, { ErrorData } from 'hls.js'
+import { useSessionStorage } from 'usehooks-ts'
 
 import { Modal } from '@components/modal'
 
 import { settingsConfig } from '@config'
-import { Video } from '@interfaces'
-import { videoService } from '@service'
+import { Bookmark, Video } from '@interfaces'
 
 import './vidstack.css'
 
@@ -28,28 +29,34 @@ type PlayerProps = {
   poster?: string
   thumbnails?: string
   video: Video
+  bookmarks: Bookmark[]
   playerRef: React.RefObject<MediaPlayerInstance>
   modal: Modal
 }
 
-export default function Player({ title, src, poster, thumbnails, video, playerRef, modal }: PlayerProps) {
+export default function Player({ title, src, poster, thumbnails, video, playerRef, modal, bookmarks }: PlayerProps) {
+  const remote = useMediaRemote(playerRef)
   const hlsRef = useRef<Hls>()
-  const [config, setConfig] = useLocalStorage('config', { volume: 1 })
-
-  const playAddedRef = useRef(false)
-  const newVideoRef = useRef(false)
 
   const [localVideo, setLocalVideo] = useSessionStorage('video', 0)
   const [localBookmark, setLocalBookmark] = useSessionStorage('bookmark', 0)
 
-  useEffect(() => {
-    newVideoRef.current = localVideo !== video.id
-    if (newVideoRef.current) {
+  const chapters = useMemo<VTTContent>(() => {
+    return {
+      cues: bookmarks.map((bookmark, idx, arr) => ({
+        startTime: bookmark.start,
+        endTime: arr.at(idx + 1)?.start ?? video.duration,
+        text: bookmark.name
+      }))
+    }
+  }, [bookmarks, video.duration])
+
+  const onCanLoad = () => {
+    if (localVideo !== video.id) {
       setLocalVideo(video.id)
       setLocalBookmark(0)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [playerRef])
+  }
 
   const onProviderChange = (provider: MediaProviderAdapter | null) => {
     if (provider === null) return
@@ -67,29 +74,10 @@ export default function Player({ title, src, poster, thumbnails, video, playerRe
     }
   }
 
-  const onPlay = () => {
-    if (newVideoRef.current && !playAddedRef.current) {
-      playAddedRef.current = true
-
-      videoService
-        .addPlays(video.id)
-        .then(() => {
-          console.log('play added')
-        })
-        .catch(() => {
-          playAddedRef.current = false
-        })
+  const onManifestParsed = () => {
+    if (hlsRef.current !== undefined) {
+      hlsRef.current.startLoad(localBookmark)
     }
-  }
-
-  const onManifestParsed = (data: ManifestParsedData) => {
-    if (hlsRef.current === undefined) return
-
-    const maxLevel = data.levels.filter(level => level.height <= settingsConfig.player.quality.max).length - 1
-    hlsRef.current.startLevel = maxLevel - 1
-    hlsRef.current.autoLevelCapping = maxLevel
-
-    hlsRef.current.startLoad(localBookmark)
   }
 
   const onHlsError = (detail: ErrorData) => {
@@ -108,10 +96,6 @@ export default function Player({ title, src, poster, thumbnails, video, playerRe
     playerRef.current.currentTime += 10 * Math.sign(e.deltaY) * -1
   }
 
-  const onVolumeChange = (details: MediaVolumeChange) => {
-    setConfig({ ...config, volume: details.volume })
-  }
-
   return (
     <MediaPlayer
       ref={playerRef}
@@ -122,9 +106,10 @@ export default function Player({ title, src, poster, thumbnails, video, playerRe
       streamType='on-demand'
       load='eager'
       viewType='video'
+      storage='vidstack'
       onProviderChange={onProviderChange}
       onTimeUpdate={onTimeUpdate}
-      onPlay={onPlay}
+      onCanLoad={onCanLoad}
       onWheel={onWheel}
       onHlsManifestParsed={onManifestParsed}
       onHlsInstance={hls => (hlsRef.current = hls)}
@@ -132,35 +117,32 @@ export default function Player({ title, src, poster, thumbnails, video, playerRe
       keyTarget='document'
       keyDisabled={modal.visible}
       keyShortcuts={{
-        togglePaused: ['Space'],
-        toggleMuted: ['m'],
-        seekBackward: {
-          keys: ['ArrowLeft'],
+        toggleMuted: 'm',
+        volumeUp: 'ArrowUp',
+        volumeDown: 'ArrowDown',
+        seekBackward: 'ArrowLeft',
+        seekForward: 'ArrowRight',
+        togglePaused: {
+          keys: 'Space',
           callback(e) {
-            if (playerRef.current !== null && e.type === 'keydown') {
-              playerRef.current.currentTime -= 1
+            if (e.type === 'keyup') {
+              remote.togglePaused()
             }
           }
-        },
-        seekForward: {
-          keys: ['ArrowRight'],
-          callback(e) {
-            if (playerRef.current !== null && e.type === 'keydown') {
-              playerRef.current.currentTime += 1
-            }
-          }
-        },
-        volumeUp: ['ArrowUp'],
-        volumeDown: ['ArrowDown']
+        }
       }}
-      volume={config.volume}
-      onVolumeChange={onVolumeChange}
     >
       <MediaProvider>
-        {poster !== undefined && <Poster className='vds-poster' src={poster} alt={title} />}
+        {poster !== undefined && localBookmark === 0 && <Poster className='vds-poster' src={poster} alt={title} />}
+        <Track kind='chapters' content={chapters} default type='json' />
       </MediaProvider>
-
-      <DefaultVideoLayout thumbnails={thumbnails} icons={defaultLayoutIcons} />
+      <DefaultVideoLayout
+        thumbnails={thumbnails}
+        icons={defaultLayoutIcons}
+        seekStep={1}
+        slots={{ googleCastButton: null, pipButton: null, fullscreenButton: null }}
+        noScrubGesture={false}
+      />
     </MediaPlayer>
   )
 }

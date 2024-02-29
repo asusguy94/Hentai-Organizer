@@ -1,3 +1,5 @@
+import dayjs from 'dayjs'
+
 export function getUnique<T extends object>(arr: T[], prop: keyof T): T[]
 export function getUnique<T>(arr: T[]): T[]
 export function getUnique<T>(arr: T[], prop?: keyof T): T[] {
@@ -27,4 +29,15 @@ export function getProgress(index: number, total: number) {
     progress: clamp((index + 1) / (total + 1), 1),
     buffer: clamp((index + 2) / (total + 1), 1)
   }
+}
+
+export function calculateTimeCode(seconds: number, timeFormat = 'HH:mm:ss'): string {
+  return dayjs(0)
+    .hour(0)
+    .millisecond(seconds * 1000)
+    .format(timeFormat) // use .SSS for milliseconds
+}
+
+export async function getResponse<T>(href: string) {
+  return fetch(href).then(res => res.json() as Promise<T>)
 }

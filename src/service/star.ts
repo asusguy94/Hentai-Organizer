@@ -1,19 +1,25 @@
-import { useFetch } from 'usehooks-ts'
+import { useQuery } from '@tanstack/react-query'
 
 import { createApi } from '@config'
+import { getResponse } from '@utils/shared'
 
 const { api, baseURL } = createApi('/star')
 
+type StarInfo = {
+  breast: string[]
+  haircolor: string[]
+  hairstyle: string[]
+  attribute: string[]
+}
+
 export default {
   useInfo: () => {
-    type StarInfo = {
-      breast: string[]
-      haircolor: string[]
-      hairstyle: string[]
-      attribute: string[]
-    }
+    const query = useQuery<StarInfo>({
+      queryKey: ['star', 'info'],
+      queryFn: () => getResponse(baseURL)
+    })
 
-    return useFetch<StarInfo>(baseURL)
+    return { data: query.data }
   },
   addAttribute: (id: number, name: string) => api.put(`/${id}/attribute`, { name }),
   removeAttribute: (id: number, name: string) => api.put(`/${id}/attribute`, { name, remove: true }),

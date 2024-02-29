@@ -9,6 +9,7 @@ import { db } from '@utils/server/prisma'
 
 export const dynamic = 'force-dynamic'
 
+//TODO migrate to api
 export default async function AddVideoPage() {
   const filesDB = await db.video.findMany()
   const filesArray = filesDB.map(video => video.path)

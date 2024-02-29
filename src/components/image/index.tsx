@@ -3,8 +3,8 @@ import NextImage, { type ImageProps as NextImageProps } from 'next/image'
 import ImageNotSupportedOutlinedIcon from '@mui/icons-material/ImageNotSupportedOutlined'
 import { CardMedia as MUICardMedia } from '@mui/material'
 
-export function ResponsiveImage({ alt, ...other }: NextImageProps & MissingImage) {
-  return <Image style={{ width: '100%', height: 'auto' }} alt={alt} {...other} />
+export function ResponsiveImage({ alt, style, ...other }: NextImageProps & MissingImage) {
+  return <Image style={{ ...style, width: '100%', height: 'auto' }} alt={alt} {...other} />
 }
 
 export default function Image({ missing, scale, renderStyle, ...nextProps }: NextImageProps & MissingImage) {
@@ -59,8 +59,8 @@ function MissingImage({ scale = 1, renderStyle }: MissingImageProps) {
         ...(renderStyle === 'height'
           ? { height: '100%' }
           : renderStyle === 'transform'
-          ? { transform: 'translateY(50%)' } //TODO why 50%
-          : {}),
+            ? { transform: 'translateY(50%)' } //TODO why 50%
+            : {}),
         scale: scale.toString()
       }}
     />

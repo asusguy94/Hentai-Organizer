@@ -9,21 +9,6 @@
   --media-slider-track-bg: rgba(255, 255, 255, 0.25);
 }
 
-.src-buttons {
-  display: flex;
-  align-items: center;
-  justify-content: space-evenly;
-  margin-top: 40px;
-  margin-inline: auto;
-  max-width: 300px;
-}
-
-/* Disable Buttons */
-.vds-pip-button,
-.vds-fullscreen-button {
-  display: none;
-}
-
 /* Always display Timeline-DOT */
 .vds-time-slider .vds-slider-thumb {
   opacity: 1;

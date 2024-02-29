@@ -1,5 +1,3 @@
-@import '_util.css';
-
 :root {
   /* Star Image */
   --starWidth: 200px;
@@ -36,4 +34,22 @@ button {
   font-weight: 400 !important;
   font-size: 0.9rem !important;
   cursor: default !important;
+}
+
+/* Util */
+.text-center {
+  text-align: center;
+}
+
+.d-inline-block {
+  display: inline-block !important;
+}
+
+.d-flex {
+  display: flex !important;
+}
+
+.py-0 {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
 }

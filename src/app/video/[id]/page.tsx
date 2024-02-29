@@ -6,11 +6,12 @@ import { dirOnly, formatDate, noExt } from '@utils/server/helper'
 import { db } from '@utils/server/prisma'
 import { escapeRegExp, getUnique } from '@utils/shared'
 
+//TODO migrate to api
 export default async function VideoPage({ params }: Params<'id'>) {
   const id = parseInt(params.id)
 
   const video = await db.video.findFirstOrThrow({ where: { id } })
-  const outfits = await db.outfit.findMany({ orderBy: { name: 'asc' } })
+  const outfits = await db.outfit.findMany({ orderBy: { name: 'asc' } }) // available from api
 
   const stars = await db.star.findMany({
     where: { videos: { some: { videoID: id } } },
@@ -37,8 +38,8 @@ export default async function VideoPage({ params }: Params<'id'>) {
     }
   })
 
-  const categories = await db.category.findMany({ orderBy: { name: 'asc' } })
-  const attributes = await db.attribute.findMany({ select: { id: true, name: true }, where: { starOnly: false } })
+  const categories = await db.category.findMany({ orderBy: { name: 'asc' } }) // available from api
+  const attributes = await db.attribute.findMany({ select: { id: true, name: true }, where: { starOnly: false } }) // available from api
 
   // check if title matches api
   const isValid = {
@@ -124,14 +125,12 @@ export default async function VideoPage({ params }: Params<'id'>) {
             select: {
               id: true,
               name: true,
-              cover: true,
-              _count: { select: { plays: true } }
+              cover: true
             }
           })
-        ).map(({ cover, _count, ...video }) => ({
+        ).map(({ cover, ...video }) => ({
           ...video,
-          image: cover,
-          plays: _count.plays
+          image: cover
         }))
       }}
     />

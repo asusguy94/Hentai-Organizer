@@ -35,9 +35,8 @@
         background-color: lightgray;
       }
 
-      .thumbnail img {
-        // why is this needed?
-        margin-bottom: -7px; // 10-3
+      .thumbnail {
+        display: flex;
       }
 
       .title {

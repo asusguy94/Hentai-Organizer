@@ -41,12 +41,6 @@ export default function VideoPlayer({
 
   const copy = async () => await navigator.clipboard.writeText(video.path.file.slice(0, -4))
 
-  const resetPlays = () => {
-    videoService.resetPlays(video.id).then(() => {
-      router.refresh()
-    })
-  }
-
   const deleteVideo = () => {
     videoService.deleteVideo(video.id).then(() => {
       router.replace('/video')
@@ -116,6 +110,7 @@ export default function VideoPlayer({
           title={video.name}
           playerRef={playerRef}
           video={video}
+          bookmarks={bookmarks}
           poster={`${serverConfig.api}/video/${video.id}/poster`}
           thumbnails={`${serverConfig.api}/video/${video.id}/vtt`}
           src={{
@@ -159,8 +154,6 @@ export default function VideoPlayer({
           text={video.censored ? 'UnCensor' : 'Censor'}
           onClick={censorToggle}
         />
-
-        <IconWithText component={ContextMenuItem} icon='delete' text='Remove Plays' onClick={resetPlays} />
 
         <IconWithText
           component={ContextMenuItem}

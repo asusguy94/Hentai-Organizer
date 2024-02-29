@@ -5,7 +5,6 @@ import { useEffect, useRef, useState } from 'react'
 import {
   Button,
   Card,
-  CardContent,
   Checkbox,
   Divider,
   FormControlLabel,
@@ -762,10 +761,6 @@ function Franchise({ video }: FranchiseProps) {
       {video.related.map(v => (
         <a href={`/video/${v.id}`} key={v.id}>
           <Grid container component={Card} className={styles.episode}>
-            <Grid component={CardContent}>
-              <Typography>{v.plays} plays</Typography>
-            </Grid>
-
             <Grid item xs={2} className={styles.thumbnail}>
               <ResponsiveImage
                 src={`${serverConfig.api}/video/${v.id}/cover`}
@@ -774,7 +769,6 @@ function Franchise({ video }: FranchiseProps) {
                 missing={v.image === null}
                 alt='video'
                 sizes={`${(((100 / 12) * 3) / 12) * 2}vw`}
-                style={{ display: 'flex' }}
               />
             </Grid>
 

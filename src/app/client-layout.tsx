@@ -10,7 +10,7 @@ import NavBar from '@components/navbar'
 
 import Providers from './providers'
 
-import '@styles/globals.css'
+import '../globals.css'
 import 'react-toastify/dist/ReactToastify.min.css'
 
 const roboto = Roboto({

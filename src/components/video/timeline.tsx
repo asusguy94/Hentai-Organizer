@@ -274,7 +274,7 @@ export default function Timeline({
                   left: `${(bookmark.start / video.duration) * 100}%`,
                   top: `${(bookmarkLevels[idx] - 1) * spacing.bookmark}px`
                 }}
-                onClick={() => playVideo(bookmark.start)}
+                onMouseDown={e => e.button === 0 && playVideo(bookmark.start)}
                 ref={(bookmark: HTMLButtonElement) => (bookmarksRef.current[idx] = bookmark)}
               >
                 <div data-tooltip-id={bookmark.id.toString()}>{bookmark.name}</div>

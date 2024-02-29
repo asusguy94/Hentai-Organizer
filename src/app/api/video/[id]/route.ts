@@ -11,11 +11,10 @@ import validate, { z } from '@utils/server/validation'
 export async function PUT(req: Request, { params }: Params<'id'>) {
   const id = parseInt(params.id)
 
-  const { cen, noStar, plays, title, franchise, date, path } = validate(
+  const { cen, noStar, title, franchise, date, path } = validate(
     z.object({
       cen: z.boolean().optional(),
       noStar: z.boolean().optional(),
-      plays: z.number().int().nonnegative().optional(),
       title: z.string().optional(),
       franchise: z.string().optional(),
       date: z.string().optional(),
@@ -38,21 +37,6 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
         data: { noStar }
       })
     )
-  } else if (plays !== undefined) {
-    if (!plays) {
-      return NextResponse.json(
-        await db.plays.deleteMany({
-          where: { id }
-        })
-      )
-    } else {
-      // Add PLAYS
-      return NextResponse.json(
-        await db.plays.create({
-          data: { videoID: id }
-        })
-      )
-    }
   } else if (title !== undefined) {
     return NextResponse.json(
       await db.video.update({

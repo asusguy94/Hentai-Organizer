@@ -19,7 +19,6 @@ type Related = {
   id: number
   name: string
   image: string | null
-  plays: number
 }
 
 export type Video = {
@@ -102,7 +101,6 @@ export type VideoSearch = {
   poster: string | null
   published: string | null
   quality: number
-  plays: number
   attributes: string[]
   categories: string[]
   outfits: string[]

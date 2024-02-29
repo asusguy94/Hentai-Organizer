@@ -21,7 +21,6 @@ export async function GET() {
           brand: true,
           name: true,
           date_published: true,
-          plays: true,
           cover: true,
           poster: true,
           slug: true,
@@ -39,7 +38,6 @@ export async function GET() {
       })
     ).map(({ date_published, height, bookmarks, stars, ...video }) => ({
       ...video,
-      plays: video.plays.length,
       quality: height,
       attributes: getUnique([
         ...stars.flatMap(({ star }) => star.attributes).map(({ attribute }) => attribute.name),

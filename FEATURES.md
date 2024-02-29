@@ -18,11 +18,10 @@
 
 ## :heavy_check_mark: Home Page
 
-| Name           | Status             |
-| -------------- | ------------------ |
-| Recent Videos  | :heavy_check_mark: |
-| Newest Videos  | :heavy_check_mark: |
-| Popular Videos | :heavy_check_mark: |
+| Name          | Status             |
+| ------------- | ------------------ |
+| Recent Videos | :heavy_check_mark: |
+| Newest Videos | :heavy_check_mark: |
 
 ## :heavy_check_mark: Add Videos
 
@@ -91,7 +90,6 @@
 | --------------- | --------------------------------------------- | :--------: |
 | Add Bookmark    | :heavy_check_mark:                            |            |
 | UnCensor/Censor | :heavy_check_mark:                            |            |
-| Remove Plays    | :heavy_check_mark:                            |            |
 | Rename File     | :heavy_check_mark: [Info](#issue-explanation) | FUNCTIONAL |
 | Copy Filename   | :heavy_check_mark:                            |            |
 | Update Video    | :heavy_check_mark:                            |            |
@@ -115,7 +113,6 @@
 
 | Name      | Status                                        |  Priority  |
 | --------- | --------------------------------------------- | :--------: |
-| Plays     | :heavy_check_mark:                            |            |
 | Thumbnail | :heavy_check_mark:                            |            |
 | Title     | :heavy_check_mark:                            |            |
 | Link      | :heavy_check_mark: [Info](#issue-explanation) | FUNCTIONAL |

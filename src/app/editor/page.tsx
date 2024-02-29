@@ -34,7 +34,6 @@ type UpdateRef = {
 type OnlyType = 'starOnly' | 'videoOnly'
 type WithOnlyType = General & { videoOnly?: boolean; starOnly?: boolean }
 
-//NEXT can be migrated to server-component
 export default function EditorPage() {
   return (
     <Grid container justifyContent='center'>

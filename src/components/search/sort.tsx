@@ -66,7 +66,8 @@ type DefaultVideoObj = {
   outfit: string
   network: string
   query: string
-  sort: WithReverse<'alphabetical' | 'added' | 'plays' | 'published' | 'quality'>
+  sort: WithReverse<'alphabetical' | 'added' | 'published' | 'quality' | 'shuffle'>
+  shuffle: string
 }
 
 type DefaultStarObj = {
@@ -85,7 +86,8 @@ export const defaultVideoObj: DefaultVideoObj = {
   outfit: '',
   network: 'ALL',
   query: '',
-  sort: 'alphabetical'
+  sort: 'alphabetical',
+  shuffle: ''
 }
 
 export const defaultStarObj: DefaultStarObj = {
@@ -106,9 +108,6 @@ export function getVideoSort(type: DefaultVideoObj['sort']): SortMethodVideo {
     case 'added':
       sortMethod = (a, b) => a.id - b.id
       break
-    case 'plays':
-      sortMethod = (a, b) => a.plays - b.plays
-      break
     case 'published':
       sortMethod = (a, b) => {
         if (a.published === null && b.published === null) return 0
@@ -120,6 +119,9 @@ export function getVideoSort(type: DefaultVideoObj['sort']): SortMethodVideo {
       break
     case 'quality':
       sortMethod = (a, b) => a.quality - b.quality
+      break
+    case 'shuffle':
+      sortMethod = () => Math.random() - 0.5
       break
     default:
       sortMethod = (a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'case' })

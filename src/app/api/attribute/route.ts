@@ -7,6 +7,7 @@ import validate, { z } from '@utils/server/validation'
 export async function GET() {
   return NextResponse.json(
     await db.attribute.findMany({
+      select: { id: true, name: true, videoOnly: true, starOnly: true },
       orderBy: { name: 'asc' }
     })
   )

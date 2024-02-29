@@ -2,9 +2,11 @@ import Client from './client'
 
 import { Params } from '@interfaces'
 import { db } from '@utils/server/prisma'
+import validate, { z } from '@utils/server/validation'
 
+//TODO migrate to api
 export default async function StarPage({ params }: Params<'id'>) {
-  const id = parseInt(params.id)
+  const { id } = validate(z.object({ id: z.coerce.number() }), params)
 
   const star = await db.star.findFirstOrThrow({ where: { id } })
 

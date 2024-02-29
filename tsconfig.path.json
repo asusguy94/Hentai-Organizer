@@ -1,10 +1,10 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
     "paths": {
       "@service": ["./src/service"], // only index-page
       "@components/*": ["./src/components/*"],
       "@config": ["./src/config"], // only index-page
-      "@pages/*": ["./src/pages/*"],
       "@styles/*": ["./src/styles/*"],
       "@utils/client": ["./src/utils/client"],
       "@utils/server/*": ["./src/utils/server/*"],

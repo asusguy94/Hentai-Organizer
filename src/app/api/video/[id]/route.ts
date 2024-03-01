@@ -5,7 +5,12 @@ import { dirOnly, formatDate, removeCover, removePoster, removePreviews } from '
 import { db } from '@utils/server/prisma'
 import validate, { z } from '@utils/server/validation'
 
-//NEXT /video/[id]
+export async function GET(req: Request, { params }: Params<'id'>) {
+  const { id } = validate(z.object({ id: z.coerce.number() }), params)
+
+  return Response.json(await db.video.findFirstOrThrow({ where: { id } }))
+}
+
 export async function PUT(req: Request, { params }: Params<'id'>) {
   const id = parseInt(params.id)
 

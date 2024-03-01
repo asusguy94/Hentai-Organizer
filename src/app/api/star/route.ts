@@ -1,5 +1,3 @@
-import { NextResponse } from 'next/server'
-
 import { db } from '@utils/server/prisma'
 import { getUnique } from '@utils/shared'
 
@@ -7,7 +5,7 @@ export const dynamic = 'force-dynamic'
 
 //NEXT /star/[id]
 export async function GET() {
-  return NextResponse.json({
+  return Response.json({
     breast: getUnique(
       (
         await db.star.findMany({

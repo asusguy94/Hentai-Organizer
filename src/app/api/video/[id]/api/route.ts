@@ -1,5 +1,3 @@
-import { NextResponse } from 'next/server'
-
 import { Params } from '@interfaces'
 import { getVideo } from '@utils/server/hanime'
 import { downloader } from '@utils/server/helper'
@@ -28,14 +26,14 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
     try {
       const { released, brand } = await getVideo(slug)
 
-      return NextResponse.json(
+      return Response.json(
         await db.video.update({
           data: { date_published: new Date(released.date), brand, slug },
           where: { id }
         })
       )
     } catch (e) {
-      return NextResponse.json({
+      return Response.json({
         error: 'invalid slug'
       })
     }
@@ -43,7 +41,7 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
     if (video.slug !== null) {
       const { brand } = await getVideo(video.slug)
 
-      return NextResponse.json(
+      return Response.json(
         await db.video.update({
           data: { brand },
           where: { id }
@@ -54,7 +52,7 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
     if (video.slug !== null) {
       const { released } = await getVideo(video.slug)
 
-      return NextResponse.json(
+      return Response.json(
         await db.video.update({
           data: { date_published: new Date(released.date) },
           where: { id }
@@ -67,7 +65,7 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
 
       downloader(cover, `media/images/videos/cover/${video.id}.png`)
 
-      return NextResponse.json(
+      return Response.json(
         await db.video.update({
           data: { cover },
           where: { id }
@@ -80,7 +78,7 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
 
       downloader(poster, `media/images/videos/poster/${video.id}.png`)
 
-      return NextResponse.json(
+      return Response.json(
         await db.video.update({
           data: { poster },
           where: { id }

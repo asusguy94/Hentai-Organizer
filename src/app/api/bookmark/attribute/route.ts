@@ -1,5 +1,3 @@
-import { NextResponse } from 'next/server'
-
 import { db } from '@utils/server/prisma'
 import validate, { z } from '@utils/server/validation'
 
@@ -40,8 +38,8 @@ export async function POST(req: Request) {
     for await (const data of result) {
       res.push(await insertHandler(data.id, attributeId))
     }
-    return NextResponse.json(res)
+    return Response.json(res)
   } else if (bookmarkId !== undefined) {
-    return NextResponse.json(await insertHandler(bookmarkId, attributeId))
+    return Response.json(await insertHandler(bookmarkId, attributeId))
   }
 }

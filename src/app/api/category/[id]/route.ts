@@ -1,5 +1,3 @@
-import { NextResponse } from 'next/server'
-
 import { Params } from '@interfaces'
 import { db } from '@utils/server/prisma'
 import validate, { z } from '@utils/server/validation'
@@ -15,7 +13,7 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
     await req.json()
   )
 
-  return NextResponse.json(
+  return Response.json(
     await db.category.update({
       where: { id },
       data: { name: value }

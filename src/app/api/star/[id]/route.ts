@@ -1,5 +1,3 @@
-import { NextResponse } from 'next/server'
-
 import { Params } from '@interfaces'
 import { db } from '@utils/server/prisma'
 import validate, { z } from '@utils/server/validation'
@@ -39,7 +37,7 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
   )
 
   if (name !== undefined) {
-    return NextResponse.json(
+    return Response.json(
       await db.star.update({
         where: { id },
         data: { name }
@@ -47,14 +45,14 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
     )
   } else if (label !== undefined && value !== undefined) {
     if (value.length) {
-      return NextResponse.json(
+      return Response.json(
         await db.star.update({
           where: { id },
           data: { [label]: value }
         })
       )
     } else {
-      return NextResponse.json(
+      return Response.json(
         await db.star.update({
           where: { id },
           data: { [label]: null }
@@ -67,7 +65,7 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
 export async function DELETE(req: Request, { params }: Params<'id'>) {
   const { id } = validate(z.object({ id: z.coerce.number() }), params)
 
-  return NextResponse.json(
+  return Response.json(
     await db.star.delete({
       where: { id }
     })

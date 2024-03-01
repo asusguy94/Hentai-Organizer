@@ -1,5 +1,3 @@
-import { NextResponse } from 'next/server'
-
 import { db } from '@utils/server/prisma'
 import validate, { z } from '@utils/server/validation'
 
@@ -35,5 +33,5 @@ export async function POST(req: Request) {
     )
   }
 
-  return NextResponse.json(res)
+  return Response.json(res)
 }

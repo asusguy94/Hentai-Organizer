@@ -1,5 +1,3 @@
-import { NextResponse } from 'next/server'
-
 import fs from 'fs'
 
 import { Params } from '@interfaces'
@@ -37,7 +35,7 @@ export async function POST(req: Request, { params }: Params<'id'>) {
   // Download Image
   await downloader(url, `media/images/stars/${id}.jpg`)
 
-  return NextResponse.json({
+  return Response.json({
     image: `${id}.jpg`
   })
 }
@@ -55,6 +53,6 @@ export async function DELETE(req: Request, { params }: Params<'id'>) {
 
     await fs.promises.unlink(`./media/images/stars/${star.image}`)
 
-    return NextResponse.json(result)
+    return Response.json(result)
   }
 }

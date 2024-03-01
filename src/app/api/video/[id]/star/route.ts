@@ -1,5 +1,3 @@
-import { NextResponse } from 'next/server'
-
 import { Params } from '@interfaces'
 import { db } from '@utils/server/prisma'
 import validate, { z } from '@utils/server/validation'
@@ -23,7 +21,7 @@ export async function POST(req: Request, { params }: Params<'id'>) {
   })
   await db.videoStars.create({ data: { starID: star.id, videoID: id } })
 
-  return NextResponse.json({
+  return Response.json({
     ...star,
     attributes: star.attributes.map(({ attribute }) => attribute)
   })

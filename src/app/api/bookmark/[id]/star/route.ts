@@ -1,5 +1,3 @@
-import { NextResponse } from 'next/server'
-
 import { Params } from '@interfaces'
 import { db } from '@utils/server/prisma'
 import validate, { z } from '@utils/server/validation'
@@ -15,7 +13,7 @@ export async function POST(req: Request, { params }: Params<'id'>) {
     await req.json()
   )
 
-  return NextResponse.json(
+  return Response.json(
     await db.bookmark.update({
       where: { id },
       data: { starID: starId }
@@ -27,7 +25,7 @@ export async function POST(req: Request, { params }: Params<'id'>) {
 export async function DELETE(req: Request, { params }: Params<'id'>) {
   const id = parseInt(params.id)
 
-  return NextResponse.json(
+  return Response.json(
     await db.bookmark.update({
       where: { id },
       data: { star: { disconnect: true } }

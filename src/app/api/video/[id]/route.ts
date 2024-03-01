@@ -1,5 +1,3 @@
-import { NextResponse } from 'next/server'
-
 import fs from 'fs'
 
 import { Params } from '@interfaces'
@@ -24,28 +22,28 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
   )
 
   if (cen !== undefined) {
-    return NextResponse.json(
+    return Response.json(
       await db.video.update({
         where: { id },
         data: { cen }
       })
     )
   } else if (noStar !== undefined) {
-    return NextResponse.json(
+    return Response.json(
       await db.video.update({
         where: { id },
         data: { noStar }
       })
     )
   } else if (title !== undefined) {
-    return NextResponse.json(
+    return Response.json(
       await db.video.update({
         where: { id },
         data: { name: title }
       })
     )
   } else if (franchise !== undefined) {
-    return NextResponse.json(
+    return Response.json(
       await db.video.update({
         where: { id },
         data: { franchise }
@@ -53,7 +51,7 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
     )
   } else if (date !== undefined) {
     if (!date) {
-      return NextResponse.json(
+      return Response.json(
         await db.video.update({
           where: { id },
           data: { date_published: null }
@@ -65,7 +63,7 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
         data: { date_published: new Date(formatDate(date, true)) }
       })
 
-      return NextResponse.json({
+      return Response.json({
         ...video,
         date_published: video.date_published !== null ? formatDate(video.date_published) : null
       })
@@ -78,7 +76,7 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
     //TODO the last one throws if the folder doesn't exist
 
     // UPDATE DATABASE
-    return NextResponse.json(
+    return Response.json(
       await db.video.update({
         where: { id },
         data: { path }
@@ -101,11 +99,10 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
     await removeCover(id)
     await removePoster(id)
 
-    return NextResponse.json(result)
+    return Response.json(result)
   }
 }
 
-//NEXT /video/[id]
 export function DELETE(req: Request, { params }: Params<'id'>) {
   const id = parseInt(params.id)
 
@@ -125,5 +122,5 @@ export function DELETE(req: Request, { params }: Params<'id'>) {
     ])
   })
 
-  return NextResponse.json(result)
+  return Response.json(result)
 }

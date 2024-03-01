@@ -1,5 +1,3 @@
-import { NextResponse } from 'next/server'
-
 import { Params } from '@interfaces'
 import { db } from '@utils/server/prisma'
 import validate, { z } from '@utils/server/validation'
@@ -47,7 +45,7 @@ export async function POST(req: Request, { params }: Params<'id'>) {
       }
     })
 
-    return NextResponse.json({
+    return Response.json({
       id: bookmark.id,
       videoID: bookmark.videoID,
       categoryID: bookmark.categoryID,
@@ -79,7 +77,7 @@ export async function POST(req: Request, { params }: Params<'id'>) {
       }
     })
 
-    return NextResponse.json({
+    return Response.json({
       id: bookmark.id,
       videoID: bookmark.videoID,
       categoryID: bookmark.categoryID,

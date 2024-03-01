@@ -1,5 +1,3 @@
-import { NextResponse } from 'next/server'
-
 import { formatDate } from '@utils/server/helper'
 import { db } from '@utils/server/prisma'
 import { getUnique } from '@utils/shared'
@@ -8,7 +6,7 @@ export const dynamic = 'force-dynamic'
 
 //NEXT /video/search
 export async function GET() {
-  return NextResponse.json(
+  return Response.json(
     (
       await db.star.findMany({
         orderBy: { name: 'asc' },

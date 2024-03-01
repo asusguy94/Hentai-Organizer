@@ -9,7 +9,7 @@ const { baseURL } = createApi('/search')
 export default {
   useStars: () => {
     const query = useQuery<StarSearch[]>({
-      queryKey: ['search', 'stars'],
+      queryKey: ['search', 'star'],
       queryFn: () => getResponse(`${baseURL}/star`),
       placeholderData: prevData => prevData
     })
@@ -18,7 +18,7 @@ export default {
   },
   useVideos: () => {
     const query = useQuery<VideoSearch[]>({
-      queryKey: ['search', 'videos'],
+      queryKey: ['search', 'video'],
       queryFn: () => getResponse(`${baseURL}/video`),
       placeholderData: prevData => prevData
     })

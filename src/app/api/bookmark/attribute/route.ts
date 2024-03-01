@@ -1,13 +1,12 @@
 import { db } from '@utils/server/prisma'
 import validate, { z } from '@utils/server/validation'
 
-//NEXT /video/[id]
 export async function POST(req: Request) {
   const {
     bookmarkID: bookmarkId,
     attributeID: attributeId,
-    starID: starId,
-    videoID: videoId
+    starID,
+    videoID
   } = validate(
     z.object({
       bookmarkID: z.number().int().positive().optional(),
@@ -31,8 +30,8 @@ export async function POST(req: Request) {
     })
   }
 
-  if (starId !== undefined && videoId !== undefined) {
-    const result = await db.bookmark.findMany({ where: { videoID: videoId, starID: starId } })
+  if (starID !== undefined && videoID !== undefined) {
+    const result = await db.bookmark.findMany({ where: { videoID, starID } })
 
     const res = []
     for await (const data of result) {

@@ -4,7 +4,6 @@ import { getUnique } from '@utils/shared'
 
 export const dynamic = 'force-dynamic'
 
-//NEXT /video/search
 export async function GET() {
   return Response.json(
     (

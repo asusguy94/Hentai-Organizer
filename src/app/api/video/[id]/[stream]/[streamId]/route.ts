@@ -2,7 +2,6 @@ import { Params } from '@interfaces'
 import { noExt, sendFile } from '@utils/server/helper'
 import { db } from '@utils/server/prisma'
 
-//NEXT /video/[id]
 export async function GET(req: Request, { params }: Params<['id', 'stream', 'streamId']>) {
   const id = parseInt(params.id)
   const { stream, streamId } = params

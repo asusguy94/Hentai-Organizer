@@ -65,7 +65,6 @@ export type Bookmark = {
   starImage?: string
   starID: number
   start: number
-  active: boolean
   attributes: Attribute[]
   outfit: string | null
 }

@@ -32,7 +32,7 @@ export default {
   setLink: (id: number, value: string) => api.put(`/${id}`, { label: 'starLink', value }),
   useVideos: (id: number) => {
     const query = useQuery<StarVideo[]>({
-      queryKey: ['star', id, 'videos'],
+      queryKey: ['star', id, 'video'],
       queryFn: () => getResponse(`${baseURL}/${id}/video`)
     })
 

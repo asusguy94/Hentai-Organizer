@@ -1,7 +1,6 @@
 import { Params } from '@interfaces'
 import { db } from '@utils/server/prisma'
 
-//NEXT /video/[id]
 export async function GET(req: Request, { params }: Params<'id'>) {
   const id = parseInt(params.id)
 

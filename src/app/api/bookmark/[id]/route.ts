@@ -2,7 +2,6 @@ import { Params } from '@interfaces'
 import { db } from '@utils/server/prisma'
 import validate, { z } from '@utils/server/validation'
 
-//NEXT /video/[id]
 export async function PUT(req: Request, { params }: Params<'id'>) {
   const id = parseInt(params.id)
 
@@ -23,7 +22,6 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
       })
     )
   } else if (categoryID !== undefined) {
-    // Change CategoryID
     return Response.json(
       await db.bookmark.update({
         where: { id },
@@ -33,7 +31,6 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
   }
 }
 
-//NEXT /video/[id]
 export async function DELETE(req: Request, { params }: Params<'id'>) {
   const id = parseInt(params.id)
 

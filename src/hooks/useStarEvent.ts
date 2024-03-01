@@ -12,7 +12,6 @@ export type EventData = {
   name: string
   starID: number
   start: number
-  active: boolean
   attributes: unknown[]
 }
 
@@ -22,7 +21,6 @@ export default function useStarEvent() {
     name: '',
     starID: 0,
     start: 0,
-    active: false,
     attributes: []
   }
 

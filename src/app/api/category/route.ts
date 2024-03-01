@@ -1,7 +1,6 @@
 import { db } from '@utils/server/prisma'
 import validate, { z } from '@utils/server/validation'
 
-//NEXT /editor
 export async function GET() {
   return Response.json(
     await db.category.findMany({
@@ -10,7 +9,6 @@ export async function GET() {
   )
 }
 
-//NEXT /editor
 export async function POST(req: Request) {
   const { name } = validate(
     z.object({

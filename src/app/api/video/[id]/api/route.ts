@@ -4,7 +4,6 @@ import { downloader } from '@utils/server/helper'
 import { db } from '@utils/server/prisma'
 import validate, { z } from '@utils/server/validation'
 
-//NEXT /video/[id]
 export async function PUT(req: Request, { params }: Params<'id'>) {
   const id = parseInt(params.id)
 

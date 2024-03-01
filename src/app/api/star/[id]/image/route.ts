@@ -5,7 +5,6 @@ import { downloader, sendFile } from '@utils/server/helper'
 import { db } from '@utils/server/prisma'
 import validate, { z } from '@utils/server/validation'
 
-//NEXT /star/[id] && /star/search && /video/[id]
 export async function GET(req: Request, { params }: Params<'id'>) {
   const id = parseInt(params.id)
 
@@ -15,7 +14,6 @@ export async function GET(req: Request, { params }: Params<'id'>) {
   }
 }
 
-//NEXT /star/[id]
 export async function POST(req: Request, { params }: Params<'id'>) {
   const id = parseInt(params.id)
 
@@ -40,7 +38,6 @@ export async function POST(req: Request, { params }: Params<'id'>) {
   })
 }
 
-//NEXT /star/[id]
 export async function DELETE(req: Request, { params }: Params<'id'>) {
   const id = parseInt(params.id)
 

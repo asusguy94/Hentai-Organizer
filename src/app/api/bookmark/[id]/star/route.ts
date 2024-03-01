@@ -2,11 +2,10 @@ import { Params } from '@interfaces'
 import { db } from '@utils/server/prisma'
 import validate, { z } from '@utils/server/validation'
 
-//NEXT /video/[id]
 export async function POST(req: Request, { params }: Params<'id'>) {
   const id = parseInt(params.id)
 
-  const { starID: starId } = validate(
+  const { starID } = validate(
     z.object({
       starID: z.number().int().positive()
     }),
@@ -16,12 +15,11 @@ export async function POST(req: Request, { params }: Params<'id'>) {
   return Response.json(
     await db.bookmark.update({
       where: { id },
-      data: { starID: starId }
+      data: { starID }
     })
   )
 }
 
-//NEXT /video/[id]
 export async function DELETE(req: Request, { params }: Params<'id'>) {
   const id = parseInt(params.id)
 

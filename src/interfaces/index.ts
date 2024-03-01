@@ -105,3 +105,9 @@ export type VideoSearch = {
   categories: string[]
   outfits: string[]
 }
+
+export type StarVideo = {
+  id: number
+  name: string
+  path: string
+}

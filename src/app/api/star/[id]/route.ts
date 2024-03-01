@@ -4,9 +4,30 @@ import { Params } from '@interfaces'
 import { db } from '@utils/server/prisma'
 import validate, { z } from '@utils/server/validation'
 
-//NEXT /star/[id]
+export async function GET(req: Request, { params }: Params<'id'>) {
+  const { id } = validate(z.object({ id: z.coerce.number() }), params)
+
+  const star = await db.star.findFirstOrThrow({
+    where: { id },
+    include: { attributes: { select: { attribute: true } } }
+  })
+
+  return Response.json({
+    id: star.id,
+    name: star.name,
+    image: star.image,
+    info: {
+      breast: star.breast ?? '',
+      haircolor: star.haircolor ?? '',
+      hairstyle: star.hairstyle ?? '',
+      attribute: star.attributes.map(({ attribute }) => attribute.name)
+    },
+    link: star.starLink
+  })
+}
+
 export async function PUT(req: Request, { params }: Params<'id'>) {
-  const id = parseInt(params.id)
+  const { id } = validate(z.object({ id: z.coerce.number() }), params)
 
   const { name, label, value } = validate(
     z.object({
@@ -43,9 +64,8 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
   }
 }
 
-//NEXT /star/[id]
 export async function DELETE(req: Request, { params }: Params<'id'>) {
-  const id = parseInt(params.id)
+  const { id } = validate(z.object({ id: z.coerce.number() }), params)
 
   return NextResponse.json(
     await db.star.delete({

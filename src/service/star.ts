@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 
 import { createApi } from '@config'
+import { StarVideo } from '@interfaces'
 import { getResponse } from '@utils/shared'
 
 const { api, baseURL } = createApi('/star')
@@ -28,5 +29,34 @@ export default {
   removeImage: (id: number) => api.delete(`/${id}/image`),
   removeStar: (id: number) => api.delete(`/${id}`),
   renameStar: (id: number, name: string) => api.put(`/${id}`, { name }),
-  setLink: (id: number, value: string) => api.put(`/${id}`, { label: 'starLink', value })
+  setLink: (id: number, value: string) => api.put(`/${id}`, { label: 'starLink', value }),
+  useVideos: (id: number) => {
+    const query = useQuery<StarVideo[]>({
+      queryKey: ['star', id, 'videos'],
+      queryFn: () => getResponse(`${baseURL}/${id}/video`)
+    })
+
+    return { data: query.data }
+  },
+  useStar: (id: number) => {
+    type Star = {
+      id: number
+      name: string
+      image: string | null
+      info: {
+        breast: string
+        haircolor: string
+        hairstyle: string
+        attribute: string[]
+      }
+      link: string | null
+    }
+
+    const query = useQuery<Star>({
+      queryKey: ['star', id],
+      queryFn: () => getResponse(`${baseURL}/${id}`)
+    })
+
+    return { data: query.data }
+  }
 }

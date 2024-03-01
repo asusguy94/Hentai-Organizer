@@ -3,9 +3,43 @@ import { db } from '@utils/server/prisma'
 import validate, { z } from '@utils/server/validation'
 import { getUnique } from '@utils/shared'
 
-//NEXT /video/[id]
+export async function GET(req: Request, { params }: Params<'id'>) {
+  const { id } = validate(z.object({ id: z.coerce.number() }), params)
+
+  const bookmarks = await db.bookmark.findMany({
+    where: { videoID: id },
+    orderBy: { start: 'asc' },
+    select: {
+      id: true,
+      start: true,
+      category: true,
+      outfit: true,
+      attributes: { include: { attribute: { select: { id: true, name: true } } } },
+      star: {
+        include: { attributes: { include: { attribute: { select: { id: true, name: true } } } } }
+      }
+    }
+  })
+
+  return Response.json(
+    bookmarks.map(({ category, star, ...bookmark }) => {
+      const starAttributes = star?.attributes.map(({ attribute }) => attribute) ?? []
+      const bookmarkAttributes = bookmark.attributes.map(({ attribute }) => attribute)
+
+      return {
+        ...bookmark,
+        name: category.name,
+        outfit: bookmark.outfit?.name ?? null,
+        attributes: getUnique([...starAttributes, ...bookmarkAttributes], 'id'),
+        starID: star?.id ?? 0,
+        starImage: star?.image ?? undefined
+      }
+    })
+  )
+}
+
 export async function POST(req: Request, { params }: Params<'id'>) {
-  const id = parseInt(params.id)
+  const { id } = validate(z.object({ id: z.coerce.number() }), params)
 
   const { categoryID, time, starID } = validate(
     z.object({

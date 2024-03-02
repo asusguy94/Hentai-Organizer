@@ -39,10 +39,6 @@ export function calculateTimeCode(seconds: number, timeFormat = 'HH:mm:ss'): str
     .format(timeFormat) // use .SSS for milliseconds
 }
 
-export async function getResponse<T>(href: string) {
-  return fetch(href).then(res => res.json() as Promise<T>)
-}
-
 type MutateAndInvalidateProps<TData, TResult> = {
   mutate: UseMutateFunction<TResult, DefaultError, TData>
   queryClient: QueryClient

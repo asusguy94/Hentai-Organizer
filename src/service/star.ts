@@ -3,9 +3,8 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 
 import { createApi } from '@config'
 import { StarVideo } from '@interfaces'
-import { getResponse } from '@utils/shared'
 
-const { api, baseURL } = createApi('/star')
+const { api } = createApi('/star')
 
 type StarInfo = {
   breast: string[]
@@ -18,7 +17,7 @@ export default {
   useInfo: () => {
     const query = useQuery<StarInfo>({
       ...keys.stars.info,
-      queryFn: () => getResponse(baseURL)
+      queryFn: () => api.get('').then(res => res.data)
     })
 
     return { data: query.data }
@@ -26,7 +25,7 @@ export default {
   useAddAttribute: (id: number) => {
     const { mutate } = useMutation<unknown, Error, { name: string }>({
       mutationKey: ['star', id, 'addAttribute'],
-      mutationFn: payload => api.put(`/${id}/attribute`, payload)
+      mutationFn: payload => api.put(`/${id}/attribute`, payload).then(res => res.data)
     })
 
     return { mutate }
@@ -34,7 +33,7 @@ export default {
   useRemoveAttribute: (id: number) => {
     const { mutate } = useMutation<unknown, Error, { name: string }>({
       mutationKey: ['star', id, 'removeAttribute'],
-      mutationFn: payload => api.put(`/${id}/attribute`, { ...payload, remove: true })
+      mutationFn: payload => api.put(`/${id}/attribute`, { ...payload, remove: true }).then(res => res.data)
     })
 
     return { mutate }
@@ -42,7 +41,7 @@ export default {
   useUpdateInfo: (id: number) => {
     const { mutate } = useMutation<unknown, Error, { label: string; value: string }>({
       mutationKey: ['star', id, 'updateInfo'],
-      mutationFn: payload => api.put(`/${id}`, payload)
+      mutationFn: payload => api.put(`/${id}`, payload).then(res => res.data)
     })
 
     return { mutate }
@@ -55,14 +54,14 @@ export default {
 
     return { mutate }
   },
-  removeImage: (id: number) => api.delete(`/${id}/image`),
-  removeStar: (id: number) => api.delete(`/${id}`),
-  renameStar: (id: number, name: string) => api.put(`/${id}`, { name }),
-  setLink: (id: number, value: string) => api.put(`/${id}`, { label: 'starLink', value }),
+  removeImage: (id: number) => api.delete(`/${id}/image`).then(res => res.data),
+  removeStar: (id: number) => api.delete(`/${id}`).then(res => res.data),
+  renameStar: (id: number, name: string) => api.put(`/${id}`, { name }).then(res => res.data),
+  setLink: (id: number, value: string) => api.put(`/${id}`, { label: 'starLink', value }).then(res => res.data),
   useVideos: (id: number) => {
     const query = useQuery<StarVideo[]>({
       ...keys.stars.byId(id)._ctx.video,
-      queryFn: () => getResponse(`${baseURL}/${id}/video`)
+      queryFn: () => api.get(`/${id}/video`).then(res => res.data)
     })
 
     return { data: query.data }
@@ -83,7 +82,7 @@ export default {
 
     const query = useQuery<Star>({
       ...keys.stars.byId(id),
-      queryFn: () => getResponse(`${baseURL}/${id}`)
+      queryFn: () => api.get(`/${id}`).then(res => res.data)
     })
 
     return { data: query.data }

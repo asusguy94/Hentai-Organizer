@@ -49,10 +49,7 @@ type Star = {
 
 export default function StarPage() {
   const params = useParams<{id:string}>()
-
-  const {id} = validate(z.object({ id: z.coerce.number() }), params)
-
-  if(params?.id === undefined) throw new Error('id is undefined')
+  const { id } = validate(z.object({ id: z.coerce.number() }), params)
 
   const { data: star } = starService.useStar(id)
   const { data: videos } = starService.useVideos(id)

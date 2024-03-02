@@ -3,15 +3,14 @@ import { useQuery } from '@tanstack/react-query'
 
 import { createApi } from '@config'
 import { Category } from '@interfaces'
-import { getResponse } from '@utils/shared'
 
-const { baseURL } = createApi('/category')
+const { api } = createApi('/category')
 
 export default {
   useAll: () => {
     const query = useQuery<Category[]>({
       ...keys.categories.all,
-      queryFn: () => getResponse(baseURL)
+      queryFn: () => api.get('').then(res => res.data)
     })
 
     return { data: query.data }

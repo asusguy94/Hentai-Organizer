@@ -3,15 +3,14 @@ import { useQuery } from '@tanstack/react-query'
 
 import { createApi } from '@config'
 import { StarSearch, VideoSearch } from '@interfaces'
-import { getResponse } from '@utils/shared'
 
-const { baseURL } = createApi('/search')
+const { api } = createApi('/search')
 
 export default {
   useStars: () => {
     const query = useQuery<StarSearch[]>({
       ...keys.search.star,
-      queryFn: () => getResponse(`${baseURL}/star`),
+      queryFn: () => api.get('/star').then(res => res.data),
       placeholderData: prevData => prevData
     })
 
@@ -20,7 +19,7 @@ export default {
   useVideos: () => {
     const query = useQuery<VideoSearch[]>({
       ...keys.search.video,
-      queryFn: () => getResponse(`${baseURL}/video`),
+      queryFn: () => api.get('/video').then(res => res.data),
       placeholderData: prevData => prevData
     })
 

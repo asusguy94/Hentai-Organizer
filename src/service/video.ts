@@ -3,9 +3,8 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 
 import { createApi } from '@config'
 import { Bookmark, General, Validity, Video, VideoStar } from '@interfaces'
-import { getResponse } from '@utils/shared'
 
-const { api, baseURL } = createApi('/video')
+const { api } = createApi('/video')
 
 type HomeVideo = {
   id: number
@@ -15,12 +14,12 @@ type HomeVideo = {
 }
 
 export default {
-  renameVideo: (id: number, path: string) => api.put(`/${id}`, { path }),
-  toggleCensor: (id: number, censored: boolean) => api.put(`/${id}`, { cen: !censored }),
-  updateVideo: (id: number) => api.put(`/${id}`),
-  deleteVideo: (id: number) => api.delete(`/${id}`),
+  renameVideo: (id: number, path: string) => api.put(`/${id}`, { path }).then(res => res.data),
+  toggleCensor: (id: number, censored: boolean) => api.put(`/${id}`, { cen: !censored }).then(res => res.data),
+  updateVideo: (id: number) => api.put(`/${id}`).then(res => res.data),
+  deleteVideo: (id: number) => api.delete(`/${id}`).then(res => res.data),
   useAddBookmark: (id: number) => {
-    const { mutate } = useMutation<Bookmark, Error, { categoryID: number; time: number; starID?: number }>({
+    const { mutate } = useMutation<unknown, Error, { categoryID: number; time: number; starID?: number }>({
       mutationKey: ['video', id, 'addBookmark'],
       mutationFn: ({ starID, ...payload }) => {
         if (starID !== undefined) {
@@ -33,8 +32,8 @@ export default {
 
     return { mutate }
   },
-  renameFranchise: (id: number, value: string) => api.put(`/${id}`, { franchise: value }),
-  renameTitle: (id: number, value: string) => api.put(`/${id}`, { title: value }),
+  renameFranchise: (id: number, value: string) => api.put(`/${id}`, { franchise: value }).then(res => res.data),
+  renameTitle: (id: number, value: string) => api.put(`/${id}`, { title: value }).then(res => res.data),
   useRemoveStar: (id: number) => {
     const { mutate, mutateAsync } = useMutation<unknown, Error, { starID: number }>({
       mutationKey: ['video', id, 'removeStar'],
@@ -45,7 +44,7 @@ export default {
   },
   toggleNoStar: (id: number, checked: boolean) => api.put(`/${id}`, { noStar: checked }),
   useAddStar: (id: number) => {
-    const { mutate, mutateAsync } = useMutation<VideoStar, Error, { name: string }>({
+    const { mutate, mutateAsync } = useMutation<unknown, Error, { name: string }>({
       mutationKey: ['video', id, 'addStar'],
       mutationFn: payload => api.post(`/${id}/star`, payload).then(res => res.data)
     })
@@ -55,22 +54,24 @@ export default {
   useRelatedStars: (id: number) => {
     const query = useQuery<General[]>({
       ...keys.videos.related._ctx.star(id),
-      queryFn: () => getResponse(`${baseURL}/${id}/related/star`)
+      queryFn: () => api.get(`/${id}/related/star`).then(res => res.data)
     })
 
     return { data: query.data }
   },
-  removeAttribute: (id: number, attributeID: number) => api.delete(`/${id}/attribute/${attributeID}`),
-  addVideos: (videos: unknown[]) => api.post('/add', { videos }),
-  setSlug: (id: number, slug: string) => api.put(`/${id}/api`, { slug }),
-  setBrand: (id: number) => api.put(`/${id}/api`, { brand: true }),
-  setDate: (id: number) => api.put(`/${id}/api`, { date: true }),
-  setCover: (id: number) => api.put(`/${id}/api`, { cover: true }),
-  setPoster: (id: number) => api.put(`/${id}/api`, { poster: true }),
+  removeAttribute: (id: number, attributeID: number) => {
+    return api.delete(`/${id}/attribute/${attributeID}`).then(res => res.data)
+  },
+  addVideos: (videos: unknown[]) => api.post('/add', { videos }).then(res => res.data),
+  setSlug: (id: number, slug: string) => api.put(`/${id}/api`, { slug }).then(res => res.data),
+  setBrand: (id: number) => api.put(`/${id}/api`, { brand: true }).then(res => res.data),
+  setDate: (id: number) => api.put(`/${id}/api`, { date: true }).then(res => res.data),
+  setCover: (id: number) => api.put(`/${id}/api`, { cover: true }).then(res => res.data),
+  setPoster: (id: number) => api.put(`/${id}/api`, { poster: true }).then(res => res.data),
   useHomeVideos: (label: string, limit: number) => {
     const query = useQuery<HomeVideo[]>({
       ...keys.videos.home(label, limit),
-      queryFn: () => getResponse(`${baseURL}/home/${label}/${limit}`)
+      queryFn: () => api.get(`/home/${label}/${limit}`).then(res => res.data)
     })
 
     return { data: query.data }
@@ -78,15 +79,16 @@ export default {
   useStars: (id: number) => {
     const query = useQuery<VideoStar[]>({
       ...keys.videos.byId(id)._ctx.star,
-      queryFn: () => getResponse(`${baseURL}/${id}/star`)
+      queryFn: () => api.get(`/${id}/star`).then(res => res.data)
     })
 
     return { data: query.data }
   },
   useIsValid: (id: number) => {
+    //TODO can probably be merged with useVideo
     const query = useQuery<Validity>({
       ...keys.videos.byId(id)._ctx.validate,
-      queryFn: () => getResponse(`${baseURL}/${id}/validate`)
+      queryFn: () => api.get(`/${id}/validate`).then(res => res.data)
     })
 
     return { data: query.data }
@@ -94,7 +96,7 @@ export default {
   useVideo: (id: number) => {
     const query = useQuery<Video>({
       ...keys.videos.byId(id),
-      queryFn: () => getResponse(`${baseURL}/${id}`)
+      queryFn: () => api.get(`/${id}`).then(res => res.data)
     })
 
     return { data: query.data }
@@ -102,27 +104,37 @@ export default {
   useBookmarks: (id: number) => {
     const query = useQuery<Bookmark[]>({
       ...keys.videos.byId(id)._ctx.bookmark,
-      queryFn: () => getResponse(`${baseURL}/${id}/bookmark`)
+      queryFn: () => api.get(`/${id}/bookmark`).then(res => res.data)
     })
 
     return { data: query.data }
   },
   useNewVideos: () => {
-    const query = useQuery<{ path: string; franchise: string; episode: number; name: string; slug: string }[]>({
+    type NewVideo = {
+      path: string
+      franchise: string
+      episode: number
+      name: string
+      slug: string
+    }
+
+    const query = useQuery<NewVideo[]>({
       ...keys.videos.new,
-      queryFn: () => getResponse(`${baseURL}/add`)
+      queryFn: () => api.get('/add').then(res => res.data)
     })
 
     return { data: query.data }
   },
   useVideos: () => {
-    const query = useQuery<{
+    type AllVideos = {
       bookmarks: { noStar: General[] }
       video: { noBookmarks: General[]; noStars: General[]; slugMissmatch: General[]; unusedStar: General[] }
       stars: { noImage: General[] }
-    }>({
+    }
+
+    const query = useQuery<AllVideos>({
       ...keys.videos.all,
-      queryFn: () => getResponse(baseURL)
+      queryFn: () => api.get('').then(res => res.data)
     })
 
     return { data: query.data }

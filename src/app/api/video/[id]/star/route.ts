@@ -24,7 +24,7 @@ export async function GET(req: Request, { params }: Params<'id'>) {
 }
 
 export async function POST(req: Request, { params }: Params<'id'>) {
-  const id = parseInt(params.id)
+  const { id } = validate(z.object({ id: z.coerce.number() }), params)
 
   const { name } = validate(
     z.object({

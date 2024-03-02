@@ -57,7 +57,7 @@ export async function GET(req: Request, { params }: Params<'id'>) {
 }
 
 export async function PUT(req: Request, { params }: Params<'id'>) {
-  const id = parseInt(params.id)
+  const { id } = validate(z.object({ id: z.coerce.number() }), params)
 
   const { cen, noStar, title, franchise, date, path } = validate(
     z.object({
@@ -154,7 +154,7 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
 }
 
 export function DELETE(req: Request, { params }: Params<'id'>) {
-  const id = parseInt(params.id)
+  const { id } = validate(z.object({ id: z.coerce.number() }), params)
 
   const result = db.video.delete({ where: { id } })
 

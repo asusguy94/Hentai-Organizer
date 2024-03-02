@@ -35,7 +35,14 @@ export default {
   },
   renameFranchise: (id: number, value: string) => api.put(`/${id}`, { franchise: value }),
   renameTitle: (id: number, value: string) => api.put(`/${id}`, { title: value }),
-  removeStar: (id: number, starID: number) => api.delete(`/${id}/star/${starID}`),
+  useRemoveStar: (id: number) => {
+    const { mutate, mutateAsync } = useMutation<unknown, Error, { starID: number }>({
+      mutationKey: ['video', id, 'removeStar'],
+      mutationFn: ({ starID }) => api.delete(`/${id}/star/${starID}`).then(res => res.data)
+    })
+
+    return { mutate, mutateAsync }
+  },
   toggleNoStar: (id: number, checked: boolean) => api.put(`/${id}`, { noStar: checked }),
   useAddStar: (id: number) => {
     const { mutate, mutateAsync } = useMutation<VideoStar, Error, { name: string }>({

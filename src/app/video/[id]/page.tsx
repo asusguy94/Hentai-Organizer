@@ -194,9 +194,15 @@ type StarsProps = {
   starEvent: { getEvent: Event; getDefault: EventData; setEvent: EventHandler }
 }
 function Stars({ video, stars, bookmarks, attributes, categories, onModal, starEvent }: StarsProps) {
+  const { mutate } = videoService.useRemoveStar(video.id)
+  const queryClient = useQueryClient()
+
   const removeStar = (id: number) => {
-    videoService.removeStar(video.id, id).then(() => {
-      location.reload()
+    mutateAndInvalidate({
+      mutate,
+      queryClient,
+      ...keys.videos.byId(video.id)._ctx.star,
+      variables: { starID: id }
     })
   }
 
@@ -531,17 +537,21 @@ type RemoveUnusedStarsProps = {
   disabled: boolean
 }
 function RemoveUnusedStars({ video, bookmarks, stars, disabled }: RemoveUnusedStarsProps) {
+  const { mutateAsync } = videoService.useRemoveStar(video.id)
+  const queryClient = useQueryClient()
+
   if (disabled || stars.every(star => bookmarks.some(bookmark => bookmark.starID === star.id))) {
     return null
   }
 
   const handleClick = () => {
-    Promise.allSettled(
-      stars
+    mutateAndInvalidateAll({
+      mutate: mutateAsync,
+      queryClient,
+      ...keys.videos.byId(video.id)._ctx.star,
+      variables: stars
         .filter(star => bookmarks.every(bookmark => bookmark.starID !== star.id))
-        .map(star => videoService.removeStar(video.id, star.id))
-    ).then(() => {
-      location.reload()
+        .map(star => ({ starID: star.id }))
     })
   }
 

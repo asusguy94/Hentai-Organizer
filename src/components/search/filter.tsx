@@ -74,7 +74,7 @@ export function FilterRadio<T extends DefaultObj>({
 type FilterCheckboxProps<TData extends string | General, TObj extends DefaultObj> = {
   data?: TData[]
   label: string & keyof TObj
-  callback: (ref: RegularHandlerProps, item: TData) => void
+  callback: (ref: RegularHandlerProps, item: string) => void
   nullCallback?: (e: RegularHandlerProps) => void
   defaultNull?: boolean
   defaultObj: TObj
@@ -116,7 +116,7 @@ export function FilterCheckbox<TData extends string | General, TObj extends Defa
               key={key}
               label={value}
               value={value}
-              item={item}
+              item={value}
               callback={callback}
               defaultChecked={currentArrayValue.includes(value)}
               softDisabled={defaultNull}

@@ -14,7 +14,7 @@ import { SortObjVideo as SortObj, defaultVideoObj as defaultObj, getSortString }
 import Videos from './videos'
 
 import { useAllSearchParams, useDynamicSearchParam, useSearchParam } from '@hooks/search'
-import { General, Outfit } from '@interfaces'
+import { General } from '@interfaces'
 
 import styles from './search.module.scss'
 
@@ -158,57 +158,51 @@ function Filter() {
     axios.get<string[]>('/api/brand').then(({ data }) => setBrands(data))
   }, [])
 
-  const category = (ref: RegularHandlerProps, target: General) => {
-    const value = target.name
-
+  const category = (ref: RegularHandlerProps, target: string) => {
     if (categoryParam === defaultObj.category) {
-      setParam('category', value)
+      setParam('category', target)
     } else {
       const urlParam = categoryParam.split(',')
 
       if (!ref.checked) {
-        const filtered = urlParam.filter(category => category !== value)
+        const filtered = urlParam.filter(category => category !== target)
         setParam('category', filtered.toString())
       } else {
-        const merged = [...urlParam, value]
+        const merged = [...urlParam, target]
         setParam('category', merged.toString())
       }
     }
     update()
   }
 
-  const attribute = (ref: RegularHandlerProps, target: General) => {
-    const value = target.name
-
+  const attribute = (ref: RegularHandlerProps, target: string) => {
     if (attributeParam === defaultObj.attribute) {
-      setParam('attribute', value)
+      setParam('attribute', target)
     } else {
       const urlParam = attributeParam.split(',')
 
       if (!ref.checked) {
-        const filtered = urlParam.filter(attribute => attribute !== value)
+        const filtered = urlParam.filter(attribute => attribute !== target)
         setParam('attribute', filtered.toString())
       } else {
-        const merged = [...urlParam, value]
+        const merged = [...urlParam, target]
         setParam('attribute', merged.toString())
       }
     }
     update()
   }
 
-  const outfit = (ref: RegularHandlerProps, target: Outfit) => {
-    const value = target.name
-
+  const outfit = (ref: RegularHandlerProps, target: string) => {
     if (outfitParam === defaultObj.outfit) {
-      setParam('outfit', value)
+      setParam('outfit', target)
     } else {
       const urlParam = outfitParam.split(',')
 
       if (!ref.checked) {
-        const filtered = urlParam.filter(outfit => outfit !== value)
+        const filtered = urlParam.filter(outfit => outfit !== target)
         setParam('outfit', filtered.toString())
       } else {
-        const merged = [...urlParam, value]
+        const merged = [...urlParam, target]
         setParam('outfit', merged.toString())
       }
     }

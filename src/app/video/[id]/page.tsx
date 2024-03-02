@@ -243,8 +243,8 @@ type StarProps = {
 }
 function Star({ video, star, bookmarks, attributes, categories, removeStar, onModal, starEvent }: StarProps) {
   const [border, setBorder] = useState(false)
-  const { mutate } = videoService.useAddBookmark(video.id)
-  const { mutate: mutateAddStar } = videoService.useAddStar(video.id)
+  const { mutate: mutateAddBookmark } = videoService.useAddBookmark(video.id)
+  const { mutate: mutateAddStar } = bookmarkService.useAddStar()
   const queryClient = useQueryClient()
 
   const handleRibbon = (star: VideoStar) => {
@@ -260,7 +260,7 @@ function Star({ video, star, bookmarks, attributes, categories, removeStar, onMo
     const time = Math.round(player.currentTime)
     if (time) {
       mutateAndInvalidate({
-        mutate,
+        mutate: mutateAddBookmark,
         queryClient,
         ...keys.videos.byId(video.id)._ctx.bookmark,
         variables: { categoryID: category.id, time, starID: star.id }
@@ -295,8 +295,8 @@ function Star({ video, star, bookmarks, attributes, categories, removeStar, onMo
         mutateAndInvalidate({
           mutate: mutateAddStar,
           queryClient,
-          ...keys.videos.byId(video.id)._ctx.star,
-          variables: { name: star.name }
+          ...keys.videos.byId(video.id)._ctx.bookmark,
+          variables: { id: bookmark.id, starID: star.id }
         })
       }
     }

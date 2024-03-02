@@ -102,7 +102,7 @@ type StarFormProps = {
 }
 function StarForm({ star }: StarFormProps) {
   const { data: starData } = starService.useInfo()
-  const { mutate } = starService.useUpdateInfo(star.id)
+  const { mutate: mutateUpdateInfo } = starService.useUpdateInfo(star.id)
   const { mutate: mutateAddAttribute } = starService.useAddAttribute(star.id)
   const { mutate: mutateRemoveAttribute } = starService.useRemoveAttribute(star.id)
   const queryClient = useQueryClient()
@@ -127,7 +127,7 @@ function StarForm({ star }: StarFormProps) {
 
   const updateInfo = (value: string, label: string) => {
     mutateAndInvalidate({
-      mutate,
+      mutate: mutateUpdateInfo,
       queryClient,
       ...keys.stars.byId(star.id),
       variables: { label, value }

@@ -1,7 +1,7 @@
 'use client'
 
 import { useParams } from 'next/navigation'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 import {
   Button,
@@ -18,8 +18,8 @@ import {
 import { keys } from '@keys'
 import { useQueryClient } from '@tanstack/react-query'
 import { MediaPlayerInstance } from '@vidstack/react'
+import { motion } from 'framer-motion'
 import { ContextMenu, ContextMenuTrigger, ContextMenuItem } from 'rctx-contextmenu'
-import { Flipped, Flipper } from 'react-flip-toolkit'
 
 import { IconWithText } from '@components/icon'
 import { ImageCard, ResponsiveImage } from '@components/image'
@@ -163,11 +163,10 @@ function Sidebar({ video, stars, bookmarks, attributes, categories, onModal, sta
 
       <Franchise video={video} />
 
-      <Flipper flipKey={stars}>
         <Grid container justifyContent='center'>
           <Stars
             video={video}
-            stars={stars}
+          stars={stars}
             bookmarks={bookmarks}
             attributes={attributes}
             categories={categories}
@@ -175,7 +174,6 @@ function Sidebar({ video, stars, bookmarks, attributes, categories, onModal, sta
             starEvent={starEvent}
           />
         </Grid>
-      </Flipper>
 
       <StarInput video={video} stars={stars} bookmarks={bookmarks} getAttributes={getAttributes} />
 
@@ -202,9 +200,17 @@ function Stars({ video, stars, bookmarks, attributes, categories, onModal, starE
     })
   }
 
+  const sortedStars = useMemo(() => {
+    const bookmarkTime = (star: VideoStar) => {
+      return bookmarks.find(bookmark => bookmark.starID === star.id)?.start ?? Infinity
+    }
+
+    return stars.toSorted((a, b) => bookmarkTime(a) - bookmarkTime(b))
+  }, [bookmarks, stars])
+
   return (
     <Grid container justifyContent='center' id={styles.stars}>
-      {stars.map(star => (
+      {sortedStars.map(star => (
         <Star
           key={star.id}
           video={video}
@@ -308,7 +314,6 @@ function Star({ video, star, bookmarks, attributes, categories, removeStar, onMo
   }
 
   return (
-    <Flipped key={star.id} flipId={star.id}>
       <Grid
         item
         xs={4}
@@ -316,6 +321,7 @@ function Star({ video, star, bookmarks, attributes, categories, removeStar, onMo
         onMouseEnter={starEvent.getEvent.event ? () => setBorder(true) : undefined}
         onMouseLeave={starEvent.getEvent.event ? () => setBorder(false) : undefined}
       >
+      <motion.div layoutId={star.id.toString()}>
         <ContextMenuTrigger id={`star-${star.id}`}>
           <RibbonContainer component={Card} className={`${styles.star} ${border ? styles.active : ''}`}>
             <ImageCard
@@ -400,8 +406,8 @@ function Star({ video, star, bookmarks, attributes, categories, removeStar, onMo
             onClick={() => removeStar(star.id)}
           />
         </ContextMenu>
+      </motion.div>
       </Grid>
-    </Flipped>
   )
 }
 

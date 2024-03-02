@@ -64,7 +64,12 @@ export default {
 
     return { mutate }
   },
-  addStarAttribute: (videoID: number, starID: number, attributeID: number) => {
-    return api.post('/attribute', { videoID, starID, attributeID })
+  useAddStarAttribute: (videoID: number, starID: number) => {
+    const { mutate } = useMutation<unknown, Error, { attributeID: number }>({
+      mutationKey: ['bookmark', videoID, 'star', starID, 'addAttribute'],
+      mutationFn: payload => api.post('/attribute', { ...payload, videoID, starID })
+    })
+
+    return { mutate }
   }
 }

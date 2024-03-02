@@ -251,6 +251,7 @@ function Star({ video, star, bookmarks, attributes, categories, removeStar, onMo
   const [border, setBorder] = useState(false)
   const { mutate: mutateAddBookmark } = videoService.useAddBookmark(video.id)
   const { mutate: mutateAddStar } = bookmarkService.useAddStar()
+  const { mutate: mutateAddStarAttribute } = bookmarkService.useAddStarAttribute(video.id, star.id)
   const queryClient = useQueryClient()
 
   const handleRibbon = (star: VideoStar) => {
@@ -274,9 +275,12 @@ function Star({ video, star, bookmarks, attributes, categories, removeStar, onMo
     }
   }
 
-  const addAttribute = (star: VideoStar, attribute: Attribute) => {
-    bookmarkService.addStarAttribute(video.id, star.id, attribute.id).then(() => {
-      location.reload()
+  const addAttribute = (attribute: Attribute) => {
+    mutateAndInvalidate({
+      mutate: mutateAddStarAttribute,
+      queryClient,
+      ...keys.videos.byId(video.id)._ctx.bookmark, // TODO does this need to also refresh the star?
+      variables: { attributeID: attribute.id }
     })
   }
 
@@ -385,7 +389,7 @@ function Star({ video, star, bookmarks, attributes, categories, removeStar, onMo
                       color='primary'
                       onClick={() => {
                         onModal()
-                        addAttribute(star, attribute)
+                        addAttribute(attribute)
                       }}
                     >
                       {attribute.name}

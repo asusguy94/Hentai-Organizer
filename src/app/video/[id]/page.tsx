@@ -6,6 +6,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   Button,
   Card,
+  CardMedia,
   Checkbox,
   Divider,
   FormControlLabel,
@@ -22,7 +23,6 @@ import { motion } from 'framer-motion'
 import { ContextMenu, ContextMenuTrigger, ContextMenuItem } from 'rctx-contextmenu'
 
 import { IconWithText } from '@components/icon'
-import { ImageCard, ResponsiveImage } from '@components/image'
 import Link from '@components/link'
 import ModalComponent, { Modal, ModalHandler, useModal } from '@components/modal'
 import Ribbon, { RibbonContainer } from '@components/ribbon'
@@ -163,17 +163,17 @@ function Sidebar({ video, stars, bookmarks, attributes, categories, onModal, sta
 
       <Franchise video={video} />
 
-        <Grid container justifyContent='center'>
-          <Stars
-            video={video}
+      <Grid container justifyContent='center'>
+        <Stars
+          video={video}
           stars={stars}
-            bookmarks={bookmarks}
-            attributes={attributes}
-            categories={categories}
-            onModal={onModal}
-            starEvent={starEvent}
-          />
-        </Grid>
+          bookmarks={bookmarks}
+          attributes={attributes}
+          categories={categories}
+          onModal={onModal}
+          starEvent={starEvent}
+        />
+      </Grid>
 
       <StarInput video={video} stars={stars} bookmarks={bookmarks} getAttributes={getAttributes} />
 
@@ -314,27 +314,19 @@ function Star({ video, star, bookmarks, attributes, categories, removeStar, onMo
   }
 
   return (
-      <Grid
-        item
-        xs={4}
-        onClick={starEvent.getEvent.event ? () => addStar(star) : undefined}
-        onMouseEnter={starEvent.getEvent.event ? () => setBorder(true) : undefined}
-        onMouseLeave={starEvent.getEvent.event ? () => setBorder(false) : undefined}
-      >
+    <Grid
+      item
+      xs={4}
+      onClick={starEvent.getEvent.event ? () => addStar(star) : undefined}
+      onMouseEnter={starEvent.getEvent.event ? () => setBorder(true) : undefined}
+      onMouseLeave={starEvent.getEvent.event ? () => setBorder(false) : undefined}
+    >
       <motion.div layoutId={star.id.toString()}>
         <ContextMenuTrigger id={`star-${star.id}`}>
           <RibbonContainer component={Card} className={`${styles.star} ${border ? styles.active : ''}`}>
-            <ImageCard
-              src={`${serverConfig.api}/star/${star.id}/image`}
-              width={200}
-              height={200}
-              missing={star.image === null}
-              renderStyle='transform'
-              scale={5}
-              alt='star'
-              responsive
-              sizes={`${(100 / 12) * 4}vw`}
-            />
+            <CardMedia>
+              <img src={`${serverConfig.api}/star/${star.id}/image`} style={{ width: '100%' }} alt='star' />
+            </CardMedia>
 
             <Link href={`/star/${star.id}`}>
               <Typography>{star.name}</Typography>
@@ -407,7 +399,7 @@ function Star({ video, star, bookmarks, attributes, categories, removeStar, onMo
           />
         </ContextMenu>
       </motion.div>
-      </Grid>
+    </Grid>
   )
 }
 
@@ -574,13 +566,10 @@ function Franchise({ video }: FranchiseProps) {
         <a href={`/video/${v.id}`} key={v.id}>
           <Grid container component={Card} className={styles.episode}>
             <Grid item xs={2} className={styles.thumbnail}>
-              <ResponsiveImage
+              <img
                 src={`${serverConfig.api}/video/${v.id}/cover`}
-                width={90}
-                height={130}
-                missing={v.image === null}
+                style={{ width: '100%', height: 'auto' }}
                 alt='video'
-                sizes={`${(((100 / 12) * 3) / 12) * 2}vw`}
               />
             </Grid>
 

@@ -1,4 +1,4 @@
-import { DefaultError, QueryClient, QueryKey, UseMutateFunction } from '@tanstack/react-query'
+import { DefaultError, QueryClient, QueryKey, UseMutateAsyncFunction, UseMutateFunction } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 
 export function getUnique<T extends object>(arr: T[], prop: keyof T): T[]
@@ -43,20 +43,6 @@ export async function getResponse<T>(href: string) {
   return fetch(href).then(res => res.json() as Promise<T>)
 }
 
-type MutateAndResolveProps<TData, Tresult> = {
-  mutate: UseMutateFunction<Tresult, DefaultError, TData>
-  variables: TData
-}
-
-function mutateAndResolve<TData, Tresult>({ mutate, variables }: MutateAndResolveProps<TData, Tresult>) {
-  return new Promise<Tresult>((resolve, reject) => {
-    mutate(variables, {
-      onSuccess: data => resolve(data),
-      onError: error => reject(error)
-    })
-  })
-}
-
 type MutateAndInvalidateProps<TData, TResult> = {
   mutate: UseMutateFunction<TResult, DefaultError, TData>
   queryClient: QueryClient
@@ -84,7 +70,7 @@ export function mutateAndInvalidate<TData, TResult>({
 }
 
 type MutateAndInvalidateAllProps<TData, TResult> = {
-  mutate: UseMutateFunction<TResult, DefaultError, TData>
+  mutate: UseMutateAsyncFunction<TResult, DefaultError, TData>
   queryClient: QueryClient
   queryKey: QueryKey
   variables: TData[]
@@ -98,11 +84,11 @@ export function mutateAndInvalidateAll<TData, TResult>({
   variables,
   reloadByDefault = false
 }: MutateAndInvalidateAllProps<TData, TResult>) {
-  Promise.all(variables.map(variable => mutateAndResolve({ mutate, variables: variable }))).then(() => {
-    queryClient.invalidateQueries({ queryKey })
-
+  Promise.allSettled(variables.map(variable => mutate(variable))).then(() => {
     if (reloadByDefault) {
       location.reload()
+    } else {
+      queryClient.invalidateQueries({ queryKey })
     }
   })
 }

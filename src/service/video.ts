@@ -38,12 +38,12 @@ export default {
   removeStar: (id: number, starID: number) => api.delete(`/${id}/star/${starID}`),
   toggleNoStar: (id: number, checked: boolean) => api.put(`/${id}`, { noStar: checked }),
   useAddStar: (id: number) => {
-    const { mutate } = useMutation<VideoStar, Error, { name: string }>({
+    const { mutate, mutateAsync } = useMutation<VideoStar, Error, { name: string }>({
       mutationKey: ['video', id, 'addStar'],
       mutationFn: payload => api.post(`/${id}/star`, payload).then(res => res.data)
     })
 
-    return { mutate }
+    return { mutate, mutateAsync }
   },
   useRelatedStars: (id: number) => {
     const query = useQuery<General[]>({

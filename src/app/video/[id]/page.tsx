@@ -509,15 +509,14 @@ type AddRelatedStarsProps = {
 }
 function AddRelatedStars({ video, disabled }: AddRelatedStarsProps) {
   const { data: relatedStars } = videoService.useRelatedStars(video.id)
-  const { mutate } = videoService.useAddStar(video.id)
+  const { mutateAsync } = videoService.useAddStar(video.id)
   const queryClient = useQueryClient()
 
   if (disabled || relatedStars === undefined || relatedStars.length === 0) return null
 
   const handleClick = () => {
-    // TODO validate that this works
     mutateAndInvalidateAll({
-      mutate,
+      mutate: mutateAsync,
       queryClient,
       ...keys.videos.byId(video.id)._ctx.star,
       variables: relatedStars.map(star => ({ name: star.name }))

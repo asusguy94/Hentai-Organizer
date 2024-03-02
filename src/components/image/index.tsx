@@ -1,24 +1,29 @@
-import NextImage, { type ImageProps as NextImageProps } from 'next/image'
-
 import ImageNotSupportedOutlinedIcon from '@mui/icons-material/ImageNotSupportedOutlined'
 import { CardMedia as MUICardMedia } from '@mui/material'
 
-export function ResponsiveImage({ alt, style, ...other }: NextImageProps & MissingImage) {
+type ImgProps = React.ImgHTMLAttributes<HTMLImageElement>
+
+export function ResponsiveImage({ alt, style, ...other }: ImgProps & MissingImage & MissingImageProps) {
   return <Image style={{ ...style, width: '100%', height: 'auto' }} alt={alt} {...other} />
 }
 
-export default function Image({ missing, scale, renderStyle, ...nextProps }: NextImageProps & MissingImage) {
+export default function Image({
+  missing,
+  scale,
+  renderStyle,
+  alt = '',
+  ...props
+}: ImgProps & MissingImage & MissingImageProps) {
   if (missing) return <MissingImage scale={scale} renderStyle={renderStyle} />
 
-  return <NextImage {...nextProps} />
+  return <img alt={alt} {...props} />
 }
 
 type CardProps = {
   height: number
   alt: string
   responsive?: boolean
-} & Omit<NextImageProps, 'alt' | 'height'> &
-  MissingImage
+}
 
 export function ImageCard({
   height,
@@ -27,7 +32,7 @@ export function ImageCard({
   responsive = false,
   renderStyle = 'height',
   ...other
-}: CardProps) {
+}: CardProps & ImgProps & MissingImage & MissingImageProps) {
   return (
     <MUICardMedia style={missing ? { height, textAlign: 'center' } : {}}>
       {responsive ? (
@@ -41,7 +46,7 @@ export function ImageCard({
 
 type MissingImage = {
   missing?: boolean
-} & MissingImageProps
+}
 
 type MissingImageProps = {
   scale?: number

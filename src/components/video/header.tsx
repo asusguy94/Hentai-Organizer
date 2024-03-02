@@ -1,5 +1,3 @@
-import { useRouter } from 'next/navigation'
-
 import { Button, Grid, TextField, Typography } from '@mui/material'
 
 import { ContextMenu, ContextMenuTrigger, ContextMenuItem } from 'rctx-contextmenu'
@@ -7,7 +5,7 @@ import { ContextMenu, ContextMenuTrigger, ContextMenuItem } from 'rctx-contextme
 import Icon, { IconWithText } from '../icon'
 import { ModalHandler } from '../modal'
 
-import { Validity, Video } from '@interfaces'
+import { Video } from '@interfaces'
 import { videoService } from '@service'
 import { escapeRegExp } from '@utils/shared'
 
@@ -16,9 +14,12 @@ import styles from './header.module.scss'
 type HeaderProps = {
   video: Video
   onModal: ModalHandler
-  isValid: Validity
 }
-export default function Header({ video, onModal, isValid }: HeaderProps) {
+export default function Header({ video, onModal }: HeaderProps) {
+  const { data: isValid } = videoService.useIsValid(video.id)
+
+  if (isValid === undefined) return null
+
   return (
     <Grid container item alignItems='center' component='header' id={styles.header}>
       <HeaderTitle video={video} onModal={onModal} isValid={isValid.title} />
@@ -44,36 +45,34 @@ type HeaderTitleProps = {
   isValid: boolean
 }
 function HeaderTitle({ video, onModal, isValid }: HeaderTitleProps) {
-  const router = useRouter()
-
   const copyFranchise = async () => await navigator.clipboard.writeText(video.franchise)
 
   const renameFranchise = (newFranchise: string) => {
     if (video.name.startsWith(video.franchise)) {
       const newTitle = video.name.replace(new RegExp(`^${escapeRegExp(video.franchise)}`), newFranchise)
 
-      Promise.all([
+      Promise.allSettled([
         videoService.renameFranchise(video.id, newFranchise),
         videoService.renameTitle(video.id, newTitle)
       ]).then(() => {
-        router.refresh()
+        location.reload()
       })
     } else {
       videoService.renameFranchise(video.id, newFranchise).then(() => {
-        router.refresh()
+        location.reload()
       })
     }
   }
 
   const renameTitle = (newTitle: string) => {
     videoService.renameTitle(video.id, newTitle).then(() => {
-      router.refresh()
+      location.reload()
     })
   }
 
   const setSlug = (slug: string) => {
     videoService.setSlug(video.id, slug).then(() => {
-      router.refresh()
+      location.reload()
     })
   }
 
@@ -227,11 +226,9 @@ type HeaderDateProps = {
   video: Video
 }
 function HeaderDate({ video }: HeaderDateProps) {
-  const router = useRouter()
-
   const handleDate = () => {
     videoService.setDate(video.id).then(() => {
-      router.refresh()
+      location.reload()
     })
   }
 
@@ -248,14 +245,12 @@ type InvalidFnameProps = {
   isValid: boolean
 }
 function InvalidFname({ video, isValid }: InvalidFnameProps) {
-  const router = useRouter()
-
   if (isValid) return null
 
   const handleRename = () => {
     if (video.slug !== null) {
       videoService.renameVideo(video.id, `${video.slug}.mp4`).then(() => {
-        router.refresh()
+        location.reload()
       })
     }
   }
@@ -272,11 +267,9 @@ type HeaderNetworkProps = {
   video: Video
 }
 function HeaderNetwork({ video }: HeaderNetworkProps) {
-  const router = useRouter()
-
   const handleNetwork = () => {
     videoService.setBrand(video.id).then(() => {
-      router.refresh()
+      location.reload()
     })
   }
 

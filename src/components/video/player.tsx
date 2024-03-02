@@ -2,6 +2,8 @@ import { useRouter } from 'next/navigation'
 
 import { Button, TextField } from '@mui/material'
 
+import { keys } from '@keys'
+import { useQueryClient } from '@tanstack/react-query'
 import { ContextMenu, ContextMenuTrigger, ContextMenuItem } from 'rctx-contextmenu'
 
 import Player, { MediaPlayerInstance } from '@components/vidstack'
@@ -10,34 +12,25 @@ import { IconWithText } from '../icon'
 import { Modal, ModalHandler } from '../modal'
 
 import { serverConfig } from '@config'
-import { Bookmark, Category, Video, VideoStar, SetState } from '@interfaces'
+import { Bookmark, Category, Video, VideoStar } from '@interfaces'
 import { videoService } from '@service'
+import { mutateAndInvalidate } from '@utils/shared'
 
 type VideoPlayerProps = {
   video: Video
   bookmarks: Bookmark[]
   categories: Category[]
   stars: VideoStar[]
-  update: {
-    video: SetState<Video | undefined>
-    bookmarks: SetState<Bookmark[]>
-  }
   playerRef: React.RefObject<MediaPlayerInstance>
   modal: {
     handler: ModalHandler
     data: Modal
   }
 }
-export default function VideoPlayer({
-  video,
-  bookmarks,
-  categories,
-  stars,
-  update,
-  playerRef,
-  modal
-}: VideoPlayerProps) {
+export default function VideoPlayer({ video, bookmarks, categories, stars, playerRef, modal }: VideoPlayerProps) {
   const router = useRouter()
+  const { mutate } = videoService.useAddBookmark(video.id)
+  const queryClient = useQueryClient()
 
   const copy = async () => await navigator.clipboard.writeText(video.path.file.slice(0, -4))
 
@@ -49,31 +42,31 @@ export default function VideoPlayer({
 
   const renameVideo = (path: string) => {
     videoService.renameVideo(video.id, path).then(() => {
-      router.refresh()
+      location.reload()
     })
   }
 
   const censorToggle = () => {
     videoService.toggleCensor(video.id, video.censored).then(() => {
-      update.video({ ...video, censored: !video.censored })
+      location.reload()
     })
   }
 
   const updateVideo = () => {
     videoService.updateVideo(video.id).then(() => {
-      router.refresh()
+      location.reload()
     })
   }
 
   const setCover = () => {
     videoService.setCover(video.id).then(() => {
-      router.refresh()
+      location.reload()
     })
   }
 
   const setPoster = () => {
     videoService.setPoster(video.id).then(() => {
-      router.refresh()
+      location.reload()
     })
   }
 
@@ -83,21 +76,11 @@ export default function VideoPlayer({
     if (player !== null) {
       const time = Math.round(player.currentTime)
       if (time) {
-        videoService.addBookmark(video.id, category.id, time).then(({ data }) => {
-          update.bookmarks(
-            [
-              ...bookmarks,
-              {
-                id: data.id,
-                name: category.name,
-                start: time,
-                starID: 0,
-                attributes: data.attributes ?? [],
-                active: false,
-                outfit: null
-              }
-            ].sort((a, b) => a.start - b.start)
-          )
+        mutateAndInvalidate({
+          mutate,
+          queryClient,
+          ...keys.videos.byId(video.id)._ctx.bookmark,
+          variables: { categoryID: category.id, time }
         })
       }
     }

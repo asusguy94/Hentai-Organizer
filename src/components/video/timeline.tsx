@@ -1,22 +1,25 @@
-import { Fragment, useEffect, useRef, useState } from 'react'
+import { Fragment, useCallback, useEffect, useRef, useState } from 'react'
 
 import { Button } from '@mui/material'
 
+import { keys } from '@keys'
+import { useQueryClient } from '@tanstack/react-query'
 import { ContextMenu, ContextMenuTrigger, ContextMenuItem } from 'rctx-contextmenu'
 import { Tooltip } from 'react-tooltip'
 import { useWindowSize } from 'react-use'
 
 import { MediaPlayerInstance } from '@components/vidstack'
 
-import { defaultSettings, useSettings } from '../../app/settings/components'
 import { IconWithText } from '../icon'
 import Image from '../image'
 import { ModalHandler } from '../modal'
 
 import { serverConfig } from '@config'
+import useCollisionCheck from '@hooks/useCollisionCheck'
 import { EventHandler } from '@hooks/useStarEvent'
-import { Attribute, Bookmark, Category, VideoStar, Video, SetState, Outfit } from '@interfaces'
-import { bookmarkService } from '@service'
+import { Attribute, Bookmark, Category, VideoStar, Video, Outfit } from '@interfaces'
+import { bookmarkService, outfitService } from '@service'
+import { mutateAndInvalidate } from '@utils/shared'
 
 import styles from './timeline.module.scss'
 
@@ -28,10 +31,7 @@ type TimelineProps = {
   stars: VideoStar[]
   attributes: Attribute[]
   categories: Category[]
-  outfits: Outfit[]
-  setTime: (bookmarkID: number, time?: number) => void
   playerRef: React.RefObject<MediaPlayerInstance>
-  update: SetState<Bookmark[]>
   onModal: ModalHandler
   setStarEvent: EventHandler
 }
@@ -41,20 +41,39 @@ export default function Timeline({
   stars,
   attributes,
   categories,
-  outfits,
-  setTime,
   playerRef,
-  update,
   onModal,
   setStarEvent
 }: TimelineProps) {
   const windowSize = useWindowSize()
   const bookmarksRef = useRef<HTMLButtonElement[]>([])
   const [bookmarkLevels, setBookmarkLevels] = useState<number[]>([])
-  const [maxLevel, setMaxLevel] = useState(0)
-  const localSettings = useSettings()
+  const [refReady, setRefReady] = useState(false)
+  const { collisionCheck } = useCollisionCheck()
+  const { mutate } = bookmarkService.useSetTime()
+  const { mutate: mutateSetCategory } = bookmarkService.useSetCategory()
+  const { mutate: mutateAddAttribute } = bookmarkService.useAddAttribute()
+  const { mutate: mutateRemoveAttribute } = bookmarkService.useRemoveAttribute()
+  const { mutate: mutateSetOutfit } = bookmarkService.useSetOutfit()
+  const queryClient = useQueryClient()
 
-  const isActive = (bookmark: Bookmark) => bookmark.active
+  const { data: outfits } = outfitService.useAll()
+
+  const setTime = (bookmarkID: number) => {
+    const player = playerRef.current
+
+    if (player !== null) {
+      const time = Math.round(player.currentTime)
+
+      mutateAndInvalidate({
+        mutate,
+        queryClient,
+        ...keys.videos.byId(video.id)._ctx.bookmark,
+        variables: { time, id: bookmarkID }
+      })
+    }
+  }
+
   const hasStar = (bookmark: Bookmark) => bookmark.starID > 0
   const attributesFromStar = (starID: number) => stars.filter(star => star.id === starID)[0]?.attributes ?? []
   const isStarAttribute = (starID: number, attributeID: number) => {
@@ -63,137 +82,61 @@ export default function Timeline({
 
   const removeBookmark = (id: number) => {
     bookmarkService.removeBookmark(id).then(() => {
-      update(bookmarks.filter(bookmark => bookmark.id !== id))
+      location.reload()
     })
   }
 
   const setCategory = (category: Category, bookmark: Bookmark) => {
-    bookmarkService.setCategory(bookmark.id, category.id).then(() => {
-      update(
-        bookmarks.map(item => {
-          if (item.id === bookmark.id) {
-            return { ...item, name: category.name }
-          }
-
-          return item
-        })
-      )
+    mutateAndInvalidate({
+      mutate: mutateSetCategory,
+      queryClient,
+      ...keys.videos.byId(video.id)._ctx.bookmark,
+      variables: { categoryID: category.id, id: bookmark.id }
     })
   }
 
   const setOutfit = (outfit: Outfit, bookmark: Bookmark) => {
-    bookmarkService.setOutfit(bookmark.id, outfit.id).then(() => {
-      update(
-        bookmarks.map(item => {
-          if (item.id === bookmark.id) {
-            return { ...item, outfit: outfit.name }
-          }
-
-          return item
-        })
-      )
+    mutateAndInvalidate({
+      mutate: mutateSetOutfit,
+      queryClient,
+      ...keys.videos.byId(video.id)._ctx.bookmark,
+      variables: { outfitID: outfit.id, id: bookmark.id }
     })
   }
 
   const removeOutfit = (bookmark: Bookmark) => {
     bookmarkService.removeOutfit(bookmark.id).then(() => {
-      update(
-        bookmarks.map(item => {
-          if (item.id === bookmark.id) {
-            return { ...item, outfit: null }
-          }
-
-          return item
-        })
-      )
+      location.reload()
     })
   }
 
   const addAttribute = (attribute: Attribute, bookmark: Bookmark) => {
-    bookmarkService.addAttribute(bookmark.id, attribute.id).then(() => {
-      update(
-        bookmarks.map(item => {
-          if (item.id === bookmark.id) {
-            return {
-              ...item,
-              attributes: [...item.attributes, { id: attribute.id, name: attribute.name }]
-            }
-          }
-
-          return item
-        })
-      )
+    mutateAndInvalidate({
+      mutate: mutateAddAttribute,
+      queryClient,
+      ...keys.videos.byId(video.id)._ctx.bookmark,
+      variables: { attributeID: attribute.id, id: bookmark.id }
     })
   }
 
   const removeAttribute = (bookmark: Bookmark, attribute: Attribute) => {
-    bookmarkService.removeAttribute(bookmark.id, attribute.id).then(() => {
-      update(
-        bookmarks.map(item => {
-          if (item.id === bookmark.id) {
-            return {
-              ...item,
-              attributes: item.attributes.filter(attr => attr.id !== attribute.id)
-            }
-          }
-
-          return item
-        })
-      )
+    mutateAndInvalidate({
+      mutate: mutateRemoveAttribute,
+      queryClient,
+      ...keys.videos.byId(video.id)._ctx.bookmark,
+      variables: { attributeID: attribute.id, id: bookmark.id }
     })
   }
 
   const clearAttributes = (bookmark: Bookmark) => {
     bookmarkService.clearAttributes(bookmark.id).then(() => {
-      update(
-        bookmarks.map(item => {
-          if (item.id === bookmark.id) {
-            const starID = bookmark.starID
-
-            if (starID !== 0) {
-              const starAttribute = attributesFromStar(starID)
-
-              return {
-                ...item,
-                attributes: item.attributes.filter(attribute => {
-                  return starAttribute.some(attr => attr.name === attribute.name)
-                })
-              }
-            } else {
-              // Bookmark does not have a star
-              return { ...item, attributes: [] }
-            }
-          }
-
-          return item
-        })
-      )
+      location.reload()
     })
   }
 
   const removeStar = (bookmark: Bookmark) => {
     bookmarkService.removeStar(bookmark.id).then(() => {
-      update(
-        bookmarks.map(item => {
-          if (item.id === bookmark.id) {
-            const attributes = attributesFromStar(bookmark.starID)
-
-            if (item.attributes.length > attributes.length) {
-              // Bookmark have at least 1 attribute not from star
-              return {
-                ...item,
-                starID: 0,
-                attributes: item.attributes.filter(attribute => attributes.every(attr => attr.name !== attribute.name))
-              }
-            } else {
-              // Bookmark has only attributes from star
-              return { ...item, starID: 0, attributes: [] }
-            }
-          }
-
-          return item
-        })
-      )
+      location.reload()
     })
   }
 
@@ -206,20 +149,8 @@ export default function Timeline({
   }
 
   useEffect(() => {
-    const collisionCheck = (a: HTMLElement | null, b: HTMLElement | null) => {
-      if (a === null || b === null) return false
-
-      const bookmarkSpacing = localSettings?.bookmark_spacing ?? defaultSettings.bookmark_spacing
-
-      const aRect = a.getBoundingClientRect()
-      const bRect = b.getBoundingClientRect()
-
-      return aRect.x + aRect.width >= bRect.x - bookmarkSpacing && aRect.x - bookmarkSpacing <= bRect.x + bRect.width
-    }
-
-    const bookmarksArr = bookmarks.length > 0 ? bookmarksRef.current : []
+    const bookmarksArr = bookmarksRef.current
     const levels: number[] = new Array(bookmarks.length).fill(0)
-    let maxLevel = 0
 
     for (let i = 0; i < bookmarksArr.length; i++) {
       let level = 1
@@ -231,31 +162,23 @@ export default function Timeline({
       }
 
       levels[i] = level
-      if (level > maxLevel) maxLevel = level
     }
 
     setBookmarkLevels(levels)
-    setMaxLevel(maxLevel)
-  }, [bookmarks, localSettings?.bookmark_spacing, windowSize.width])
+  }, [bookmarks, collisionCheck, refReady, windowSize.width])
 
-  useEffect(() => {
-    const setHeight = () => {
-      const videoElement = playerRef.current?.el ?? null
-      if (videoElement !== null) {
-        const videoTop = videoElement.getBoundingClientRect().top
-        videoElement.style.height = `calc(100vh - (${spacing.bookmark}px * ${maxLevel}) - ${videoTop}px - ${spacing.top}px)`
-        //maxHeight: whitespace bellow, allows scrolling beneath video
-        //height: no whitespace bellow, video always at bottom of screen
+  const assignRef = useCallback(
+    (bookmark: HTMLButtonElement | null, idx: number) => {
+      if (bookmark === null) return
+
+      bookmarksRef.current[idx] = bookmark
+
+      if (bookmarks.every((_, idx) => bookmarksRef.current.at(idx) !== undefined)) {
+        setRefReady(true)
       }
-    }
-
-    setHeight() // always run once
-    window.addEventListener('scroll', setHeight)
-
-    return () => {
-      window.removeEventListener('scroll', setHeight)
-    }
-  }, [maxLevel, playerRef])
+    },
+    [bookmarks]
+  )
 
   return (
     <div id={styles.timeline} style={bookmarks.length > 0 ? { marginTop: spacing.top } : {}}>
@@ -267,7 +190,7 @@ export default function Timeline({
             <ContextMenuTrigger id={`bookmark-${bookmark.id}`}>
               <Button
                 size='small'
-                variant={isActive(bookmark) ? 'contained' : 'outlined'}
+                variant='outlined'
                 color={hasStar(bookmark) ? 'primary' : 'secondary'}
                 className={styles.bookmark}
                 style={{
@@ -275,7 +198,7 @@ export default function Timeline({
                   top: `${(bookmarkLevels[idx] - 1) * spacing.bookmark}px`
                 }}
                 onMouseDown={e => e.button === 0 && playVideo(bookmark.start)}
-                ref={(bookmark: HTMLButtonElement) => (bookmarksRef.current[idx] = bookmark)}
+                ref={bookmark => assignRef(bookmark, idx)}
               >
                 <div data-tooltip-id={bookmark.id.toString()}>{bookmark.name}</div>
 
@@ -424,7 +347,7 @@ export default function Timeline({
                   onModal(
                     'Set Outfit',
                     outfits
-                      .filter(outfit => outfit.name !== bookmark.outfit)
+                      ?.filter(outfit => outfit.name !== bookmark.outfit)
                       .map(outfit => (
                         <Button
                           key={outfit.id}

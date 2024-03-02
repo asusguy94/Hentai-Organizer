@@ -1,51 +1,58 @@
-import Client from './client'
+'use client'
 
-import { db } from '@utils/server/prisma'
+import { Grid, List, ListItemButton, ListItemText, Typography } from '@mui/material'
 
-export const dynamic = 'force-dynamic'
+import Link from '@components/link'
 
-//TODO migrate to api
-export default async function VideosPage() {
-  const limit = 7
+import { General } from '@interfaces'
+import { videoService } from '@service'
 
-  const noBookmarkStar = await db.video.findMany({
-    select: { id: true, name: true },
-    where: { noStar: false, bookmarks: { some: { star: null } } },
-    orderBy: [{ date_published: 'desc' }, { id: 'desc' }],
-    take: limit
-  })
+export default function VideosPage() {
+  const { data } = videoService.useVideos()
 
-  const noStarImage = await db.video.findMany({
-    select: { id: true, name: true },
-    where: { noStar: false, stars: { some: { star: { image: null } } } },
-    take: limit
-  })
-
-  const noBookmarks = await db.video.findMany({
-    select: { id: true, name: true },
-    where: { noStar: false, bookmarks: { none: {} } },
-    take: limit
-  })
-
-  const noStars = await db.video.findMany({
-    select: { id: true, name: true },
-    where: { noStar: false, stars: { none: {} } },
-    take: limit
-  })
-
-  const slugMissmatch = (
-    await db.video.findMany({
-      where: { slug: { not: null }, OR: [{ noStar: true }, { bookmarks: { some: {} } }] }
-    })
-  )
-    .filter(video => `${video.slug}.mp4` !== video.path)
-    .slice(0, limit)
+  if (data === undefined) return null
 
   return (
-    <Client
-      video={{ noBookmarks, noStars, slugMissmatch, unusedStar: [] }}
-      stars={{ noImage: noStarImage }}
-      bookmarks={{ noStar: noBookmarkStar }}
-    />
+    <Grid container spacing={2}>
+      <Grid item xs={4}>
+        <View label='Missing BookmarkStar' data={data.bookmarks.noStar} />
+        <View label='Missing StarImage' data={data.stars.noImage} />
+      </Grid>
+
+      <Grid item xs={4}>
+        <View label='Missing Bookmarks' data={data.video.noBookmarks} />
+        <View label='Missing Stars' data={data.video.noStars} />
+      </Grid>
+
+      <Grid item xs={4}>
+        <View label='Slug/Fname Missmatch' data={data.video.slugMissmatch} />
+        <View label='Unused VideoStar' data={data.video.unusedStar} />
+      </Grid>
+    </Grid>
+  )
+}
+
+type ViewProps = {
+  data: General[]
+  label: string
+}
+function View({ data, label }: ViewProps) {
+  if (data.length === 0) return null
+
+  return (
+    <>
+      <Typography variant='h4'>
+        {label} ({data.length})
+      </Typography>
+      <List>
+        {data.map(video => (
+          <Link key={video.id} href={`/video/${video.id}`}>
+            <ListItemButton divider>
+              <ListItemText>{video.name}</ListItemText>
+            </ListItemButton>
+          </Link>
+        ))}
+      </List>
+    </>
   )
 }

@@ -30,6 +30,9 @@ import { starService } from '@service'
 
 import styles from './star.module.scss'
 import validate, { z } from '@utils/server/validation'
+import { mutateAndInvalidate } from '@utils/shared'
+import { keys } from '@keys'
+import { useQueryClient } from '@tanstack/react-query'
 
 type Star = {
   id: number
@@ -99,22 +102,35 @@ type StarFormProps = {
 }
 function StarForm({ star }: StarFormProps) {
   const { data: starData } = starService.useInfo()
+  const { mutate } = starService.useUpdateInfo(star.id)
+  const { mutate: mutateAddAttribute } = starService.useAddAttribute(star.id)
+  const { mutate: mutateRemoveAttribute } = starService.useRemoveAttribute(star.id)
+  const queryClient = useQueryClient()
 
   const addAttribute = (name: string) => {
-    starService.addAttribute(star.id, name).then(() => {
-      location.reload()
+    mutateAndInvalidate({
+      mutate: mutateAddAttribute,
+      queryClient,
+      ...keys.stars.byId(star.id),
+      variables: { name }
     })
   }
 
   const removeAttribute = (name: string) => {
-    starService.removeAttribute(star.id, name).then(() => {
-      location.reload()
+    mutateAndInvalidate({
+      mutate: mutateRemoveAttribute,
+      queryClient,
+      ...keys.stars.byId(star.id),
+      variables: { name }
     })
   }
 
   const updateInfo = (value: string, label: string) => {
-    starService.updateInfo(star.id, label, value).then(() => {
-      location.reload()
+    mutateAndInvalidate({
+      mutate,
+      queryClient,
+      ...keys.stars.byId(star.id),
+      variables: { label, value }
     })
   }
 
@@ -144,10 +160,16 @@ type StarImageDropboxProps = {
 }
 function StarImageDropbox({ star, videos }: StarImageDropboxProps) {
   const router = useRouter()
+  const { mutate } = starService.useAddImage(star.id)
+  const queryClient = useQueryClient()
+
 
   const addImage = (image: string) => {
-    starService.addImage(star.id, image).then(() => {
-      location.reload()
+    mutateAndInvalidate({
+      mutate,
+      queryClient,
+      ...keys.stars.byId(star.id),
+      variables: {url:image}
     })
   }
 

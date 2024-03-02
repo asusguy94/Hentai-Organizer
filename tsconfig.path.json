@@ -11,7 +11,8 @@
       "@utils/pusher/*": ["./src/utils/pusher/*"],
       "@utils/shared": ["./src/utils/shared"],
       "@hooks/*": ["./src/hooks/*"],
-      "@interfaces": ["./src/interfaces"]
+      "@interfaces": ["./src/interfaces"],
+      "@keys": ["./src/keys"]
     }
   }
 }

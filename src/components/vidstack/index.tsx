@@ -1,4 +1,4 @@
-import { useMemo, useRef } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 
 import {
   MediaPlayer,
@@ -51,12 +51,12 @@ export default function Player({ title, src, poster, thumbnails, video, playerRe
     }
   }, [bookmarks, video.duration])
 
-  const onCanLoad = () => {
+  useEffect(() => {
     if (localVideo !== video.id) {
       setLocalVideo(video.id)
       setLocalBookmark(0)
     }
-  }
+  }, [localVideo, setLocalBookmark, setLocalVideo, video.id])
 
   const onProviderChange = (provider: MediaProviderAdapter | null) => {
     if (provider === null) return
@@ -109,7 +109,6 @@ export default function Player({ title, src, poster, thumbnails, video, playerRe
       storage='vidstack'
       onProviderChange={onProviderChange}
       onTimeUpdate={onTimeUpdate}
-      onCanLoad={onCanLoad}
       onWheel={onWheel}
       onHlsManifestParsed={onManifestParsed}
       onHlsInstance={hls => (hlsRef.current = hls)}

@@ -1,3 +1,4 @@
+import { keys } from '@keys'
 import { useQuery } from '@tanstack/react-query'
 
 import { createApi } from '@config'
@@ -9,7 +10,7 @@ const { baseURL } = createApi('/category')
 export default {
   useAll: () => {
     const query = useQuery<Category[]>({
-      queryKey: ['category'],
+      ...keys.categories.all,
       queryFn: () => getResponse(baseURL)
     })
 

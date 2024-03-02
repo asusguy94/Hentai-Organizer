@@ -1,14 +1,59 @@
 import fs from 'fs'
 
 import { Params } from '@interfaces'
-import { dirOnly, formatDate, removeCover, removePoster, removePreviews } from '@utils/server/helper'
+import { dirOnly, formatDate, noExt, removeCover, removePoster, removePreviews } from '@utils/server/helper'
 import { db } from '@utils/server/prisma'
 import validate, { z } from '@utils/server/validation'
 
 export async function GET(req: Request, { params }: Params<'id'>) {
   const { id } = validate(z.object({ id: z.coerce.number() }), params)
 
-  return Response.json(await db.video.findFirstOrThrow({ where: { id } }))
+  const { height, cen, ...video } = await db.video.findFirstOrThrow({
+    where: { id },
+    select: {
+      id: true,
+      slug: true,
+      name: true,
+      episode: true,
+      path: true,
+      franchise: true,
+      noStar: true,
+      duration: true,
+      date: true,
+      date_published: true,
+      brand: true,
+      height: true,
+      cen: true
+    }
+  })
+
+  return Response.json({
+    ...video,
+    quality: height,
+    censored: cen,
+    path: {
+      file: video.path,
+      stream: `${noExt(video.path)}/master.m3u8`
+    },
+    date: {
+      added: formatDate(video.date),
+      published: video.date_published ? formatDate(video.date_published) : null
+    },
+    related: (
+      await db.video.findMany({
+        where: { franchise: video.franchise },
+        orderBy: { episode: 'asc' },
+        select: {
+          id: true,
+          name: true,
+          cover: true
+        }
+      })
+    ).map(({ cover, ...video }) => ({
+      ...video,
+      image: cover
+    }))
+  })
 }
 
 export async function PUT(req: Request, { params }: Params<'id'>) {

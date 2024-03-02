@@ -1,70 +1,113 @@
-import fs from 'fs'
+'use client'
 
-import Client from './client'
+import { useState } from 'react'
 
-import { settingsConfig } from '@config'
-import { getVideo } from '@utils/server/hanime'
-import { dirOnly, extOnly } from '@utils/server/helper'
-import { db } from '@utils/server/prisma'
+import {
+  Grid,
+  Button,
+  Table,
+  TableContainer,
+  TableBody,
+  TableRow,
+  TableCell,
+  TableHead,
+  Typography,
+  Paper
+} from '@mui/material'
 
-export const dynamic = 'force-dynamic'
+import Spinner from '@components/spinner'
 
-//TODO migrate to api
-export default async function AddVideoPage() {
-  const filesDB = await db.video.findMany()
-  const filesArray = filesDB.map(video => video.path)
+import Progress from './progress'
 
-  const files = await fs.promises.readdir('./media/videos')
+import { generateService, videoService } from '@service'
 
-  const newFiles = []
-  for (let i = 0; newFiles.length < settingsConfig.addFiles.maxFiles && i < files.length; i++) {
-    const file = files[i]
+export default function AddVideo() {
+  const { data: videos } = videoService.useNewVideos()
 
-    const slug = dirOnly(file).replace(/-\d{3,4}p-[^-]+/, '')
-    if (
-      !filesArray.includes(file) &&
-      (await fs.promises.lstat(`./media/videos/${file}`)).isFile() &&
-      extOnly(`./media/videos/${file}`) === '.mp4' // prevent random files to be imported!
-    ) {
-      const { franchise } = await getVideo(slug)
+  if (videos === undefined) return <Spinner />
 
-      const generated = generate(file, slug, franchise)
-      if (generated !== undefined) {
-        newFiles.push({ ...generated, slug })
+  return (
+    <Grid className='text-center'>
+      <Typography style={{ marginBottom: 8 }}>Import Videos</Typography>
+
+      {videos.length === 0 ? (
+        <div className='text-center'>
+          <Action label='Generate Metadata' callback={generateService.meta} />
+          <Action label='Generate VTT' callback={generateService.vtt} />
+
+          <Progress />
+        </div>
+      ) : (
+        <>
+          <TableContainer component={Paper}>
+            <Table size='small'>
+              <TableHead>
+                <TableRow>
+                  <TableCell>episode</TableCell>
+                  <TableCell>franchise</TableCell>
+                  <TableCell>title</TableCell>
+                  <TableCell>slug</TableCell>
+                  <TableCell>path</TableCell>
+                </TableRow>
+              </TableHead>
+
+              <TableBody>
+                {videos.map(video => (
+                  <TableRow key={video.path}>
+                    <TableCell>{video.episode}</TableCell>
+                    <TableCell>{video.franchise}</TableCell>
+                    <TableCell>{video.name}</TableCell>
+                    <TableCell>{video.slug}</TableCell>
+                    <TableCell>{video.path}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+
+          <div style={{ marginTop: 8 }}>
+            <Action
+              label='Add Videos'
+              callback={() =>
+                videoService.addVideos(videos).then(() => {
+                  location.reload()
+                })
+              }
+            />
+          </div>
+        </>
+      )}
+    </Grid>
+  )
+}
+
+type ButtonProps = {
+  label: string
+  callback?: () => Promise<unknown>
+  disabled?: boolean
+}
+function Action({ label, callback, disabled = false }: ButtonProps) {
+  const [isDisabled, setIsDisabled] = useState(disabled)
+
+  const clickHandler = () => {
+    if (!isDisabled) {
+      setIsDisabled(true)
+
+      if (callback !== undefined) {
+        callback().then(() => setIsDisabled(false))
       }
     }
   }
 
-  return <Client videos={newFiles} />
-}
-
-function generate(path: string, slug: string, franchise: string) {
-  //FIXME currently defaults to -1 for bonus episodes or episodes without numbers
-  // defaulting to "1" would solve the issue, but might cause duplicate episodes
-  // it would also mark every bonus episode as "1"
-  //get franchise as a slug (avaliable from api), and then split, probably the best solution
-
-  const episodeNumber = generateEpisode(slug)
-  const episodeName = generateTitle(franchise, episodeNumber)
-
-  return {
-    path,
-    franchise,
-    name: episodeName,
-    episode: episodeNumber
-  }
-}
-
-function generateEpisode(slug: string) {
-  // check if episode is (bonus|special|extra)-episode
-  const episodeString = slug.match(/-(\d+)$/)?.at(1)
-  if (episodeString !== undefined) {
-    return parseInt(episodeString)
-  }
-
-  return -1
-}
-
-function generateTitle(franchise: string, episode: number) {
-  return `${franchise} Episode ${episode}`
+  return (
+    <Button
+      variant='outlined'
+      color='primary'
+      disabled={isDisabled}
+      onClick={clickHandler}
+      style={{ marginLeft: 6, marginRight: 6 }}
+    >
+      {label}
+    </Button>
+  )
 }

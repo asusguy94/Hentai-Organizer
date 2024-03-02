@@ -1,3 +1,4 @@
+import { keys } from '@keys'
 import { useQuery } from '@tanstack/react-query'
 
 import { createApi } from '@config'
@@ -9,7 +10,7 @@ const { baseURL } = createApi('/attribute')
 export default {
   useAll: () => {
     const query = useQuery<Attribute[]>({
-      queryKey: ['attribute'],
+      ...keys.attributes.all,
       queryFn: () => getResponse(baseURL)
     })
 

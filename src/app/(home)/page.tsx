@@ -30,7 +30,7 @@ function Column({ label, cols, rows = 1 }: ColumnProps) {
       </h2>
 
       <Grid container spacing={2} columns={cols}>
-        {videos?.map((video, idx) => {
+        {videos.map(video => {
           const isMissing = video.image === null
 
           return (
@@ -44,7 +44,6 @@ function Column({ label, cols, rows = 1 }: ColumnProps) {
                     missing={isMissing}
                     className={classes.thumb}
                     alt='video'
-                    priority={idx % cols === 0}
                     sizes={`${100 / cols}vw`}
                   />
 

@@ -189,7 +189,7 @@ function StarImageDropbox({ star, videos }: StarImageDropboxProps) {
           <ContextMenuTrigger id='star__image'>
             <Image
               id={styles.profile}
-              src={`${serverConfig.api}/star/${star.id}/image`}
+              src={`${serverConfig.legacyApi}/star/${star.id}/image`}
               alt='star'
               width={200}
               height={275}
@@ -225,7 +225,7 @@ function StarVideo({ video }: { video: StarVideo }) {
   const [src, setSrc] = useState('')
 
   // FIXME this is not working as intended
-  const [dataSrc, setDataSrc] = useState(`${serverConfig.api}/video/${video.id}/file`)
+  const [dataSrc, setDataSrc] = useState(`${serverConfig.legacyApi}/video/${video.id}/file`)
 
   const thumbnail = useRef<NodeJS.Timeout>()
 
@@ -295,7 +295,7 @@ function StarVideo({ video }: { video: StarVideo }) {
             src={src}
             data-src={dataSrc}
             preload='metadata'
-            poster={`${serverConfig.api}/video/${video.id}/poster`}
+            poster={`${serverConfig.legacyApi}/video/${video.id}/poster`}
             muted
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}

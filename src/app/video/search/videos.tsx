@@ -76,7 +76,7 @@ function VideoCard({ video }: VideoCardProps) {
       <RibbonContainer component={Card} className={styles.video}>
         <CardActionArea>
           <ImageCard
-            src={`${serverConfig.api}/video/${video.id}/cover`}
+            src={`${serverConfig.legacyApi}/video/${video.id}/cover`}
             width={210}
             height={275}
             missing={video.cover === null}

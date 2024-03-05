@@ -335,7 +335,7 @@ function Star({ video, star, bookmarks, attributes, categories, removeStar, onMo
         <ContextMenuTrigger id={`star-${star.id}`}>
           <RibbonContainer component={Card} className={`${styles.star} ${border ? styles.active : ''}`}>
             <CardMedia>
-              <img src={`${serverConfig.api}/star/${star.id}/image`} style={{ width: '100%' }} alt='star' />
+              <img src={`${serverConfig.legacyApi}/star/${star.id}/image`} style={{ width: '100%' }} alt='star' />
             </CardMedia>
 
             <Link href={`/star/${star.id}`}>
@@ -581,7 +581,7 @@ function Franchise({ video }: FranchiseProps) {
           <Grid container component={Card} className={styles.episode}>
             <Grid item xs={2} className={styles.thumbnail}>
               <img
-                src={`${serverConfig.api}/video/${v.id}/cover`}
+                src={`${serverConfig.legacyApi}/video/${v.id}/cover`}
                 style={{ width: '100%', height: 'auto' }}
                 alt='video'
               />

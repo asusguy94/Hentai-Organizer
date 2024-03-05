@@ -206,7 +206,7 @@ export default function Timeline({
                   <Tooltip id={bookmark.id.toString()} className={styles.tooltip} opacity={1}>
                     {bookmark.starID !== 0 && (
                       <Image
-                        src={`${serverConfig.api}/star/${bookmark.starID}/image`}
+                        src={`${serverConfig.legacyApi}/star/${bookmark.starID}/image`}
                         data-star-id={bookmark.starID}
                         width={200}
                         height={275}

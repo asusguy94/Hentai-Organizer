@@ -14,12 +14,10 @@ type HomeVideo = {
 }
 
 export default {
-  renameVideo: (id: number, path: string) => legacyApi.put(`/${id}`, { path }).then(res => res.data as unknown),
-  toggleCensor: (id: number, censored: boolean) => {
-    return legacyApi.put(`/${id}`, { cen: !censored }).then(res => res.data as unknown)
-  },
-  updateVideo: (id: number) => legacyApi.put(`/${id}`).then(res => res.data as unknown),
-  deleteVideo: (id: number) => legacyApi.delete(`/${id}`).then(res => res.data as unknown),
+  renameVideo: (id: number, path: string) => legacyApi.put(`/${id}`, { path }),
+  toggleCensor: (id: number, censored: boolean) => legacyApi.put(`/${id}`, { cen: !censored }),
+  updateVideo: (id: number) => legacyApi.put(`/${id}`),
+  deleteVideo: (id: number) => legacyApi.delete(`/${id}`),
   useAddBookmark: (id: number) => {
     const queryClient = useQueryClient()
 
@@ -37,12 +35,8 @@ export default {
 
     return { mutate }
   },
-  renameFranchise: (id: number, value: string) => {
-    return legacyApi.put(`/${id}`, { franchise: value }).then(res => res.data as unknown)
-  },
-  renameTitle: (id: number, value: string) => {
-    return legacyApi.put(`/${id}`, { title: value }).then(res => res.data as unknown)
-  },
+  renameFranchise: (id: number, value: string) => legacyApi.put(`/${id}`, { franchise: value }),
+  renameTitle: (id: number, value: string) => legacyApi.put(`/${id}`, { title: value }),
   useRemoveStar: (id: number) => {
     const queryClient = useQueryClient()
 
@@ -108,15 +102,13 @@ export default {
 
     return { data: query.data }
   },
-  removeAttribute: (id: number, attributeID: number) => {
-    return legacyApi.delete(`/${id}/attribute/${attributeID}`).then(res => res.data as unknown)
-  },
-  addVideos: (videos: unknown[]) => legacyApi.post('/add', { videos }).then(res => res.data as unknown),
-  setSlug: (id: number, slug: string) => legacyApi.put(`/${id}/api`, { slug }).then(res => res.data as unknown),
-  setBrand: (id: number) => legacyApi.put(`/${id}/api`, { brand: true }).then(res => res.data as unknown),
-  setDate: (id: number) => legacyApi.put(`/${id}/api`, { date: true }).then(res => res.data as unknown),
-  setCover: (id: number) => legacyApi.put(`/${id}/api`, { cover: true }).then(res => res.data as unknown),
-  setPoster: (id: number) => legacyApi.put(`/${id}/api`, { poster: true }).then(res => res.data as unknown),
+  removeAttribute: (id: number, attributeID: number) => legacyApi.delete(`/${id}/attribute/${attributeID}`),
+  addVideos: (videos: unknown[]) => legacyApi.post('/add', { videos }),
+  setSlug: (id: number, slug: string) => legacyApi.put(`/${id}/api`, { slug }),
+  setBrand: (id: number) => legacyApi.put(`/${id}/api`, { brand: true }),
+  setDate: (id: number) => legacyApi.put(`/${id}/api`, { date: true }),
+  setCover: (id: number) => legacyApi.put(`/${id}/api`, { cover: true }),
+  setPoster: (id: number) => legacyApi.put(`/${id}/api`, { poster: true }),
   useHomeVideos: (label: string, limit: number) => {
     const query = useQuery<HomeVideo[]>({
       ...keys.video.home(label, limit),

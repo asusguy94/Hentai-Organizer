@@ -66,12 +66,10 @@ export default {
 
     return { mutate }
   },
-  removeImage: (id: number) => legacyApi.delete(`/${id}/image`).then(res => res.data as unknown),
-  removeStar: (id: number) => legacyApi.delete(`/${id}`).then(res => res.data as unknown),
-  renameStar: (id: number, name: string) => legacyApi.put(`/${id}`, { name }).then(res => res.data as unknown),
-  setLink: (id: number, value: string) => {
-    return legacyApi.put(`/${id}`, { label: 'starLink', value }).then(res => res.data as unknown)
-  },
+  removeImage: (id: number) => legacyApi.delete(`/${id}/image`),
+  removeStar: (id: number) => legacyApi.delete(`/${id}`),
+  renameStar: (id: number, name: string) => legacyApi.put(`/${id}`, { name }),
+  setLink: (id: number, value: string) => legacyApi.put(`/${id}`, { label: 'starLink', value }),
   useVideos: (id: number) => {
     const query = useQuery<StarVideo[]>({
       ...keys.star.byId(id)._ctx.video,

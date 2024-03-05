@@ -22,7 +22,12 @@ export default function createApi(suffix: string, options?: Partial<Options>) {
       put: <T>(...args: Parameters<(typeof api)['put']>) => getResponse<T>(api.put(...args)),
       delete: <T>(...args: Parameters<(typeof api)['delete']>) => getResponse<T>(api.delete(...args))
     },
-    legacyApi: api,
+    legacyApi: {
+      get: (...args: Parameters<(typeof api)['get']>) => getResponse<unknown>(api.get(...args)),
+      post: (...args: Parameters<(typeof api)['post']>) => getResponse<unknown>(api.post(...args)),
+      put: (...args: Parameters<(typeof api)['put']>) => getResponse<unknown>(api.put(...args)),
+      delete: (...args: Parameters<(typeof api)['delete']>) => getResponse<unknown>(api.delete(...args))
+    },
     baseURL
   }
 }

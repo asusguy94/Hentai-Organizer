@@ -19,71 +19,71 @@ export default {
 
     return { mutate }
   },
-  useSetCategory: () => {
+  useSetCategory: (videoId: number) => {
     const queryClient = useQueryClient()
 
     const { mutate } = useMutation<unknown, Error, { id: number; categoryID: number }>({
       mutationKey: ['bookmark', 'setCategory'],
       mutationFn: ({ id, ...payload }) => api.put(`/${id}`, payload),
-      onSuccess: (_, { id }) => queryClient.invalidateQueries({ ...keys.video.byId(id)._ctx.bookmark })
+      onSuccess: () => queryClient.invalidateQueries({ ...keys.video.byId(videoId)._ctx.bookmark })
     })
 
     return { mutate }
   },
-  useSetOutfit: () => {
+  useSetOutfit: (videoId: number) => {
     const queryClient = useQueryClient()
 
     const { mutate } = useMutation<unknown, Error, { id: number; outfitID: number }>({
       mutationKey: ['bookmark', 'setOutfit'],
       mutationFn: ({ id, ...payload }) => api.put(`/${id}/outfit`, payload),
-      onSuccess: (_, { id }) => queryClient.invalidateQueries({ ...keys.video.byId(id)._ctx.bookmark })
+      onSuccess: () => queryClient.invalidateQueries({ ...keys.video.byId(videoId)._ctx.bookmark })
     })
 
     return { mutate }
   },
   removeOutfit: (id: number) => api.delete(`/${id}/outfit`),
-  useAddAttribute: () => {
+  useAddAttribute: (videoId: number) => {
     const queryClient = useQueryClient()
 
     const { mutate } = useMutation<unknown, Error, { id: number; attributeID: number }>({
       mutationKey: ['bookmark', 'addAttribute'],
       mutationFn: ({ id, ...payload }) => api.post('/attribute', { bookmarkID: id, attributeID: payload.attributeID }),
-      onSuccess: (_, { id }) => queryClient.invalidateQueries({ ...keys.video.byId(id)._ctx.bookmark })
+      onSuccess: () => queryClient.invalidateQueries({ ...keys.video.byId(videoId)._ctx.bookmark })
     })
 
     return { mutate }
   },
-  useRemoveAttribute: () => {
+  useRemoveAttribute: (videoId: number) => {
     const queryClient = useQueryClient()
 
     const { mutate } = useMutation<unknown, Error, { id: number; attributeID: number }>({
       mutationKey: ['bookmark', 'removeAttribute'],
       mutationFn: ({ id, attributeID }) => api.delete(`/${id}/attribute/${attributeID}`),
-      onSuccess: (_, { id }) => queryClient.invalidateQueries({ ...keys.video.byId(id)._ctx.bookmark })
+      onSuccess: () => queryClient.invalidateQueries({ ...keys.video.byId(videoId)._ctx.bookmark })
     })
 
     return { mutate }
   },
   clearAttributes: (id: number) => api.delete(`/${id}/attribute`),
   removeStar: (id: number) => api.delete(`/${id}/star`),
-  useSetTime: () => {
+  useSetTime: (videoId: number) => {
     const queryClient = useQueryClient()
 
     const { mutate } = useMutation<unknown, Error, { id: number; time: number }>({
       mutationKey: ['bookmark', 'setTime'],
       mutationFn: ({ id, ...payload }) => api.put(`/${id}`, payload),
-      onSuccess: (_, { id }) => queryClient.invalidateQueries({ ...keys.video.byId(id)._ctx.bookmark })
+      onSuccess: () => queryClient.invalidateQueries({ ...keys.video.byId(videoId)._ctx.bookmark })
     })
 
     return { mutate }
   },
-  useAddStar: () => {
+  useAddStar: (videoId: number) => {
     const queryClient = useQueryClient()
 
     const { mutate } = useMutation<unknown, Error, { id: number; starID: number }>({
       mutationKey: ['bookmark', 'addStar'],
       mutationFn: ({ id, ...payload }) => api.post(`/${id}/star`, payload),
-      onSuccess: (_, { id }) => queryClient.invalidateQueries({ ...keys.video.byId(id)._ctx.star })
+      onSuccess: () => queryClient.invalidateQueries({ ...keys.video.byId(videoId)._ctx.star })
     })
 
     return { mutate }

@@ -46,11 +46,11 @@ export default function Timeline({
   const bookmarksRef = useRef<HTMLButtonElement[]>([])
   const [bookmarkLevels, setBookmarkLevels] = useState<number[]>([])
   const { collisionCheck } = useCollisionCheck()
-  const { mutate } = bookmarkService.useSetTime()
-  const { mutate: mutateSetCategory } = bookmarkService.useSetCategory()
-  const { mutate: mutateAddAttribute } = bookmarkService.useAddAttribute()
-  const { mutate: mutateRemoveAttribute } = bookmarkService.useRemoveAttribute()
-  const { mutate: mutateSetOutfit } = bookmarkService.useSetOutfit()
+  const { mutate: mutateSetTime } = bookmarkService.useSetTime(video.id)
+  const { mutate: mutateSetCategory } = bookmarkService.useSetCategory(video.id)
+  const { mutate: mutateAddAttribute } = bookmarkService.useAddAttribute(video.id)
+  const { mutate: mutateRemoveAttribute } = bookmarkService.useRemoveAttribute(video.id)
+  const { mutate: mutateSetOutfit } = bookmarkService.useSetOutfit(video.id)
   const { mutate: mutateRemoveBookmark } = bookmarkService.useRemoveBookmark(video.id)
 
   const { data: outfits } = outfitService.useAll()
@@ -61,7 +61,7 @@ export default function Timeline({
     if (player !== null) {
       const time = Math.round(player.currentTime)
 
-      mutate({ time, id: bookmarkID })
+      mutateSetTime({ time, id: bookmarkID })
     }
   }
 

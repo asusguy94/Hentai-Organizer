@@ -242,7 +242,7 @@ type StarProps = {
 function Star({ video, star, bookmarks, attributes, categories, removeStar, onModal, starEvent }: StarProps) {
   const [border, setBorder] = useState(false)
   const { mutate: mutateAddBookmark } = videoService.useAddBookmark(video.id)
-  const { mutate: mutateAddStar } = bookmarkService.useAddStar()
+  const { mutate: mutateAddStar } = bookmarkService.useAddStar(video.id)
   const { mutate: mutateAddStarAttribute } = bookmarkService.useAddStarAttribute(video.id, star.id)
 
   const handleRibbon = (star: VideoStar) => {

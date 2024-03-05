@@ -56,13 +56,17 @@ export default {
     })
 
     const mutate = (payload: Payload) => {
-      mutateSync(payload)
-      onSuccess()
+      mutateSync(payload, {
+        onSuccess: () => {
+          onSuccess()
+        }
+      })
     }
 
-    const mutateAll = async (payload: Payload[]) => {
-      await Promise.allSettled(payload.map(p => mutateAsync(p)))
-      onSuccess()
+    const mutateAll = (payloads: Payload[]) => {
+      Promise.allSettled(payloads.map(payload => mutateAsync(payload))).then(() => {
+        onSuccess()
+      })
     }
 
     return { mutate, mutateAll }
@@ -81,13 +85,17 @@ export default {
     })
 
     const mutate = (payload: Payload) => {
-      mutateSync(payload)
-      onSuccess()
+      mutateSync(payload, {
+        onSuccess: () => {
+          onSuccess()
+        }
+      })
     }
 
-    const mutateAll = async (payload: Payload[]) => {
-      await Promise.allSettled(payload.map(p => mutateAsync(p)))
-      onSuccess()
+    const mutateAll = (payloads: Payload[]) => {
+      Promise.allSettled(payloads.map(payload => mutateAsync(payload))).then(() => {
+        onSuccess()
+      })
     }
 
     return { mutate, mutateAll }

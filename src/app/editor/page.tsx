@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 
 import {
   Grid,
@@ -16,10 +16,10 @@ import {
   Checkbox
 } from '@mui/material'
 
-import axios from 'axios'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import capitalize from 'capitalize'
 
-import { serverConfig } from '@config'
+import { createApi } from '@config'
 import { General } from '@interfaces'
 
 import styles from './editor.module.css'
@@ -31,36 +31,58 @@ type UpdateRef = {
   starOnly?: boolean
 }
 
+type TableKeys = 'attribute' | 'category' | 'outfit'
 type OnlyType = 'starOnly' | 'videoOnly'
-type WithOnlyType = General & { videoOnly?: boolean; starOnly?: boolean }
+type WithOnlyType = General & Partial<Record<OnlyType, boolean>>
 
 export default function EditorPage() {
   return (
     <Grid container justifyContent='center'>
-      <Wrapper name='Attribute' obj={['starOnly', 'videoOnly']} />
-      <Wrapper name='Category' />
-      <Wrapper name='Outfit' />
+      <Table name='attribute' obj={['starOnly', 'videoOnly']} />
+      <Table name='category' />
+      <Table name='outfit' />
     </Grid>
   )
 }
 
 type WrapperProps = {
-  name: string
+  name: TableKeys
   obj?: OnlyType[]
 }
 
-function Wrapper({ name, obj = [] }: WrapperProps) {
+function Table({ name, obj }: WrapperProps) {
   const [input, setInput] = useState('')
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => setInput(e.target.value)
+  const queryClient = useQueryClient()
+
+  const { api } = createApi(`/${name}`)
+
+  const { data } = useQuery<WithOnlyType[]>({
+    queryKey: [name],
+    queryFn: () => api.get('')
+  })
+
+  const { mutate: mutateCreate } = useMutation<unknown, Error, { name: string }>({
+    mutationKey: [name, 'create'],
+    mutationFn: payload => api.post('', payload),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: [name] })
+  })
+
+  const { mutate: mutateCheckbox } = useMutation<unknown, Error, { name: string; ref: UpdateRef }>({
+    mutationKey: [name, 'updateCheckbox'],
+    mutationFn: ({ ref, ...payload }) => api.post(`/${ref.id}`, payload),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: [name] })
+  })
+
+  const updateItem = (ref: UpdateRef, value: string) => {
+    mutateCheckbox({ ref, name: value })
+  }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
 
     if (input.length > 0 && input.toLowerCase() !== input) {
-      axios.post(`${serverConfig.legacyApi}/${name.toLowerCase()}`, { name: input }).then(() => {
-        location.reload()
-      })
+      mutateCreate({ name: input })
     }
   }
 
@@ -70,8 +92,8 @@ function Wrapper({ name, obj = [] }: WrapperProps) {
         <Grid item component='form' onSubmit={handleSubmit}>
           <TextField
             variant='standard'
-            label={name}
-            onChange={handleChange}
+            name={capitalize(name)}
+            onChange={e => setInput(e.target.value)}
             style={{ marginLeft: 5, marginRight: 5 }}
           />
 
@@ -81,62 +103,44 @@ function Wrapper({ name, obj = [] }: WrapperProps) {
         </Grid>
       </Grid>
 
-      <Table name={name.toLowerCase()} obj={obj} />
+      <TableContainer component={Paper} style={{ overflowX: 'visible' }}>
+        <MuiTable size='small' className={styles['table-striped']} stickyHeader>
+          <TableHead>
+            <MuiTableRow>
+              <TableCell>ID</TableCell>
+              <TableCell>{capitalize(name)}</TableCell>
+
+              {obj?.map(name => <TableCell key={name}>{name}</TableCell>)}
+            </MuiTableRow>
+          </TableHead>
+
+          <TableBody>
+            {data?.map(item => <TableRow key={item.id} obj={obj} data={item} update={updateItem} />)}
+          </TableBody>
+        </MuiTable>
+      </TableContainer>
     </Grid>
-  )
-}
-
-type TableProps = {
-  name: string
-  obj: OnlyType[]
-}
-function Table({ name, obj = [] }: TableProps) {
-  const [data, setData] = useState<WithOnlyType[]>([])
-
-  useEffect(() => {
-    axios.get<WithOnlyType[]>(`${serverConfig.legacyApi}/${name}`).then(({ data }) => {
-      setData(data.sort((a, b) => a.id - b.id))
-    })
-  }, [name])
-
-  const updateItem = (ref: UpdateRef, value: string) => {
-    axios.put(`${serverConfig.legacyApi}/${name}/${ref.id}`, { value }).then(() => {
-      setData(data.map(item => ({ ...item, name: ref.id === item.id ? value : item.name })))
-    })
-  }
-
-  return (
-    <TableContainer component={Paper} style={{ overflowX: 'visible' }}>
-      <MuiTable size='small' className={styles['table-striped']} stickyHeader>
-        <TableHead>
-          <MuiTableRow>
-            <TableCell>ID</TableCell>
-            <TableCell>{capitalize(name)}</TableCell>
-
-            {obj.map(label => (
-              <TableCell key={label}>{label}</TableCell>
-            ))}
-          </MuiTableRow>
-        </TableHead>
-
-        <TableBody>
-          {data.map(item => (
-            <TableRow key={item.id} obj={obj} data={item} update={updateItem} />
-          ))}
-        </TableBody>
-      </MuiTable>
-    </TableContainer>
   )
 }
 
 type TableRowProps = {
   update: (ref: UpdateRef, value: string) => void
   data: WithOnlyType
-  obj: OnlyType[]
+  obj?: OnlyType[]
 }
 function TableRow({ update, data, obj }: TableRowProps) {
   const [edit, setEdit] = useState(false)
   const [input, setInput] = useState('')
+
+  const queryClient = useQueryClient()
+
+  const { api } = createApi(`/attribute/${data.id}`)
+
+  const { mutate } = useMutation<unknown, Error, { name: string; value: boolean }>({
+    mutationKey: ['attribute', 'updateName'],
+    mutationFn: payload => api.put('', payload),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['attribute'] })
+  })
 
   const save = () => {
     setEdit(false)
@@ -145,9 +149,7 @@ function TableRow({ update, data, obj }: TableRowProps) {
   }
 
   const setCondition = (ref: UpdateRef, prop: string, value: boolean, checkbox: HTMLInputElement) => {
-    axios.put(`${serverConfig.legacyApi}/attribute/${ref.id}`, { label: prop, value }).catch(() => {
-      checkbox.checked = !value
-    })
+    mutate({ name: prop, value }, { onError: () => (checkbox.checked = !value) })
   }
 
   return (
@@ -169,7 +171,7 @@ function TableRow({ update, data, obj }: TableRowProps) {
         )}
       </TableCell>
 
-      {obj.map(item => (
+      {obj?.map(item => (
         <TableCell key={item} className='py-0'>
           <Checkbox
             defaultChecked={data[item]}

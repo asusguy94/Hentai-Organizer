@@ -1,3 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import React, { useEffect, useState } from 'react'
 
 import { Button, Card, Modal as MUIModal, Typography } from '@mui/material'
@@ -89,8 +94,8 @@ function ModalChild({ title, filter, children, query, onClose }: ModalChildProps
       })
       .filter(item => item.props.children.toLowerCase().includes(query))
       .sort((a, b) => {
-        const valA = a.props.children.toLowerCase()
-        const valB = b.props.children.toLowerCase()
+        const valA: string = a.props.children.toLowerCase()
+        const valB: string = b.props.children.toLowerCase()
 
         if (query.length > 0) {
           if (valA.startsWith(query) && valB.startsWith(query)) return 0

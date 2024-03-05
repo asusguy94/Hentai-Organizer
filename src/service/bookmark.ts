@@ -5,7 +5,7 @@ import { createApi } from '@config'
 const { api, legacyApi } = createApi('/bookmark')
 
 export default {
-  removeBookmark: (id: number) => legacyApi.delete(`/${id}`).then(res => res.data),
+  removeBookmark: (id: number) => legacyApi.delete(`/${id}`).then(res => res.data as unknown),
   useSetCategory: () => {
     //TODO add id as a parameter
     const { mutate } = useMutation<unknown, Error, { id: number; categoryID: number }>({

@@ -62,7 +62,7 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
     if (video.slug !== null) {
       const { cover } = await getVideo(video.slug)
 
-      downloader(cover, `media/images/videos/cover/${video.id}.png`)
+      await downloader(cover, `media/images/videos/cover/${video.id}.png`)
 
       return Response.json(
         await db.video.update({
@@ -75,7 +75,7 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
     if (video.slug !== null) {
       const { poster } = await getVideo(video.slug)
 
-      downloader(poster, `media/images/videos/poster/${video.id}.png`)
+      await downloader(poster, `media/images/videos/poster/${video.id}.png`)
 
       return Response.json(
         await db.video.update({

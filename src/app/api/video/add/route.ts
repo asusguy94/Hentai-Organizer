@@ -56,9 +56,7 @@ export async function GET() {
       const { franchise } = await getVideo(slug)
 
       const generated = generate(file, slug, franchise)
-      if (generated !== undefined) {
-        newFiles.push({ ...generated, slug })
-      }
+      newFiles.push({ ...generated, slug })
     }
   }
 }

@@ -6,7 +6,6 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   Button,
   Card,
-  CardMedia,
   Checkbox,
   Divider,
   FormControlLabel,
@@ -23,6 +22,7 @@ import { motion } from 'framer-motion'
 import { ContextMenu, ContextMenuTrigger, ContextMenuItem } from 'rctx-contextmenu'
 
 import { IconWithText } from '@components/icon'
+import { ImageCard, ResponsiveImage } from '@components/image'
 import Link from '@components/link'
 import ModalComponent, { Modal, ModalHandler, useModal } from '@components/modal'
 import Ribbon, { RibbonContainer } from '@components/ribbon'
@@ -334,9 +334,18 @@ function Star({ video, star, bookmarks, attributes, categories, removeStar, onMo
       <motion.div layoutId={star.id.toString()}>
         <ContextMenuTrigger id={`star-${star.id}`}>
           <RibbonContainer component={Card} className={`${styles.star} ${border ? styles.active : ''}`}>
-            <CardMedia>
-              <img src={`${serverConfig.legacyApi}/star/${star.id}/image`} style={{ width: '100%' }} alt='star' />
-            </CardMedia>
+            <ImageCard
+              src={`${serverConfig.legacyApi}/star/${star.id}/image`}
+              width={200}
+              height={200}
+              missing={star.image === null}
+              renderStyle='transform'
+              scale={5}
+              alt='star'
+              priority
+              responsive
+              sizes={`${(100 / 12) * 4}vw`}
+            />
 
             <Link href={`/star/${star.id}`}>
               <Typography>{star.name}</Typography>
@@ -468,6 +477,7 @@ function StarInput({ video, stars, bookmarks, getAttributes }: StarInputProps) {
 
                 // Reset focused state
                 //@ts-expect-error: target is missing from MUI
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-call
                 e.target.blur()
               }
             }}
@@ -580,10 +590,13 @@ function Franchise({ video }: FranchiseProps) {
         <a href={`/video/${v.id}`} key={v.id}>
           <Grid container component={Card} className={styles.episode}>
             <Grid item xs={2} className={styles.thumbnail}>
-              <img
+              <ResponsiveImage
                 src={`${serverConfig.legacyApi}/video/${v.id}/cover`}
-                style={{ width: '100%', height: 'auto' }}
+                width={90}
+                height={130}
+                missing={v.image === null}
                 alt='video'
+                sizes={`${(((100 / 12) * 3) / 12) * 2}vw`}
               />
             </Grid>
 

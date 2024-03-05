@@ -19,8 +19,7 @@ export async function GET(req: Request, { params }: Params<'id'>) {
     try {
       const { name } = await getVideo(video.slug)
 
-      const countChars = (str: string, char: string) =>
-        (str.match(new RegExp(`${escapeRegExp(char)}`, 'g')) ?? []).length
+      const countChars = (str: string, char: string) => (str.match(new RegExp(escapeRegExp(char), 'g')) ?? []).length
 
       const specialChars = ['%', '*', '?', ':'] // "%" can be removed, when finished processing all files, as it not an illegal character
 

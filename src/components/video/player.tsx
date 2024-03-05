@@ -32,7 +32,11 @@ export default function VideoPlayer({ video, bookmarks, categories, stars, playe
   const { mutate } = videoService.useAddBookmark(video.id)
   const queryClient = useQueryClient()
 
-  const copy = async () => await navigator.clipboard.writeText(video.path.file.slice(0, -4))
+  const copy = () => {
+    ;(async () => {
+      await navigator.clipboard.writeText(video.path.file.slice(0, -4))
+    })()
+  }
 
   const deleteVideo = () => {
     videoService.deleteVideo(video.id).then(() => {

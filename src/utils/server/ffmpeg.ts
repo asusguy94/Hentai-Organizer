@@ -16,13 +16,13 @@ async function getRawDuration(file: string) {
   return new Promise<number>((resolve, reject) => {
     ffmpeg.ffprobe(file, (err, metadata) => {
       if (err) {
-        reject(err)
+        reject(err as Error)
         return
       }
 
       const duration = metadata.format.duration
       if (duration === undefined) {
-        reject('Duration is undefined')
+        reject(new Error('Duration is undefined'))
       } else {
         resolve(duration)
       }
@@ -96,16 +96,14 @@ export async function rebuildVideoFile(src: string) {
   const { dir, ext, name } = path.parse(src)
   const newSrc = `${dir}/${name}_${ext}`
 
+  await fs.promises.rename(src, newSrc)
   return new Promise<boolean>((resolve, reject) => {
-    // eslint-disable-next-line @typescript-eslint/require-await
-    fs.promises.rename(src, newSrc).then(async () => {
-      ffmpeg(newSrc)
-        .videoCodec('copy')
-        .audioCodec('copy')
-        .output(src)
-        .on('end', () => fs.unlink(newSrc, err => resolve(err !== null)))
-        .on('error', err => reject(err))
-        .run()
-    })
+    ffmpeg(newSrc)
+      .videoCodec('copy')
+      .audioCodec('copy')
+      .output(src)
+      .on('end', () => fs.unlink(newSrc, err => resolve(err !== null)))
+      .on('error', err => reject(err as Error))
+      .run()
   })
 }

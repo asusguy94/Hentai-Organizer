@@ -121,8 +121,8 @@ export async function PUT(req: Request, { params }: Params<'id'>) {
   } else if (path !== undefined) {
     const video = await db.video.findFirstOrThrow({ where: { id } })
 
-    fs.promises.rename(`./media/videos/${video.path}`, `./media/videos/${path}`)
-    fs.promises.rename(`./media/videos/${dirOnly(video.path)}`, `./media/videos/${dirOnly(path)}`)
+    await fs.promises.rename(`./media/videos/${video.path}`, `./media/videos/${path}`)
+    await fs.promises.rename(`./media/videos/${dirOnly(video.path)}`, `./media/videos/${dirOnly(path)}`)
     //TODO the last one throws if the folder doesn't exist
 
     // UPDATE DATABASE

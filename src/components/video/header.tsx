@@ -45,7 +45,11 @@ type HeaderTitleProps = {
   isValid: boolean
 }
 function HeaderTitle({ video, onModal, isValid }: HeaderTitleProps) {
-  const copyFranchise = async () => await navigator.clipboard.writeText(video.franchise)
+  const copyFranchise = () => {
+    ;(async () => {
+      await navigator.clipboard.writeText(video.franchise)
+    })()
+  }
 
   const renameFranchise = (newFranchise: string) => {
     if (video.name.startsWith(video.franchise)) {
@@ -151,8 +155,8 @@ function HeaderTitle({ video, onModal, isValid }: HeaderTitleProps) {
                 autoFocus
                 onKeyDown={e => {
                   if (e.key === 'Enter') {
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
                     //@ts-expect-error: target is missing from MUI
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                     const value: string = e.target.value
 
                     // Only submit data if all lowercase
@@ -202,8 +206,8 @@ function HeaderSlug({ video, onModal }: HeaderSlugProps) {
             autoFocus
             onKeyDown={e => {
               if (e.key === 'Enter') {
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
                 //@ts-expect-error: target is missing from MUI
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                 const value: string = e.target.value
 
                 // Only submit data if all lowercase

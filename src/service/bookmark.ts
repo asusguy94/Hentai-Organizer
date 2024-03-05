@@ -3,14 +3,25 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 import { createApi } from '@config'
 
-const { api, legacyApi } = createApi('/bookmark')
+const { api } = createApi('/bookmark')
+
+//TODO add id as a parameter
 
 export default {
-  removeBookmark: (id: number) => legacyApi.delete(`/${id}`).then(res => res.data as unknown),
+  useRemoveBookmark: (videoId: number) => {
+    const queryClient = useQueryClient()
+
+    const { mutate } = useMutation<unknown, Error, { id: number }>({
+      mutationKey: ['bookmark', 'remove'],
+      mutationFn: ({ id }) => api.delete(`/${id}`),
+      onSuccess: () => queryClient.invalidateQueries({ ...keys.video.byId(videoId)._ctx.bookmark })
+    })
+
+    return { mutate }
+  },
   useSetCategory: () => {
     const queryClient = useQueryClient()
 
-    //TODO add id as a parameter
     const { mutate } = useMutation<unknown, Error, { id: number; categoryID: number }>({
       mutationKey: ['bookmark', 'setCategory'],
       mutationFn: ({ id, ...payload }) => api.put(`/${id}`, payload),
@@ -20,7 +31,6 @@ export default {
     return { mutate }
   },
   useSetOutfit: () => {
-    //TODO add id as a parameter
     const queryClient = useQueryClient()
 
     const { mutate } = useMutation<unknown, Error, { id: number; outfitID: number }>({
@@ -33,7 +43,6 @@ export default {
   },
   removeOutfit: (id: number) => api.delete(`/${id}/outfit`),
   useAddAttribute: () => {
-    //TODO add id as a parameter
     const queryClient = useQueryClient()
 
     const { mutate } = useMutation<unknown, Error, { id: number; attributeID: number }>({
@@ -47,7 +56,6 @@ export default {
   useRemoveAttribute: () => {
     const queryClient = useQueryClient()
 
-    //TODO add id as a parameter
     const { mutate } = useMutation<unknown, Error, { id: number; attributeID: number }>({
       mutationKey: ['bookmark', 'removeAttribute'],
       mutationFn: ({ id, attributeID }) => api.delete(`/${id}/attribute/${attributeID}`),
@@ -59,7 +67,6 @@ export default {
   clearAttributes: (id: number) => api.delete(`/${id}/attribute`),
   removeStar: (id: number) => api.delete(`/${id}/star`),
   useSetTime: () => {
-    // TODO add id as a parameter
     const queryClient = useQueryClient()
 
     const { mutate } = useMutation<unknown, Error, { id: number; time: number }>({
@@ -71,7 +78,6 @@ export default {
     return { mutate }
   },
   useAddStar: () => {
-    //TODO add id as a parameter
     const queryClient = useQueryClient()
 
     const { mutate } = useMutation<unknown, Error, { id: number; starID: number }>({

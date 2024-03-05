@@ -16,19 +16,15 @@ type HeaderProps = {
   onModal: ModalHandler
 }
 export default function Header({ video, onModal }: HeaderProps) {
-  const { data: isValid } = videoService.useIsValid(video.id)
-
-  if (isValid === undefined) return null
-
   return (
     <Grid container item alignItems='center' component='header' id={styles.header}>
-      <HeaderTitle video={video} onModal={onModal} isValid={isValid.title} />
+      <HeaderTitle video={video} onModal={onModal} isValid={video.isValid.title} />
 
       {video.slug === null ? (
         <HeaderSlug video={video} onModal={onModal} />
       ) : (
         <>
-          <InvalidFname video={video} isValid={isValid.fname} />
+          <InvalidFname video={video} isValid={video.isValid.fname} />
           <HeaderDate video={video} />
           <HeaderNetwork video={video} />
         </>

@@ -35,6 +35,7 @@ export type Video = {
   date: { added: string; published: string | null }
   quality: number
   related: Related[]
+  isValid: { title: boolean; fname: boolean }
 }
 
 export type Attribute = {
@@ -67,11 +68,6 @@ export type Bookmark = {
   start: number
   attributes: Attribute[]
   outfit: string | null
-}
-
-export type Validity = {
-  title: boolean
-  fname: boolean
 }
 
 export type StarSearch = {

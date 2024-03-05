@@ -2,7 +2,7 @@ import { keys } from '@keys'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import { createApi } from '@config'
-import { Bookmark, General, Validity, Video, VideoStar } from '@interfaces'
+import { Bookmark, General, Video, VideoStar } from '@interfaces'
 
 const { api, legacyApi } = createApi('/video')
 
@@ -121,15 +121,6 @@ export default {
     const query = useQuery<VideoStar[]>({
       ...keys.video.byId(id)._ctx.star,
       queryFn: () => api.get(`/${id}/star`)
-    })
-
-    return { data: query.data }
-  },
-  useIsValid: (id: number) => {
-    //TODO can probably be merged with useVideo
-    const query = useQuery<Validity>({
-      ...keys.video.byId(id)._ctx.validate,
-      queryFn: () => api.get(`/${id}/validate`)
     })
 
     return { data: query.data }

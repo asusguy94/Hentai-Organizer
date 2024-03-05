@@ -10,7 +10,7 @@ export default {
   useStars: () => {
     const query = useQuery<StarSearch[]>({
       ...keys.search.star,
-      queryFn: () => api.get('/star').then(res => res.data),
+      queryFn: () => api.get('/star'),
       placeholderData: prevData => prevData
     })
 
@@ -19,7 +19,7 @@ export default {
   useVideos: () => {
     const query = useQuery<VideoSearch[]>({
       ...keys.search.video,
-      queryFn: () => api.get('/video').then(res => res.data),
+      queryFn: () => api.get('/video'),
       placeholderData: prevData => prevData
     })
 

@@ -58,7 +58,7 @@ function Wrapper({ name, obj = [] }: WrapperProps) {
     e.preventDefault()
 
     if (input.length > 0 && input.toLowerCase() !== input) {
-      axios.post(`${serverConfig.api}/${name.toLowerCase()}`, { name: input }).then(() => {
+      axios.post(`${serverConfig.legacyApi}/${name.toLowerCase()}`, { name: input }).then(() => {
         location.reload()
       })
     }
@@ -94,13 +94,13 @@ function Table({ name, obj = [] }: TableProps) {
   const [data, setData] = useState<WithOnlyType[]>([])
 
   useEffect(() => {
-    axios.get<WithOnlyType[]>(`${serverConfig.api}/${name}`).then(({ data }) => {
+    axios.get<WithOnlyType[]>(`${serverConfig.legacyApi}/${name}`).then(({ data }) => {
       setData(data.sort((a, b) => a.id - b.id))
     })
   }, [name])
 
   const updateItem = (ref: UpdateRef, value: string) => {
-    axios.put(`${serverConfig.api}/${name}/${ref.id}`, { value }).then(() => {
+    axios.put(`${serverConfig.legacyApi}/${name}/${ref.id}`, { value }).then(() => {
       setData(data.map(item => ({ ...item, name: ref.id === item.id ? value : item.name })))
     })
   }
@@ -145,7 +145,7 @@ function TableRow({ update, data, obj }: TableRowProps) {
   }
 
   const setCondition = (ref: UpdateRef, prop: string, value: boolean, checkbox: HTMLInputElement) => {
-    axios.put(`${serverConfig.api}/attribute/${ref.id}`, { label: prop, value }).catch(() => {
+    axios.put(`${serverConfig.legacyApi}/attribute/${ref.id}`, { label: prop, value }).catch(() => {
       checkbox.checked = !value
     })
   }

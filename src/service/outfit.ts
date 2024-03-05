@@ -10,7 +10,7 @@ export default {
   useAll: () => {
     const query = useQuery<Outfit[]>({
       ...keys.outfits.all,
-      queryFn: () => api.get('').then(res => res.data)
+      queryFn: () => api.get('')
     })
 
     return { data: query.data }

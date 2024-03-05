@@ -1,10 +1,7 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
-
 import { Button, FormControl, Grid, RadioGroup, SelectChangeEvent, TextField } from '@mui/material'
 
-import axios from 'axios'
 import ScrollToTop from 'react-scroll-to-top'
 
 import { RegularHandlerProps } from '@components/indeterminate'
@@ -15,7 +12,7 @@ import Videos from './videos'
 
 import { useAllSearchParams, useDynamicSearchParam, useSearchParam } from '@hooks/search'
 import useFocus from '@hooks/useFocus'
-import { General } from '@interfaces'
+import { attributeService, brandService, categoryService, outfitService } from '@service'
 
 import styles from './search.module.scss'
 
@@ -140,17 +137,10 @@ function Filter() {
     nullCategory: nullCategoryParam
   } = useAllSearchParams(defaultObj)
 
-  const [attributes, setAttributes] = useState<General[]>([])
-  const [categories, setCategories] = useState<General[]>([])
-  const [outfits, setOutfits] = useState<General[]>([])
-  const [brands, setBrands] = useState<string[]>([])
-
-  useEffect(() => {
-    axios.get<General[]>('/api/attribute').then(({ data }) => setAttributes(data))
-    axios.get<General[]>('/api/category').then(({ data }) => setCategories(data))
-    axios.get<General[]>('/api/outfit').then(({ data }) => setOutfits(data))
-    axios.get<string[]>('/api/brand').then(({ data }) => setBrands(data))
-  }, [])
+  const { data: attributes } = attributeService.useAll()
+  const { data: categories } = categoryService.useAll()
+  const { data: outfits } = outfitService.useAll()
+  const { data: brands } = brandService.useAll()
 
   const category = (ref: RegularHandlerProps, target: string) => {
     if (categoryParam === defaultObj.category) {

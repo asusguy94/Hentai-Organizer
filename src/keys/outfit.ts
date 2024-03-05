@@ -1,5 +1,5 @@
 import { createQueryKeys } from '@lukemorales/query-key-factory'
 
-export const outfits = createQueryKeys('outfits', {
+export const outfits = createQueryKeys('outfit', {
   all: null
 })

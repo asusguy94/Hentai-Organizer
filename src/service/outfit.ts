@@ -9,7 +9,7 @@ const { api } = createApi('/outfit')
 export default {
   useAll: () => {
     const query = useQuery<Outfit[]>({
-      ...keys.outfits.all,
+      ...keys.outfit.all,
       queryFn: () => api.get('')
     })
 

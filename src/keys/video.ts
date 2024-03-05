@@ -1,6 +1,6 @@
 import { createQueryKeys } from '@lukemorales/query-key-factory'
 
-export const videos = createQueryKeys('videos', {
+export const videos = createQueryKeys('video', {
   byId: (id: number) => ({
     queryKey: [id],
     contextQueries: {

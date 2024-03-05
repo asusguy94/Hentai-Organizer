@@ -201,7 +201,7 @@ function Stars({ video, stars, bookmarks, attributes, categories, onModal, starE
     mutateAndInvalidate({
       mutate,
       queryClient,
-      ...keys.videos.byId(video.id)._ctx.star,
+      ...keys.video.byId(video.id)._ctx.star,
       variables: { starID: id }
     })
   }
@@ -269,7 +269,7 @@ function Star({ video, star, bookmarks, attributes, categories, removeStar, onMo
       mutateAndInvalidate({
         mutate: mutateAddBookmark,
         queryClient,
-        ...keys.videos.byId(video.id)._ctx.bookmark,
+        ...keys.video.byId(video.id)._ctx.bookmark,
         variables: { categoryID: category.id, time, starID: star.id }
       })
     }
@@ -279,7 +279,7 @@ function Star({ video, star, bookmarks, attributes, categories, removeStar, onMo
     mutateAndInvalidate({
       mutate: mutateAddStarAttribute,
       queryClient,
-      ...keys.videos.byId(video.id)._ctx.bookmark, // TODO does this need to also refresh the star?
+      ...keys.video.byId(video.id)._ctx.bookmark, // TODO does this need to also refresh the star?
       variables: { attributeID: attribute.id }
     })
   }
@@ -305,7 +305,7 @@ function Star({ video, star, bookmarks, attributes, categories, removeStar, onMo
         mutateAndInvalidate({
           mutate: mutateAddStar,
           queryClient,
-          ...keys.videos.byId(video.id)._ctx.bookmark,
+          ...keys.video.byId(video.id)._ctx.bookmark,
           variables: { id: bookmark.id, starID: star.id }
         })
       }
@@ -445,7 +445,7 @@ function StarInput({ video, stars, bookmarks, getAttributes }: StarInputProps) {
       mutateAndInvalidate({
         mutate,
         queryClient,
-        ...keys.videos.byId(video.id)._ctx.star,
+        ...keys.video.byId(video.id)._ctx.star,
         variables: { name }
       })
     }
@@ -530,7 +530,7 @@ function AddRelatedStars({ video, disabled }: AddRelatedStarsProps) {
     mutateAndInvalidateAll({
       mutate: mutateAsync,
       queryClient,
-      ...keys.videos.byId(video.id)._ctx.star,
+      ...keys.video.byId(video.id)._ctx.star,
       variables: relatedStars.map(star => ({ name: star.name }))
     })
   }
@@ -562,7 +562,7 @@ function RemoveUnusedStars({ video, bookmarks, stars, disabled }: RemoveUnusedSt
     mutateAndInvalidateAll({
       mutate: mutateAsync,
       queryClient,
-      ...keys.videos.byId(video.id)._ctx.star,
+      ...keys.video.byId(video.id)._ctx.star,
       variables: stars
         .filter(star => bookmarks.every(bookmark => bookmark.starID !== star.id))
         .map(star => ({ starID: star.id }))

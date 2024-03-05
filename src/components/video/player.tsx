@@ -83,7 +83,7 @@ export default function VideoPlayer({ video, bookmarks, categories, stars, playe
         mutateAndInvalidate({
           mutate,
           queryClient,
-          ...keys.videos.byId(video.id)._ctx.bookmark,
+          ...keys.video.byId(video.id)._ctx.bookmark,
           variables: { categoryID: category.id, time }
         })
       }

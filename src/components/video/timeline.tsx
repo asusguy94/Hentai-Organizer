@@ -68,7 +68,7 @@ export default function Timeline({
       mutateAndInvalidate({
         mutate,
         queryClient,
-        ...keys.videos.byId(video.id)._ctx.bookmark,
+        ...keys.video.byId(video.id)._ctx.bookmark,
         variables: { time, id: bookmarkID }
       })
     }
@@ -90,7 +90,7 @@ export default function Timeline({
     mutateAndInvalidate({
       mutate: mutateSetCategory,
       queryClient,
-      ...keys.videos.byId(video.id)._ctx.bookmark,
+      ...keys.video.byId(video.id)._ctx.bookmark,
       variables: { categoryID: category.id, id: bookmark.id }
     })
   }
@@ -99,7 +99,7 @@ export default function Timeline({
     mutateAndInvalidate({
       mutate: mutateSetOutfit,
       queryClient,
-      ...keys.videos.byId(video.id)._ctx.bookmark,
+      ...keys.video.byId(video.id)._ctx.bookmark,
       variables: { outfitID: outfit.id, id: bookmark.id }
     })
   }
@@ -114,7 +114,7 @@ export default function Timeline({
     mutateAndInvalidate({
       mutate: mutateAddAttribute,
       queryClient,
-      ...keys.videos.byId(video.id)._ctx.bookmark,
+      ...keys.video.byId(video.id)._ctx.bookmark,
       variables: { attributeID: attribute.id, id: bookmark.id }
     })
   }
@@ -123,7 +123,7 @@ export default function Timeline({
     mutateAndInvalidate({
       mutate: mutateRemoveAttribute,
       queryClient,
-      ...keys.videos.byId(video.id)._ctx.bookmark,
+      ...keys.video.byId(video.id)._ctx.bookmark,
       variables: { attributeID: attribute.id, id: bookmark.id }
     })
   }

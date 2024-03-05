@@ -9,7 +9,7 @@ const { api } = createApi('/attribute')
 export default {
   useAll: () => {
     const query = useQuery<Attribute[]>({
-      ...keys.attributes.all,
+      ...keys.attribute.all,
       queryFn: () => api.get('')
     })
 

@@ -108,7 +108,7 @@ function StarForm({ star }: StarFormProps) {
     mutateAndInvalidate({
       mutate: mutateAddAttribute,
       queryClient,
-      ...keys.stars.byId(star.id),
+      ...keys.star.byId(star.id),
       variables: { name }
     })
   }
@@ -117,7 +117,7 @@ function StarForm({ star }: StarFormProps) {
     mutateAndInvalidate({
       mutate: mutateRemoveAttribute,
       queryClient,
-      ...keys.stars.byId(star.id),
+      ...keys.star.byId(star.id),
       variables: { name }
     })
   }
@@ -126,7 +126,7 @@ function StarForm({ star }: StarFormProps) {
     mutateAndInvalidate({
       mutate: mutateUpdateInfo,
       queryClient,
-      ...keys.stars.byId(star.id),
+      ...keys.star.byId(star.id),
       variables: { label, value }
     })
   }
@@ -165,7 +165,7 @@ function StarImageDropbox({ star, videos }: StarImageDropboxProps) {
     mutateAndInvalidate({
       mutate,
       queryClient,
-      ...keys.stars.byId(star.id),
+      ...keys.star.byId(star.id),
       variables: {url:image}
     })
   }

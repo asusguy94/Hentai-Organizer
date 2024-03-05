@@ -16,7 +16,7 @@ type StarInfo = {
 export default {
   useInfo: () => {
     const query = useQuery<StarInfo>({
-      ...keys.stars.info,
+      ...keys.star.info,
       queryFn: () => api.get('')
     })
 
@@ -62,7 +62,7 @@ export default {
   },
   useVideos: (id: number) => {
     const query = useQuery<StarVideo[]>({
-      ...keys.stars.byId(id)._ctx.video,
+      ...keys.star.byId(id)._ctx.video,
       queryFn: () => api.get(`/${id}/video`)
     })
 
@@ -83,7 +83,7 @@ export default {
     }
 
     const query = useQuery<Star>({
-      ...keys.stars.byId(id),
+      ...keys.star.byId(id),
       queryFn: () => api.get(`/${id}`)
     })
 

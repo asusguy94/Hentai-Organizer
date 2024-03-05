@@ -59,7 +59,7 @@ export default {
   },
   useRelatedStars: (id: number) => {
     const query = useQuery<General[]>({
-      ...keys.videos.related._ctx.star(id),
+      ...keys.video.related._ctx.star(id),
       queryFn: () => api.get(`/${id}/related/star`)
     })
 
@@ -76,7 +76,7 @@ export default {
   setPoster: (id: number) => legacyApi.put(`/${id}/api`, { poster: true }).then(res => res.data as unknown),
   useHomeVideos: (label: string, limit: number) => {
     const query = useQuery<HomeVideo[]>({
-      ...keys.videos.home(label, limit),
+      ...keys.video.home(label, limit),
       queryFn: () => api.get(`/home/${label}/${limit}`)
     })
 
@@ -84,7 +84,7 @@ export default {
   },
   useStars: (id: number) => {
     const query = useQuery<VideoStar[]>({
-      ...keys.videos.byId(id)._ctx.star,
+      ...keys.video.byId(id)._ctx.star,
       queryFn: () => api.get(`/${id}/star`)
     })
 
@@ -93,7 +93,7 @@ export default {
   useIsValid: (id: number) => {
     //TODO can probably be merged with useVideo
     const query = useQuery<Validity>({
-      ...keys.videos.byId(id)._ctx.validate,
+      ...keys.video.byId(id)._ctx.validate,
       queryFn: () => api.get(`/${id}/validate`)
     })
 
@@ -101,7 +101,7 @@ export default {
   },
   useVideo: (id: number) => {
     const query = useQuery<Video>({
-      ...keys.videos.byId(id),
+      ...keys.video.byId(id),
       queryFn: () => api.get(`/${id}`)
     })
 
@@ -109,7 +109,7 @@ export default {
   },
   useBookmarks: (id: number) => {
     const query = useQuery<Bookmark[]>({
-      ...keys.videos.byId(id)._ctx.bookmark,
+      ...keys.video.byId(id)._ctx.bookmark,
       queryFn: () => api.get(`/${id}/bookmark`)
     })
 
@@ -125,7 +125,7 @@ export default {
     }
 
     const query = useQuery<NewVideo[]>({
-      ...keys.videos.new,
+      ...keys.video.new,
       queryFn: () => api.get('/add')
     })
 
@@ -139,7 +139,7 @@ export default {
     }
 
     const query = useQuery<AllVideos>({
-      ...keys.videos.all,
+      ...keys.video.all,
       queryFn: () => api.get('')
     })
 

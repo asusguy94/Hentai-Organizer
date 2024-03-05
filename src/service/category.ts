@@ -9,7 +9,7 @@ const { api } = createApi('/category')
 export default {
   useAll: () => {
     const query = useQuery<Category[]>({
-      ...keys.categories.all,
+      ...keys.category.all,
       queryFn: () => api.get('')
     })
 

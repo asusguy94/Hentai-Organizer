@@ -40,14 +40,13 @@ export default {
   useRemoveStar: (id: number) => {
     const queryClient = useQueryClient()
 
-    const onSuccess = () => queryClient.invalidateQueries({ ...keys.video.byId(id)._ctx.star })
-
     type Payload = { starID: number }
-
     const { mutate: mutateSync, mutateAsync } = useMutation<unknown, Error, Payload>({
       mutationKey: ['video', id, 'removeStar'],
       mutationFn: ({ starID }) => api.delete(`/${id}/star/${starID}`)
     })
+
+    const onSuccess = () => queryClient.invalidateQueries({ ...keys.video.byId(id)._ctx.star })
 
     const mutate = (payload: Payload) => {
       mutateSync(payload, {
@@ -70,13 +69,12 @@ export default {
     const queryClient = useQueryClient()
 
     type Payload = { name: string }
-
-    const onSuccess = () => queryClient.invalidateQueries({ ...keys.video.byId(id)._ctx.star })
-
     const { mutate: mutateSync, mutateAsync } = useMutation<unknown, Error, Payload>({
       mutationKey: ['video', id, 'addStar'],
       mutationFn: payload => api.post(`/${id}/star`, payload)
     })
+
+    const onSuccess = () => queryClient.invalidateQueries({ ...keys.video.byId(id)._ctx.star })
 
     const mutate = (payload: Payload) => {
       mutateSync(payload, {

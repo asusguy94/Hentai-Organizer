@@ -65,7 +65,17 @@ export default {
     return { mutate }
   },
   clearAttributes: (id: number) => api.delete(`/${id}/attribute`),
-  removeStar: (id: number) => api.delete(`/${id}/star`),
+  useRemoveStar: (videoId: number) => {
+    const queryClient = useQueryClient()
+
+    const { mutate } = useMutation<unknown, Error, { id: number }>({
+      mutationKey: ['bookmark', 'removeStar'],
+      mutationFn: ({ id }) => api.delete(`${id}/star`),
+      onSuccess: () => queryClient.invalidateQueries({ ...keys.video.byId(videoId)._ctx.bookmark })
+    })
+
+    return { mutate }
+  },
   useSetTime: (videoId: number) => {
     const queryClient = useQueryClient()
 
@@ -83,7 +93,7 @@ export default {
     const { mutate } = useMutation<unknown, Error, { id: number; starID: number }>({
       mutationKey: ['bookmark', 'addStar'],
       mutationFn: ({ id, ...payload }) => api.post(`/${id}/star`, payload),
-      onSuccess: () => queryClient.invalidateQueries({ ...keys.video.byId(videoId)._ctx.star })
+      onSuccess: () => queryClient.invalidateQueries({ ...keys.video.byId(videoId)._ctx.bookmark })
     })
 
     return { mutate }

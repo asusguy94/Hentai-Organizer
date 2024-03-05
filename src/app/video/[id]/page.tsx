@@ -192,12 +192,6 @@ type StarsProps = {
   starEvent: { getEvent: Event; getDefault: EventData; setEvent: EventHandler }
 }
 function Stars({ video, stars, bookmarks, attributes, categories, onModal, starEvent }: StarsProps) {
-  const { mutate } = videoService.useRemoveStar(video.id)
-
-  const removeStar = (id: number) => {
-    mutate({ starID: id })
-  }
-
   const sortedStars = useMemo(() => {
     const bookmarkTime = (star: VideoStar) => {
       return bookmarks.find(bookmark => bookmark.starID === star.id)?.start ?? Infinity
@@ -216,7 +210,6 @@ function Stars({ video, stars, bookmarks, attributes, categories, onModal, starE
           bookmarks={bookmarks}
           attributes={attributes}
           categories={categories}
-          removeStar={removeStar}
           onModal={onModal}
           starEvent={starEvent}
         />
@@ -231,7 +224,6 @@ type StarProps = {
   bookmarks: Bookmark[]
   attributes: Attribute[]
   categories: Category[]
-  removeStar: (id: number) => void
   onModal: ModalHandler
   starEvent: {
     getEvent: Event
@@ -239,11 +231,16 @@ type StarProps = {
     getDefault: Event['data']
   }
 }
-function Star({ video, star, bookmarks, attributes, categories, removeStar, onModal, starEvent }: StarProps) {
+function Star({ video, star, bookmarks, attributes, categories, onModal, starEvent }: StarProps) {
   const [border, setBorder] = useState(false)
   const { mutate: mutateAddBookmark } = videoService.useAddBookmark(video.id)
   const { mutate: mutateAddStar } = bookmarkService.useAddStar(video.id)
   const { mutate: mutateAddStarAttribute } = bookmarkService.useAddStarAttribute(video.id, star.id)
+  const { mutate: mutateRemoveStar } = videoService.useRemoveStar(video.id)
+
+  const removeStar = () => {
+    mutateRemoveStar({ starID: star.id })
+  }
 
   const handleRibbon = (star: VideoStar) => {
     const hasBookmark = bookmarks.some(bookmark => bookmark.starID === star.id)
@@ -394,7 +391,7 @@ function Star({ video, star, bookmarks, attributes, categories, removeStar, onMo
             icon='delete'
             text='Remove'
             disabled={bookmarks.some(bookmark => bookmark.starID === star.id)}
-            onClick={() => removeStar(star.id)}
+            onClick={removeStar}
           />
         </ContextMenu>
       </motion.div>

@@ -52,6 +52,7 @@ export default function Timeline({
   const { mutate: mutateRemoveAttribute } = bookmarkService.useRemoveAttribute(video.id)
   const { mutate: mutateSetOutfit } = bookmarkService.useSetOutfit(video.id)
   const { mutate: mutateRemoveBookmark } = bookmarkService.useRemoveBookmark(video.id)
+  const { mutate: mutateRemoveStar } = bookmarkService.useRemoveStar(video.id)
 
   const { data: outfits } = outfitService.useAll()
 
@@ -107,9 +108,7 @@ export default function Timeline({
   }
 
   const removeStar = (bookmark: Bookmark) => {
-    bookmarkService.removeStar(bookmark.id).then(() => {
-      location.reload()
-    })
+    mutateRemoveStar({ id: bookmark.id })
   }
 
   const playVideo = (time: number) => {

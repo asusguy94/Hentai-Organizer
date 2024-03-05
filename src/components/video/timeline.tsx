@@ -2,8 +2,6 @@ import { Fragment, useEffect, useRef, useState } from 'react'
 
 import { Button } from '@mui/material'
 
-import { keys } from '@keys'
-import { useQueryClient } from '@tanstack/react-query'
 import { ContextMenu, ContextMenuTrigger, ContextMenuItem } from 'rctx-contextmenu'
 import { Tooltip } from 'react-tooltip'
 import { useWindowSize } from 'react-use'
@@ -19,7 +17,6 @@ import useCollisionCheck from '@hooks/useCollisionCheck'
 import { EventHandler } from '@hooks/useStarEvent'
 import { Attribute, Bookmark, Category, VideoStar, Video, Outfit } from '@interfaces'
 import { bookmarkService, outfitService } from '@service'
-import { mutateAndInvalidate } from '@utils/shared'
 
 import styles from './timeline.module.scss'
 
@@ -54,7 +51,6 @@ export default function Timeline({
   const { mutate: mutateAddAttribute } = bookmarkService.useAddAttribute()
   const { mutate: mutateRemoveAttribute } = bookmarkService.useRemoveAttribute()
   const { mutate: mutateSetOutfit } = bookmarkService.useSetOutfit()
-  const queryClient = useQueryClient()
 
   const { data: outfits } = outfitService.useAll()
 
@@ -64,12 +60,7 @@ export default function Timeline({
     if (player !== null) {
       const time = Math.round(player.currentTime)
 
-      mutateAndInvalidate({
-        mutate,
-        queryClient,
-        ...keys.video.byId(video.id)._ctx.bookmark,
-        variables: { time, id: bookmarkID }
-      })
+      mutate({ time, id: bookmarkID })
     }
   }
 
@@ -86,21 +77,11 @@ export default function Timeline({
   }
 
   const setCategory = (category: Category, bookmark: Bookmark) => {
-    mutateAndInvalidate({
-      mutate: mutateSetCategory,
-      queryClient,
-      ...keys.video.byId(video.id)._ctx.bookmark,
-      variables: { categoryID: category.id, id: bookmark.id }
-    })
+    mutateSetCategory({ categoryID: category.id, id: bookmark.id })
   }
 
   const setOutfit = (outfit: Outfit, bookmark: Bookmark) => {
-    mutateAndInvalidate({
-      mutate: mutateSetOutfit,
-      queryClient,
-      ...keys.video.byId(video.id)._ctx.bookmark,
-      variables: { outfitID: outfit.id, id: bookmark.id }
-    })
+    mutateSetOutfit({ outfitID: outfit.id, id: bookmark.id })
   }
 
   const removeOutfit = (bookmark: Bookmark) => {
@@ -110,20 +91,13 @@ export default function Timeline({
   }
 
   const addAttribute = (attribute: Attribute, bookmark: Bookmark) => {
-    mutateAndInvalidate({
-      mutate: mutateAddAttribute,
-      queryClient,
-      ...keys.video.byId(video.id)._ctx.bookmark,
-      variables: { attributeID: attribute.id, id: bookmark.id }
-    })
+    mutateAddAttribute({ attributeID: attribute.id, id: bookmark.id })
   }
 
   const removeAttribute = (bookmark: Bookmark, attribute: Attribute) => {
-    mutateAndInvalidate({
-      mutate: mutateRemoveAttribute,
-      queryClient,
-      ...keys.video.byId(video.id)._ctx.bookmark,
-      variables: { attributeID: attribute.id, id: bookmark.id }
+    mutateRemoveAttribute({
+      attributeID: attribute.id,
+      id: bookmark.id
     })
   }
 

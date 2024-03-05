@@ -11,7 +11,6 @@ export const videos = createQueryKeys('video', {
   }),
   new: null,
   all: null,
-  star: null,
   related: {
     queryKey: null,
     contextQueries: {

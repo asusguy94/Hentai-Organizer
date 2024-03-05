@@ -1,4 +1,5 @@
-import { useMutation } from '@tanstack/react-query'
+import { keys } from '@keys'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 import { createApi } from '@config'
 
@@ -7,19 +8,25 @@ const { api, legacyApi } = createApi('/bookmark')
 export default {
   removeBookmark: (id: number) => legacyApi.delete(`/${id}`).then(res => res.data as unknown),
   useSetCategory: () => {
+    const queryClient = useQueryClient()
+
     //TODO add id as a parameter
     const { mutate } = useMutation<unknown, Error, { id: number; categoryID: number }>({
       mutationKey: ['bookmark', 'setCategory'],
-      mutationFn: ({ id, ...payload }) => api.put(`/${id}`, payload)
+      mutationFn: ({ id, ...payload }) => api.put(`/${id}`, payload),
+      onSuccess: (_, { id }) => queryClient.invalidateQueries({ ...keys.video.byId(id)._ctx.bookmark })
     })
 
     return { mutate }
   },
   useSetOutfit: () => {
     //TODO add id as a parameter
+    const queryClient = useQueryClient()
+
     const { mutate } = useMutation<unknown, Error, { id: number; outfitID: number }>({
       mutationKey: ['bookmark', 'setOutfit'],
-      mutationFn: ({ id, ...payload }) => api.put(`/${id}/outfit`, payload)
+      mutationFn: ({ id, ...payload }) => api.put(`/${id}/outfit`, payload),
+      onSuccess: (_, { id }) => queryClient.invalidateQueries({ ...keys.video.byId(id)._ctx.bookmark })
     })
 
     return { mutate }
@@ -27,18 +34,24 @@ export default {
   removeOutfit: (id: number) => api.delete(`/${id}/outfit`),
   useAddAttribute: () => {
     //TODO add id as a parameter
+    const queryClient = useQueryClient()
+
     const { mutate } = useMutation<unknown, Error, { id: number; attributeID: number }>({
       mutationKey: ['bookmark', 'addAttribute'],
-      mutationFn: ({ id, ...payload }) => api.post('/attribute', { bookmarkID: id, attributeID: payload.attributeID })
+      mutationFn: ({ id, ...payload }) => api.post('/attribute', { bookmarkID: id, attributeID: payload.attributeID }),
+      onSuccess: (_, { id }) => queryClient.invalidateQueries({ ...keys.video.byId(id)._ctx.bookmark })
     })
 
     return { mutate }
   },
   useRemoveAttribute: () => {
+    const queryClient = useQueryClient()
+
     //TODO add id as a parameter
     const { mutate } = useMutation<unknown, Error, { id: number; attributeID: number }>({
       mutationKey: ['bookmark', 'removeAttribute'],
-      mutationFn: ({ id, attributeID }) => api.delete(`/${id}/attribute/${attributeID}`)
+      mutationFn: ({ id, attributeID }) => api.delete(`/${id}/attribute/${attributeID}`),
+      onSuccess: (_, { id }) => queryClient.invalidateQueries({ ...keys.video.byId(id)._ctx.bookmark })
     })
 
     return { mutate }
@@ -47,26 +60,35 @@ export default {
   removeStar: (id: number) => api.delete(`/${id}/star`),
   useSetTime: () => {
     // TODO add id as a parameter
+    const queryClient = useQueryClient()
+
     const { mutate } = useMutation<unknown, Error, { id: number; time: number }>({
       mutationKey: ['bookmark', 'setTime'],
-      mutationFn: ({ id, ...payload }) => api.put(`/${id}`, payload)
+      mutationFn: ({ id, ...payload }) => api.put(`/${id}`, payload),
+      onSuccess: (_, { id }) => queryClient.invalidateQueries({ ...keys.video.byId(id)._ctx.bookmark })
     })
 
     return { mutate }
   },
   useAddStar: () => {
     //TODO add id as a parameter
+    const queryClient = useQueryClient()
+
     const { mutate } = useMutation<unknown, Error, { id: number; starID: number }>({
       mutationKey: ['bookmark', 'addStar'],
-      mutationFn: ({ id, ...payload }) => api.post(`/${id}/star`, payload)
+      mutationFn: ({ id, ...payload }) => api.post(`/${id}/star`, payload),
+      onSuccess: (_, { id }) => queryClient.invalidateQueries({ ...keys.video.byId(id)._ctx.star })
     })
 
     return { mutate }
   },
   useAddStarAttribute: (videoID: number, starID: number) => {
+    const queryClient = useQueryClient()
+
     const { mutate } = useMutation<unknown, Error, { attributeID: number }>({
       mutationKey: ['bookmark', videoID, 'star', starID, 'addAttribute'],
-      mutationFn: payload => api.post('/attribute', { ...payload, videoID, starID })
+      mutationFn: payload => api.post('/attribute', { ...payload, videoID, starID }),
+      onSuccess: () => queryClient.invalidateQueries({ ...keys.video.byId(videoID)._ctx.bookmark })
     })
 
     return { mutate }

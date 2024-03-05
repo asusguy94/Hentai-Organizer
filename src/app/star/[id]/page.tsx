@@ -30,9 +30,6 @@ import { starService } from '@service'
 
 import styles from './star.module.scss'
 import validate, { z } from '@utils/server/validation'
-import { mutateAndInvalidate } from '@utils/shared'
-import { keys } from '@keys'
-import { useQueryClient } from '@tanstack/react-query'
 
 type Star = {
   id: number
@@ -102,33 +99,17 @@ function StarForm({ star }: StarFormProps) {
   const { mutate: mutateUpdateInfo } = starService.useUpdateInfo(star.id)
   const { mutate: mutateAddAttribute } = starService.useAddAttribute(star.id)
   const { mutate: mutateRemoveAttribute } = starService.useRemoveAttribute(star.id)
-  const queryClient = useQueryClient()
 
   const addAttribute = (name: string) => {
-    mutateAndInvalidate({
-      mutate: mutateAddAttribute,
-      queryClient,
-      ...keys.star.byId(star.id),
-      variables: { name }
-    })
+    mutateAddAttribute({name})
   }
 
   const removeAttribute = (name: string) => {
-    mutateAndInvalidate({
-      mutate: mutateRemoveAttribute,
-      queryClient,
-      ...keys.star.byId(star.id),
-      variables: { name }
-    })
+    mutateRemoveAttribute({ name })
   }
 
   const updateInfo = (value: string, label: string) => {
-    mutateAndInvalidate({
-      mutate: mutateUpdateInfo,
-      queryClient,
-      ...keys.star.byId(star.id),
-      variables: { label, value }
-    })
+    mutateUpdateInfo({ label, value })
   }
 
   if (starData === undefined) return null
@@ -158,16 +139,9 @@ type StarImageDropboxProps = {
 function StarImageDropbox({ star, videos }: StarImageDropboxProps) {
   const router = useRouter()
   const { mutate } = starService.useAddImage(star.id)
-  const queryClient = useQueryClient()
-
 
   const addImage = (image: string) => {
-    mutateAndInvalidate({
-      mutate,
-      queryClient,
-      ...keys.star.byId(star.id),
-      variables: {url:image}
-    })
+    mutate({ url: image })
   }
 
   const removeImage = () => {

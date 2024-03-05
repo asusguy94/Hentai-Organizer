@@ -2,8 +2,6 @@ import { useRouter } from 'next/navigation'
 
 import { Button, TextField } from '@mui/material'
 
-import { keys } from '@keys'
-import { useQueryClient } from '@tanstack/react-query'
 import { ContextMenu, ContextMenuTrigger, ContextMenuItem } from 'rctx-contextmenu'
 
 import Player, { MediaPlayerInstance } from '@components/vidstack'
@@ -14,7 +12,6 @@ import { Modal, ModalHandler } from '../modal'
 import { serverConfig } from '@config'
 import { Bookmark, Category, Video, VideoStar } from '@interfaces'
 import { videoService } from '@service'
-import { mutateAndInvalidate } from '@utils/shared'
 
 type VideoPlayerProps = {
   video: Video
@@ -30,7 +27,6 @@ type VideoPlayerProps = {
 export default function VideoPlayer({ video, bookmarks, categories, stars, playerRef, modal }: VideoPlayerProps) {
   const router = useRouter()
   const { mutate } = videoService.useAddBookmark(video.id)
-  const queryClient = useQueryClient()
 
   const copy = () => {
     ;(async () => {
@@ -80,12 +76,7 @@ export default function VideoPlayer({ video, bookmarks, categories, stars, playe
     if (player !== null) {
       const time = Math.round(player.currentTime)
       if (time) {
-        mutateAndInvalidate({
-          mutate,
-          queryClient,
-          ...keys.video.byId(video.id)._ctx.bookmark,
-          variables: { categoryID: category.id, time }
-        })
+        mutate({ categoryID: category.id, time })
       }
     }
   }

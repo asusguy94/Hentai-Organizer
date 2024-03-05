@@ -1,5 +1,5 @@
 import { keys } from '@keys'
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import { createApi } from '@config'
 import { StarVideo } from '@interfaces'
@@ -23,33 +23,45 @@ export default {
     return { data: query.data }
   },
   useAddAttribute: (id: number) => {
+    const queryClient = useQueryClient()
+
     const { mutate } = useMutation<unknown, Error, { name: string }>({
       mutationKey: ['star', id, 'addAttribute'],
-      mutationFn: payload => api.put(`/${id}/attribute`, payload)
+      mutationFn: payload => api.put(`/${id}/attribute`, payload),
+      onSuccess: () => queryClient.invalidateQueries({ ...keys.star.byId(id) })
     })
 
     return { mutate }
   },
   useRemoveAttribute: (id: number) => {
+    const queryClient = useQueryClient()
+
     const { mutate } = useMutation<unknown, Error, { name: string }>({
       mutationKey: ['star', id, 'removeAttribute'],
-      mutationFn: payload => api.put(`/${id}/attribute`, { ...payload, remove: true })
+      mutationFn: payload => api.put(`/${id}/attribute`, { ...payload, remove: true }),
+      onSuccess: () => queryClient.invalidateQueries({ ...keys.star.byId(id) })
     })
 
     return { mutate }
   },
   useUpdateInfo: (id: number) => {
+    const queryClient = useQueryClient()
+
     const { mutate } = useMutation<unknown, Error, { label: string; value: string }>({
       mutationKey: ['star', id, 'updateInfo'],
-      mutationFn: payload => api.put(`/${id}`, payload)
+      mutationFn: payload => api.put(`/${id}`, payload),
+      onSuccess: () => queryClient.invalidateQueries({ ...keys.star.byId(id) })
     })
 
     return { mutate }
   },
   useAddImage: (id: number) => {
+    const queryClient = useQueryClient()
+
     const { mutate } = useMutation<unknown, Error, { url: string }>({
       mutationKey: ['star', id, 'addImage'],
-      mutationFn: payload => api.post(`/${id}/image`, payload)
+      mutationFn: payload => api.post(`/${id}/image`, payload),
+      onSuccess: () => queryClient.invalidateQueries({ ...keys.star.byId(id) })
     })
 
     return { mutate }

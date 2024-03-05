@@ -5,7 +5,6 @@ import fs from 'fs'
 import path from 'path'
 
 import { settingsConfig } from '@config'
-import { calculateTimeCode } from '@utils/shared'
 
 /**
  * Get the closest number from an array of numbers
@@ -131,6 +130,13 @@ export function formatDate(dateStr: string | Date, raw = false) {
   const date = dayjs(dateStr)
 
   return raw ? date.format('YYYY-MM-DD') : date.format('D MMMM YYYY')
+}
+
+function calculateTimeCode(seconds: number, timeFormat = 'HH:mm:ss'): string {
+  return dayjs(0)
+    .hour(0)
+    .millisecond(seconds * 1000)
+    .format(timeFormat) // use .SSS for milliseconds
 }
 
 export async function generateVTTData(

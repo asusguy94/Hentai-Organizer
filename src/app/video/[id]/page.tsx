@@ -15,8 +15,6 @@ import {
   Typography
 } from '@mui/material'
 
-import { keys } from '@keys'
-import { useQueryClient } from '@tanstack/react-query'
 import { MediaPlayerInstance } from '@vidstack/react'
 import { motion } from 'framer-motion'
 import { ContextMenu, ContextMenuTrigger, ContextMenuItem } from 'rctx-contextmenu'
@@ -34,7 +32,7 @@ import useStarEvent, { type Event, type EventData, type EventHandler } from '@ho
 import { Attribute, Bookmark, Category, VideoStar, Video } from '@interfaces'
 import { attributeService, bookmarkService, categoryService, videoService } from '@service'
 import validate, { z } from '@utils/server/validation'
-import { escapeRegExp, getUnique, mutateAndInvalidate, mutateAndInvalidateAll } from '@utils/shared'
+import { escapeRegExp, getUnique } from '@utils/shared'
 
 import styles from './video.module.scss'
 
@@ -195,15 +193,9 @@ type StarsProps = {
 }
 function Stars({ video, stars, bookmarks, attributes, categories, onModal, starEvent }: StarsProps) {
   const { mutate } = videoService.useRemoveStar(video.id)
-  const queryClient = useQueryClient()
 
   const removeStar = (id: number) => {
-    mutateAndInvalidate({
-      mutate,
-      queryClient,
-      ...keys.video.byId(video.id)._ctx.star,
-      variables: { starID: id }
-    })
+    mutate({ starID: id })
   }
 
   const sortedStars = useMemo(() => {
@@ -252,7 +244,6 @@ function Star({ video, star, bookmarks, attributes, categories, removeStar, onMo
   const { mutate: mutateAddBookmark } = videoService.useAddBookmark(video.id)
   const { mutate: mutateAddStar } = bookmarkService.useAddStar()
   const { mutate: mutateAddStarAttribute } = bookmarkService.useAddStarAttribute(video.id, star.id)
-  const queryClient = useQueryClient()
 
   const handleRibbon = (star: VideoStar) => {
     const hasBookmark = bookmarks.some(bookmark => bookmark.starID === star.id)
@@ -266,22 +257,16 @@ function Star({ video, star, bookmarks, attributes, categories, removeStar, onMo
 
     const time = Math.round(player.currentTime)
     if (time) {
-      mutateAndInvalidate({
-        mutate: mutateAddBookmark,
-        queryClient,
-        ...keys.video.byId(video.id)._ctx.bookmark,
-        variables: { categoryID: category.id, time, starID: star.id }
+      mutateAddBookmark({
+        categoryID: category.id,
+        time,
+        starID: star.id
       })
     }
   }
 
   const addAttribute = (attribute: Attribute) => {
-    mutateAndInvalidate({
-      mutate: mutateAddStarAttribute,
-      queryClient,
-      ...keys.video.byId(video.id)._ctx.bookmark, // TODO does this need to also refresh the star?
-      variables: { attributeID: attribute.id }
-    })
+    mutateAddStarAttribute({ attributeID: attribute.id })
   }
 
   // TODO auto-run if only 1 star
@@ -302,12 +287,7 @@ function Star({ video, star, bookmarks, attributes, categories, removeStar, onMo
       // Bookmark has ZERO Overlapping Attributes
       if (!overlappingAttributes) {
         // Request Bookmark Update
-        mutateAndInvalidate({
-          mutate: mutateAddStar,
-          queryClient,
-          ...keys.video.byId(video.id)._ctx.bookmark,
-          variables: { id: bookmark.id, starID: star.id }
-        })
+        mutateAddStar({ id: bookmark.id, starID: star.id })
       }
     }
   }
@@ -432,7 +412,6 @@ function StarInput({ video, stars, bookmarks, getAttributes }: StarInputProps) {
   const [input, setInput] = useState('')
   const [noStarToggle, setNoStarToggle] = useState(false)
   const { mutate } = videoService.useAddStar(video.id)
-  const queryClient = useQueryClient()
 
   const handleNoStar = (checked: boolean) => {
     videoService.toggleNoStar(video.id, checked).then(() => {
@@ -442,12 +421,7 @@ function StarInput({ video, stars, bookmarks, getAttributes }: StarInputProps) {
 
   const addStar = (name: string) => {
     if (input.length > 0) {
-      mutateAndInvalidate({
-        mutate,
-        queryClient,
-        ...keys.video.byId(video.id)._ctx.star,
-        variables: { name }
-      })
+      mutate({ name })
     }
   }
 
@@ -521,18 +495,12 @@ type AddRelatedStarsProps = {
 }
 function AddRelatedStars({ video, disabled }: AddRelatedStarsProps) {
   const { data: relatedStars } = videoService.useRelatedStars(video.id)
-  const { mutateAsync } = videoService.useAddStar(video.id)
-  const queryClient = useQueryClient()
+  const { mutateAll } = videoService.useAddStar(video.id)
 
   if (disabled || relatedStars === undefined || relatedStars.length === 0) return null
 
   const handleClick = () => {
-    mutateAndInvalidateAll({
-      mutate: mutateAsync,
-      queryClient,
-      ...keys.video.byId(video.id)._ctx.star,
-      variables: relatedStars.map(star => ({ name: star.name }))
-    })
+    mutateAll(relatedStars.map(star => ({ name: star.name })))
   }
 
   return (
@@ -551,22 +519,16 @@ type RemoveUnusedStarsProps = {
   disabled: boolean
 }
 function RemoveUnusedStars({ video, bookmarks, stars, disabled }: RemoveUnusedStarsProps) {
-  const { mutateAsync } = videoService.useRemoveStar(video.id)
-  const queryClient = useQueryClient()
+  const { mutateAll } = videoService.useRemoveStar(video.id)
 
   if (disabled || stars.every(star => bookmarks.some(bookmark => bookmark.starID === star.id))) {
     return null
   }
 
   const handleClick = () => {
-    mutateAndInvalidateAll({
-      mutate: mutateAsync,
-      queryClient,
-      ...keys.video.byId(video.id)._ctx.star,
-      variables: stars
-        .filter(star => bookmarks.every(bookmark => bookmark.starID !== star.id))
-        .map(star => ({ starID: star.id }))
-    })
+    mutateAll(
+      stars.filter(star => bookmarks.every(bookmark => bookmark.starID !== star.id)).map(star => ({ starID: star.id }))
+    )
   }
 
   return (

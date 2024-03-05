@@ -1,5 +1,5 @@
 import { keys } from '@keys'
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import { createApi } from '@config'
 import { Bookmark, General, Validity, Video, VideoStar } from '@interfaces'
@@ -21,6 +21,8 @@ export default {
   updateVideo: (id: number) => legacyApi.put(`/${id}`).then(res => res.data as unknown),
   deleteVideo: (id: number) => legacyApi.delete(`/${id}`).then(res => res.data as unknown),
   useAddBookmark: (id: number) => {
+    const queryClient = useQueryClient()
+
     const { mutate } = useMutation<unknown, Error, { categoryID: number; time: number; starID?: number }>({
       mutationKey: ['video', id, 'addBookmark'],
       mutationFn: ({ starID, ...payload }) => {
@@ -29,7 +31,8 @@ export default {
         }
 
         return api.post(`/${id}/bookmark`, payload)
-      }
+      },
+      onSuccess: () => queryClient.invalidateQueries({ ...keys.video.byId(id)._ctx.bookmark })
     })
 
     return { mutate }
@@ -41,21 +44,53 @@ export default {
     return legacyApi.put(`/${id}`, { title: value }).then(res => res.data as unknown)
   },
   useRemoveStar: (id: number) => {
-    const { mutate, mutateAsync } = useMutation<unknown, Error, { starID: number }>({
+    const queryClient = useQueryClient()
+
+    const onSuccess = () => queryClient.invalidateQueries({ ...keys.video.byId(id)._ctx.star })
+
+    type Payload = { starID: number }
+
+    const { mutate: mutateSync, mutateAsync } = useMutation<unknown, Error, Payload>({
       mutationKey: ['video', id, 'removeStar'],
       mutationFn: ({ starID }) => api.delete(`/${id}/star/${starID}`)
     })
 
-    return { mutate, mutateAsync }
+    const mutate = (payload: Payload) => {
+      mutateSync(payload)
+      onSuccess()
+    }
+
+    const mutateAll = async (payload: Payload[]) => {
+      await Promise.allSettled(payload.map(p => mutateAsync(p)))
+      onSuccess()
+    }
+
+    return { mutate, mutateAll }
   },
   toggleNoStar: (id: number, checked: boolean) => legacyApi.put(`/${id}`, { noStar: checked }),
   useAddStar: (id: number) => {
-    const { mutate, mutateAsync } = useMutation<unknown, Error, { name: string }>({
+    const queryClient = useQueryClient()
+
+    type Payload = { name: string }
+
+    const onSuccess = () => queryClient.invalidateQueries({ ...keys.video.byId(id)._ctx.star })
+
+    const { mutate: mutateSync, mutateAsync } = useMutation<unknown, Error, Payload>({
       mutationKey: ['video', id, 'addStar'],
       mutationFn: payload => api.post(`/${id}/star`, payload)
     })
 
-    return { mutate, mutateAsync }
+    const mutate = (payload: Payload) => {
+      mutateSync(payload)
+      onSuccess()
+    }
+
+    const mutateAll = async (payload: Payload[]) => {
+      await Promise.allSettled(payload.map(p => mutateAsync(p)))
+      onSuccess()
+    }
+
+    return { mutate, mutateAll }
   },
   useRelatedStars: (id: number) => {
     const query = useQuery<General[]>({

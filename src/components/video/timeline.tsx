@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useEffect, useRef, useState } from 'react'
+import { Fragment, useEffect, useRef, useState } from 'react'
 
 import { Button } from '@mui/material'
 
@@ -48,7 +48,6 @@ export default function Timeline({
   const windowSize = useWindowSize()
   const bookmarksRef = useRef<HTMLButtonElement[]>([])
   const [bookmarkLevels, setBookmarkLevels] = useState<number[]>([])
-  const [refReady, setRefReady] = useState(false)
   const { collisionCheck } = useCollisionCheck()
   const { mutate } = bookmarkService.useSetTime()
   const { mutate: mutateSetCategory } = bookmarkService.useSetCategory()
@@ -149,8 +148,9 @@ export default function Timeline({
   }
 
   useEffect(() => {
-    const bookmarksArr = bookmarksRef.current
-    const levels: number[] = new Array(bookmarks.length).fill(0)
+    const bookmarksArr = bookmarks.length > 0 ? bookmarksRef.current : []
+    const levels = Array<number>(bookmarks.length).fill(0)
+    let maxLevel = 0
 
     for (let i = 0; i < bookmarksArr.length; i++) {
       let level = 1
@@ -162,23 +162,19 @@ export default function Timeline({
       }
 
       levels[i] = level
+      if (level > maxLevel) maxLevel = level
     }
 
     setBookmarkLevels(levels)
-  }, [bookmarks, collisionCheck, refReady, windowSize.width])
 
-  const assignRef = useCallback(
-    (bookmark: HTMLButtonElement | null, idx: number) => {
-      if (bookmark === null) return
-
-      bookmarksRef.current[idx] = bookmark
-
-      if (bookmarks.every((_, idx) => bookmarksRef.current.at(idx) !== undefined)) {
-        setRefReady(true)
-      }
-    },
-    [bookmarks]
-  )
+    const videoElement = playerRef.current?.el ?? null
+    if (videoElement !== null) {
+      const videoTop = videoElement.getBoundingClientRect().top
+      videoElement.style.height = `calc(100vh - (${spacing.bookmark}px * ${maxLevel}) - ${videoTop}px - ${spacing.top}px)`
+      //maxHeight: whitespace bellow, allows scrolling beneath video
+      //height: no whitespace bellow, video always at bottom of screen
+    }
+  }, [bookmarks, collisionCheck, playerRef, windowSize.width])
 
   return (
     <div id={styles.timeline} style={bookmarks.length > 0 ? { marginTop: spacing.top } : {}}>
@@ -198,7 +194,7 @@ export default function Timeline({
                   top: `${(bookmarkLevels[idx] - 1) * spacing.bookmark}px`
                 }}
                 onMouseDown={e => e.button === 0 && playVideo(bookmark.start)}
-                ref={bookmark => assignRef(bookmark, idx)}
+                ref={bookmark => bookmark !== null && (bookmarksRef.current[idx] = bookmark)}
               >
                 <div data-tooltip-id={bookmark.id.toString()}>{bookmark.name}</div>
 

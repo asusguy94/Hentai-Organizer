@@ -1,10 +1,9 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 
 import { Grid, TextField, FormControl, RadioGroup } from '@mui/material'
 
-import axios from 'axios'
 import ScrollToTop from 'react-scroll-to-top'
 
 import { RegularHandlerProps } from '@components/indeterminate'
@@ -14,6 +13,7 @@ import { SortObjStar as SortObj, defaultStarObj as defaultObj, getSortString } f
 import Stars from './stars'
 
 import { useAllSearchParams, useDynamicSearchParam, useSearchParam } from '@hooks/search'
+import { starService } from '@service'
 
 import styles from './search.module.scss'
 
@@ -123,27 +123,7 @@ function Sort() {
 function Filter() {
   const { setParam, update } = useDynamicSearchParam(defaultObj)
   const { attribute: attributeParam } = useAllSearchParams(defaultObj)
-
-  const [breasts, setBreasts] = useState<string[]>([])
-  const [haircolors, setHaircolors] = useState<string[]>([])
-  const [hairstyles, setHairstyles] = useState<string[]>([])
-  const [attributes, setAttributes] = useState<string[]>([])
-
-  type StarData = {
-    breasts: string[]
-    haircolors: string[]
-    hairstyles: string[]
-  }
-
-  useEffect(() => {
-    axios.get<StarData>('/api/star/info').then(({ data }) => {
-      setBreasts(data.breasts)
-      setHaircolors(data.haircolors)
-      setHairstyles(data.hairstyles)
-    })
-
-    axios.get<string[]>('/api/attribute/star').then(({ data }) => setAttributes(data))
-  }, [])
+  const { data: starData } = starService.useInfo()
 
   const breast = (target: string) => {
     if (target === defaultObj.breast) {
@@ -207,28 +187,28 @@ function Filter() {
   return (
     <>
       <FilterRadio
-        data={breasts}
+        data={starData?.breast}
         label='breast'
         callback={breast}
         globalCallback={breast_ALL}
         defaultObj={defaultObj}
       />
       <FilterRadio
-        data={haircolors}
+        data={starData?.haircolor}
         label='haircolor'
         callback={haircolor}
         globalCallback={haircolor_ALL}
         defaultObj={defaultObj}
       />
       <FilterRadio
-        data={hairstyles}
+        data={starData?.hairstyle}
         label='hairstyle'
         callback={hairstyle}
         globalCallback={hairstyle_ALL}
         defaultObj={defaultObj}
       />
 
-      <FilterCheckbox data={attributes} label='attribute' callback={attribute} defaultObj={defaultObj} />
+      <FilterCheckbox data={starData?.attribute} label='attribute' callback={attribute} defaultObj={defaultObj} />
     </>
   )
 }

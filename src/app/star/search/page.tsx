@@ -1,7 +1,5 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
-
 import { Grid, TextField, FormControl, RadioGroup } from '@mui/material'
 
 import ScrollToTop from 'react-scroll-to-top'
@@ -13,6 +11,7 @@ import { SortObjStar as SortObj, defaultStarObj as defaultObj, getSortString } f
 import Stars from './stars'
 
 import { useAllSearchParams, useDynamicSearchParam, useSearchParam } from '@hooks/search'
+import useFocus from '@hooks/useFocus'
 import { starService } from '@service'
 
 import styles from './search.module.scss'
@@ -47,14 +46,7 @@ function TitleSearch() {
   const { setParam, update } = useDynamicSearchParam(defaultObj)
   const { currentValue } = useSearchParam(defaultObj, 'query')
 
-  const ref = useRef<HTMLInputElement>(null)
-
-  useEffect(() => {
-    if (ref.current !== null) {
-      ref.current.value = currentValue
-      ref.current.focus()
-    }
-  }, [currentValue])
+  const ref = useFocus(currentValue)
 
   const callback = (e: React.ChangeEvent<HTMLInputElement>) => {
     setParam('query', e.currentTarget.value)

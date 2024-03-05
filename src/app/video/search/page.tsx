@@ -14,6 +14,7 @@ import { SortObjVideo as SortObj, defaultVideoObj as defaultObj, getSortString }
 import Videos from './videos'
 
 import { useAllSearchParams, useDynamicSearchParam, useSearchParam } from '@hooks/search'
+import useFocus from '@hooks/useFocus'
 import { General } from '@interfaces'
 
 import styles from './search.module.scss'
@@ -48,14 +49,7 @@ function TitleSearch() {
   const { setParam, update } = useDynamicSearchParam(defaultObj)
   const { currentValue } = useSearchParam(defaultObj, 'query')
 
-  const ref = useRef<HTMLInputElement>(null)
-
-  useEffect(() => {
-    if (ref.current !== null) {
-      ref.current.value = currentValue
-      ref.current.focus()
-    }
-  }, [currentValue])
+  const ref = useFocus(currentValue)
 
   const callback = (e: React.ChangeEvent<HTMLInputElement>) => {
     setParam('query', e.target.value)

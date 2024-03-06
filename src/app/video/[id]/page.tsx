@@ -88,7 +88,7 @@ export default function VideoPage() {
 }
 
 type SectionProps = {
-  video?: Video
+  video: Video
   bookmarks: Bookmark[]
   categories: Category[]
   attributes: Attribute[]
@@ -101,8 +101,6 @@ type SectionProps = {
 }
 function Section({ video, bookmarks, categories, attributes, stars, modal, setStarEvent }: SectionProps) {
   const playerRef = useRef<MediaPlayerInstance>(null)
-
-  if (video === undefined) return <Spinner />
 
   return (
     <Grid item xs={9} component='section'>
@@ -132,11 +130,11 @@ function Section({ video, bookmarks, categories, attributes, stars, modal, setSt
 }
 
 type SidebarProps = {
-  video?: Video
+  video: Video
   stars: VideoStar[]
   bookmarks: Bookmark[]
-  attributes?: Attribute[]
-  categories?: Category[]
+  attributes: Attribute[]
+  categories: Category[]
   onModal: ModalHandler
   starEvent: { getEvent: Event; getDefault: EventData; setEvent: EventHandler }
 }
@@ -148,8 +146,6 @@ function Sidebar({ video, stars, bookmarks, attributes, categories, onModal, sta
 
     return getUnique(sortedAttributes, 'id')
   }
-
-  if (video === undefined || categories === undefined || attributes === undefined) return <Spinner />
 
   return (
     <Grid item xs={3} id={styles.sidebar} component='aside'>

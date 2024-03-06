@@ -137,8 +137,6 @@ type FilterDropdownProps<T extends DefaultObj> = {
 export function FilterDropdown<T extends DefaultObj>({ data, label, callback, defaultObj }: FilterDropdownProps<T>) {
   const { currentValue } = useSearchParam(defaultObj, label)
 
-  if (data === undefined) return <Spinner />
-
   return (
     <>
       <h2>{capitalize(label, true)}</h2>
@@ -147,7 +145,7 @@ export function FilterDropdown<T extends DefaultObj>({ data, label, callback, de
         <Select variant='standard' id={label} defaultValue={currentValue} onChange={callback}>
           <MenuItem value='ALL'>All</MenuItem>
 
-          {data.map(item => (
+          {data?.map(item => (
             <MenuItem key={item} value={item}>
               {item}
             </MenuItem>

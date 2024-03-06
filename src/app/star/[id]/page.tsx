@@ -296,6 +296,14 @@ function StarInputForm({ value, update, name, list, children, emptyByDefault = f
   const [open, setOpen] = useState(false)
   const [input, setInput] = useState('')
 
+  useEffect(() => {
+    if (!emptyByDefault && typeof value === 'string') {
+      setInput(value)
+    }
+
+    return () => setInput('')
+  }, [emptyByDefault, value])
+
   const updateValue = (value: string) => {
     if (value === '') setOpen(false)
 
@@ -314,14 +322,6 @@ function StarInputForm({ value, update, name, list, children, emptyByDefault = f
 
   const isChanged = input.toLowerCase() !== (typeof value === 'string' && !emptyByDefault ? value : '').toLowerCase()
   const shouldShrink = isChanged || (typeof value === 'string' && value.length > 0)
-
-  useEffect(() => {
-    if (!emptyByDefault && typeof value === 'string') {
-      setInput(value)
-    }
-
-    return () => setInput('')
-  }, [emptyByDefault, value])
 
   // FIXME excluding an item from dropdown causes a warning
   return (

@@ -50,11 +50,13 @@ type ModalProps = {
 export default function ModalComponent({ title, visible, filter, children, onClose }: ModalProps) {
   const [query, setQuery] = useState('')
 
+  useEffect(() => {
+    setQuery('')
+  }, [filter])
+
   const isLetter = (e: KeyboardEvent) => /^Key([A-Z])$/.test(e.code)
   const isSpace = (e: KeyboardEvent) => e.code === 'Space'
   const isBackspace = (e: KeyboardEvent) => e.code === 'Backspace'
-
-  useEffect(() => setQuery(''), [filter])
 
   useKey(
     e => filter && (isLetter(e) || isSpace(e) || isBackspace(e)),

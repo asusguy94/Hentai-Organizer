@@ -41,6 +41,13 @@ export default function Player({ title, src, poster, thumbnails, video, playerRe
   const [localVideo, setLocalVideo] = useSessionStorage('video', 0)
   const [localBookmark, setLocalBookmark] = useSessionStorage('bookmark', 0)
 
+  useEffect(() => {
+    if (localVideo !== video.id) {
+      setLocalVideo(video.id)
+      setLocalBookmark(0)
+    }
+  }, [localVideo, setLocalBookmark, setLocalVideo, video.id])
+
   const chapters = useMemo<VTTContent>(() => {
     return {
       cues: bookmarks.map((bookmark, idx, arr) => ({
@@ -50,13 +57,6 @@ export default function Player({ title, src, poster, thumbnails, video, playerRe
       }))
     }
   }, [bookmarks, video.duration])
-
-  useEffect(() => {
-    if (localVideo !== video.id) {
-      setLocalVideo(video.id)
-      setLocalBookmark(0)
-    }
-  }, [localVideo, setLocalBookmark, setLocalVideo, video.id])
 
   const onProviderChange = (provider: MediaProviderAdapter | null) => {
     if (provider === null) return

@@ -46,6 +46,7 @@ export default function Timeline({
   const bookmarksRef = useRef<HTMLButtonElement[]>([])
   const [bookmarkLevels, setBookmarkLevels] = useState<number[]>([])
   const { collisionCheck } = useCollisionCheck()
+  const { data: outfits } = outfitService.useAll()
   const { mutate: mutateSetTime } = bookmarkService.useSetTime(video.id)
   const { mutate: mutateSetCategory } = bookmarkService.useSetCategory(video.id)
   const { mutate: mutateAddAttribute } = bookmarkService.useAddAttribute(video.id)
@@ -54,7 +55,34 @@ export default function Timeline({
   const { mutate: mutateRemoveBookmark } = bookmarkService.useRemoveBookmark(video.id)
   const { mutate: mutateRemoveStar } = bookmarkService.useRemoveStar(video.id)
 
-  const { data: outfits } = outfitService.useAll()
+  useEffect(() => {
+    const bookmarksArr = bookmarks.length > 0 ? bookmarksRef.current : []
+    const levels = Array<number>(bookmarks.length).fill(0)
+    let maxLevel = 0
+
+    for (let i = 0; i < bookmarksArr.length; i++) {
+      let level = 1
+      for (let j = 0; j < i; j++) {
+        if (levels[j] === level && collisionCheck(bookmarksArr[j], bookmarksArr[i])) {
+          level++
+          j = -1
+        }
+      }
+
+      levels[i] = level
+      if (level > maxLevel) maxLevel = level
+    }
+
+    setBookmarkLevels(levels)
+
+    const videoElement = playerRef.current?.el ?? null
+    if (videoElement !== null) {
+      const videoTop = videoElement.getBoundingClientRect().top
+      videoElement.style.height = `calc(100vh - (${spacing.bookmark}px * ${maxLevel}) - ${videoTop}px - ${spacing.top}px)`
+      //maxHeight: whitespace bellow, allows scrolling beneath video
+      //height: no whitespace bellow, video always at bottom of screen
+    }
+  }, [bookmarks, collisionCheck, playerRef, windowSize.width])
 
   const setTime = (bookmarkID: number) => {
     const player = playerRef.current
@@ -118,35 +146,6 @@ export default function Timeline({
       player.play()
     }
   }
-
-  useEffect(() => {
-    const bookmarksArr = bookmarks.length > 0 ? bookmarksRef.current : []
-    const levels = Array<number>(bookmarks.length).fill(0)
-    let maxLevel = 0
-
-    for (let i = 0; i < bookmarksArr.length; i++) {
-      let level = 1
-      for (let j = 0; j < i; j++) {
-        if (levels[j] === level && collisionCheck(bookmarksArr[j], bookmarksArr[i])) {
-          level++
-          j = -1
-        }
-      }
-
-      levels[i] = level
-      if (level > maxLevel) maxLevel = level
-    }
-
-    setBookmarkLevels(levels)
-
-    const videoElement = playerRef.current?.el ?? null
-    if (videoElement !== null) {
-      const videoTop = videoElement.getBoundingClientRect().top
-      videoElement.style.height = `calc(100vh - (${spacing.bookmark}px * ${maxLevel}) - ${videoTop}px - ${spacing.top}px)`
-      //maxHeight: whitespace bellow, allows scrolling beneath video
-      //height: no whitespace bellow, video always at bottom of screen
-    }
-  }, [bookmarks, collisionCheck, playerRef, windowSize.width])
 
   return (
     <div id={styles.timeline} style={bookmarks.length > 0 ? { marginTop: spacing.top } : {}}>

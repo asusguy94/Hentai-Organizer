@@ -406,6 +406,10 @@ function StarInput({ video, stars, bookmarks, getAttributes }: StarInputProps) {
   const [noStarToggle, setNoStarToggle] = useState(false)
   const { mutate } = videoService.useAddStar(video.id)
 
+  useEffect(() => {
+    setNoStarToggle(video.noStar)
+  }, [video.noStar])
+
   const handleNoStar = (checked: boolean) => {
     videoService.toggleNoStar(video.id, checked).then(() => {
       location.reload()
@@ -417,11 +421,6 @@ function StarInput({ video, stars, bookmarks, getAttributes }: StarInputProps) {
       mutate({ name })
     }
   }
-
-  // if 'noStar' is updated outside this component
-  useEffect(() => {
-    if (video.noStar) setNoStarToggle(true)
-  }, [video.noStar])
 
   return (
     <Grid container justifyContent='center'>

@@ -59,6 +59,8 @@ export async function GET() {
       newFiles.push({ ...generated, slug })
     }
   }
+
+  return Response.json(newFiles)
 }
 
 export async function POST(req: Request) {

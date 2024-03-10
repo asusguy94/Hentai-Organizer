@@ -3,20 +3,17 @@ import { Fragment, useEffect, useRef, useState } from 'react'
 import { Button } from '@mui/material'
 
 import { ContextMenu, ContextMenuTrigger, ContextMenuItem } from 'rctx-contextmenu'
-import { Tooltip } from 'react-tooltip'
 import { useWindowSize } from 'react-use'
 
-import { MediaPlayerInstance } from '@components/vidstack'
+import { MediaPlayerInstance } from '@/components/vidstack'
 
 import { IconWithText } from '../icon'
-import Image from '../image'
 import { ModalHandler } from '../modal'
 
-import { serverConfig } from '@config'
-import useCollisionCheck from '@hooks/useCollisionCheck'
-import { EventHandler } from '@hooks/useStarEvent'
-import { Attribute, Bookmark, Category, VideoStar, Video, Outfit } from '@interfaces'
-import { bookmarkService, outfitService } from '@service'
+import useCollisionCheck from '@/hooks/useCollisionCheck'
+import { EventHandler } from '@/hooks/useStarEvent'
+import { Attribute, Bookmark, Category, VideoStar, Video, Outfit } from '@/interface'
+import { bookmarkService, outfitService } from '@/service'
 
 import styles from './timeline.module.scss'
 
@@ -163,7 +160,7 @@ export default function Timeline({
   return (
     <div id={styles.timeline} style={bookmarks.length > 0 ? { marginTop: spacing.top } : {}}>
       {bookmarks.map((bookmark, idx) => {
-        const tooltip = bookmark.starID > 0 || bookmark.attributes.length > 0 || bookmark.outfit !== null
+        // const tooltip = bookmark.starID > 0 || bookmark.attributes.length > 0 || bookmark.outfit !== null
 
         return (
           <Fragment key={bookmark.id}>
@@ -182,15 +179,15 @@ export default function Timeline({
               >
                 <div data-tooltip-id={bookmark.id.toString()}>{bookmark.name}</div>
 
-                {tooltip && (
+                {/* {tooltip && (
                   <Tooltip id={bookmark.id.toString()} className={styles.tooltip} opacity={1}>
                     {bookmark.starID !== 0 && (
-                      <Image
+                      <img
                         src={`${serverConfig.newApi}/star/${bookmark.starID}/image`}
                         data-star-id={bookmark.starID}
-                        width={200}
-                        height={275}
-                        missing={stars.find(s => s.id === bookmark.starID)?.image === null}
+                        // width={200}
+                        // height={275}
+                        // missing={stars.find(s => s.id === bookmark.starID)?.image === null}
                         alt='star'
                       />
                     )}
@@ -230,7 +227,7 @@ export default function Timeline({
                       </>
                     )}
                   </Tooltip>
-                )}
+                )} */}
               </Button>
             </ContextMenuTrigger>
 

@@ -1,8 +1,6 @@
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { DefaultObj } from '@/components/search/sort'
 
-import { DefaultObj } from '@components/search/sort'
-
-import { AllowString } from '@interfaces'
+import { AllowString } from '@/interface'
 
 type ParamValue<T, K extends keyof T> = T[K] extends string ? AllowString<T[K]> : never
 

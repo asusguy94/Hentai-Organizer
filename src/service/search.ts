@@ -1,8 +1,8 @@
-import { keys } from '@keys'
 import { useQuery } from '@tanstack/react-query'
 
-import { createApi } from '@config'
-import { StarSearch, VideoSearch } from '@interfaces'
+import { createApi } from '@/config'
+import { StarSearch, VideoSearch } from '@/interface'
+import { keys } from '@/keys'
 
 const { api } = createApi('/search')
 

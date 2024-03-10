@@ -1,8 +1,8 @@
-import { keys } from '@keys'
 import { useQuery } from '@tanstack/react-query'
 
-import { createApi } from '@config'
-import { Outfit } from '@interfaces'
+import { createApi } from '@/config'
+import { Outfit } from '@/interface'
+import { keys } from '@/keys'
 
 const { api } = createApi('/outfit')
 

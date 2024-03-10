@@ -1,7 +1,7 @@
-import { keys } from '@keys'
 import { useQuery } from '@tanstack/react-query'
 
-import { createApi } from '@config'
+import { createApi } from '@/config'
+import { keys } from '@/keys'
 
 const { api } = createApi('/brand')
 

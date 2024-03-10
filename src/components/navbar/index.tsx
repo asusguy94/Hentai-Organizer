@@ -1,4 +1,4 @@
-import Link from '../link'
+import { Link } from '@tanstack/react-router'
 
 import styles from './navbar.module.scss'
 
@@ -6,38 +6,43 @@ export default function NavBar() {
   return (
     <nav id={styles.navbar}>
       <ul>
-        <NavBarItem name='Home' path='/' />
+        <li>
+          <Link to='/'>Home</Link>
+        </li>
 
-        <NavBarItem name='Video Search' path='/video/search?nullCategory=1'>
-          <NavBarItem name='Videos' path='/video' />
-        </NavBarItem>
+        <li>
+          {/* <NavBarItem name='Video Search' path='/video/search?nullCategory=1'> */}
+          <Link to='/'>Video Search</Link>
 
-        <NavBarItem name='Star Search' path='/star/search' />
+          <ul className={styles.sub}>
+            <li>
+              <Link to='/video'>Videos</Link>
+            </li>
+          </ul>
+          {/* </NavBarItem> */}
+        </li>
+
+        <li>
+          <Link to='/'>Star Search</Link>
+          {/* <NavBarItem name='Star Search' path='/star/search' /> */}
+        </li>
       </ul>
 
       <ul>
-        <NavBarItem name='Settings' path='/settings' />
-        <NavBarItem name='DB Editor' path='/editor' />
-        <NavBarItem name='Import Videos' path='/video/add' />
+        <li>
+          <Link to='/'>Settings</Link>
+          {/* <NavBarItem name='Settings' path='/settings' /> */}
+        </li>
+
+        <li>
+          <Link to='/editor'>DB Editor</Link>
+        </li>
+
+        <li>
+          {/* <NavBarItem name='Import Videos' path='/video/add' /> */}
+          <Link to='/'>Import Videos</Link>
+        </li>
       </ul>
     </nav>
-  )
-}
-
-type NavBarItemProps = {
-  name: string
-  path: string
-  disabled?: boolean
-  children?: React.ReactNode
-}
-function NavBarItem({ name, path, children, disabled = false }: NavBarItemProps) {
-  if (disabled) return null
-
-  return (
-    <li>
-      <Link href={path}>{name}</Link>
-
-      {children && <ul className={styles.sub}>{children}</ul>}
-    </li>
   )
 }

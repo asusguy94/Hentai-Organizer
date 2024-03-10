@@ -1,11 +1,9 @@
-'use client'
-
-import { useParams } from 'next/navigation'
 import { useEffect, useMemo, useRef, useState } from 'react'
 
 import {
   Button,
   Card,
+  CardMedia,
   Checkbox,
   Divider,
   FormControlLabel,
@@ -15,35 +13,38 @@ import {
   Typography
 } from '@mui/material'
 
+import { Link, createFileRoute } from '@tanstack/react-router'
 import { MediaPlayerInstance } from '@vidstack/react'
 import { motion } from 'framer-motion'
 import { ContextMenu, ContextMenuTrigger, ContextMenuItem } from 'rctx-contextmenu'
 
-import { IconWithText } from '@components/icon'
-import { ImageCard, ResponsiveImage } from '@components/image'
-import Link from '@components/link'
-import ModalComponent, { Modal, ModalHandler, useModal } from '@components/modal'
-import Ribbon, { RibbonContainer } from '@components/ribbon'
-import Spinner from '@components/spinner'
-import { Header, Player, Timeline } from '@components/video'
+import { IconWithText } from '@/components/icon'
+import ModalComponent, { Modal, ModalHandler, useModal } from '@/components/modal'
+import Ribbon, { RibbonContainer } from '@/components/ribbon'
+import Spinner from '@/components/spinner'
+import { Header, Player, Timeline } from '@/components/video'
 
-import { serverConfig } from '@config'
-import useStarEvent, { type Event, type EventData, type EventHandler } from '@hooks/useStarEvent'
-import { Attribute, Bookmark, Category, VideoStar, Video } from '@interfaces'
-import { attributeService, bookmarkService, categoryService, videoService } from '@service'
-import validate, { escapeRegExp, getUnique, z } from '@utils/shared'
+import { serverConfig } from '@/config'
+import useStarEvent, { type Event, type EventData, type EventHandler } from '@/hooks/useStarEvent'
+import { Attribute, Bookmark, Category, Video, VideoStar } from '@/interface'
+import { attributeService, bookmarkService, categoryService, videoService } from '@/service'
+import { escapeRegExp, getUnique } from '@/utils/shared'
 
 import styles from './video.module.scss'
 
-export default function VideoPage() {
-  const params = useParams<{ id: string }>()
-  const { id } = validate(z.object({ id: z.coerce.number() }), params)
+export const Route = createFileRoute('/video/$videoId')({
+  parseParams: ({ videoId }) => ({ videoId: parseInt(videoId) }),
+  component: VideoPage
+})
 
-  const { data: stars } = videoService.useStars(id)
+function VideoPage() {
+  const { videoId } = Route.useParams()
+
+  const { data: stars } = videoService.useStars(videoId)
   const { data: categories } = categoryService.useAll()
   const { data: attributes } = attributeService.useVideos()
-  const { data: video } = videoService.useVideo(id)
-  const { data: bookmarks } = videoService.useBookmarks(id)
+  const { data: video } = videoService.useVideo(videoId)
+  const { data: bookmarks } = videoService.useBookmarks(videoId)
 
   const { modal, setModal } = useModal()
   const { setEvent, getEvent, getDefault } = useStarEvent()
@@ -306,20 +307,21 @@ function Star({ video, star, bookmarks, attributes, categories, onModal, starEve
       <motion.div layoutId={star.id.toString()}>
         <ContextMenuTrigger id={`star-${star.id}`}>
           <RibbonContainer component={Card} className={`${styles.star} ${border ? styles.active : ''}`}>
-            <ImageCard
-              src={`${serverConfig.newApi}/star/${star.id}/image`}
-              width={200}
-              height={200}
-              missing={star.image === null}
-              renderStyle='transform'
-              scale={5}
-              alt='star'
-              priority
-              responsive
-              sizes={`${(100 / 12) * 4}vw`}
-            />
+            <CardMedia>
+              <img
+                src={`${serverConfig.newApi}/star/${star.id}/image`}
+                alt='star'
+                style={{ width: '100%' }}
+                // missing={star.image === null}
+                // renderStyle='transform'
+                // scale={5}
+                // priority
+                // responsive
+                // sizes={`${(100 / 12) * 4}vw`}
+              />
+            </CardMedia>
 
-            <Link href={`/star/${star.id}`}>
+            <Link to='/star/$starId' params={{ starId: star.id.toString() }}>
               <Typography>{star.name}</Typography>
             </Link>
 
@@ -543,13 +545,14 @@ function Franchise({ video }: FranchiseProps) {
         <a href={`/video/${v.id}`} key={v.id}>
           <Grid container component={Card} className={styles.episode}>
             <Grid item xs={2} className={styles.thumbnail}>
-              <ResponsiveImage
+              <img
                 src={`${serverConfig.newApi}/video/${v.id}/cover`}
-                width={90}
-                height={130}
-                missing={v.image === null}
+                // width={90}
+                // height={130}
+                // missing={v.image === null}
                 alt='video'
-                sizes={`${(((100 / 12) * 3) / 12) * 2}vw`}
+                // sizes={`${(((100 / 12) * 3) / 12) * 2}vw`}
+                style={{ width: '100%', height: 'auto' }}
               />
             </Grid>
 

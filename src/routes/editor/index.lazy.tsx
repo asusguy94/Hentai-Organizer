@@ -1,5 +1,3 @@
-'use client'
-
 import { useState } from 'react'
 
 import {
@@ -17,10 +15,11 @@ import {
 } from '@mui/material'
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { createLazyFileRoute } from '@tanstack/react-router'
 import capitalize from 'capitalize'
 
-import { createApi } from '@config'
-import { General } from '@interfaces'
+import { createApi } from '@/config'
+import { General } from '@/interface'
 
 import styles from './editor.module.css'
 
@@ -35,15 +34,15 @@ type TableKeys = 'attribute' | 'category' | 'outfit'
 type OnlyType = 'starOnly' | 'videoOnly'
 type WithOnlyType = General & Partial<Record<OnlyType, boolean>>
 
-export default function EditorPage() {
-  return (
+export const Route = createLazyFileRoute('/editor/')({
+  component: () => (
     <Grid container justifyContent='center'>
       <Table name='attribute' obj={['starOnly', 'videoOnly']} />
       <Table name='category' />
       <Table name='outfit' />
     </Grid>
   )
-}
+})
 
 type WrapperProps = {
   name: TableKeys

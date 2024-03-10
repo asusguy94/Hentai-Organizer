@@ -1,7 +1,7 @@
-import { keys } from '@keys'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
-import { createApi } from '@config'
+import { createApi } from '@/config'
+import { keys } from '@/keys'
 
 const { api } = createApi('/bookmark')
 

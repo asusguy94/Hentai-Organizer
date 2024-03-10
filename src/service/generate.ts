@@ -1,4 +1,4 @@
-import { createApi } from '@config'
+import { createApi } from '@/config'
 
 const { legacyApi } = createApi('/generate')
 

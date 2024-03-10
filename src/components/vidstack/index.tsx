@@ -16,10 +16,9 @@ import { DefaultVideoLayout, defaultLayoutIcons } from '@vidstack/react/player/l
 import Hls, { ErrorData } from 'hls.js'
 import { useSessionStorage } from 'usehooks-ts'
 
-import { Modal } from '@components/modal'
+import { Modal } from '@/components/modal'
 
-import { settingsConfig } from '@config'
-import { Bookmark, Video } from '@interfaces'
+import { Bookmark, Video } from '@/interface'
 
 import './vidstack.css'
 
@@ -81,10 +80,6 @@ export default function Player({ title, src, poster, thumbnails, video, playerRe
   }
 
   const onHlsError = (detail: ErrorData) => {
-    if (settingsConfig.debug) {
-      console.log(detail)
-    }
-
     if (detail.fatal) {
       hlsRef.current?.destroy()
     }

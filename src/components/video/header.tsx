@@ -5,9 +5,9 @@ import { ContextMenu, ContextMenuTrigger, ContextMenuItem } from 'rctx-contextme
 import Icon, { IconWithText } from '../icon'
 import { ModalHandler } from '../modal'
 
-import { Video } from '@interfaces'
-import { videoService } from '@service'
-import { escapeRegExp } from '@utils/shared'
+import { Video } from '@/interface'
+import { videoService } from '@/service'
+import { escapeRegExp } from '@/utils/shared'
 
 import styles from './header.module.scss'
 
@@ -42,9 +42,7 @@ type HeaderTitleProps = {
 }
 function HeaderTitle({ video, onModal, isValid }: HeaderTitleProps) {
   const copyFranchise = () => {
-    ;(async () => {
-      await navigator.clipboard.writeText(video.franchise)
-    })()
+    navigator.clipboard.writeText(video.franchise)
   }
 
   const renameFranchise = (newFranchise: string) => {

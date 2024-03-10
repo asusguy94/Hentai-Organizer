@@ -1,17 +1,16 @@
-import { useRouter } from 'next/navigation'
-
 import { Button, TextField } from '@mui/material'
 
+import { useNavigate } from '@tanstack/react-router'
 import { ContextMenu, ContextMenuTrigger, ContextMenuItem } from 'rctx-contextmenu'
 
-import Player, { MediaPlayerInstance } from '@components/vidstack'
+import Player, { MediaPlayerInstance } from '@/components/vidstack'
 
 import { IconWithText } from '../icon'
 import { Modal, ModalHandler } from '../modal'
 
-import { serverConfig } from '@config'
-import { Bookmark, Category, Video, VideoStar } from '@interfaces'
-import { videoService } from '@service'
+import { serverConfig } from '@/config'
+import { Bookmark, Category, Video, VideoStar } from '@/interface'
+import { videoService } from '@/service'
 
 type VideoPlayerProps = {
   video: Video
@@ -25,18 +24,16 @@ type VideoPlayerProps = {
   }
 }
 export default function VideoPlayer({ video, bookmarks, categories, stars, playerRef, modal }: VideoPlayerProps) {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { mutate } = videoService.useAddBookmark(video.id)
 
   const copy = () => {
-    ;(async () => {
-      await navigator.clipboard.writeText(video.path.file.slice(0, -4))
-    })()
+    navigator.clipboard.writeText(video.path.file.slice(0, -4))
   }
 
   const deleteVideo = () => {
     videoService.deleteVideo(video.id).then(() => {
-      router.replace('/video')
+      navigate({ to: '/video' })
     })
   }
 

@@ -1,8 +1,8 @@
-import { keys } from '@keys'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
-import { createApi } from '@config'
-import { Bookmark, General, Video, VideoStar } from '@interfaces'
+import { createApi } from '@/config'
+import { Bookmark, General, Video, VideoStar } from '@/interface'
+import { keys } from '@/keys'
 
 const { api, legacyApi } = createApi('/video')
 

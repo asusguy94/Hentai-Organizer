@@ -38,7 +38,7 @@ function Column({ label, cols, rows = 1 }: ColumnProps) {
               <Link href={`/video/${video.id}`}>
                 <RibbonContainer className={classes.video}>
                   <ResponsiveImage
-                    src={`${serverConfig.legacyApi}/video/${video.id}/cover`}
+                    src={`${serverConfig.newApi}/video/${video.id}/cover`}
                     width={190}
                     height={275}
                     missing={isMissing}

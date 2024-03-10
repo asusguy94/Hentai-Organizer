@@ -51,7 +51,7 @@ function StarCard({ star }: StarCardProps) {
       <Card className={styles.star}>
         <CardActionArea>
           <ImageCard
-            src={`${serverConfig.legacyApi}/star/${star.id}/image`}
+            src={`${serverConfig.newApi}/star/${star.id}/image`}
             width={200}
             height={275}
             missing={star.image === null}

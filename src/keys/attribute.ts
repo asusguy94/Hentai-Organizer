@@ -1,5 +1,6 @@
 import { createQueryKeys } from '@lukemorales/query-key-factory'
 
 export const attributes = createQueryKeys('attribute', {
-  all: null
+  all: null,
+  video: null
 })

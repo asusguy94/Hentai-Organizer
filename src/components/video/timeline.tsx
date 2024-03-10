@@ -44,6 +44,7 @@ export default function Timeline({
 }: TimelineProps) {
   const windowSize = useWindowSize()
   const bookmarksRef = useRef<HTMLButtonElement[]>([])
+  const [maxLevel, setMaxLevel] = useState(0)
   const [bookmarkLevels, setBookmarkLevels] = useState<number[]>([])
   const { collisionCheck } = useCollisionCheck()
   const { data: outfits } = outfitService.useAll()
@@ -73,16 +74,28 @@ export default function Timeline({
       if (level > maxLevel) maxLevel = level
     }
 
+    setMaxLevel(maxLevel)
     setBookmarkLevels(levels)
-
-    const videoElement = playerRef.current?.el ?? null
-    if (videoElement !== null) {
-      const videoTop = videoElement.getBoundingClientRect().top
-      videoElement.style.height = `calc(100vh - (${spacing.bookmark}px * ${maxLevel}) - ${videoTop}px - ${spacing.top}px)`
-      //maxHeight: whitespace bellow, allows scrolling beneath video
-      //height: no whitespace bellow, video always at bottom of screen
-    }
   }, [bookmarks, collisionCheck, playerRef, windowSize.width])
+
+  useEffect(() => {
+    const setHeight = () => {
+      const videoElement = playerRef.current?.el ?? null
+      if (videoElement !== null) {
+        const videoTop = videoElement.getBoundingClientRect().top
+        videoElement.style.height = `calc(100vh - (${spacing.bookmark}px * ${maxLevel}) - ${videoTop}px - ${spacing.top}px)`
+        //maxHeight: whitespace bellow, allows scrolling beneath video
+        //height: no whitespace bellow, video always at bottom of screen
+      }
+    }
+
+    setHeight() // always run once
+    window.addEventListener('scroll', setHeight)
+
+    return () => {
+      window.removeEventListener('scroll', setHeight)
+    }
+  }, [maxLevel, playerRef])
 
   const setTime = (bookmarkID: number) => {
     const player = playerRef.current
@@ -173,7 +186,7 @@ export default function Timeline({
                   <Tooltip id={bookmark.id.toString()} className={styles.tooltip} opacity={1}>
                     {bookmark.starID !== 0 && (
                       <Image
-                        src={`${serverConfig.legacyApi}/star/${bookmark.starID}/image`}
+                        src={`${serverConfig.newApi}/star/${bookmark.starID}/image`}
                         data-star-id={bookmark.starID}
                         width={200}
                         height={275}

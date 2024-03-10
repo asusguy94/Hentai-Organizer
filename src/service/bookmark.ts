@@ -47,7 +47,9 @@ export default {
 
     const { mutate } = useMutation<unknown, Error, { id: number; attributeID: number }>({
       mutationKey: ['bookmark', 'addAttribute'],
-      mutationFn: ({ id, ...payload }) => api.post('/attribute', { bookmarkID: id, attributeID: payload.attributeID }),
+      mutationFn: ({ id, ...payload }) => {
+        return api.post('/attribute', { bookmarkID: id, attributeID: payload.attributeID })
+      },
       onSuccess: () => queryClient.invalidateQueries({ ...keys.video.byId(videoId)._ctx.bookmark })
     })
 

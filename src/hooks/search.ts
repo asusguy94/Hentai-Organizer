@@ -11,7 +11,7 @@ export function useDynamicSearchParam<T extends DefaultObj>(defaultValue: T) {
   const router = useRouter()
   const pathname = usePathname()
 
-  const currentSearchParams = new URLSearchParams([...(searchParams?.entries() ?? [])])
+  const currentSearchParams = new URLSearchParams(searchParams)
 
   const setParam = <K extends keyof T & string>(param: K, value: ParamValue<T, K>) => {
     if (value !== defaultValue[param]) {
@@ -33,7 +33,7 @@ export function useAllSearchParams<T extends Record<string, string>>(defaultPara
 
   const result: Record<string, string> = {}
   for (const key in defaultParams) {
-    result[key] = searchParams?.get(key) ?? defaultParams[key]
+    result[key] = searchParams.get(key) ?? defaultParams[key]
   }
 
   return result as T

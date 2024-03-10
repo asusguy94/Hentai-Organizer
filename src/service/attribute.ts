@@ -14,5 +14,13 @@ export default {
     })
 
     return { data: query.data }
+  },
+  useVideos: () => {
+    const query = useQuery<Attribute[]>({
+      ...keys.attribute.video,
+      queryFn: () => api.get('/video')
+    })
+
+    return { data: query.data }
   }
 }

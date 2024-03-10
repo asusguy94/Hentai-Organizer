@@ -27,9 +27,9 @@ import Spinner from '@components/spinner'
 import { serverConfig } from '@config'
 import { StarVideo } from '@interfaces'
 import { starService } from '@service'
+import validate, { z } from '@utils/shared'
 
 import styles from './star.module.scss'
-import validate, { z } from '@utils/server/validation'
 
 type Star = {
   id: number
@@ -45,14 +45,12 @@ type Star = {
 }
 
 export default function StarPage() {
-  const params = useParams<{id:string}>()
+  const params = useParams<{ id: string }>()
   const { id } = validate(z.object({ id: z.coerce.number() }), params)
 
   const { data: star } = starService.useStar(id)
   const { data: videos } = starService.useVideos(id)
-  const { modal, setModal } = useModal() 
-
-  
+  const { modal, setModal } = useModal()
 
   if (star === undefined || videos === undefined) return <Spinner />
 
@@ -60,10 +58,10 @@ export default function StarPage() {
     <Grid container>
       <Grid item xs={6}>
         <div id={styles.star}>
-          <StarImageDropbox star={star} videos={videos}  />
-          <StarTitle star={star} onModal={setModal}  />
-          <StarForm star={star}  />
-          <StarVideos videos={videos} />
+          <StarImageDropbox star={star} videos={videos} />
+          <StarTitle star={star} onModal={setModal} />
+          <StarForm star={star} />
+          <Videos videos={videos} />
         </div>
 
         <ModalComponent visible={modal.visible} title={modal.title} filter={modal.filter} onClose={setModal}>
@@ -77,14 +75,14 @@ export default function StarPage() {
 type StarVideosProps = {
   videos: StarVideo[]
 }
-function StarVideos({ videos }: StarVideosProps) {
+function Videos({ videos }: StarVideosProps) {
   if (videos.length === 0) return null
 
   return (
     <Grid container style={{ marginTop: 12 }}>
       <Grid container id={styles.videos}>
         {videos.map(video => (
-          <StarVideo key={video.id} video={video} />
+          <Video key={video.id} video={video} />
         ))}
       </Grid>
     </Grid>
@@ -101,7 +99,7 @@ function StarForm({ star }: StarFormProps) {
   const { mutate: mutateRemoveAttribute } = starService.useRemoveAttribute(star.id)
 
   const addAttribute = (name: string) => {
-    mutateAddAttribute({name})
+    mutateAddAttribute({ name })
   }
 
   const removeAttribute = (name: string) => {
@@ -142,10 +140,14 @@ function StarImageDropbox({ star, videos }: StarImageDropboxProps) {
 
   const addImage = (image: string) => {
     mutate({ url: image })
+
+    // reload is require for context-menu to update
+    location.reload()
   }
 
   const removeImage = () => {
     starService.removeImage(star.id).then(() => {
+      // reload is require for context-menu to update
       location.reload()
     })
   }
@@ -163,7 +165,7 @@ function StarImageDropbox({ star, videos }: StarImageDropboxProps) {
           <ContextMenuTrigger id='star__image'>
             <Image
               id={styles.profile}
-              src={`${serverConfig.legacyApi}/star/${star.id}/image`}
+              src={`${serverConfig.newApi}/star/${star.id}/image`}
               alt='star'
               width={200}
               height={275}
@@ -195,11 +197,11 @@ function StarImageDropbox({ star, videos }: StarImageDropboxProps) {
   )
 }
 
-function StarVideo({ video }: { video: StarVideo }) {
+function Video({ video }: { video: StarVideo }) {
   const [src, setSrc] = useState('')
 
   // FIXME this is not working as intended
-  const [dataSrc, setDataSrc] = useState(`${serverConfig.legacyApi}/video/${video.id}/file`)
+  const [dataSrc, setDataSrc] = useState(`${serverConfig.newApi}/video/${video.id}/file`)
 
   const thumbnail = useRef<NodeJS.Timeout>()
 
@@ -269,7 +271,7 @@ function StarVideo({ video }: { video: StarVideo }) {
             src={src}
             data-src={dataSrc}
             preload='metadata'
-            poster={`${serverConfig.legacyApi}/video/${video.id}/poster`}
+            poster={`${serverConfig.newApi}/video/${video.id}/poster`}
             muted
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}

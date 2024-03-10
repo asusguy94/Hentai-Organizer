@@ -8,7 +8,7 @@ WORKDIR /app
 
 # Install dependencies
 COPY package.json yarn.lock* ./
-RUN yarn --frozen-lockfile
+RUN yarn install
 
 ##### BUILDER
 FROM custom_node AS builder
@@ -19,7 +19,6 @@ RUN yarn build
 
 ##### RUNNER
 FROM custom_node AS runner
-RUN apk add ffmpeg
 WORKDIR /app
 
 ENV NODE_ENV production

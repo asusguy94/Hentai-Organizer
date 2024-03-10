@@ -89,11 +89,11 @@ export default function VideoPlayer({ video, bookmarks, categories, stars, playe
           playerRef={playerRef}
           video={video}
           bookmarks={bookmarks}
-          poster={`${serverConfig.legacyApi}/video/${video.id}/poster`}
-          thumbnails={`${serverConfig.legacyApi}/video/${video.id}/vtt`}
+          poster={`${serverConfig.newApi}/video/${video.id}/poster`}
+          thumbnails={`${serverConfig.newApi}/video/${video.id}/vtt`}
           src={{
-            video: `${serverConfig.legacyApi}/video/${video.id}/file`,
-            hls: `${serverConfig.legacyApi}/video/${video.id}/hls`
+            video: `${serverConfig.newApi}/video/${video.id}/file`,
+            hls: `${serverConfig.newApi}/video/${video.id}/hls`
           }}
           modal={modal.data}
         />

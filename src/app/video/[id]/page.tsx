@@ -31,8 +31,7 @@ import { serverConfig } from '@config'
 import useStarEvent, { type Event, type EventData, type EventHandler } from '@hooks/useStarEvent'
 import { Attribute, Bookmark, Category, VideoStar, Video } from '@interfaces'
 import { attributeService, bookmarkService, categoryService, videoService } from '@service'
-import validate, { z } from '@utils/server/validation'
-import { escapeRegExp, getUnique } from '@utils/shared'
+import validate, { escapeRegExp, getUnique, z } from '@utils/shared'
 
 import styles from './video.module.scss'
 
@@ -42,7 +41,7 @@ export default function VideoPage() {
 
   const { data: stars } = videoService.useStars(id)
   const { data: categories } = categoryService.useAll()
-  const { data: attributes } = attributeService.useAll()
+  const { data: attributes } = attributeService.useVideos()
   const { data: video } = videoService.useVideo(id)
   const { data: bookmarks } = videoService.useBookmarks(id)
 
@@ -308,7 +307,7 @@ function Star({ video, star, bookmarks, attributes, categories, onModal, starEve
         <ContextMenuTrigger id={`star-${star.id}`}>
           <RibbonContainer component={Card} className={`${styles.star} ${border ? styles.active : ''}`}>
             <ImageCard
-              src={`${serverConfig.legacyApi}/star/${star.id}/image`}
+              src={`${serverConfig.newApi}/star/${star.id}/image`}
               width={200}
               height={200}
               missing={star.image === null}
@@ -545,7 +544,7 @@ function Franchise({ video }: FranchiseProps) {
           <Grid container component={Card} className={styles.episode}>
             <Grid item xs={2} className={styles.thumbnail}>
               <ResponsiveImage
-                src={`${serverConfig.legacyApi}/video/${v.id}/cover`}
+                src={`${serverConfig.newApi}/video/${v.id}/cover`}
                 width={90}
                 height={130}
                 missing={v.image === null}

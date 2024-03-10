@@ -1,3 +1,4 @@
 export default {
-  legacyApi: '/api'
+  legacyApi: '/api',
+  newApi: 'http://transcoder.local:4002/api'
 }

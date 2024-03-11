@@ -13,16 +13,25 @@ import { createFileRoute } from '@tanstack/react-router'
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as VideoSearchImport } from './routes/video/search'
 import { Route as VideoVideoIdImport } from './routes/video/$videoId'
+import { Route as StarStarIdImport } from './routes/star/$starId'
 
 // Create Virtual Routes
 
+const SettingsLazyImport = createFileRoute('/settings')()
 const IndexLazyImport = createFileRoute('/')()
 const VideoIndexLazyImport = createFileRoute('/video/')()
 const EditorIndexLazyImport = createFileRoute('/editor/')()
-const StarStarIdLazyImport = createFileRoute('/star/$starId')()
+const VideoAddLazyImport = createFileRoute('/video/add')()
+const StarSearchLazyImport = createFileRoute('/star/search')()
 
 // Create/Update Routes
+
+const SettingsLazyRoute = SettingsLazyImport.update({
+  path: '/settings',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/settings.lazy').then((d) => d.Route))
 
 const IndexLazyRoute = IndexLazyImport.update({
   path: '/',
@@ -39,13 +48,28 @@ const EditorIndexLazyRoute = EditorIndexLazyImport.update({
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/editor/index.lazy').then((d) => d.Route))
 
-const StarStarIdLazyRoute = StarStarIdLazyImport.update({
-  path: '/star/$starId',
+const VideoAddLazyRoute = VideoAddLazyImport.update({
+  path: '/video/add',
   getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/star/$starId.lazy').then((d) => d.Route))
+} as any).lazy(() => import('./routes/video/add.lazy').then((d) => d.Route))
+
+const StarSearchLazyRoute = StarSearchLazyImport.update({
+  path: '/star/search',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/star/search.lazy').then((d) => d.Route))
+
+const VideoSearchRoute = VideoSearchImport.update({
+  path: '/video/search',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const VideoVideoIdRoute = VideoVideoIdImport.update({
   path: '/video/$videoId',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const StarStarIdRoute = StarStarIdImport.update({
+  path: '/star/$starId',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -57,12 +81,28 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexLazyImport
       parentRoute: typeof rootRoute
     }
+    '/settings': {
+      preLoaderRoute: typeof SettingsLazyImport
+      parentRoute: typeof rootRoute
+    }
+    '/star/$starId': {
+      preLoaderRoute: typeof StarStarIdImport
+      parentRoute: typeof rootRoute
+    }
     '/video/$videoId': {
       preLoaderRoute: typeof VideoVideoIdImport
       parentRoute: typeof rootRoute
     }
-    '/star/$starId': {
-      preLoaderRoute: typeof StarStarIdLazyImport
+    '/video/search': {
+      preLoaderRoute: typeof VideoSearchImport
+      parentRoute: typeof rootRoute
+    }
+    '/star/search': {
+      preLoaderRoute: typeof StarSearchLazyImport
+      parentRoute: typeof rootRoute
+    }
+    '/video/add': {
+      preLoaderRoute: typeof VideoAddLazyImport
       parentRoute: typeof rootRoute
     }
     '/editor/': {
@@ -80,8 +120,12 @@ declare module '@tanstack/react-router' {
 
 export const routeTree = rootRoute.addChildren([
   IndexLazyRoute,
+  SettingsLazyRoute,
+  StarStarIdRoute,
   VideoVideoIdRoute,
-  StarStarIdLazyRoute,
+  VideoSearchRoute,
+  StarSearchLazyRoute,
+  VideoAddLazyRoute,
   EditorIndexLazyRoute,
   VideoIndexLazyRoute,
 ])

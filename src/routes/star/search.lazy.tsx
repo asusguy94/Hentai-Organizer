@@ -1,26 +1,44 @@
-'use client'
+import {
+  Card,
+  CardActionArea,
+  CardMedia,
+  FormControl,
+  Grid,
+  Link,
+  RadioGroup,
+  TextField,
+  Typography
+} from '@mui/material'
 
-import { Grid, TextField, FormControl, RadioGroup } from '@mui/material'
-
+import { createLazyFileRoute } from '@tanstack/react-router'
 import ScrollToTop from 'react-scroll-to-top'
 
-import { RegularHandlerProps } from '@components/indeterminate'
-import { FilterCheckbox, FilterRadio } from '@components/search/filter'
-import { SortObjStar as SortObj, defaultStarObj as defaultObj, getSortString } from '@components/search/sort'
+import { RegularHandlerProps } from '@/components/indeterminate'
+import { FilterCheckbox, FilterRadio, isDefault } from '@/components/search/filter'
+import {
+  SortObjStar as SortObj,
+  defaultStarObj as defaultObj,
+  getStarSort as getSort,
+  getSortString
+} from '@/components/search/sort'
+import Spinner from '@/components/spinner'
+import VGrid from '@/components/virtualized/virtuoso'
 
-import Stars from './stars'
-
-import { useAllSearchParams, useDynamicSearchParam, useSearchParam } from '@hooks/search'
-import useFocus from '@hooks/useFocus'
-import { starService } from '@service'
+import { serverConfig } from '@/config'
+import { useAllSearchParams, useDynamicSearchParam, useSearchParam } from '@/hooks/search'
+import useFocus from '@/hooks/useFocus'
+import { StarSearch } from '@/interface'
+import { searchService, starService } from '@/service'
 
 import styles from './search.module.scss'
 
-export default function StarSearchPage() {
-  return (
+export const Route = createLazyFileRoute('/star/search')({
+  component: () => (
     <Grid container>
       <Grid item xs={2} id={styles.sidebar}>
-        <Sidebar />
+        <TitleSearch />
+        <Sort />
+        <Filter />
       </Grid>
 
       <Grid item xs={10}>
@@ -30,17 +48,7 @@ export default function StarSearchPage() {
       <ScrollToTop smooth />
     </Grid>
   )
-}
-
-function Sidebar() {
-  return (
-    <>
-      <TitleSearch />
-      <Sort />
-      <Filter />
-    </>
-  )
-}
+})
 
 function TitleSearch() {
   const { setParam, update } = useDynamicSearchParam(defaultObj)
@@ -202,5 +210,60 @@ function Filter() {
 
       <FilterCheckbox data={starData?.attribute} label='attribute' callback={attribute} defaultObj={defaultObj} />
     </>
+  )
+}
+
+function Stars() {
+  const { breast, haircolor, hairstyle, attribute, query, sort } = useAllSearchParams(defaultObj)
+  const { data: stars, isLoading } = searchService.useStars()
+
+  if (isLoading || stars === undefined) return <Spinner />
+
+  const visible = stars
+    .sort(getSort(sort))
+    .filter(s => s.name.toLowerCase().includes(query.toLowerCase()) || isDefault(query, defaultObj.query))
+    .filter(s => s.breast === breast || isDefault(breast, defaultObj.breast))
+    .filter(s => s.haircolor === haircolor || isDefault(haircolor, defaultObj.haircolor))
+    .filter(s => s.hairstyle === hairstyle || isDefault(hairstyle, defaultObj.hairstyle))
+    .filter(
+      s => attribute.split(',').every(attr => s.attributes.includes(attr)) || isDefault(attribute, defaultObj.attribute)
+    )
+
+  return (
+    <div id={styles.stars}>
+      <Typography variant='h6' className='text-center'>
+        <span id={styles.count}>{visible.length}</span> Stars
+      </Typography>
+
+      <VGrid itemHeight={333} total={visible.length} renderData={idx => <StarCard star={visible[idx]} />} />
+    </div>
+  )
+}
+
+type StarCardProps = {
+  star?: StarSearch
+}
+function StarCard({ star }: StarCardProps) {
+  if (star === undefined) return null
+
+  return (
+    <Link href={`/star/${star.id}`}>
+      <Card className={styles.star}>
+        <CardActionArea>
+          <CardMedia>
+            <img
+              src={`${serverConfig.newApi}/star/${star.id}/image`}
+              // missing={star.image === null}
+              alt='star'
+              style={{ width: '100%' }}
+            />
+          </CardMedia>
+
+          <Grid container justifyContent='center' className={styles.title}>
+            <Typography className='text-center'>{star.name}</Typography>
+          </Grid>
+        </CardActionArea>
+      </Card>
+    </Link>
   )
 }

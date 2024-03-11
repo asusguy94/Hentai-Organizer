@@ -1,11 +1,13 @@
-'use client'
-
 import { Grid, List, ListItemButton, ListItemText, Typography } from '@mui/material'
 
-import Link from '@components/link'
+import { Link, createLazyFileRoute } from '@tanstack/react-router'
 
-import { General } from '@interfaces'
-import { videoService } from '@service'
+import { General } from '@/interface'
+import { videoService } from '@/service'
+
+export const Route = createLazyFileRoute('/video/')({
+  component: VideosPage
+})
 
 export default function VideosPage() {
   const { data } = videoService.useVideos()
@@ -46,7 +48,7 @@ function View({ data, label }: ViewProps) {
       </Typography>
       <List>
         {data.map(video => (
-          <Link key={video.id} href={`/video/${video.id}`}>
+          <Link key={video.id} to='/video/$videoId' params={{ videoId: video.id }}>
             <ListItemButton divider>
               <ListItemText>{video.name}</ListItemText>
             </ListItemButton>

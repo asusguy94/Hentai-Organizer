@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
 
-import { defaultSettings, useSettings } from '@/components/settings/components'
+import { defaultSettings, useSettings } from '@/components/settings'
 
 export default function useCollisionCheck() {
   const localSettings = useSettings()

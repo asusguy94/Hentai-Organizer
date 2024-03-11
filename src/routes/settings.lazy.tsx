@@ -1,17 +1,20 @@
-'use client'
-
 import { useEffect, useState } from 'react'
 
 import { Button, Grid, TextField } from '@mui/material'
 
+import { createLazyFileRoute } from '@tanstack/react-router'
 import { useLocalStorage } from 'usehooks-ts'
 
-import { SettingKey, SettingValue, Settings, defaultSettings, keys, settingsKey } from './components'
+import { SettingKey, SettingValue, Settings, defaultSettings, keys, settingsKey } from '@/components/settings'
 
-import { SetState } from '@interfaces'
-import { clamp } from '@utils/shared'
+import { SetState } from '@/interface'
+import { clamp } from '@/utils/shared'
 
-export default function SettingsPage() {
+export const Route = createLazyFileRoute('/settings')({
+  component: SettingsPage
+})
+
+function SettingsPage() {
   const [rawSettings, setRawSettings] = useLocalStorage<Settings>(settingsKey, defaultSettings)
   const [localSettings, setLocalSettings] = useState<Settings>(defaultSettings)
   const [changed, setChanged] = useState(false)

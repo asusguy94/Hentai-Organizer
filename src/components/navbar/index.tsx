@@ -11,27 +11,25 @@ export default function NavBar() {
         </li>
 
         <li>
-          {/* <NavBarItem name='Video Search' path='/video/search?nullCategory=1'> */}
-          <Link to='/'>Video Search</Link>
+          <Link to='/video/search' search={{ nullCategory: 1 }}>
+            Video Search
+          </Link>
 
           <ul className={styles.sub}>
             <li>
               <Link to='/video'>Videos</Link>
             </li>
           </ul>
-          {/* </NavBarItem> */}
         </li>
 
         <li>
-          <Link to='/'>Star Search</Link>
-          {/* <NavBarItem name='Star Search' path='/star/search' /> */}
+          <Link to='/star/search'>Star Search</Link>
         </li>
       </ul>
 
       <ul>
         <li>
-          <Link to='/'>Settings</Link>
-          {/* <NavBarItem name='Settings' path='/settings' /> */}
+          <Link to='/settings'>Settings</Link>
         </li>
 
         <li>
@@ -39,8 +37,7 @@ export default function NavBar() {
         </li>
 
         <li>
-          {/* <NavBarItem name='Import Videos' path='/video/add' /> */}
-          <Link to='/'>Import Videos</Link>
+          <Link to='/video/add'>Import Videos</Link>
         </li>
       </ul>
     </nav>

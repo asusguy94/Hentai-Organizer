@@ -1,26 +1,48 @@
-'use client'
+import { useMemo } from 'react'
 
-import { Button, FormControl, Grid, RadioGroup, SelectChangeEvent, TextField } from '@mui/material'
+import {
+  Button,
+  Card,
+  CardActionArea,
+  FormControl,
+  Grid,
+  RadioGroup,
+  SelectChangeEvent,
+  TextField,
+  Typography
+} from '@mui/material'
 
+import { Link, createFileRoute } from '@tanstack/react-router'
 import ScrollToTop from 'react-scroll-to-top'
 
-import { RegularHandlerProps } from '@components/indeterminate'
-import { FilterCheckbox, FilterDropdown } from '@components/search/filter'
-import { SortObjVideo as SortObj, defaultVideoObj as defaultObj, getSortString } from '@components/search/sort'
+import { RegularHandlerProps } from '@/components/indeterminate'
+import Ribbon, { RibbonContainer } from '@/components/ribbon'
+import { FilterCheckbox, FilterDropdown, isDefault } from '@/components/search/filter'
+import {
+  SortObjVideo as SortObj,
+  defaultVideoObj as defaultObj,
+  getSortString,
+  getVideoSort as getSort
+} from '@/components/search/sort'
+import { defaultSettings, useSettings } from '@/components/settings'
+import Spinner from '@/components/spinner'
+import VGrid from '@/components/virtualized/virtuoso'
 
-import Videos from './videos'
-
-import { useAllSearchParams, useDynamicSearchParam, useSearchParam } from '@hooks/search'
-import useFocus from '@hooks/useFocus'
-import { attributeService, brandService, categoryService, outfitService } from '@service'
+import { serverConfig } from '@/config'
+import { useAllSearchParams, useDynamicSearchParam, useSearchParam } from '@/hooks/search'
+import useFocus from '@/hooks/useFocus'
+import { VideoSearch } from '@/interface'
+import { attributeService, brandService, categoryService, outfitService, searchService } from '@/service'
 
 import styles from './search.module.scss'
 
-export default function VideoSearchPage() {
-  return (
+export const Route = createFileRoute('/video/search')({
+  component: () => (
     <Grid container>
       <Grid item xs={2} id={styles.sidebar}>
-        <Sidebar />
+        <TitleSearch />
+        <Sort />
+        <Filter />
       </Grid>
 
       <Grid item xs={10}>
@@ -30,17 +52,7 @@ export default function VideoSearchPage() {
       <ScrollToTop smooth />
     </Grid>
   )
-}
-
-function Sidebar() {
-  return (
-    <>
-      <TitleSearch />
-      <Sort />
-      <Filter />
-    </>
-  )
-}
+})
 
 function TitleSearch() {
   const { setParam, update } = useDynamicSearchParam(defaultObj)
@@ -224,5 +236,79 @@ function Filter() {
       <FilterCheckbox data={outfits} label='outfit' callback={outfit} defaultObj={defaultObj} />
       <FilterCheckbox data={attributes} label='attribute' callback={attribute} defaultObj={defaultObj} />
     </>
+  )
+}
+
+function Videos() {
+  const { sort, query, category, outfit, attribute, network, nullCategory } = useAllSearchParams(defaultObj)
+  const { data: videos, isLoading } = searchService.useVideos()
+
+  const localSettings = useSettings()
+
+  const filtered = useMemo<VideoSearch[]>(() => {
+    const videoCount = localSettings?.video_count
+
+    if (videos === undefined) return []
+    if (videoCount === undefined || videoCount === defaultSettings.video_count) return videos
+
+    return videos.filter((_, idx) => idx < videoCount)
+  }, [localSettings?.video_count, videos])
+
+  if (isLoading || videos === undefined) return <Spinner />
+
+  const visible = filtered
+    .filter(v => !v.noStar)
+    .sort(getSort(sort))
+    .filter(v => v.name.toLowerCase().includes(query.toLowerCase()) || isDefault(query, defaultObj.query))
+    .filter(
+      v => category.split(',').every(cat => v.categories.includes(cat)) || isDefault(category, defaultObj.category)
+    )
+    .filter(
+      v =>
+        (nullCategory !== defaultObj.nullCategory && v.categories.length === 0) ||
+        isDefault(nullCategory, defaultObj.nullCategory)
+    )
+    .filter(v => outfit.split(',').every(out => v.outfits.includes(out)) || isDefault(outfit, defaultObj.outfit))
+    .filter(
+      v => attribute.split(',').every(attr => v.attributes.includes(attr)) || isDefault(attribute, defaultObj.attribute)
+    )
+    .filter(v => v.brand === network || isDefault(network, defaultObj.network))
+
+  return (
+    <div id={styles.videos}>
+      <Typography variant='h6' className='text-center'>
+        <span id={styles.count}>{visible.length}</span> Videos
+      </Typography>
+
+      <VGrid itemHeight={385.375} total={visible.length} renderData={idx => <VideoCard video={visible[idx]} />} />
+    </div>
+  )
+}
+
+type VideoCardProps = {
+  video?: VideoSearch
+}
+function VideoCard({ video }: VideoCardProps) {
+  if (video === undefined) return null
+
+  return (
+    <Link to='/video/$videoId' params={{ videoId: video.id }}>
+      <RibbonContainer component={Card} className={styles.video}>
+        <CardActionArea>
+          <img
+            src={`${serverConfig.newApi}/video/${video.id}/cover`}
+            // missing={video.cover === null}
+            style={{ width: '100%' }}
+            alt='video'
+          />
+
+          <Grid container justifyContent='center' className={styles.title}>
+            <Typography className='text-center'>{video.name}</Typography>
+          </Grid>
+
+          {video.quality < 1080 && <Ribbon label={video.quality.toString()} />}
+        </CardActionArea>
+      </RibbonContainer>
+    </Link>
   )
 }

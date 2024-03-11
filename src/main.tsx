@@ -39,7 +39,15 @@ if (root === null) {
   ReactDOM.createRoot(root).render(
     <React.StrictMode>
       <QueryClientProvider client={client}>
-        <RouterProvider router={router} />
+        <RouterProvider
+          router={router}
+          defaultErrorComponent={({ error }: { error: Error }) => (
+            <div>
+              <h1>{error.message}</h1>
+              <pre>{error.stack}</pre>
+            </div>
+          )}
+        />
       </QueryClientProvider>
     </React.StrictMode>
   )

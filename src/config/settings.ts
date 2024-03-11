@@ -1,6 +1,6 @@
 function getValueWithType<T>(label: string, defaultValue: T): T {
   try {
-    const value = process.env[label] ?? localStorage.getItem(`NEXT_PUBLIC_${label}`)
+    const value = import.meta.env[label] ?? localStorage.getItem(label)
 
     if (value !== null) {
       try {
@@ -21,15 +21,8 @@ function getValueWithType<T>(label: string, defaultValue: T): T {
 }
 
 export default {
-  qualities: [1080, 720, 480, 360],
-  addFiles: {
-    maxFiles: getValueWithType<number>('ADD_FILES_MAX', 10)
-  },
   pusher: {
-    appId: process.env['PUSHER_APP_ID'] ?? '',
     key: getValueWithType('PUSHER_KEY', ''),
-    secret: process.env['PUSHER_SECRET'] ?? '',
     cluster: getValueWithType('PUSHER_CLUSTER', 'eu')
-  },
-  debug: getValueWithType<boolean>('DEBUG', false)
+  }
 }

@@ -1,6 +1,3 @@
-'use client'
-
-import { useParams, useRouter } from 'next/navigation'
 import { Fragment, useEffect, useRef, useState } from 'react'
 
 import {
@@ -15,21 +12,24 @@ import {
   Typography
 } from '@mui/material'
 
+import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
 import { ContextMenu, ContextMenuTrigger, ContextMenuItem } from 'rctx-contextmenu'
 
-import Dropbox from '@components/dropbox'
-import { IconWithText } from '@components/icon'
-import Image from '@components/image'
-import Link from '@components/link'
-import ModalComponent, { ModalHandler, useModal } from '@components/modal'
-import Spinner from '@components/spinner'
+import Dropbox from '@/components/dropbox'
+import { IconWithText } from '@/components/icon'
+import ModalComponent, { ModalHandler, useModal } from '@/components/modal'
+import Spinner from '@/components/spinner'
 
-import { serverConfig } from '@config'
-import { StarVideo } from '@interfaces'
-import { starService } from '@service'
-import validate, { z } from '@utils/shared'
+import { serverConfig } from '@/config'
+import { StarVideo } from '@/interface'
+import { starService } from '@/service'
 
 import styles from './star.module.scss'
+
+export const Route = createFileRoute('/star/$starId')({
+  parseParams: ({ starId }) => ({ starId: parseInt(starId) }),
+  component: StarPage
+})
 
 type Star = {
   id: number
@@ -45,11 +45,10 @@ type Star = {
 }
 
 export default function StarPage() {
-  const params = useParams<{ id: string }>()
-  const { id } = validate(z.object({ id: z.coerce.number() }), params)
+  const { starId } = Route.useParams()
 
-  const { data: star } = starService.useStar(id)
-  const { data: videos } = starService.useVideos(id)
+  const { data: star } = starService.useStar(starId)
+  const { data: videos } = starService.useVideos(starId)
   const { modal, setModal } = useModal()
 
   if (star === undefined || videos === undefined) return <Spinner />
@@ -135,7 +134,7 @@ type StarImageDropboxProps = {
   videos: StarVideo[]
 }
 function StarImageDropbox({ star, videos }: StarImageDropboxProps) {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { mutate } = starService.useAddImage(star.id)
 
   const addImage = (image: string) => {
@@ -154,7 +153,7 @@ function StarImageDropbox({ star, videos }: StarImageDropboxProps) {
 
   const removeStar = () => {
     starService.removeStar(star.id).then(() => {
-      router.replace('/star')
+      navigate({ to: '/', replace: true })
     })
   }
 
@@ -163,12 +162,11 @@ function StarImageDropbox({ star, videos }: StarImageDropboxProps) {
       {star.image !== null ? (
         <>
           <ContextMenuTrigger id='star__image'>
-            <Image
+            <img
               id={styles.profile}
+              //missing={false}
               src={`${serverConfig.newApi}/star/${star.id}/image`}
               alt='star'
-              width={200}
-              height={275}
             />
           </ContextMenuTrigger>
 
@@ -263,7 +261,7 @@ function Video({ video }: { video: StarVideo }) {
   }
 
   return (
-    <Link className={styles.video} href={`/video/${video.id}`}>
+    <Link className={styles.video} to='/video/$videoId' params={{ videoId: video.id }}>
       <Card>
         <CardActionArea>
           <CardMedia
@@ -333,7 +331,7 @@ function StarInputForm({ value, update, name, list, children, emptyByDefault = f
           inputValue={input}
           //
           // EVENTS
-          onInputChange={(e, val, reason) => {
+          onInputChange={(_e, val, reason) => {
             if (reason === 'reset' && !open) return
 
             updateValue(val)
@@ -421,7 +419,7 @@ function StarTitle({ star, onModal: handleModal }: StarTitleProps) {
               <>
                 {' '}
                 (
-                <Link href={star.link} target='_blank'>
+                <Link to={star.link} target='_blank'>
                   LINK
                 </Link>
                 )

@@ -147,7 +147,7 @@ function TableRow({ update, data, obj }: TableRowProps) {
     if (input) update(data, input)
   }
 
-  const setCondition = (ref: UpdateRef, prop: string, value: boolean, checkbox: HTMLInputElement) => {
+  const setCondition = (_ref: UpdateRef, prop: string, value: boolean, checkbox: HTMLInputElement) => {
     mutate({ name: prop, value }, { onError: () => (checkbox.checked = !value) })
   }
 

@@ -321,7 +321,7 @@ function Star({ video, star, bookmarks, attributes, categories, onModal, starEve
               />
             </CardMedia>
 
-            <Link to='/star/$starId' params={{ starId: star.id.toString() }}>
+            <Link to='/star/$starId' params={{ starId: star.id }}>
               <Typography>{star.name}</Typography>
             </Link>
 
@@ -457,7 +457,7 @@ function StarInput({ video, stars, bookmarks, getAttributes }: StarInputProps) {
             control={
               <Checkbox
                 checked={noStarToggle}
-                onChange={(e, checked) => {
+                onChange={(_e, checked) => {
                   // Update checked status
                   setNoStarToggle(checked)
 
@@ -547,12 +547,9 @@ function Franchise({ video }: FranchiseProps) {
             <Grid item xs={2} className={styles.thumbnail}>
               <img
                 src={`${serverConfig.newApi}/video/${v.id}/cover`}
-                // width={90}
-                // height={130}
                 // missing={v.image === null}
                 alt='video'
-                // sizes={`${(((100 / 12) * 3) / 12) * 2}vw`}
-                style={{ width: '100%', height: 'auto' }}
+                style={{ width: '100%' }}
               />
             </Grid>
 

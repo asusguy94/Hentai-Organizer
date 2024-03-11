@@ -153,7 +153,10 @@ function StarImageDropbox({ star, videos }: StarImageDropboxProps) {
 
   const removeStar = () => {
     starService.removeStar(star.id).then(() => {
-      navigate({ to: '/', replace: true })
+      navigate({
+        to: '/',
+        replace: true
+      })
     })
   }
 

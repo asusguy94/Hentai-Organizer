@@ -188,7 +188,6 @@ export default function Timeline({
                         src={`${serverConfig.newApi}/star/${bookmark.starID}/image`}
                         data-star-id={bookmark.starID}
                         // missing={stars.find(s => s.id === bookmark.starID)?.image === null}
-                        style={{ width: '100%' }}
                         alt='star'
                       />
                     )}

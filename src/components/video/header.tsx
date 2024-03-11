@@ -1,5 +1,6 @@
 import { Button, Grid, TextField, Typography } from '@mui/material'
 
+import { useNavigate } from '@tanstack/react-router'
 import { ContextMenu, ContextMenuTrigger, ContextMenuItem } from 'rctx-contextmenu'
 
 import Icon, { IconWithText } from '../icon'
@@ -265,14 +266,23 @@ type HeaderNetworkProps = {
   video: Video
 }
 function HeaderNetwork({ video }: HeaderNetworkProps) {
-  const handleNetwork = () => {
-    videoService.setBrand(video.id).then(() => {
-      location.reload()
-    })
+  const navigate = useNavigate()
+
+  const handleClick = () => {
+    if (video.brand === null) {
+      videoService.setBrand(video.id).then(() => {
+        location.reload()
+      })
+    } else {
+      navigate({
+        to: '/video/search',
+        search: { network: video.brand }
+      })
+    }
   }
 
   return (
-    <Button size='small' variant='outlined' onClick={handleNetwork}>
+    <Button size='small' variant='outlined' onClick={handleClick}>
       <Icon code='brand' />
       <span>{video.brand ?? 'Get Brand'}</span>
     </Button>

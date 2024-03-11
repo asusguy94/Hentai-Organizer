@@ -20,7 +20,11 @@ export function useDynamicSearchParam<T extends DefaultObj>(defaultValue: T) {
   }
 
   const update = () => {
-    navigate({ to: location.pathname + '?' + currentSearchParams, replace: true, resetScroll: false })
+    navigate({
+      to: location.pathname + '?' + currentSearchParams,
+      replace: true,
+      resetScroll: false
+    })
   }
 
   return { setParam, update }

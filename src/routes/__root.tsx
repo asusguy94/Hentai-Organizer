@@ -5,6 +5,7 @@ import { ToastContainer } from 'react-toastify'
 
 import NavBar from '@/components/navbar'
 
+import '../index.css'
 import 'react-toastify/dist/ReactToastify.min.css'
 
 export const Route = createRootRoute({

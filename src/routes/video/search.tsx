@@ -298,7 +298,7 @@ function VideoCard({ video }: VideoCardProps) {
           <img
             src={`${serverConfig.newApi}/video/${video.id}/cover`}
             // missing={video.cover === null}
-            style={{ width: '100%' }}
+            style={{ width: '100%', height: 'auto' }}
             alt='video'
           />
 

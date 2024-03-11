@@ -49,6 +49,7 @@ function Column({ label, cols, rows = 1 }: ColumnProps) {
                     alt='video'
                     style={{
                       width: '100%',
+                      height: 'auto',
                       border: '1px solid #dee2e6',
                       borderRadius: '0.25rem'
                     }}

@@ -255,7 +255,7 @@ function StarCard({ star }: StarCardProps) {
               src={`${serverConfig.newApi}/star/${star.id}/image`}
               // missing={star.image === null}
               alt='star'
-              style={{ width: '100%' }}
+              style={{ width: '100%', height: 'auto' }}
             />
           </CardMedia>
 

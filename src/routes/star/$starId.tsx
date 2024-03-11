@@ -167,6 +167,7 @@ function StarImageDropbox({ star, videos }: StarImageDropboxProps) {
               //missing={false}
               src={`${serverConfig.newApi}/star/${star.id}/image`}
               alt='star'
+              style={{ width: '100%', height: 'auto' }}
             />
           </ContextMenuTrigger>
 

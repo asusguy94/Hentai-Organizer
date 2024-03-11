@@ -311,7 +311,7 @@ function Star({ video, star, bookmarks, attributes, categories, onModal, starEve
               <img
                 src={`${serverConfig.newApi}/star/${star.id}/image`}
                 alt='star'
-                style={{ width: '100%' }}
+                style={{ width: '100%', height: 'auto' }}
                 // missing={star.image === null}
                 // renderStyle='transform'
                 // scale={5}
@@ -549,7 +549,7 @@ function Franchise({ video }: FranchiseProps) {
                 src={`${serverConfig.newApi}/video/${v.id}/cover`}
                 // missing={v.image === null}
                 alt='video'
-                style={{ width: '100%' }}
+                style={{ width: '100%', height: 'auto' }}
               />
             </Grid>
 

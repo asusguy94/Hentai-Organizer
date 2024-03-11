@@ -9,6 +9,7 @@ import { useWindowSize } from 'react-use'
 import { MediaPlayerInstance } from '@/components/vidstack'
 
 import { IconWithText } from '../icon'
+import MissingImage from '../image/missing'
 import { ModalHandler } from '../modal'
 
 import { serverConfig } from '@/config'
@@ -183,14 +184,17 @@ export default function Timeline({
 
                 {tooltip && (
                   <Tooltip id={bookmark.id.toString()} className={styles.tooltip} opacity={1}>
-                    {bookmark.starID !== 0 && (
-                      <img
-                        src={`${serverConfig.newApi}/star/${bookmark.starID}/image`}
-                        data-star-id={bookmark.starID}
-                        // missing={stars.find(s => s.id === bookmark.starID)?.image === null}
-                        alt='star'
-                      />
-                    )}
+                    {bookmark.starID !== 0 &&
+                      (stars.find(s => s.id === bookmark.starID)?.image === null ? (
+                        <MissingImage />
+                      ) : (
+                        <img
+                          src={`${serverConfig.newApi}/star/${bookmark.starID}/image`}
+                          data-star-id={bookmark.starID}
+                          // missing={stars.find(s => s.id === bookmark.starID)?.image === null}
+                          alt='star'
+                        />
+                      ))}
 
                     {bookmark.attributes
                       .sort((a, b) => {

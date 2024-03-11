@@ -19,6 +19,7 @@ import { motion } from 'framer-motion'
 import { ContextMenu, ContextMenuTrigger, ContextMenuItem } from 'rctx-contextmenu'
 
 import { IconWithText } from '@/components/icon'
+import MissingImage from '@/components/image/missing'
 import ModalComponent, { Modal, ModalHandler, useModal } from '@/components/modal'
 import Ribbon, { RibbonContainer } from '@/components/ribbon'
 import Spinner from '@/components/spinner'
@@ -296,6 +297,7 @@ function Star({ video, star, bookmarks, attributes, categories, onModal, starEve
     return commonAttributeIds
   }
 
+  const isMissing = star.image === null
   return (
     <Grid
       item
@@ -307,18 +309,16 @@ function Star({ video, star, bookmarks, attributes, categories, onModal, starEve
       <motion.div layoutId={star.id.toString()}>
         <ContextMenuTrigger id={`star-${star.id}`}>
           <RibbonContainer component={Card} className={`${styles.star} ${border ? styles.active : ''}`}>
-            <CardMedia>
-              <img
-                src={`${serverConfig.newApi}/star/${star.id}/image`}
-                alt='star'
-                style={{ width: '100%', height: 'auto' }}
-                // missing={star.image === null}
-                // renderStyle='transform'
-                // scale={5}
-                // priority
-                // responsive
-                // sizes={`${(100 / 12) * 4}vw`}
-              />
+            <CardMedia style={isMissing ? { height: 200 } : {}}>
+              {isMissing ? (
+                <MissingImage renderStyle='transform' scale={5} />
+              ) : (
+                <img
+                  src={`${serverConfig.newApi}/star/${star.id}/image`}
+                  alt='star'
+                  style={{ width: '100%', height: 'auto' }}
+                />
+              )}
             </CardMedia>
 
             <Link to='/star/$starId' params={{ starId: star.id }}>

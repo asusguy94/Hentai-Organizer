@@ -13,6 +13,7 @@ import {
 import { createLazyFileRoute } from '@tanstack/react-router'
 import ScrollToTop from 'react-scroll-to-top'
 
+import MissingImage from '@/components/image/missing'
 import { RegularHandlerProps } from '@/components/indeterminate'
 import { FilterCheckbox, FilterRadio, isDefault } from '@/components/search/filter'
 import {
@@ -250,13 +251,17 @@ function StarCard({ star }: StarCardProps) {
     <Link href={`/star/${star.id}`}>
       <Card className={styles.star}>
         <CardActionArea>
-          <CardMedia>
-            <img
-              src={`${serverConfig.newApi}/star/${star.id}/image`}
-              // missing={star.image === null}
-              alt='star'
-              style={{ width: '100%', height: 'auto' }}
-            />
+          <CardMedia style={{ height: 200, textAlign: 'center' }}>
+            {star.image === null ? (
+              <MissingImage renderStyle='transform' scale={5} />
+            ) : (
+              <img
+                src={`${serverConfig.newApi}/star/${star.id}/image`}
+                // missing={star.image === null}
+                alt='star'
+                style={{ width: '100%', height: 'auto' }}
+              />
+            )}
           </CardMedia>
 
           <Grid container justifyContent='center' className={styles.title}>

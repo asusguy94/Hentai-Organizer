@@ -549,7 +549,7 @@ function Franchise({ video }: FranchiseProps) {
                 src={`${serverConfig.newApi}/video/${v.id}/cover`}
                 // missing={v.image === null}
                 alt='video'
-                style={{ width: '100%', height: 'auto' }}
+                style={{ width: '100%', height: '100%' }}
               />
             </Grid>
 

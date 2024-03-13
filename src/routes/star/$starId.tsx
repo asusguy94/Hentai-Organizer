@@ -204,7 +204,6 @@ function Video({ video }: { video: StarVideo }) {
 
   const thumbnail = useRef<NodeJS.Timeout>()
 
-  // eslint-disable-next-line @typescript-eslint/require-await
   const reload = async () => {
     setSrc(dataSrc)
     setDataSrc('')
@@ -242,7 +241,6 @@ function Video({ video }: { video: StarVideo }) {
     }, duration * 1000)
   }
 
-  // eslint-disable-next-line @typescript-eslint/require-await
   const stopThumbnailPlayback = async (video: HTMLVideoElement) => {
     stopFrom(video)
 
@@ -448,7 +446,6 @@ function StarTitle({ star, onModal: handleModal }: StarTitleProps) {
                     handleModal()
 
                     //@ts-expect-error: target is missing from MUI
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
                     renameStar(e.target.value)
                   }
                 }}
@@ -474,7 +471,6 @@ function StarTitle({ star, onModal: handleModal }: StarTitleProps) {
                     handleModal()
 
                     //@ts-expect-error: target is missing from MUI
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
                     setLink(e.target.value)
                   }
                 }}

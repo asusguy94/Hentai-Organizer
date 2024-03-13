@@ -145,7 +145,6 @@ export default function VideoPlayer({ video, bookmarks, categories, stars, playe
                     modal.handler()
 
                     //@ts-expect-error: target is undefined in MUI
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
                     renameVideo(e.target.value)
                   }
                 }}

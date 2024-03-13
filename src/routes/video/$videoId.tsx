@@ -444,7 +444,6 @@ function StarInput({ video, stars, bookmarks, getAttributes }: StarInputProps) {
 
                 // Reset focused state
                 //@ts-expect-error: target is missing from MUI
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-call
                 e.target.blur()
               }
             }}

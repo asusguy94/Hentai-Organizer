@@ -100,7 +100,6 @@ function HeaderTitle({ video, onModal, isValid }: HeaderTitleProps) {
                     onModal()
 
                     //@ts-expect-error: target is missing from MUI
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
                     renameTitle(e.target.value)
                   }
                 }}
@@ -125,7 +124,6 @@ function HeaderTitle({ video, onModal, isValid }: HeaderTitleProps) {
                     onModal()
 
                     //@ts-expect-error: target is missing from MUI
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
                     renameFranchise(e.target.value)
                   }
                 }}
@@ -151,7 +149,6 @@ function HeaderTitle({ video, onModal, isValid }: HeaderTitleProps) {
                 onKeyDown={e => {
                   if (e.key === 'Enter') {
                     //@ts-expect-error: target is missing from MUI
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                     const value: string = e.target.value
 
                     // Only submit data if all lowercase
@@ -202,7 +199,6 @@ function HeaderSlug({ video, onModal }: HeaderSlugProps) {
             onKeyDown={e => {
               if (e.key === 'Enter') {
                 //@ts-expect-error: target is missing from MUI
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                 const value: string = e.target.value
 
                 // Only submit data if all lowercase

@@ -544,13 +544,16 @@ function Franchise({ video }: FranchiseProps) {
       {video.related.map(v => (
         <a href={`/video/${v.id}`} key={v.id}>
           <Grid container component={Card} className={styles.episode}>
-            <Grid item xs={2} className={styles.thumbnail}>
-              <img
-                src={`${serverConfig.newApi}/video/${v.id}/cover`}
-                // missing={v.image === null}
-                alt='video'
-                style={{ width: '100%', height: '100%' }}
-              />
+            <Grid item xs={2} className={styles.thumbnail} justifyContent='center'>
+              {v.image === null ? (
+                <MissingImage />
+              ) : (
+                <img
+                  src={`${serverConfig.newApi}/video/${v.id}/cover`}
+                  style={{ width: '100%', height: '100%' }}
+                  alt='video'
+                />
+              )}
             </Grid>
 
             <Grid className={styles.title}>

@@ -251,15 +251,14 @@ function StarCard({ star }: StarCardProps) {
     <Link href={`/star/${star.id}`}>
       <Card className={styles.star}>
         <CardActionArea>
-          <CardMedia style={{ height: 200, textAlign: 'center' }}>
+          <CardMedia style={{ height: 275, textAlign: 'center' }}>
             {star.image === null ? (
               <MissingImage renderStyle='transform' scale={5} />
             ) : (
               <img
                 src={`${serverConfig.newApi}/star/${star.id}/image`}
-                // missing={star.image === null}
                 alt='star'
-                style={{ width: '100%', height: 'auto' }}
+                style={{ width: '100%', height: '100%' }}
               />
             )}
           </CardMedia>

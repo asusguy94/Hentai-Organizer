@@ -2,7 +2,7 @@ import ImageNotSupportedOutlinedIcon from '@mui/icons-material/ImageNotSupported
 
 type MissingImageProps = {
   scale?: number
-  renderStyle?: 'transform'
+  renderStyle?: 'height' | 'transform'
 }
 
 export default function MissingImage({ scale = 1, renderStyle }: MissingImageProps) {
@@ -13,7 +13,11 @@ export default function MissingImage({ scale = 1, renderStyle }: MissingImagePro
       color='action'
       fontSize='large'
       style={{
-        ...(renderStyle === 'transform' ? { transform: 'translateY(50%)' } : {}),
+        ...(renderStyle === 'height'
+          ? { height: '100%' }
+          : renderStyle === 'transform'
+            ? { transform: 'translateY(50%)' }
+            : {}),
         scale: scale.toString()
       }}
     />

@@ -4,6 +4,7 @@ import {
   Button,
   Card,
   CardActionArea,
+  CardMedia,
   FormControl,
   Grid,
   RadioGroup,
@@ -15,6 +16,7 @@ import {
 import { Link, createFileRoute } from '@tanstack/react-router'
 import ScrollToTop from 'react-scroll-to-top'
 
+import MissingImage from '@/components/image/missing'
 import { RegularHandlerProps } from '@/components/indeterminate'
 import Ribbon, { RibbonContainer } from '@/components/ribbon'
 import { FilterCheckbox, FilterDropdown, isDefault } from '@/components/search/filter'
@@ -295,12 +297,17 @@ function VideoCard({ video }: VideoCardProps) {
     <Link to='/video/$videoId' params={{ videoId: video.id }}>
       <RibbonContainer component={Card} className={styles.video}>
         <CardActionArea>
-          <img
-            src={`${serverConfig.newApi}/video/${video.id}/cover`}
-            // missing={video.cover === null}
-            style={{ width: '100%', height: 'auto' }}
-            alt='video'
-          />
+          <CardMedia style={{ height: 275, textAlign: 'center' }}>
+            {video.cover === null ? (
+              <MissingImage renderStyle='height' scale={5} />
+            ) : (
+              <img
+                src={`${serverConfig.newApi}/video/${video.id}/cover`}
+                style={{ width: '100%', height: '100%' }}
+                alt='video'
+              />
+            )}
+          </CardMedia>
 
           <Grid container justifyContent='center' className={styles.title}>
             <Typography className='text-center'>{video.name}</Typography>

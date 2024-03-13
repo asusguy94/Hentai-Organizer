@@ -3,6 +3,7 @@ import { Grid } from '@mui/material'
 import { Link, createLazyFileRoute } from '@tanstack/react-router'
 import capitalize from 'capitalize'
 
+import MissingImage from '@/components/image/missing'
 import Ribbon, { RibbonContainer } from '@/components/ribbon'
 
 import { serverConfig } from '@/config'
@@ -42,22 +43,26 @@ function Column({ label, cols, rows = 1 }: ColumnProps) {
           return (
             <Grid item xs={1} key={video.id} style={isMissing ? { textAlign: 'center' } : {}}>
               <Link to='/video/$videoId' params={{ videoId: video.id }}>
-                <RibbonContainer style={{ color: 'black' }}>
-                  <img
-                    src={`${serverConfig.newApi}/video/${video.id}/cover`}
-                    // missing={isMissing}
-                    alt='video'
-                    style={{
-                      width: '100%',
-                      height: 'auto',
-                      border: '1px solid #dee2e6',
-                      borderRadius: '0.25rem'
-                    }}
-                  />
+                <RibbonContainer>
+                  {isMissing ? (
+                    <MissingImage />
+                  ) : (
+                    <img
+                      src={`${serverConfig.newApi}/video/${video.id}/cover`}
+                      alt='video'
+                      style={{
+                        width: '100%',
+                        height: 'auto',
+                        border: '1px solid #dee2e6',
+                        borderRadius: '0.25rem'
+                      }}
+                    />
+                  )}
 
                   <div
                     style={{
                       textAlign: 'center',
+                      color: 'black',
                       // Restrict to 3 lines
                       WebkitLineClamp: 3,
                       display: '-webkit-box',

@@ -139,9 +139,6 @@ function StarImageDropbox({ star, videos }: StarImageDropboxProps) {
 
   const addImage = (image: string) => {
     mutate({ url: image })
-
-    // reload is require for context-menu to update
-    location.reload()
   }
 
   const removeImage = () => {

@@ -12,7 +12,7 @@ import {
   Typography
 } from '@mui/material'
 
-import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
+import { Link, createFileRoute } from '@tanstack/react-router'
 import { ContextMenu, ContextMenuTrigger, ContextMenuItem } from 'rctx-contextmenu'
 
 import Dropbox from '@/components/dropbox'
@@ -134,27 +134,20 @@ type StarImageDropboxProps = {
   videos: StarVideo[]
 }
 function StarImageDropbox({ star, videos }: StarImageDropboxProps) {
-  const navigate = useNavigate()
-  const { mutate } = starService.useAddImage(star.id)
+  const { mutate: mutateAddImage } = starService.useAddImage(star.id)
+  const { mutate: mutateRemoveImage } = starService.useRemoveImage(star.id)
+  const { mutate: mutateRemoveStar } = starService.useRemoveStar(star.id)
 
   const addImage = (image: string) => {
-    mutate({ url: image })
+    mutateAddImage({ url: image })
   }
 
   const removeImage = () => {
-    starService.removeImage(star.id).then(() => {
-      // reload is require for context-menu to update
-      location.reload()
-    })
+    mutateRemoveImage()
   }
 
   const removeStar = () => {
-    starService.removeStar(star.id).then(() => {
-      navigate({
-        to: '/',
-        replace: true
-      })
-    })
+    mutateRemoveStar()
   }
 
   return (
@@ -396,16 +389,15 @@ type StarTitleProps = {
   onModal: ModalHandler
 }
 function StarTitle({ star, onModal: handleModal }: StarTitleProps) {
+  const { mutate: mutateRenameStar } = starService.useRenameStar(star.id)
+  const { mutate: mutateSetLink } = starService.useSetLink(star.id)
+
   const renameStar = (name: string) => {
-    starService.renameStar(star.id, name).then(() => {
-      location.reload()
-    })
+    mutateRenameStar({ name })
   }
 
   const setLink = (link: string) => {
-    starService.setLink(star.id, link).then(() => {
-      location.reload()
-    })
+    mutateSetLink({ value: link })
   }
 
   return (

@@ -1,10 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useNavigate } from '@tanstack/react-router'
 
 import { createApi } from '@/config'
 import { StarVideo } from '@/interface'
 import { keys } from '@/keys'
 
-const { api, legacyApi } = createApi('/star')
+const { api } = createApi('/star')
 
 type StarInfo = {
   breast: string[]
@@ -67,10 +68,56 @@ export default {
 
     return { mutate }
   },
-  removeImage: (id: number) => legacyApi.delete(`/${id}/image`),
-  removeStar: (id: number) => legacyApi.delete(`/${id}`),
-  renameStar: (id: number, name: string) => legacyApi.put(`/${id}`, { name }),
-  setLink: (id: number, value: string) => legacyApi.put(`/${id}`, { label: 'starLink', value }),
+  useRemoveImage: (id: number) => {
+    const { mutate } = useMutation({
+      mutationKey: ['star', id, 'removeImage'],
+      mutationFn: () => api.delete(`/${id}/image`),
+      onSuccess: () => {
+        // reload required for context-menu to update
+        location.reload()
+      }
+    })
+
+    return { mutate }
+  },
+  useRemoveStar: (id: number) => {
+    const navigate = useNavigate()
+
+    const { mutate } = useMutation({
+      mutationKey: ['star', id, 'remove'],
+      mutationFn: () => api.delete(`/${id}`),
+      onSuccess: () => {
+        navigate({
+          to: '/',
+          replace: true
+        })
+      }
+    })
+
+    return { mutate }
+  },
+  useRenameStar: (id: number) => {
+    const queryClient = useQueryClient()
+
+    const { mutate } = useMutation<unknown, Error, { name: string }>({
+      mutationKey: ['star', id, 'rename'],
+      mutationFn: payload => api.put(`/${id}`, payload),
+      onSuccess: () => queryClient.invalidateQueries({ ...keys.star.byId(id) })
+    })
+
+    return { mutate }
+  },
+  useSetLink: (id: number) => {
+    const queryClient = useQueryClient()
+
+    const { mutate } = useMutation<unknown, Error, { value: string }>({
+      mutationKey: ['star', id, 'setLink'],
+      mutationFn: payload => api.put(`/${id}`, { label: 'starLink', ...payload }),
+      onSuccess: () => queryClient.invalidateQueries({ ...keys.star.byId(id) })
+    })
+
+    return { mutate }
+  },
   useVideos: (id: number) => {
     const query = useQuery<StarVideo[]>({
       ...keys.star.byId(id)._ctx.video,

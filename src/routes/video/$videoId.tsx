@@ -291,7 +291,7 @@ function Star({ video, star, bookmarks, attributes, categories, onModal, starEve
     const attributeIds = starBookmarks.map(bookmark => bookmark.attributes.map(attribute => attribute.id))
     const commonAttributeIds = attributeIds.reduce(
       (common, ids) => common.filter(id => ids.includes(id)),
-      attributeIds.shift() || []
+      attributeIds.shift() ?? []
     )
 
     return commonAttributeIds
@@ -443,8 +443,7 @@ function StarInput({ video, stars, bookmarks, getAttributes }: StarInputProps) {
                 setInput('')
 
                 // Reset focused state
-                //@ts-expect-error: target is missing from MUI
-                e.target.blur()
+                ;(e.target as HTMLInputElement).blur()
               }
             }}
             disabled={video.noStar}

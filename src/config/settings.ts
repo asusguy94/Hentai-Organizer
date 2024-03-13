@@ -1,10 +1,12 @@
 function getValueWithType<T>(label: string, defaultValue: T): T {
   try {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const value = import.meta.env[label] ?? localStorage.getItem(label)
 
     if (value !== null) {
       try {
         // Always attempt JSON parsing first
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         return JSON.parse(value) as T
       } catch {
         // If it fails, treat the value as a raw string

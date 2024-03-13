@@ -144,8 +144,7 @@ export default function VideoPlayer({ video, bookmarks, categories, stars, playe
                   if (e.key === 'Enter') {
                     modal.handler()
 
-                    //@ts-expect-error: target is undefined in MUI
-                    renameVideo(e.target.value)
+                    renameVideo((e.target as HTMLInputElement).value)
                   }
                 }}
               />

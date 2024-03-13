@@ -99,8 +99,7 @@ function HeaderTitle({ video, onModal, isValid }: HeaderTitleProps) {
                   if (e.key === 'Enter') {
                     onModal()
 
-                    //@ts-expect-error: target is missing from MUI
-                    renameTitle(e.target.value)
+                    renameTitle((e.target as HTMLInputElement).value)
                   }
                 }}
               />
@@ -123,8 +122,7 @@ function HeaderTitle({ video, onModal, isValid }: HeaderTitleProps) {
                   if (e.key === 'Enter') {
                     onModal()
 
-                    //@ts-expect-error: target is missing from MUI
-                    renameFranchise(e.target.value)
+                    renameFranchise((e.target as HTMLInputElement).value)
                   }
                 }}
               />
@@ -148,8 +146,7 @@ function HeaderTitle({ video, onModal, isValid }: HeaderTitleProps) {
                 autoFocus
                 onKeyDown={e => {
                   if (e.key === 'Enter') {
-                    //@ts-expect-error: target is missing from MUI
-                    const value: string = e.target.value
+                    const value: string = (e.target as HTMLInputElement).value
 
                     // Only submit data if all lowercase
                     if (value === value.toLowerCase()) {
@@ -198,8 +195,7 @@ function HeaderSlug({ video, onModal }: HeaderSlugProps) {
             autoFocus
             onKeyDown={e => {
               if (e.key === 'Enter') {
-                //@ts-expect-error: target is missing from MUI
-                const value: string = e.target.value
+                const value: string = (e.target as HTMLInputElement).value
 
                 // Only submit data if all lowercase
                 if (value === value.toLowerCase()) {

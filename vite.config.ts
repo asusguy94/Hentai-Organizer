@@ -6,5 +6,22 @@ import { defineConfig } from 'vite'
 export default defineConfig({
   plugins: [react(), TanStackRouterVite()],
   resolve: { alias: { '@': '/src' } },
-  server: { port: 3000 }
+  server: { port: 3000 },
+  preview: { port: 3000 },
+  build: {
+    outDir: 'dist',
+    emptyOutDir: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          react: ['react'],
+          'react-dom': ['react-dom', 'react-dom/server'],
+          '@tanstack': ['@tanstack/react-router', '@tanstack/react-query'],
+          'react-toastify': ['react-toastify'],
+          '@mui': ['@mui/material'],
+          '@vidstack': ['@vidstack/react']
+        }
+      }
+    }
+  }
 })

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 
 import { Button, Grid, TextField } from '@mui/material'
 
-import { createLazyFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import { useLocalStorage } from 'usehooks-ts'
 
 import { SettingKey, SettingValue, Settings, defaultSettings, keys, settingsKey } from '@/components/settings'
@@ -10,7 +10,7 @@ import { SettingKey, SettingValue, Settings, defaultSettings, keys, settingsKey 
 import { SetState } from '@/interface'
 import { clamp } from '@/utils/shared'
 
-export const Route = createLazyFileRoute('/settings')({
+export const Route = createFileRoute('/settings')({
   component: SettingsPage
 })
 

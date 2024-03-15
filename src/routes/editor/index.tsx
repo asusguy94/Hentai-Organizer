@@ -15,7 +15,7 @@ import {
 } from '@mui/material'
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { createLazyFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import capitalize from 'capitalize'
 
 import { createApi } from '@/config'
@@ -34,7 +34,7 @@ type TableKeys = 'attribute' | 'category' | 'outfit'
 type OnlyType = 'starOnly' | 'videoOnly'
 type WithOnlyType = General & Partial<Record<OnlyType, boolean>>
 
-export const Route = createLazyFileRoute('/editor/')({
+export const Route = createFileRoute('/editor/')({
   component: () => (
     <Grid container justifyContent='center'>
       <Table name='attribute' obj={['starOnly', 'videoOnly']} />

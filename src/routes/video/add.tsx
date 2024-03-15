@@ -13,16 +13,16 @@ import {
   Paper
 } from '@mui/material'
 
-import { createLazyFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 
 import MuiProgress from '@/components/progress'
 import Spinner from '@/components/spinner'
 
 import { generateService, videoService } from '@/service'
-import socket from '@/utils/pusher/client'
+import socket from '@/utils/pusher'
 import { EventsForChannel } from '@/utils/pusher/types'
 
-export const Route = createLazyFileRoute('/video/add')({
+export const Route = createFileRoute('/video/add')({
   component: AddVideo
 })
 

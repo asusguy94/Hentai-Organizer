@@ -10,7 +10,7 @@ import {
   Typography
 } from '@mui/material'
 
-import { createLazyFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import ScrollToTop from 'react-scroll-to-top'
 
 import MissingImage from '@/components/image/missing'
@@ -33,7 +33,7 @@ import { searchService, starService } from '@/service'
 
 import styles from './search.module.scss'
 
-export const Route = createLazyFileRoute('/star/search')({
+export const Route = createFileRoute('/star/search')({
   component: () => (
     <Grid container>
       <Grid item xs={2} id={styles.sidebar}>

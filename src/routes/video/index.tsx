@@ -1,11 +1,11 @@
 import { Grid, List, ListItemButton, ListItemText, Typography } from '@mui/material'
 
-import { Link, createLazyFileRoute } from '@tanstack/react-router'
+import { Link, createFileRoute } from '@tanstack/react-router'
 
 import { General } from '@/interface'
 import { videoService } from '@/service'
 
-export const Route = createLazyFileRoute('/video/')({
+export const Route = createFileRoute('/video/')({
   component: VideosPage
 })
 

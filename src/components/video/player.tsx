@@ -25,7 +25,8 @@ type VideoPlayerProps = {
 }
 export default function VideoPlayer({ video, bookmarks, categories, stars, playerRef, modal }: VideoPlayerProps) {
   const navigate = useNavigate()
-  const { mutate } = videoService.useAddBookmark(video.id)
+  const { mutate: mutateAddBookmark } = videoService.useAddBookmark(video.id)
+  const { mutate: mutateToggleCensor } = videoService.useToggleCensor(video.id)
 
   const copy = () => {
     navigator.clipboard.writeText(video.path.file.slice(0, -4))
@@ -44,9 +45,7 @@ export default function VideoPlayer({ video, bookmarks, categories, stars, playe
   }
 
   const censorToggle = () => {
-    videoService.toggleCensor(video.id, video.censored).then(() => {
-      location.reload()
-    })
+    mutateToggleCensor({ cen: !video.censored })
   }
 
   const updateVideo = () => {
@@ -73,7 +72,7 @@ export default function VideoPlayer({ video, bookmarks, categories, stars, playe
     if (player !== null) {
       const time = Math.round(player.currentTime)
       if (time) {
-        mutate({ categoryID: category.id, time })
+        mutateAddBookmark({ categoryID: category.id, time })
       }
     }
   }

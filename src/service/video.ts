@@ -15,7 +15,17 @@ type HomeVideo = {
 
 export default {
   renameVideo: (id: number, path: string) => legacyApi.put(`/${id}`, { path }),
-  toggleCensor: (id: number, censored: boolean) => legacyApi.put(`/${id}`, { cen: !censored }),
+  useToggleCensor: (id: number) => {
+    const queryClient = useQueryClient()
+
+    const { mutate } = useMutation<unknown, Error, { cen: boolean }>({
+      mutationKey: ['video', id, 'toggleCensor'],
+      mutationFn: payload => legacyApi.put(`/${id}`, payload),
+      onSuccess: () => queryClient.invalidateQueries({ ...keys.video.byId(id) })
+    })
+
+    return { mutate }
+  },
   updateVideo: (id: number) => legacyApi.put(`/${id}`),
   deleteVideo: (id: number) => legacyApi.delete(`/${id}`),
   useAddBookmark: (id: number) => {

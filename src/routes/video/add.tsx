@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import {
   Grid,
@@ -15,12 +15,9 @@ import {
 
 import { createFileRoute } from '@tanstack/react-router'
 
-import MuiProgress from '@/components/progress'
 import Spinner from '@/components/spinner'
 
 import { generateService, videoService } from '@/service'
-import socket from '@/utils/pusher'
-import { EventsForChannel } from '@/utils/pusher/types'
 
 export const Route = createFileRoute('/video/add')({
   component: AddVideo
@@ -39,8 +36,6 @@ function AddVideo() {
         <div className='text-center'>
           <Action label='Generate Metadata' callback={generateService.meta} />
           <Action label='Generate VTT' callback={generateService.vtt} />
-
-          <Progress />
         </div>
       ) : (
         <>
@@ -115,31 +110,4 @@ function Action({ label, callback, disabled = false }: ButtonProps) {
       {label}
     </Button>
   )
-}
-
-function Progress() {
-  return (
-    <div style={{ padding: '1em' }}>
-      <ProgressItem event='vtt' label='Thumbnails' />
-      <ProgressItem event='generate-video' label='Generate Video' />
-    </div>
-  )
-}
-
-type ProgressItemProps = {
-  event: EventsForChannel<'ffmpeg'>['name']
-  label: string
-}
-function ProgressItem({ event, label }: ProgressItemProps) {
-  const [progress, setProgress] = useState(0)
-
-  useEffect(() => {
-    const channel = socket.subscribe('ffmpeg', { name: event, callback: log => setProgress(log.progress) })
-
-    return () => {
-      socket.unsubscribe(channel)
-    }
-  }, [event])
-
-  return <MuiProgress label={label} value={Math.floor(progress * 100)} />
 }

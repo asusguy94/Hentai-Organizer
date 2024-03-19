@@ -13,7 +13,7 @@ import MissingImage from '../image/missing'
 import { ModalHandler } from '../modal'
 
 import { serverConfig } from '@/config'
-import useCollisionCheck from '@/hooks/useCollisionCheck'
+import useCollision from '@/hooks/useCollision'
 import { EventHandler } from '@/hooks/useStarEvent'
 import { Attribute, Bookmark, Category, VideoStar, Video, Outfit } from '@/interface'
 import { bookmarkService, outfitService } from '@/service'
@@ -46,7 +46,7 @@ export default function Timeline({
   const bookmarksRef = useRef<HTMLButtonElement[]>([])
   const [maxLevel, setMaxLevel] = useState(0)
   const [bookmarkLevels, setBookmarkLevels] = useState<number[]>([])
-  const { collisionCheck } = useCollisionCheck()
+  const { collisionCheck } = useCollision()
   const { data: outfits } = outfitService.useAll()
   const { mutate: mutateSetTime } = bookmarkService.useSetTime(video.id)
   const { mutate: mutateSetCategory } = bookmarkService.useSetCategory(video.id)

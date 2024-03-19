@@ -2,7 +2,7 @@ import { useCallback } from 'react'
 
 import { defaultSettings, useSettings } from '@/components/settings'
 
-export default function useCollisionCheck() {
+export default function useCollision() {
   const localSettings = useSettings()
 
   const collisionCheck = useCallback(

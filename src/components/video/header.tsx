@@ -8,7 +8,7 @@ import { ModalHandler } from '../modal'
 
 import { Video } from '@/interface'
 import { videoService } from '@/service'
-import { escapeRegExp } from '@/utils/shared'
+import { escapeRegExp } from '@/utils'
 
 import styles from './header.module.scss'
 

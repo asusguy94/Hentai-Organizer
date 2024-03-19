@@ -8,7 +8,7 @@ import { useLocalStorage } from 'usehooks-ts'
 import { SettingKey, SettingValue, Settings, defaultSettings, keys, settingsKey } from '@/components/settings'
 
 import { SetState } from '@/interface'
-import { clamp } from '@/utils/shared'
+import { clamp } from '@/utils'
 
 export const Route = createFileRoute('/settings')({
   component: SettingsPage

@@ -20,15 +20,15 @@ import { ContextMenu, ContextMenuTrigger, ContextMenuItem } from 'rctx-contextme
 
 import { IconWithText } from '@/components/icon'
 import MissingImage from '@/components/image/missing'
-import ModalComponent, { Modal, ModalHandler, useModal } from '@/components/modal'
 import Ribbon, { RibbonContainer } from '@/components/ribbon'
 import Spinner from '@/components/spinner'
 import { Header, Player, Timeline } from '@/components/video'
 
 import { serverConfig } from '@/config'
 import ActiveContextProvider, { useActiveContext } from '@/context/activeContext'
+import { useModalContext } from '@/context/modalContext'
 import useStarEvent, { type Event, type EventData, type EventHandler } from '@/hooks/useStarEvent'
-import { Attribute, Bookmark, Category, Video, VideoStar } from '@/interface'
+import { Attribute, Bookmark, Category, SetState, Video, VideoStar } from '@/interface'
 import { attributeService, bookmarkService, categoryService, videoService } from '@/service'
 import { escapeRegExp, getUnique } from '@/utils'
 
@@ -48,9 +48,6 @@ function VideoPage() {
   const { data: video } = videoService.useVideo(videoId)
   const { data: bookmarks } = videoService.useBookmarks(videoId)
 
-  const { modal, setModal } = useModal()
-  const { setEvent, getEvent, getDefault } = useStarEvent()
-
   if (
     attributes === undefined ||
     categories === undefined ||
@@ -63,28 +60,10 @@ function VideoPage() {
   return (
     <Grid container>
       <ActiveContextProvider>
-      <Section
-        video={video}
-        bookmarks={bookmarks}
-        categories={categories}
-        attributes={attributes}
-        stars={stars}
-        modal={{ handler: setModal, data: modal }}
-      />
+          <Section video={video} bookmarks={bookmarks} categories={categories} attributes={attributes} stars={stars} />
 
-      <Sidebar
-        video={video}
-        stars={stars}
-        bookmarks={bookmarks}
-        attributes={attributes}
-        categories={categories}
-        onModal={setModal}
-      />
+          <Sidebar video={video} stars={stars} bookmarks={bookmarks} attributes={attributes} categories={categories} />
       </ActiveContextProvider>
-
-      <ModalComponent visible={modal.visible} title={modal.title} filter={modal.filter} onClose={setModal}>
-        {modal.data}
-      </ModalComponent>
     </Grid>
   )
 }
@@ -95,27 +74,16 @@ type SectionProps = {
   categories: Category[]
   attributes: Attribute[]
   stars: VideoStar[]
-  modal: {
-    handler: ModalHandler
-    data: Modal
-  }
   setStarEvent: EventHandler
 }
-function Section({ video, bookmarks, categories, attributes, stars, modal, setStarEvent }: SectionProps) {
+function Section({ video, bookmarks, categories, attributes, stars, setStarEvent }: SectionProps) {
   const playerRef = useRef<MediaPlayerInstance>(null)
 
   return (
     <Grid item xs={9} component='section'>
-      <Header video={video} onModal={modal.handler} />
+      <Header video={video} />
 
-      <Player
-        playerRef={playerRef}
-        video={video}
-        bookmarks={bookmarks}
-        categories={categories}
-        stars={stars}
-        modal={modal}
-      />
+      <Player playerRef={playerRef} video={video} bookmarks={bookmarks} categories={categories} stars={stars} />
 
       <Timeline
         video={video}
@@ -124,7 +92,6 @@ function Section({ video, bookmarks, categories, attributes, stars, modal, setSt
         attributes={attributes}
         categories={categories}
         playerRef={playerRef}
-        onModal={modal.handler}
         setStarEvent={setStarEvent}
       />
     </Grid>
@@ -137,10 +104,9 @@ type SidebarProps = {
   bookmarks: Bookmark[]
   attributes: Attribute[]
   categories: Category[]
-  onModal: ModalHandler
   starEvent: { getEvent: Event; getDefault: EventData; setEvent: EventHandler }
 }
-function Sidebar({ video, stars, bookmarks, attributes, categories, onModal, starEvent }: SidebarProps) {
+function Sidebar({ video, stars, bookmarks, attributes, categories, starEvent }: SidebarProps) {
   const { setActive } = useActiveContext()
 
   const filteredAttributes = useMemo(
@@ -169,9 +135,7 @@ function Sidebar({ video, stars, bookmarks, attributes, categories, onModal, sta
           bookmarks={bookmarks}
           attributes={attributes}
           categories={categories}
-          onModal={onModal}
           starEvent={starEvent}
-          setActive={setActive.star}
         />
       </Grid>
 
@@ -190,10 +154,9 @@ type StarsProps = {
   bookmarks: Bookmark[]
   attributes: Attribute[]
   categories: Category[]
-  onModal: ModalHandler
   starEvent: { getEvent: Event; getDefault: EventData; setEvent: EventHandler }
 }
-function Stars({ video, stars, bookmarks, attributes, categories, onModal, starEvent }: StarsProps) {
+function Stars({ video, stars, bookmarks, attributes, categories, starEvent }: StarsProps) {
   const { setActive } = useActiveContext()
 
   const sortedStars = useMemo(() => {
@@ -214,7 +177,6 @@ function Stars({ video, stars, bookmarks, attributes, categories, onModal, starE
           bookmarks={bookmarks}
           attributes={attributes}
           categories={categories}
-          onModal={onModal}
           starEvent={starEvent}
           setActive={setActive.star}
         />
@@ -229,7 +191,6 @@ type StarProps = {
   bookmarks: Bookmark[]
   attributes: Attribute[]
   categories: Category[]
-  onModal: ModalHandler
   starEvent: {
     getEvent: Event
     setEvent: EventHandler
@@ -237,12 +198,14 @@ type StarProps = {
   }
   setActive: SetState<VideoStar | null>
 }
-function Star({ video, star, bookmarks, attributes, categories, onModal, starEvent, setActive }: StarProps) {
+function Star({ video, star, bookmarks, attributes, categories, starEvent, setActive }: StarProps) {
   const [border, setBorder] = useState(false)
   const { mutate: mutateAddBookmark } = videoService.useAddBookmark(video.id)
   const { mutate: mutateAddStar } = bookmarkService.useAddStar(video.id)
   const { mutate: mutateAddStarAttribute } = bookmarkService.useAddStarAttribute(video.id, star.id)
   const { mutate: mutateRemoveStar } = videoService.useRemoveStar(video.id)
+
+  const { setModal } = useModalContext()
 
   const removeStar = () => {
     mutateRemoveStar({ starID: star.id })
@@ -305,8 +268,8 @@ function Star({ video, star, bookmarks, attributes, categories, onModal, starEve
       item
       xs={4}
       onClick={starEvent.getEvent.event ? () => addStar(star) : undefined}
-      onMouseEnter={starEvent.getEvent.event ? () => setBorder(true) : undefined}
-      onMouseLeave={starEvent.getEvent.event ? () => setBorder(false) : undefined}
+      onMouseEnter={starEvent.getEvent.event ? () => setBorder(true) : () => setActive(star)}
+      onMouseLeave={starEvent.getEvent.event ? () => setBorder(false) : () => setActive(null)}
     >
       <motion.div layoutId={star.id.toString()}>
         <ContextMenuTrigger id={`star-${star.id}`}>
@@ -338,7 +301,7 @@ function Star({ video, star, bookmarks, attributes, categories, onModal, starEve
             text='Add Bookmark'
             onClick={() => {
               setActive(null)
-              onModal(
+              setModal(
                 'Add Bookmark',
                 categories.map(category => (
                   <Button
@@ -346,7 +309,7 @@ function Star({ video, star, bookmarks, attributes, categories, onModal, starEve
                     variant='outlined'
                     color='primary'
                     onClick={() => {
-                      onModal()
+                      setModal()
                       addBookmark(category, star)
                     }}
                   >
@@ -365,7 +328,7 @@ function Star({ video, star, bookmarks, attributes, categories, onModal, starEve
             disabled={bookmarks.every(bookmark => bookmark.starID !== star.id)}
             onClick={() => {
               setActive(null)
-              onModal(
+              setModal(
                 'Add Attribute',
                 attributes
                   .filter(attribute => !commonAttributes.includes(attribute.id))
@@ -375,7 +338,7 @@ function Star({ video, star, bookmarks, attributes, categories, onModal, starEve
                       variant='outlined'
                       color='primary'
                       onClick={() => {
-                        onModal()
+                        setModal()
                         addAttribute(attribute)
                       }}
                     >

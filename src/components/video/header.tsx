@@ -4,8 +4,8 @@ import { useNavigate } from '@tanstack/react-router'
 import { ContextMenu, ContextMenuTrigger, ContextMenuItem } from 'rctx-contextmenu'
 
 import Icon, { IconWithText } from '../icon'
-import { ModalHandler } from '../modal'
 
+import { useModalContext } from '@/context/modalContext'
 import { Video } from '@/interface'
 import { videoService } from '@/service'
 import { escapeRegExp } from '@/utils'
@@ -14,15 +14,14 @@ import styles from './header.module.scss'
 
 type HeaderProps = {
   video: Video
-  onModal: ModalHandler
 }
-export default function Header({ video, onModal }: HeaderProps) {
+export default function Header({ video }: HeaderProps) {
   return (
     <Grid container item alignItems='center' component='header' id={styles.header}>
-      <HeaderTitle video={video} onModal={onModal} isValid={video.isValid.title} />
+      <HeaderTitle video={video} isValid={video.isValid.title} />
 
       {video.slug === null ? (
-        <HeaderSlug video={video} onModal={onModal} />
+        <HeaderSlug video={video} />
       ) : (
         <>
           <InvalidFname video={video} isValid={video.isValid.fname} />
@@ -38,10 +37,11 @@ export default function Header({ video, onModal }: HeaderProps) {
 
 type HeaderTitleProps = {
   video: Video
-  onModal: ModalHandler
   isValid: boolean
 }
-function HeaderTitle({ video, onModal, isValid }: HeaderTitleProps) {
+function HeaderTitle({ video, isValid }: HeaderTitleProps) {
+  const { setModal } = useModalContext()
+
   const copyFranchise = () => {
     navigator.clipboard.writeText(video.franchise)
   }
@@ -90,14 +90,14 @@ function HeaderTitle({ video, onModal, isValid }: HeaderTitleProps) {
           icon='edit'
           text='Rename Title'
           onClick={() => {
-            onModal(
+            setModal(
               'Change Title',
               <TextField
                 defaultValue={video.name}
                 autoFocus
                 onKeyDown={e => {
                   if (e.key === 'Enter') {
-                    onModal()
+                    setModal()
 
                     renameTitle((e.target as HTMLInputElement).value)
                   }
@@ -112,7 +112,7 @@ function HeaderTitle({ video, onModal, isValid }: HeaderTitleProps) {
           icon='edit'
           text='Rename Franchise'
           onClick={() => {
-            onModal(
+            setModal(
               video.name.startsWith(video.franchise) ? 'Change Franchise & Title' : 'Change Franchise',
               <TextField
                 defaultValue={video.franchise}
@@ -120,7 +120,7 @@ function HeaderTitle({ video, onModal, isValid }: HeaderTitleProps) {
                 fullWidth
                 onKeyDown={e => {
                   if (e.key === 'Enter') {
-                    onModal()
+                    setModal()
 
                     renameFranchise((e.target as HTMLInputElement).value)
                   }
@@ -139,7 +139,7 @@ function HeaderTitle({ video, onModal, isValid }: HeaderTitleProps) {
           icon='edit'
           text='Set Slug'
           onClick={() => {
-            onModal(
+            setModal(
               'Set Slug',
               <TextField
                 defaultValue={video.slug}
@@ -150,7 +150,7 @@ function HeaderTitle({ video, onModal, isValid }: HeaderTitleProps) {
 
                     // Only submit data if all lowercase
                     if (value === value.toLowerCase()) {
-                      onModal()
+                      setModal()
                       setSlug(value)
                     }
                   }
@@ -175,9 +175,10 @@ function HeaderTitle({ video, onModal, isValid }: HeaderTitleProps) {
 
 type HeaderSlugProps = {
   video: Video
-  onModal: ModalHandler
 }
-function HeaderSlug({ video, onModal }: HeaderSlugProps) {
+function HeaderSlug({ video }: HeaderSlugProps) {
+  const { setModal } = useModalContext()
+
   const setSlug = (value: string) => {
     videoService.setSlug(video.id, value).then(() => {
       location.reload()
@@ -189,7 +190,7 @@ function HeaderSlug({ video, onModal }: HeaderSlugProps) {
       size='small'
       variant='outlined'
       onClick={() => {
-        onModal(
+        setModal(
           'Set Slug',
           <TextField
             autoFocus

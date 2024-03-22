@@ -9,57 +9,25 @@ import { Button, Card, Modal as MUIModal, Typography } from '@mui/material'
 
 import { useKey } from 'react-use'
 
+import { useModalContext } from '@/context/modalContext'
+
 import styles from './modal.module.scss'
 
-export type Modal = {
-  visible: boolean
-  title: string
-  data: React.ReactNode
-  filter: boolean
-}
-export type ModalHandler = (title?: Modal['title'], data?: Modal['data'], filter?: Modal['filter']) => void
+export default function ModalComponent() {
+  const { modal, setModal } = useModalContext()
 
-export function useModal() {
-  const [modal, setModal] = useState<Modal>({
-    visible: false,
-    title: '',
-    data: null,
-    filter: false
-  })
-
-  const handleModal: ModalHandler = (title = '', data = null, filter = false) => {
-    setModal(prevModal => ({
-      title,
-      data,
-      visible: !prevModal.visible,
-      filter
-    }))
-  }
-
-  return { modal, setModal: handleModal }
-}
-
-type ModalProps = {
-  title: string
-  visible: boolean
-  filter: boolean
-  children: React.ReactNode
-  onClose: () => void
-}
-
-export default function ModalComponent({ title, visible, filter, children, onClose }: ModalProps) {
   const [query, setQuery] = useState('')
 
   useEffect(() => {
     setQuery('')
-  }, [filter])
+  }, [modal.filter])
 
   const isLetter = (e: KeyboardEvent) => /^Key([A-Z])$/.test(e.code)
   const isSpace = (e: KeyboardEvent) => e.code === 'Space'
   const isBackspace = (e: KeyboardEvent) => e.code === 'Backspace'
 
   useKey(
-    e => filter && (isLetter(e) || isSpace(e) || isBackspace(e)),
+    e => modal.filter && (isLetter(e) || isSpace(e) || isBackspace(e)),
     e => {
       if (isBackspace(e)) {
         setQuery(prevQuery => prevQuery.slice(0, -1))
@@ -69,11 +37,11 @@ export default function ModalComponent({ title, visible, filter, children, onClo
     }
   )
 
-  if (!visible) return null
+  if (!modal.visible) return null
 
   return (
-    <ModalChild title={title} query={query} onClose={onClose} filter={filter}>
-      {children}
+    <ModalChild title={modal.title} query={query} onClose={setModal} filter={modal.filter}>
+      {modal.data}
     </ModalChild>
   )
 }

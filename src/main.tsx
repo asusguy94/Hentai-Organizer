@@ -6,7 +6,9 @@ import { RouterProvider, createRouter } from '@tanstack/react-router'
 import { toast } from 'react-toastify'
 
 import ErrorComponent from './components/error'
+import ModalComponent from './components/modal'
 import NotFoundComponent from './components/not-found'
+import ModalContextProvider from './context/modalContext'
 import { routeTree } from './routeTree.gen'
 
 const router = createRouter({ routeTree })
@@ -40,11 +42,15 @@ if (root === null) {
   ReactDOM.createRoot(root).render(
     <React.StrictMode>
       <QueryClientProvider client={client}>
-        <RouterProvider
-          router={router}
-          defaultErrorComponent={ErrorComponent}
-          defaultNotFoundComponent={NotFoundComponent}
-        />
+        <ModalContextProvider>
+          <RouterProvider
+            router={router}
+            defaultErrorComponent={ErrorComponent}
+            defaultNotFoundComponent={NotFoundComponent}
+          />
+
+          <ModalComponent />
+        </ModalContextProvider>
       </QueryClientProvider>
     </React.StrictMode>
   )

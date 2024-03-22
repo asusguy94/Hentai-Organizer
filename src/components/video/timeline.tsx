@@ -10,10 +10,10 @@ import { MediaPlayerInstance } from '@/components/vidstack'
 
 import { IconWithText } from '../icon'
 import MissingImage from '../image/missing'
-import { ModalHandler } from '../modal'
 
 import { serverConfig } from '@/config'
 import { useActiveContext } from '@/context/activeContext'
+import { useModalContext } from '@/context/modalContext'
 import useCollision from '@/hooks/useCollision'
 import { EventHandler } from '@/hooks/useStarEvent'
 import { Attribute, Bookmark, Category, VideoStar, Video, Outfit } from '@/interface'
@@ -30,19 +30,9 @@ type TimelineProps = {
   attributes: Attribute[]
   categories: Category[]
   playerRef: React.RefObject<MediaPlayerInstance>
-  onModal: ModalHandler
   setStarEvent: EventHandler
 }
-export default function Timeline({
-  video,
-  bookmarks,
-  stars,
-  attributes,
-  categories,
-  playerRef,
-  onModal,
-  setStarEvent
-}: TimelineProps) {
+export default function Timeline({ video, bookmarks, stars, attributes, categories, playerRef,setStarEvent }: TimelineProps) {
   const windowSize = useWindowSize()
   const bookmarksRef = useRef<HTMLButtonElement[]>([])
   const [maxLevel, setMaxLevel] = useState(0)
@@ -58,6 +48,7 @@ export default function Timeline({
   const { mutate: mutateRemoveStar } = bookmarkService.useRemoveStar(video.id)
 
   const { active } = useActiveContext()
+  const { setModal } = useModalContext()
 
   useEffect(() => {
     const bookmarksArr = bookmarks.length > 0 ? bookmarksRef.current : []
@@ -267,7 +258,7 @@ export default function Timeline({
                 icon='add'
                 text='Add Attribute'
                 onClick={() => {
-                  onModal(
+                  setModal(
                     'Add Attribute',
                     attributes
                       .filter(attribute => bookmark.attributes.every(attr => attribute.name !== attr.name))
@@ -277,7 +268,7 @@ export default function Timeline({
                           variant='outlined'
                           color='primary'
                           onClick={() => {
-                            onModal()
+                            setModal()
                             addAttribute(attribute, bookmark)
                           }}
                         >
@@ -295,7 +286,7 @@ export default function Timeline({
                 text='Remove Attribute'
                 disabled={attributesFromStar(bookmark.starID).length >= bookmark.attributes.length}
                 onClick={() => {
-                  onModal(
+                  setModal(
                     'Remove Attribute',
                     bookmark.attributes
                       // only show attribute, if not from star
@@ -306,7 +297,7 @@ export default function Timeline({
                           variant='outlined'
                           color='primary'
                           onClick={() => {
-                            onModal()
+                            setModal()
                             removeAttribute(bookmark, attribute)
                           }}
                         >
@@ -333,7 +324,7 @@ export default function Timeline({
                 icon='add'
                 text='Set Outfit'
                 onClick={() => {
-                  onModal(
+                  setModal(
                     'Set Outfit',
                     outfits
                       ?.filter(outfit => outfit.name !== bookmark.outfit)
@@ -343,7 +334,7 @@ export default function Timeline({
                           variant='outlined'
                           color='primary'
                           onClick={() => {
-                            onModal()
+                            setModal()
                             setOutfit(outfit, bookmark)
                           }}
                         >
@@ -370,7 +361,7 @@ export default function Timeline({
                 icon='edit'
                 text='Change Category'
                 onClick={() => {
-                  onModal(
+                  setModal(
                     'Change Category',
                     categories
                       .filter(category => category.name !== bookmark.name)
@@ -380,7 +371,7 @@ export default function Timeline({
                           variant='outlined'
                           color='primary'
                           onClick={() => {
-                            onModal()
+                            setModal()
                             setCategory(category, bookmark)
                           }}
                         >

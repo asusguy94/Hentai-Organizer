@@ -6,9 +6,9 @@ import { ContextMenu, ContextMenuTrigger, ContextMenuItem } from 'rctx-contextme
 import Player, { MediaPlayerInstance } from '@/components/vidstack'
 
 import { IconWithText } from '../icon'
-import { Modal, ModalHandler } from '../modal'
 
 import { serverConfig } from '@/config'
+import { useModalContext } from '@/context/modalContext'
 import { Bookmark, Category, Video, VideoStar } from '@/interface'
 import { videoService } from '@/service'
 
@@ -18,15 +18,13 @@ type VideoPlayerProps = {
   categories: Category[]
   stars: VideoStar[]
   playerRef: React.RefObject<MediaPlayerInstance>
-  modal: {
-    handler: ModalHandler
-    data: Modal
-  }
 }
-export default function VideoPlayer({ video, bookmarks, categories, stars, playerRef, modal }: VideoPlayerProps) {
+export default function VideoPlayer({ video, bookmarks, categories, stars, playerRef }: VideoPlayerProps) {
   const navigate = useNavigate()
   const { mutate: mutateAddBookmark } = videoService.useAddBookmark(video.id)
   const { mutate: mutateToggleCensor } = videoService.useToggleCensor(video.id)
+
+  const { modal, setModal } = useModalContext()
 
   const copy = () => {
     navigator.clipboard.writeText(video.path.file.slice(0, -4))
@@ -91,7 +89,7 @@ export default function VideoPlayer({ video, bookmarks, categories, stars, playe
             video: `${serverConfig.newApi}/video/${video.id}/file`,
             hls: `${serverConfig.newApi}/video/${video.id}/hls`
           }}
-          modal={modal.data}
+          modal={modal}
         />
       </ContextMenuTrigger>
 
@@ -102,7 +100,7 @@ export default function VideoPlayer({ video, bookmarks, categories, stars, playe
           text='Add Bookmark'
           disabled={video.noStar}
           onClick={() => {
-            modal.handler(
+            setModal(
               'Add Bookmark',
               categories.map(category => (
                 <Button
@@ -110,7 +108,7 @@ export default function VideoPlayer({ video, bookmarks, categories, stars, playe
                   color='primary'
                   key={category.id}
                   onClick={() => {
-                    modal.handler()
+                    setModal()
                     addBookmark(category)
                   }}
                 >
@@ -134,14 +132,14 @@ export default function VideoPlayer({ video, bookmarks, categories, stars, playe
           icon='edit'
           text='Rename Video'
           onClick={() => {
-            modal.handler(
+            setModal(
               'Rename Video',
               <TextField
                 defaultValue={video.path.file}
                 autoFocus
                 onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
                   if (e.key === 'Enter') {
-                    modal.handler()
+                    setModal()
 
                     renameVideo((e.target as HTMLInputElement).value)
                   }

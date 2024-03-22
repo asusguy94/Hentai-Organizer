@@ -17,10 +17,10 @@ import { ContextMenu, ContextMenuTrigger, ContextMenuItem } from 'rctx-contextme
 
 import Dropbox from '@/components/dropbox'
 import { IconWithText } from '@/components/icon'
-import ModalComponent, { ModalHandler, useModal } from '@/components/modal'
 import Spinner from '@/components/spinner'
 
 import { serverConfig } from '@/config'
+import { useModalContext } from '@/context/modalContext'
 import { StarVideo } from '@/interface'
 import { starService } from '@/service'
 
@@ -49,7 +49,6 @@ export default function StarPage() {
 
   const { data: star } = starService.useStar(starId)
   const { data: videos } = starService.useVideos(starId)
-  const { modal, setModal } = useModal()
 
   if (star === undefined || videos === undefined) return <Spinner />
 
@@ -58,14 +57,10 @@ export default function StarPage() {
       <Grid item xs={6}>
         <div id={styles.star}>
           <StarImageDropbox star={star} videos={videos} />
-          <StarTitle star={star} onModal={setModal} />
+          <StarTitle star={star} />
           <StarForm star={star} />
           <Videos videos={videos} />
         </div>
-
-        <ModalComponent visible={modal.visible} title={modal.title} filter={modal.filter} onClose={setModal}>
-          {modal.data}
-        </ModalComponent>
       </Grid>
     </Grid>
   )
@@ -388,11 +383,12 @@ function StarAttributes({ remove, data }: StarAttributesProps) {
 
 type StarTitleProps = {
   star: Star
-  onModal: ModalHandler
 }
-function StarTitle({ star, onModal: handleModal }: StarTitleProps) {
+function StarTitle({ star }: StarTitleProps) {
   const { mutate: mutateRenameStar } = starService.useRenameStar(star.id)
   const { mutate: mutateSetLink } = starService.useSetLink(star.id)
+
+  const { setModal } = useModalContext()
 
   const renameStar = (name: string) => {
     mutateRenameStar({ name })
@@ -428,7 +424,7 @@ function StarTitle({ star, onModal: handleModal }: StarTitleProps) {
           icon='edit'
           text='Rename'
           onClick={() => {
-            handleModal(
+            setModal(
               'Rename',
               <TextField
                 defaultValue={star.name}
@@ -437,7 +433,7 @@ function StarTitle({ star, onModal: handleModal }: StarTitleProps) {
                   if (e.key === 'Enter') {
                     e.preventDefault()
 
-                    handleModal()
+                    setModal()
 
                     renameStar((e.target as HTMLInputElement).value)
                   }
@@ -452,7 +448,7 @@ function StarTitle({ star, onModal: handleModal }: StarTitleProps) {
           icon='edit'
           text='Set Link'
           onClick={() => {
-            handleModal(
+            setModal(
               'Set Link',
               <TextField
                 defaultValue={star.link}
@@ -461,7 +457,7 @@ function StarTitle({ star, onModal: handleModal }: StarTitleProps) {
                   if (e.key === 'Enter') {
                     e.preventDefault()
 
-                    handleModal()
+                    setModal()
 
                     setLink((e.target as HTMLInputElement).value)
                   }

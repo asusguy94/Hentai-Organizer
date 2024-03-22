@@ -35,50 +35,44 @@ function Column({ label, cols, rows = 1 }: ColumnProps) {
       </h2>
 
       <Grid container spacing={2} columns={cols}>
-        {videos.map(video => {
-          const isMissing = video.image === null
-
-          // TODO when hovering over the link, increase the border-opacity
-
-          return (
-            <Grid item xs={1} key={video.id} style={isMissing ? { textAlign: 'center' } : {}}>
-              <Link to='/video/$videoId' params={{ videoId: video.id }}>
-                <RibbonContainer>
-                  {isMissing ? (
-                    <MissingImage />
-                  ) : (
-                    <img
-                      src={`${serverConfig.newApi}/video/${video.id}/cover`}
-                      alt='video'
-                      style={{
-                        width: '100%',
-                        height: 'auto',
-                        border: '1px solid #dee2e6',
-                        borderRadius: '0.25rem'
-                      }}
-                    />
-                  )}
-
-                  <div
+        {videos.map(video => (
+          <Grid item xs={1} key={video.id}>
+            <Link to='/video/$videoId' params={{ videoId: video.id }}>
+              <RibbonContainer style={{ textAlign: 'center' }}>
+                {video.image === null ? (
+                  <MissingImage />
+                ) : (
+                  <img
+                    src={`${serverConfig.newApi}/video/${video.id}/cover`}
+                    alt='video'
                     style={{
-                      textAlign: 'center',
-                      color: 'black',
-                      // Restrict to 3 lines
-                      WebkitLineClamp: 3,
-                      display: '-webkit-box',
-                      WebkitBoxOrient: 'vertical',
-                      overflow: 'hidden'
+                      width: '100%',
+                      height: 'auto',
+                      border: '1px solid #dee2e6',
+                      borderRadius: '0.25rem'
                     }}
-                  >
-                    {video.name}
-                  </div>
+                  />
+                )}
 
-                  {video.total !== undefined && <Ribbon label={video.total.toString()} />}
-                </RibbonContainer>
-              </Link>
-            </Grid>
-          )
-        })}
+                <div
+                  style={{
+                    textAlign: 'center',
+                    color: 'black',
+                    // Restrict to 3 lines
+                    WebkitLineClamp: 3,
+                    display: '-webkit-box',
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden'
+                  }}
+                >
+                  {video.name}
+                </div>
+
+                {video.total !== undefined && <Ribbon label={video.total.toString()} />}
+              </RibbonContainer>
+            </Link>
+          </Grid>
+        ))}
       </Grid>
     </Grid>
   )

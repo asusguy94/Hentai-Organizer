@@ -27,7 +27,7 @@ import { Header, Player, Timeline } from '@/components/video'
 import { serverConfig } from '@/config'
 import ActiveContextProvider, { useActiveContext } from '@/context/activeContext'
 import { useModalContext } from '@/context/modalContext'
-import useStarEvent, { type Event, type EventData, type EventHandler } from '@/hooks/useStarEvent'
+import StarEventContextProvider, { useStarEventContext } from '@/context/starEventContext'
 import { Attribute, Bookmark, Category, SetState, Video, VideoStar } from '@/interface'
 import { attributeService, bookmarkService, categoryService, videoService } from '@/service'
 import { escapeRegExp, getUnique } from '@/utils'
@@ -60,9 +60,11 @@ function VideoPage() {
   return (
     <Grid container>
       <ActiveContextProvider>
+        <StarEventContextProvider>
           <Section video={video} bookmarks={bookmarks} categories={categories} attributes={attributes} stars={stars} />
 
           <Sidebar video={video} stars={stars} bookmarks={bookmarks} attributes={attributes} categories={categories} />
+        </StarEventContextProvider>
       </ActiveContextProvider>
     </Grid>
   )
@@ -74,9 +76,8 @@ type SectionProps = {
   categories: Category[]
   attributes: Attribute[]
   stars: VideoStar[]
-  setStarEvent: EventHandler
 }
-function Section({ video, bookmarks, categories, attributes, stars, setStarEvent }: SectionProps) {
+function Section({ video, bookmarks, categories, attributes, stars }: SectionProps) {
   const playerRef = useRef<MediaPlayerInstance>(null)
 
   return (
@@ -92,7 +93,6 @@ function Section({ video, bookmarks, categories, attributes, stars, setStarEvent
         attributes={attributes}
         categories={categories}
         playerRef={playerRef}
-        setStarEvent={setStarEvent}
       />
     </Grid>
   )
@@ -104,9 +104,8 @@ type SidebarProps = {
   bookmarks: Bookmark[]
   attributes: Attribute[]
   categories: Category[]
-  starEvent: { getEvent: Event; getDefault: EventData; setEvent: EventHandler }
 }
-function Sidebar({ video, stars, bookmarks, attributes, categories, starEvent }: SidebarProps) {
+function Sidebar({ video, stars, bookmarks, attributes, categories }: SidebarProps) {
   const { setActive } = useActiveContext()
 
   const filteredAttributes = useMemo(
@@ -129,14 +128,7 @@ function Sidebar({ video, stars, bookmarks, attributes, categories, starEvent }:
       <Franchise video={video} />
 
       <Grid container justifyContent='center'>
-        <Stars
-          video={video}
-          stars={stars}
-          bookmarks={bookmarks}
-          attributes={attributes}
-          categories={categories}
-          starEvent={starEvent}
-        />
+        <Stars video={video} stars={stars} bookmarks={bookmarks} attributes={attributes} categories={categories} />
       </Grid>
 
       <StarInput video={video} stars={stars} bookmarks={bookmarks} attributes={filteredAttributes} />
@@ -154,9 +146,8 @@ type StarsProps = {
   bookmarks: Bookmark[]
   attributes: Attribute[]
   categories: Category[]
-  starEvent: { getEvent: Event; getDefault: EventData; setEvent: EventHandler }
 }
-function Stars({ video, stars, bookmarks, attributes, categories, starEvent }: StarsProps) {
+function Stars({ video, stars, bookmarks, attributes, categories }: StarsProps) {
   const { setActive } = useActiveContext()
 
   const sortedStars = useMemo(() => {
@@ -177,7 +168,6 @@ function Stars({ video, stars, bookmarks, attributes, categories, starEvent }: S
           bookmarks={bookmarks}
           attributes={attributes}
           categories={categories}
-          starEvent={starEvent}
           setActive={setActive.star}
         />
       ))}
@@ -191,20 +181,16 @@ type StarProps = {
   bookmarks: Bookmark[]
   attributes: Attribute[]
   categories: Category[]
-  starEvent: {
-    getEvent: Event
-    setEvent: EventHandler
-    getDefault: Event['data']
-  }
   setActive: SetState<VideoStar | null>
 }
-function Star({ video, star, bookmarks, attributes, categories, starEvent, setActive }: StarProps) {
+function Star({ video, star, bookmarks, attributes, categories, setActive }: StarProps) {
   const [border, setBorder] = useState(false)
   const { mutate: mutateAddBookmark } = videoService.useAddBookmark(video.id)
   const { mutate: mutateAddStar } = bookmarkService.useAddStar(video.id)
   const { mutate: mutateAddStarAttribute } = bookmarkService.useAddStarAttribute(video.id, star.id)
   const { mutate: mutateRemoveStar } = videoService.useRemoveStar(video.id)
 
+  const { getEvent, getDefault, setEvent } = useStarEventContext()
   const { setModal } = useModalContext()
 
   const removeStar = () => {
@@ -230,11 +216,11 @@ function Star({ video, star, bookmarks, attributes, categories, starEvent, setAc
 
   // TODO auto-run if only 1 star
   const addStar = (star: VideoStar) => {
-    const bookmark = starEvent.getEvent.data
+    const bookmark = getEvent.data
 
     // Remove Border
     setBorder(false)
-    starEvent.setEvent(false, starEvent.getDefault)
+    setEvent(false, getDefault)
 
     // Check if bookmark already contains one of the attributes from the star
     const bookmarkItem = bookmarks.find(item => item.id === bookmark.id)
@@ -267,9 +253,9 @@ function Star({ video, star, bookmarks, attributes, categories, starEvent, setAc
     <Grid
       item
       xs={4}
-      onClick={starEvent.getEvent.event ? () => addStar(star) : undefined}
-      onMouseEnter={starEvent.getEvent.event ? () => setBorder(true) : () => setActive(star)}
-      onMouseLeave={starEvent.getEvent.event ? () => setBorder(false) : () => setActive(null)}
+      onClick={getEvent.event ? () => addStar(star) : undefined}
+      onMouseEnter={getEvent.event ? () => setBorder(true) : () => setActive(star)}
+      onMouseLeave={getEvent.event ? () => setBorder(false) : () => setActive(null)}
     >
       <motion.div layoutId={star.id.toString()}>
         <ContextMenuTrigger id={`star-${star.id}`}>

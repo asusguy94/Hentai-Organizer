@@ -14,8 +14,8 @@ import MissingImage from '../image/missing'
 import { serverConfig } from '@/config'
 import { useActiveContext } from '@/context/activeContext'
 import { useModalContext } from '@/context/modalContext'
+import { useStarEventContext } from '@/context/starEventContext'
 import useCollision from '@/hooks/useCollision'
-import { EventHandler } from '@/hooks/useStarEvent'
 import { Attribute, Bookmark, Category, VideoStar, Video, Outfit } from '@/interface'
 import { bookmarkService, outfitService } from '@/service'
 
@@ -30,9 +30,8 @@ type TimelineProps = {
   attributes: Attribute[]
   categories: Category[]
   playerRef: React.RefObject<MediaPlayerInstance>
-  setStarEvent: EventHandler
 }
-export default function Timeline({ video, bookmarks, stars, attributes, categories, playerRef,setStarEvent }: TimelineProps) {
+export default function Timeline({ video, bookmarks, stars, attributes, categories, playerRef }: TimelineProps) {
   const windowSize = useWindowSize()
   const bookmarksRef = useRef<HTMLButtonElement[]>([])
   const [maxLevel, setMaxLevel] = useState(0)
@@ -48,6 +47,7 @@ export default function Timeline({ video, bookmarks, stars, attributes, categori
   const { mutate: mutateRemoveStar } = bookmarkService.useRemoveStar(video.id)
 
   const { active } = useActiveContext()
+  const { setEvent: setStarEvent } = useStarEventContext()
   const { setModal } = useModalContext()
 
   useEffect(() => {

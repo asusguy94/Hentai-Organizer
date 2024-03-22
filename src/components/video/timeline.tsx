@@ -13,6 +13,7 @@ import MissingImage from '../image/missing'
 import { ModalHandler } from '../modal'
 
 import { serverConfig } from '@/config'
+import { useActiveContext } from '@/context/activeContext'
 import useCollision from '@/hooks/useCollision'
 import { EventHandler } from '@/hooks/useStarEvent'
 import { Attribute, Bookmark, Category, VideoStar, Video, Outfit } from '@/interface'
@@ -55,6 +56,8 @@ export default function Timeline({
   const { mutate: mutateSetOutfit } = bookmarkService.useSetOutfit(video.id)
   const { mutate: mutateRemoveBookmark } = bookmarkService.useRemoveBookmark(video.id)
   const { mutate: mutateRemoveStar } = bookmarkService.useRemoveStar(video.id)
+
+  const { active } = useActiveContext()
 
   useEffect(() => {
     const bookmarksArr = bookmarks.length > 0 ? bookmarksRef.current : []
@@ -165,12 +168,17 @@ export default function Timeline({
       {bookmarks.map((bookmark, idx) => {
         const tooltip = bookmark.starID > 0 || bookmark.attributes.length > 0 || bookmark.outfit !== null
 
+        const isActive =
+          (active.star !== null && bookmark.starID === active.star.id) ||
+          (active.attribute !== null && bookmark.attributes.some(a => a.id === active.attribute?.id)) ||
+          (active.outfit !== null && bookmark.outfit === active.outfit)
+
         return (
           <Fragment key={bookmark.id}>
             <ContextMenuTrigger id={`bookmark-${bookmark.id}`}>
               <Button
                 size='small'
-                variant='outlined'
+                variant={isActive ? 'contained' : 'outlined'}
                 color={hasStar(bookmark) ? 'primary' : 'secondary'}
                 className={styles.bookmark}
                 style={{

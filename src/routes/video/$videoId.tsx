@@ -26,6 +26,7 @@ import Spinner from '@/components/spinner'
 import { Header, Player, Timeline } from '@/components/video'
 
 import { serverConfig } from '@/config'
+import ActiveContextProvider, { useActiveContext } from '@/context/activeContext'
 import useStarEvent, { type Event, type EventData, type EventHandler } from '@/hooks/useStarEvent'
 import { Attribute, Bookmark, Category, Video, VideoStar } from '@/interface'
 import { attributeService, bookmarkService, categoryService, videoService } from '@/service'
@@ -61,6 +62,7 @@ function VideoPage() {
 
   return (
     <Grid container>
+      <ActiveContextProvider>
       <Section
         video={video}
         bookmarks={bookmarks}
@@ -68,7 +70,6 @@ function VideoPage() {
         attributes={attributes}
         stars={stars}
         modal={{ handler: setModal, data: modal }}
-        setStarEvent={setEvent}
       />
 
       <Sidebar
@@ -78,8 +79,8 @@ function VideoPage() {
         attributes={attributes}
         categories={categories}
         onModal={setModal}
-        starEvent={{ getEvent, setEvent, getDefault: getDefault }}
       />
+      </ActiveContextProvider>
 
       <ModalComponent visible={modal.visible} title={modal.title} filter={modal.filter} onClose={setModal}>
         {modal.data}
@@ -140,6 +141,8 @@ type SidebarProps = {
   starEvent: { getEvent: Event; getDefault: EventData; setEvent: EventHandler }
 }
 function Sidebar({ video, stars, bookmarks, attributes, categories, onModal, starEvent }: SidebarProps) {
+  const { setActive } = useActiveContext()
+
   const filteredAttributes = useMemo(
     () =>
       getUnique(
@@ -168,14 +171,15 @@ function Sidebar({ video, stars, bookmarks, attributes, categories, onModal, sta
           categories={categories}
           onModal={onModal}
           starEvent={starEvent}
+          setActive={setActive.star}
         />
       </Grid>
 
       <StarInput video={video} stars={stars} bookmarks={bookmarks} attributes={filteredAttributes} />
 
-      <Attributes attributes={filteredAttributes} />
+      <Attributes attributes={filteredAttributes} setActive={setActive.attribute} />
 
-      <Outfits bookmarks={bookmarks} />
+      <Outfits bookmarks={bookmarks} setActive={setActive.outfit} />
     </Grid>
   )
 }
@@ -190,6 +194,8 @@ type StarsProps = {
   starEvent: { getEvent: Event; getDefault: EventData; setEvent: EventHandler }
 }
 function Stars({ video, stars, bookmarks, attributes, categories, onModal, starEvent }: StarsProps) {
+  const { setActive } = useActiveContext()
+
   const sortedStars = useMemo(() => {
     const bookmarkTime = (star: VideoStar) => {
       return bookmarks.find(bookmark => bookmark.starID === star.id)?.start ?? Infinity
@@ -210,6 +216,7 @@ function Stars({ video, stars, bookmarks, attributes, categories, onModal, starE
           categories={categories}
           onModal={onModal}
           starEvent={starEvent}
+          setActive={setActive.star}
         />
       ))}
     </Grid>
@@ -228,8 +235,9 @@ type StarProps = {
     setEvent: EventHandler
     getDefault: Event['data']
   }
+  setActive: SetState<VideoStar | null>
 }
-function Star({ video, star, bookmarks, attributes, categories, onModal, starEvent }: StarProps) {
+function Star({ video, star, bookmarks, attributes, categories, onModal, starEvent, setActive }: StarProps) {
   const [border, setBorder] = useState(false)
   const { mutate: mutateAddBookmark } = videoService.useAddBookmark(video.id)
   const { mutate: mutateAddStar } = bookmarkService.useAddStar(video.id)
@@ -329,6 +337,7 @@ function Star({ video, star, bookmarks, attributes, categories, onModal, starEve
             icon='add'
             text='Add Bookmark'
             onClick={() => {
+              setActive(null)
               onModal(
                 'Add Bookmark',
                 categories.map(category => (
@@ -355,6 +364,7 @@ function Star({ video, star, bookmarks, attributes, categories, onModal, starEve
             text='Add Attribute'
             disabled={bookmarks.every(bookmark => bookmark.starID !== star.id)}
             onClick={() => {
+              setActive(null)
               onModal(
                 'Add Attribute',
                 attributes
@@ -560,12 +570,21 @@ function Franchise({ video }: FranchiseProps) {
 
 type AttributesProps = {
   attributes: Attribute[]
+  setActive: SetState<Attribute | null>
 }
-function Attributes({ attributes }: AttributesProps) {
+function Attributes({ attributes, setActive }: AttributesProps) {
   return (
     <Grid container justifyContent='center' id={styles.attributes}>
       {attributes.map(attribute => (
-        <Button key={attribute.id} size='small' variant='outlined' color='primary' className={styles.attribute}>
+        <Button
+          key={attribute.id}
+          size='small'
+          variant='outlined'
+          color='primary'
+          className={styles.attribute}
+          onMouseEnter={() => setActive(attribute)}
+          onMouseLeave={() => setActive(null)}
+        >
           {attribute.name}
         </Button>
       ))}
@@ -575,14 +594,23 @@ function Attributes({ attributes }: AttributesProps) {
 
 type OutfitProps = {
   bookmarks: Bookmark[]
+  setActive: SetState<string | null>
 }
-function Outfits({ bookmarks }: OutfitProps) {
+function Outfits({ bookmarks, setActive }: OutfitProps) {
   const outfits = getUnique(bookmarks.flatMap(bookmark => (bookmark.outfit !== null ? [bookmark.outfit] : [])))
 
   return (
     <Grid container justifyContent='center' id={styles.outfits}>
       {outfits.map(outfit => (
-        <Button key={outfit} size='small' variant='outlined' color='primary' className={styles.outfit}>
+        <Button
+          key={outfit}
+          size='small'
+          variant='outlined'
+          color='primary'
+          className={styles.outfit}
+          onMouseEnter={() => setActive(outfit)}
+          onMouseLeave={() => setActive(null)}
+        >
           {outfit}
         </Button>
       ))}

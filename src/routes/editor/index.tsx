@@ -135,7 +135,7 @@ function TableRow({ update, data, obj }: TableRowProps) {
 
   const { api } = createApi(`/attribute/${data.id}`)
 
-  const { mutate } = useMutation<unknown, Error, { name: string; value: boolean }>({
+  const { mutate } = useMutation<unknown, Error, { label: string; value: boolean }>({
     mutationKey: ['attribute', 'updateName'],
     mutationFn: payload => api.put('', payload),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['attribute'] })
@@ -148,7 +148,7 @@ function TableRow({ update, data, obj }: TableRowProps) {
   }
 
   const setCondition = (_ref: UpdateRef, prop: string, value: boolean, checkbox: HTMLInputElement) => {
-    mutate({ name: prop, value }, { onError: () => (checkbox.checked = !value) })
+    mutate({ label: prop, value }, { onError: () => (checkbox.checked = !value) })
   }
 
   return (

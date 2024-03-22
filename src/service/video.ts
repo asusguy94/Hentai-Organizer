@@ -4,7 +4,7 @@ import { createApi } from '@/config'
 import { Bookmark, General, Video, VideoStar } from '@/interface'
 import { keys } from '@/keys'
 
-const { api, legacyApi } = createApi('/video')
+const { api } = createApi('/video')
 
 type HomeVideo = {
   id: number
@@ -14,20 +14,20 @@ type HomeVideo = {
 }
 
 export default {
-  renameVideo: (id: number, path: string) => legacyApi.put(`/${id}`, { path }),
+  renameVideo: (id: number, path: string) => api.put(`/${id}`, { path }),
   useToggleCensor: (id: number) => {
     const queryClient = useQueryClient()
 
     const { mutate } = useMutation<unknown, Error, { cen: boolean }>({
       mutationKey: ['video', id, 'toggleCensor'],
-      mutationFn: payload => legacyApi.put(`/${id}`, payload),
+      mutationFn: payload => api.put(`/${id}`, payload),
       onSuccess: () => queryClient.invalidateQueries({ ...keys.video.byId(id) })
     })
 
     return { mutate }
   },
-  updateVideo: (id: number) => legacyApi.put(`/${id}`),
-  deleteVideo: (id: number) => legacyApi.delete(`/${id}`),
+  updateVideo: (id: number) => api.put(`/${id}`),
+  deleteVideo: (id: number) => api.delete(`/${id}`),
   useAddBookmark: (id: number) => {
     const queryClient = useQueryClient()
 
@@ -45,8 +45,8 @@ export default {
 
     return { mutate }
   },
-  renameFranchise: (id: number, value: string) => legacyApi.put(`/${id}`, { franchise: value }),
-  renameTitle: (id: number, value: string) => legacyApi.put(`/${id}`, { title: value }),
+  renameFranchise: (id: number, value: string) => api.put(`/${id}`, { franchise: value }),
+  renameTitle: (id: number, value: string) => api.put(`/${id}`, { title: value }),
   useRemoveStar: (id: number) => {
     const queryClient = useQueryClient()
 
@@ -74,7 +74,7 @@ export default {
 
     return { mutate, mutateAll }
   },
-  toggleNoStar: (id: number, checked: boolean) => legacyApi.put(`/${id}`, { noStar: checked }),
+  toggleNoStar: (id: number, checked: boolean) => api.put(`/${id}`, { noStar: checked }),
   useAddStar: (id: number) => {
     const queryClient = useQueryClient()
 
@@ -110,13 +110,13 @@ export default {
 
     return { data: query.data }
   },
-  removeAttribute: (id: number, attributeID: number) => legacyApi.delete(`/${id}/attribute/${attributeID}`),
-  addVideos: (videos: unknown[]) => legacyApi.post('/add', { videos }),
-  setSlug: (id: number, slug: string) => legacyApi.put(`/${id}/api`, { slug }),
-  setBrand: (id: number) => legacyApi.put(`/${id}/api`, { brand: true }),
-  setDate: (id: number) => legacyApi.put(`/${id}/api`, { date: true }),
-  setCover: (id: number) => legacyApi.put(`/${id}/api`, { cover: true }),
-  setPoster: (id: number) => legacyApi.put(`/${id}/api`, { poster: true }),
+  removeAttribute: (id: number, attributeID: number) => api.delete(`/${id}/attribute/${attributeID}`),
+  addVideos: (videos: unknown[]) => api.post('/add', { videos }),
+  setSlug: (id: number, slug: string) => api.put(`/${id}/api`, { slug }),
+  setBrand: (id: number) => api.put(`/${id}/api`, { brand: true }),
+  setDate: (id: number) => api.put(`/${id}/api`, { date: true }),
+  setCover: (id: number) => api.put(`/${id}/api`, { cover: true }),
+  setPoster: (id: number) => api.put(`/${id}/api`, { poster: true }),
   useHomeVideos: (label: string, limit: number) => {
     const query = useQuery<HomeVideo[]>({
       ...keys.video.home(label, limit),

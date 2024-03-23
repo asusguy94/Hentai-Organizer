@@ -6,7 +6,7 @@ type SpinnerProps = {
   delay?: number
 }
 
-export default function Spinner({ delay = 0 }: SpinnerProps) {
+export default function Spinner({ delay = 300 }: SpinnerProps) {
   const [showSpinner, setShowSpinner] = useState(false)
 
   useEffect(() => {

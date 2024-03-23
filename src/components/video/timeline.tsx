@@ -37,7 +37,9 @@ export default function Timeline({ video, bookmarks, stars, attributes, categori
   const [maxLevel, setMaxLevel] = useState(0)
   const [bookmarkLevels, setBookmarkLevels] = useState<number[]>([])
   const { collisionCheck } = useCollision()
+
   const { data: outfits } = outfitService.useAll()
+
   const { mutate: mutateSetTime } = bookmarkService.useSetTime(video.id)
   const { mutate: mutateSetCategory } = bookmarkService.useSetCategory(video.id)
   const { mutate: mutateAddAttribute } = bookmarkService.useAddAttribute(video.id)

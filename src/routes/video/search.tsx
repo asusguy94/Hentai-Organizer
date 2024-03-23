@@ -243,6 +243,7 @@ function Filter() {
 
 function Videos() {
   const { sort, query, category, outfit, attribute, network, nullCategory } = useAllSearchParams(defaultObj)
+
   const { data: videos, isLoading } = searchService.useVideos()
 
   const localSettings = useSettings()

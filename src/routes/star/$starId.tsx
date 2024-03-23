@@ -88,6 +88,7 @@ type StarFormProps = {
 }
 function StarForm({ star }: StarFormProps) {
   const { data: starData } = starService.useInfo()
+
   const { mutate: mutateUpdateInfo } = starService.useUpdateInfo(star.id)
   const { mutate: mutateAddAttribute } = starService.useAddAttribute(star.id)
   const { mutate: mutateRemoveAttribute } = starService.useRemoveAttribute(star.id)

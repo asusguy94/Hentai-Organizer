@@ -124,6 +124,7 @@ function Sort() {
 function Filter() {
   const { setParam, update } = useDynamicSearchParam(defaultObj)
   const { attribute: attributeParam } = useAllSearchParams(defaultObj)
+
   const { data: starData } = starService.useInfo()
 
   const breast = (target: string) => {
@@ -216,6 +217,7 @@ function Filter() {
 
 function Stars() {
   const { breast, haircolor, hairstyle, attribute, query, sort } = useAllSearchParams(defaultObj)
+
   const { data: stars, isLoading } = searchService.useStars()
 
   if (isLoading || stars === undefined) return <Spinner />

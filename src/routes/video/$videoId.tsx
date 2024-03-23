@@ -439,6 +439,7 @@ type AddRelatedStarsProps = {
 }
 function AddRelatedStars({ video, disabled }: AddRelatedStarsProps) {
   const { data: relatedStars } = videoService.useRelatedStars(video.id)
+
   const { mutateAll } = videoService.useAddStar(video.id)
 
   if (disabled || relatedStars === undefined || relatedStars.length === 0) return null

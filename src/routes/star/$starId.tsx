@@ -31,45 +31,27 @@ export const Route = createFileRoute('/star/$starId')({
   component: StarPage
 })
 
-type Star = {
-  id: number
-  name: string
-  image: string | null
-  info: {
-    breast: string
-    haircolor: string
-    hairstyle: string
-    attribute: string[]
-  }
-  link: string | null
-}
-
 export default function StarPage() {
-  const { starId } = Route.useParams()
-
-  const { data: star } = starService.useStar(starId)
-  const { data: videos } = starService.useVideos(starId)
-
-  if (star === undefined || videos === undefined) return <Spinner />
-
   return (
     <Grid container>
       <Grid item xs={6}>
         <div id={styles.star}>
-          <StarImageDropbox star={star} videos={videos} />
-          <StarTitle star={star} />
-          <StarForm star={star} />
-          <Videos videos={videos} />
+          <StarImageDropbox />
+          <StarTitle />
+          <StarForm />
+          <Videos />
         </div>
       </Grid>
     </Grid>
   )
 }
 
-type StarVideosProps = {
-  videos: StarVideo[]
-}
-function Videos({ videos }: StarVideosProps) {
+function Videos() {
+  const { starId } = Route.useParams()
+
+  const { data: videos } = starService.useVideos(starId)
+
+  if (videos === undefined) return <Spinner />
   if (videos.length === 0) return null
 
   return (
@@ -83,29 +65,21 @@ function Videos({ videos }: StarVideosProps) {
   )
 }
 
-type StarFormProps = {
-  star: Star
-}
-function StarForm({ star }: StarFormProps) {
+function StarForm() {
+  const { starId } = Route.useParams()
+
   const { data: starData } = starService.useInfo()
+  const { data: star } = starService.useStar(starId)
 
-  const { mutate: mutateUpdateInfo } = starService.useUpdateInfo(star.id)
-  const { mutate: mutateAddAttribute } = starService.useAddAttribute(star.id)
-  const { mutate: mutateRemoveAttribute } = starService.useRemoveAttribute(star.id)
-
-  const addAttribute = (name: string) => {
-    mutateAddAttribute({ name })
-  }
-
-  const removeAttribute = (name: string) => {
-    mutateRemoveAttribute({ name })
-  }
+  const { mutate: mutateUpdateInfo } = starService.useUpdateInfo(starId)
+  const { mutate: mutateAddAttribute } = starService.useAddAttribute(starId)
+  const { mutate: mutateRemoveAttribute } = starService.useRemoveAttribute(starId)
 
   const updateInfo = (value: string, label: string) => {
     mutateUpdateInfo({ label, value })
   }
 
-  if (starData === undefined) return null
+  if (starData === undefined || star === undefined) return <Spinner />
 
   return (
     <>
@@ -113,38 +87,29 @@ function StarForm({ star }: StarFormProps) {
       <StarInputForm update={updateInfo} name='Haircolor' value={star.info.haircolor} list={starData.haircolor} />
       <StarInputForm update={updateInfo} name='Hairstyle' value={star.info.hairstyle} list={starData.hairstyle} />
       <StarInputForm
-        update={addAttribute}
+        update={name => mutateAddAttribute({ name })}
         name='Attribute'
         value={star.info.attribute}
         list={starData.attribute}
         emptyByDefault
       >
-        <StarAttributes data={star.info.attribute} remove={removeAttribute} />
+        <StarAttributes data={star.info.attribute} remove={name => mutateRemoveAttribute({ name })} />
       </StarInputForm>
     </>
   )
 }
 
-type StarImageDropboxProps = {
-  star: Star
-  videos: StarVideo[]
-}
-function StarImageDropbox({ star, videos }: StarImageDropboxProps) {
-  const { mutate: mutateAddImage } = starService.useAddImage(star.id)
-  const { mutate: mutateRemoveImage } = starService.useRemoveImage(star.id)
-  const { mutate: mutateRemoveStar } = starService.useRemoveStar(star.id)
+function StarImageDropbox() {
+  const { starId } = Route.useParams()
 
-  const addImage = (image: string) => {
-    mutateAddImage({ url: image })
-  }
+  const { data: star } = starService.useStar(starId)
+  const { data: videos } = starService.useVideos(starId)
 
-  const removeImage = () => {
-    mutateRemoveImage()
-  }
+  const { mutate: mutateAddImage } = starService.useAddImage(starId)
+  const { mutate: mutateRemoveImage } = starService.useRemoveImage(starId)
+  const { mutate: mutateRemoveStar } = starService.useRemoveStar(starId)
 
-  const removeStar = () => {
-    mutateRemoveStar()
-  }
+  if (star === undefined) return <Spinner />
 
   return (
     <div className='d-inline-block'>
@@ -154,20 +119,20 @@ function StarImageDropbox({ star, videos }: StarImageDropboxProps) {
             <img
               id={styles.profile}
               //missing={false}
-              src={`${serverConfig.newApi}/star/${star.id}/image`}
+              src={`${serverConfig.newApi}/star/${starId}/image`}
               alt='star'
               style={{ width: '100%', height: 'auto' }}
             />
           </ContextMenuTrigger>
 
           <ContextMenu id='star__image'>
-            <IconWithText component={ContextMenuItem} icon='delete' text='Delete Image' onClick={removeImage} />
+            <IconWithText component={ContextMenuItem} icon='delete' text='Delete Image' onClick={mutateRemoveImage} />
           </ContextMenu>
         </>
       ) : (
         <>
           <ContextMenuTrigger id='star__dropbox'>
-            <Dropbox onDrop={addImage} />
+            <Dropbox onDrop={url => mutateAddImage({ url })} />
           </ContextMenuTrigger>
 
           <ContextMenu id='star__dropbox'>
@@ -175,8 +140,8 @@ function StarImageDropbox({ star, videos }: StarImageDropboxProps) {
               component={ContextMenuItem}
               icon='delete'
               text='Remove Star'
-              onClick={removeStar}
-              disabled={videos.length > 0}
+              onClick={mutateRemoveStar}
+              disabled={videos?.length !== 0}
             />
           </ContextMenu>
         </>
@@ -382,22 +347,17 @@ function StarAttributes({ remove, data }: StarAttributesProps) {
   )
 }
 
-type StarTitleProps = {
-  star: Star
-}
-function StarTitle({ star }: StarTitleProps) {
-  const { mutate: mutateRenameStar } = starService.useRenameStar(star.id)
-  const { mutate: mutateSetLink } = starService.useSetLink(star.id)
+function StarTitle() {
+  const { starId } = Route.useParams()
+
+  const { data: star } = starService.useStar(starId)
+
+  const { mutate: mutateRenameStar } = starService.useRenameStar(starId)
+  const { mutate: mutateSetLink } = starService.useSetLink(starId)
 
   const { setModal } = useModalContext()
 
-  const renameStar = (name: string) => {
-    mutateRenameStar({ name })
-  }
-
-  const setLink = (link: string) => {
-    mutateSetLink({ value: link })
-  }
+  if (star === undefined) return <Spinner />
 
   return (
     <div>
@@ -409,9 +369,9 @@ function StarTitle({ star }: StarTitleProps) {
               <>
                 {' '}
                 (
-                <Link to={star.link} target='_blank'>
+                <a href={star.link} target='_blank' rel='noreferrer'>
                   LINK
-                </Link>
+                </a>
                 )
               </>
             )}
@@ -436,7 +396,8 @@ function StarTitle({ star }: StarTitleProps) {
 
                     setModal()
 
-                    renameStar((e.target as HTMLInputElement).value)
+                    // TODO use form
+                    mutateRenameStar({ name: (e.target as HTMLInputElement).value })
                   }
                 }}
               />
@@ -460,7 +421,8 @@ function StarTitle({ star }: StarTitleProps) {
 
                     setModal()
 
-                    setLink((e.target as HTMLInputElement).value)
+                    // TODO use form
+                    mutateSetLink({ value: (e.target as HTMLInputElement).value })
                   }
                 }}
               />

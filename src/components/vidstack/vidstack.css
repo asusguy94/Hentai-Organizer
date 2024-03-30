@@ -9,6 +9,10 @@
   --media-slider-track-bg: rgba(255, 255, 255, 0.25);
 }
 
+.vds-time-group {
+  --media-time-color: rgba(255, 255, 255, 1);
+}
+
 /* Always display Timeline-DOT */
 .vds-time-slider .vds-slider-thumb {
   opacity: 1;

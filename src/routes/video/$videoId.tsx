@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import {
   Button,
@@ -28,7 +28,7 @@ import { serverConfig } from '@/config'
 import ActiveContextProvider, { useActiveContext } from '@/context/activeContext'
 import { useModalContext } from '@/context/modalContext'
 import StarEventContextProvider, { useStarEventContext } from '@/context/starEventContext'
-import { Attribute, Bookmark, Category, SetState, Video, VideoStar } from '@/interface'
+import { Attribute, Category, SetState, VideoStar } from '@/interface'
 import { attributeService, bookmarkService, categoryService, videoService } from '@/service'
 import { escapeRegExp, getUnique } from '@/utils'
 
@@ -40,78 +40,51 @@ export const Route = createFileRoute('/video/$videoId')({
 })
 
 function VideoPage() {
-  const { videoId } = Route.useParams()
-
-  const { data: stars } = videoService.useStars(videoId)
-  const { data: categories } = categoryService.useAll()
-  const { data: attributes } = attributeService.useVideos()
-  const { data: video } = videoService.useVideo(videoId)
-  const { data: bookmarks } = videoService.useBookmarks(videoId)
-
-  if (
-    attributes === undefined ||
-    categories === undefined ||
-    stars === undefined ||
-    video === undefined ||
-    bookmarks === undefined
-  )
-    return <Spinner />
-
   return (
     <Grid container>
       <ActiveContextProvider>
         <StarEventContextProvider>
-          <Section video={video} bookmarks={bookmarks} categories={categories} attributes={attributes} stars={stars} />
+          <Section />
 
-          <Sidebar video={video} stars={stars} bookmarks={bookmarks} attributes={attributes} categories={categories} />
+          <Sidebar />
         </StarEventContextProvider>
       </ActiveContextProvider>
     </Grid>
   )
 }
 
-type SectionProps = {
-  video: Video
-  bookmarks: Bookmark[]
-  categories: Category[]
-  attributes: Attribute[]
-  stars: VideoStar[]
-}
-function Section({ video, bookmarks, categories, attributes, stars }: SectionProps) {
+function Section() {
+  const { videoId } = Route.useParams()
+
   const playerRef = useRef<MediaPlayerInstance>(null)
+  const [ready, setReady] = useState(false)
+
+  const handleReady = useCallback(() => {
+    setReady(true)
+  }, [])
 
   return (
     <Grid item xs={9} component='section'>
-      <Header video={video} />
+      <Header videoId={videoId} />
 
-      <Player playerRef={playerRef} video={video} bookmarks={bookmarks} categories={categories} stars={stars} />
+      <Player videoId={videoId} playerRef={playerRef} onReady={handleReady} />
 
-      <Timeline
-        video={video}
-        bookmarks={bookmarks}
-        stars={stars}
-        attributes={attributes}
-        categories={categories}
-        playerRef={playerRef}
-      />
+      <Timeline videoId={videoId} playerRef={playerRef} playerReady={ready} />
     </Grid>
   )
 }
 
-type SidebarProps = {
-  video: Video
-  stars: VideoStar[]
-  bookmarks: Bookmark[]
-  attributes: Attribute[]
-  categories: Category[]
-}
-function Sidebar({ video, stars, bookmarks, attributes, categories }: SidebarProps) {
+function Sidebar() {
+  const { videoId } = Route.useParams()
+
+  const { data: bookmarks } = videoService.useBookmarks(videoId)
+
   const { setActive } = useActiveContext()
 
   const filteredAttributes = useMemo(
     () =>
       getUnique(
-        bookmarks.flatMap(({ attributes }) => attributes.sort((a, b) => a.name.localeCompare(b.name))),
+        bookmarks?.flatMap(({ attributes }) => attributes.sort((a, b) => a.name.localeCompare(b.name))) ?? [],
         'id'
       ),
     [bookmarks]
@@ -125,77 +98,64 @@ function Sidebar({ video, stars, bookmarks, attributes, categories }: SidebarPro
         <div style={{ height: 30 }}></div>
       </Grid>
 
-      <Franchise video={video} />
+      <Franchise />
 
       <Grid container justifyContent='center'>
-        <Stars video={video} stars={stars} bookmarks={bookmarks} attributes={attributes} categories={categories} />
+        <Stars />
       </Grid>
 
-      <StarInput video={video} stars={stars} bookmarks={bookmarks} attributes={filteredAttributes} />
+      <StarInput attributes={filteredAttributes} />
 
       <Attributes attributes={filteredAttributes} setActive={setActive.attribute} />
 
-      <Outfits bookmarks={bookmarks} setActive={setActive.outfit} />
+      <Outfits setActive={setActive.outfit} />
     </Grid>
   )
 }
 
-type StarsProps = {
-  video: Video
-  stars: VideoStar[]
-  bookmarks: Bookmark[]
-  attributes: Attribute[]
-  categories: Category[]
-}
-function Stars({ video, stars, bookmarks, attributes, categories }: StarsProps) {
+function Stars() {
+  const { videoId } = Route.useParams()
+
+  const { data: bookmarks } = videoService.useBookmarks(videoId)
+  const { data: stars } = videoService.useStars(videoId)
+
   const { setActive } = useActiveContext()
 
   const sortedStars = useMemo(() => {
     const bookmarkTime = (star: VideoStar) => {
-      return bookmarks.find(bookmark => bookmark.starID === star.id)?.start ?? Infinity
+      return bookmarks?.find(bookmark => bookmark.starID === star.id)?.start ?? Infinity
     }
 
-    return stars.toSorted((a, b) => bookmarkTime(a) - bookmarkTime(b))
+    return stars?.toSorted((a, b) => bookmarkTime(a) - bookmarkTime(b))
   }, [bookmarks, stars])
 
   return (
     <Grid container justifyContent='center' id={styles.stars}>
-      {sortedStars.map(star => (
-        <Star
-          key={star.id}
-          video={video}
-          star={star}
-          bookmarks={bookmarks}
-          attributes={attributes}
-          categories={categories}
-          setActive={setActive.star}
-        />
-      ))}
+      {sortedStars?.map(star => <Star key={star.id} star={star} setActive={setActive.star} />)}
     </Grid>
   )
 }
 
 type StarProps = {
-  video: Video
   star: VideoStar
-  bookmarks: Bookmark[]
-  attributes: Attribute[]
-  categories: Category[]
   setActive: SetState<VideoStar | null>
 }
-function Star({ video, star, bookmarks, attributes, categories, setActive }: StarProps) {
-  const [border, setBorder] = useState(false)
-  const { mutate: mutateAddBookmark } = videoService.useAddBookmark(video.id)
-  const { mutate: mutateAddStar } = bookmarkService.useAddStar(video.id)
-  const { mutate: mutateAddStarAttribute } = bookmarkService.useAddStarAttribute(video.id, star.id)
-  const { mutate: mutateRemoveStar } = videoService.useRemoveStar(video.id)
+function Star({ star, setActive }: StarProps) {
+  const { videoId } = Route.useParams()
+
+  const { data: bookmarks } = videoService.useBookmarks(videoId)
+  const { data: attributes } = attributeService.useAll()
+  const { data: categories } = categoryService.useAll()
+
+  const { mutate: mutateAddBookmark } = videoService.useAddBookmark(videoId)
+  const { mutate: mutateAddStar } = bookmarkService.useAddStar(videoId)
+  const { mutate: mutateAddStarAttribute } = bookmarkService.useAddStarAttribute(videoId, star.id)
+  const { mutate: mutateRemoveStar } = videoService.useRemoveStar(videoId)
 
   const { getEvent, getDefault, setEvent } = useStarEventContext()
   const { setModal } = useModalContext()
 
-  const removeStar = () => {
-    mutateRemoveStar({ starID: star.id })
-  }
+  const [border, setBorder] = useState(false)
 
   const addBookmark = (category: Category, star: VideoStar) => {
     const player = document.getElementsByTagName('video')[0]
@@ -210,10 +170,6 @@ function Star({ video, star, bookmarks, attributes, categories, setActive }: Sta
     }
   }
 
-  const addAttribute = (attribute: Attribute) => {
-    mutateAddStarAttribute({ attributeID: attribute.id })
-  }
-
   // TODO auto-run if only 1 star
   const addStar = (star: VideoStar) => {
     const bookmark = getEvent.data
@@ -223,7 +179,7 @@ function Star({ video, star, bookmarks, attributes, categories, setActive }: Sta
     setEvent(false, getDefault)
 
     // Check if bookmark already contains one of the attributes from the star
-    const bookmarkItem = bookmarks.find(item => item.id === bookmark.id)
+    const bookmarkItem = bookmarks?.find(item => item.id === bookmark.id)
     if (bookmarkItem !== undefined) {
       const overlappingAttributes = bookmarkItem.attributes.some(attr => {
         return star.attributes.some(sAttr => sAttr.id === attr.id)
@@ -232,15 +188,18 @@ function Star({ video, star, bookmarks, attributes, categories, setActive }: Sta
       // Bookmark has ZERO Overlapping Attributes
       if (!overlappingAttributes) {
         // Request Bookmark Update
-        mutateAddStar({ id: bookmark.id, starID: star.id })
+        mutateAddStar({
+          starID: star.id,
+          id: bookmark.id
+        })
       }
     }
   }
 
   const commonAttributes = useMemo(() => {
-    const starBookmarks = bookmarks.filter(b => b.starID === star.id)
-    const attributeIds = starBookmarks.map(bookmark => bookmark.attributes.map(attribute => attribute.id))
-    const commonAttributeIds = attributeIds.reduce(
+    const starBookmarks = bookmarks?.filter(b => b.starID === star.id)
+    const attributeIds = starBookmarks?.map(bookmark => bookmark.attributes.map(attribute => attribute.id))
+    const commonAttributeIds = attributeIds?.reduce(
       (common, ids) => common.filter(id => ids.includes(id)),
       attributeIds.shift() ?? []
     )
@@ -276,7 +235,7 @@ function Star({ video, star, bookmarks, attributes, categories, setActive }: Sta
               <Typography>{star.name}</Typography>
             </Link>
 
-            {bookmarks.every(bookmark => bookmark.starID !== star.id) && <Ribbon label='NEW' />}
+            {bookmarks?.every(bookmark => bookmark.starID !== star.id) && <Ribbon label='NEW' />}
           </RibbonContainer>
         </ContextMenuTrigger>
 
@@ -289,7 +248,7 @@ function Star({ video, star, bookmarks, attributes, categories, setActive }: Sta
               setActive(null)
               setModal(
                 'Add Bookmark',
-                categories.map(category => (
+                categories?.map(category => (
                   <Button
                     key={category.id}
                     variant='outlined'
@@ -311,13 +270,13 @@ function Star({ video, star, bookmarks, attributes, categories, setActive }: Sta
             component={ContextMenuItem}
             icon='add'
             text='Add Attribute'
-            disabled={bookmarks.every(bookmark => bookmark.starID !== star.id)}
+            disabled={bookmarks?.every(bookmark => bookmark.starID !== star.id)}
             onClick={() => {
               setActive(null)
               setModal(
                 'Add Attribute',
                 attributes
-                  .filter(attribute => !commonAttributes.includes(attribute.id))
+                  ?.filter(attribute => !commonAttributes?.includes(attribute.id))
                   .map(attribute => (
                     <Button
                       key={attribute.id}
@@ -325,7 +284,7 @@ function Star({ video, star, bookmarks, attributes, categories, setActive }: Sta
                       color='primary'
                       onClick={() => {
                         setModal()
-                        addAttribute(attribute)
+                        mutateAddStarAttribute({ attributeID: attribute.id })
                       }}
                     >
                       {attribute.name}
@@ -340,8 +299,8 @@ function Star({ video, star, bookmarks, attributes, categories, setActive }: Sta
             component={ContextMenuItem}
             icon='delete'
             text='Remove'
-            disabled={bookmarks.some(bookmark => bookmark.starID === star.id)}
-            onClick={removeStar}
+            disabled={bookmarks?.some(bookmark => bookmark.starID === star.id)}
+            onClick={() => mutateRemoveStar({ starID: star.id })}
           />
         </ContextMenu>
       </motion.div>
@@ -350,22 +309,27 @@ function Star({ video, star, bookmarks, attributes, categories, setActive }: Sta
 }
 
 type StarInputProps = {
-  video: Video
-  stars: VideoStar[]
-  bookmarks: Bookmark[]
   attributes: Attribute[]
 }
-function StarInput({ video, stars, bookmarks, attributes }: StarInputProps) {
+function StarInput({ attributes }: StarInputProps) {
+  const { videoId } = Route.useParams()
+
+  const { data: video } = videoService.useVideo(videoId)
+  const { data: stars } = videoService.useStars(videoId)
+  const { data: bookmarks } = videoService.useBookmarks(videoId)
+
   const [input, setInput] = useState('')
   const [noStarToggle, setNoStarToggle] = useState(false)
-  const { mutate } = videoService.useAddStar(video.id)
+  const { mutate } = videoService.useAddStar(videoId)
 
   useEffect(() => {
-    setNoStarToggle(video.noStar)
-  }, [video.noStar])
+    if (video !== undefined) {
+      setNoStarToggle(video.noStar)
+    }
+  }, [video])
 
   const handleNoStar = (checked: boolean) => {
-    videoService.toggleNoStar(video.id, checked).then(() => {
+    videoService.toggleNoStar(videoId, checked).then(() => {
       location.reload()
     })
   }
@@ -375,6 +339,8 @@ function StarInput({ video, stars, bookmarks, attributes }: StarInputProps) {
       mutate({ name })
     }
   }
+
+  if (video === undefined || stars === undefined || bookmarks === undefined) return <Spinner />
 
   return (
     <Grid container justifyContent='center'>
@@ -395,6 +361,7 @@ function StarInput({ video, stars, bookmarks, attributes }: StarInputProps) {
                 // Reset Input
                 setInput('')
 
+                // TODO use form
                 // Reset focused state
                 ;(e.target as HTMLInputElement).blur()
               }
@@ -423,9 +390,9 @@ function StarInput({ video, stars, bookmarks, attributes }: StarInputProps) {
       </div>
 
       <Grid container marginBottom={1}>
-        <AddRelatedStars video={video} disabled={bookmarks.length > 0 || stars.length > 0 || noStarToggle} />
+        <AddRelatedStars disabled={bookmarks.length > 0 || stars.length > 0 || noStarToggle} />
 
-        <RemoveUnusedStars bookmarks={bookmarks} stars={stars} disabled={stars.length === 0} video={video} />
+        <RemoveUnusedStars disabled={stars.length === 0} />
       </Grid>
 
       {attributes.length > 0 && <Divider sx={{ opacity: 0.6 }} />}
@@ -434,23 +401,25 @@ function StarInput({ video, stars, bookmarks, attributes }: StarInputProps) {
 }
 
 type AddRelatedStarsProps = {
-  video: Video
   disabled: boolean
 }
-function AddRelatedStars({ video, disabled }: AddRelatedStarsProps) {
-  const { data: relatedStars } = videoService.useRelatedStars(video.id)
+function AddRelatedStars({ disabled }: AddRelatedStarsProps) {
+  const { videoId } = Route.useParams()
 
-  const { mutateAll } = videoService.useAddStar(video.id)
+  const { data: relatedStars } = videoService.useRelatedStars(videoId)
+
+  const { mutateAll } = videoService.useAddStar(videoId)
 
   if (disabled || relatedStars === undefined || relatedStars.length === 0) return null
 
-  const handleClick = () => {
-    mutateAll(relatedStars.map(star => ({ name: star.name })))
-  }
-
   return (
     <div style={{ width: '100%' }} className='text-center'>
-      <Button size='small' variant='outlined' color='primary' onClick={handleClick}>
+      <Button
+        size='small'
+        variant='outlined'
+        color='primary'
+        onClick={() => mutateAll(relatedStars.map(star => ({ name: star.name })))}
+      >
         Add Related Stars ({relatedStars.length})
       </Button>
     </div>
@@ -458,37 +427,48 @@ function AddRelatedStars({ video, disabled }: AddRelatedStarsProps) {
 }
 
 type RemoveUnusedStarsProps = {
-  bookmarks: Bookmark[]
-  stars: VideoStar[]
-  video: Video
   disabled: boolean
 }
-function RemoveUnusedStars({ video, bookmarks, stars, disabled }: RemoveUnusedStarsProps) {
-  const { mutateAll } = videoService.useRemoveStar(video.id)
+function RemoveUnusedStars({ disabled }: RemoveUnusedStarsProps) {
+  const { videoId } = Route.useParams()
 
-  if (disabled || stars.every(star => bookmarks.some(bookmark => bookmark.starID === star.id))) {
+  const { data: stars } = videoService.useStars(videoId)
+  const { data: bookmarks } = videoService.useBookmarks(videoId)
+
+  const { mutateAll } = videoService.useRemoveStar(videoId)
+
+  if (stars === undefined) return <Spinner />
+
+  if (disabled || stars.every(star => bookmarks?.some(bookmark => bookmark.starID === star.id))) {
     return null
-  }
-
-  const handleClick = () => {
-    mutateAll(
-      stars.filter(star => bookmarks.every(bookmark => bookmark.starID !== star.id)).map(star => ({ starID: star.id }))
-    )
   }
 
   return (
     <div style={{ width: '100%' }} className='text-center'>
-      <Button size='small' variant='outlined' color='primary' onClick={handleClick}>
+      <Button
+        size='small'
+        variant='outlined'
+        color='primary'
+        onClick={() => {
+          mutateAll(
+            stars
+              .filter(star => bookmarks?.every(bookmark => bookmark.starID !== star.id))
+              .map(star => ({ starID: star.id }))
+          )
+        }}
+      >
         Remove Unused Stars
       </Button>
     </div>
   )
 }
 
-type FranchiseProps = {
-  video: Video
-}
-function Franchise({ video }: FranchiseProps) {
+function Franchise() {
+  const { videoId } = Route.useParams()
+
+  const { data: video } = videoService.useVideo(videoId)
+
+  if (video === undefined) return <Spinner />
   if (video.related.length === 1) return null
 
   return (
@@ -543,11 +523,14 @@ function Attributes({ attributes, setActive }: AttributesProps) {
 }
 
 type OutfitProps = {
-  bookmarks: Bookmark[]
   setActive: SetState<string | null>
 }
-function Outfits({ bookmarks, setActive }: OutfitProps) {
-  const outfits = getUnique(bookmarks.flatMap(bookmark => (bookmark.outfit !== null ? [bookmark.outfit] : [])))
+function Outfits({ setActive }: OutfitProps) {
+  const { videoId } = Route.useParams()
+
+  const { data: bookmarks } = videoService.useBookmarks(videoId)
+
+  const outfits = getUnique(bookmarks?.flatMap(bookmark => (bookmark.outfit !== null ? [bookmark.outfit] : [])) ?? [])
 
   return (
     <Grid container justifyContent='center' id={styles.outfits}>

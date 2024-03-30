@@ -6,60 +6,56 @@ import { ContextMenu, ContextMenuTrigger, ContextMenuItem } from 'rctx-contextme
 import Player, { MediaPlayerInstance } from '@/components/vidstack'
 
 import { IconWithText } from '../icon'
+import Spinner from '../spinner'
 
 import { serverConfig } from '@/config'
 import { useModalContext } from '@/context/modalContext'
-import { Bookmark, Category, Video, VideoStar } from '@/interface'
-import { videoService } from '@/service'
+import { Category } from '@/interface'
+import { categoryService, videoService } from '@/service'
 
 type VideoPlayerProps = {
-  video: Video
-  bookmarks: Bookmark[]
-  categories: Category[]
-  stars: VideoStar[]
+  videoId: number
   playerRef: React.RefObject<MediaPlayerInstance>
+  onReady: () => void
 }
-export default function VideoPlayer({ video, bookmarks, categories, stars, playerRef }: VideoPlayerProps) {
+export default function VideoPlayer({ videoId, playerRef, onReady }: VideoPlayerProps) {
   const navigate = useNavigate()
-  const { mutate: mutateAddBookmark } = videoService.useAddBookmark(video.id)
-  const { mutate: mutateToggleCensor } = videoService.useToggleCensor(video.id)
 
-  const { modal, setModal } = useModalContext()
+  const { data: video } = videoService.useVideo(videoId)
+  const { data: categories } = categoryService.useAll()
+  const { data: stars } = videoService.useStars(videoId)
+
+  const { mutate: mutateAddBookmark } = videoService.useAddBookmark(videoId)
+  const { mutate: mutateToggleCensor } = videoService.useToggleCensor(videoId)
+
+  const { setModal } = useModalContext()
+
+  if (video === undefined) return <Spinner />
 
   const copy = () => {
     navigator.clipboard.writeText(video.path.file.slice(0, -4))
   }
 
   const deleteVideo = () => {
-    videoService.deleteVideo(video.id).then(() => {
+    videoService.deleteVideo(videoId).then(() => {
       navigate({ to: '/video' })
     })
   }
 
   const renameVideo = (path: string) => {
-    videoService.renameVideo(video.id, path).then(() => {
-      location.reload()
-    })
-  }
-
-  const censorToggle = () => {
-    mutateToggleCensor({ cen: !video.censored })
-  }
-
-  const updateVideo = () => {
-    videoService.updateVideo(video.id).then(() => {
+    videoService.renameVideo(videoId, path).then(() => {
       location.reload()
     })
   }
 
   const setCover = () => {
-    videoService.setCover(video.id).then(() => {
+    videoService.setCover(videoId).then(() => {
       location.reload()
     })
   }
 
   const setPoster = () => {
-    videoService.setPoster(video.id).then(() => {
+    videoService.setPoster(videoId).then(() => {
       location.reload()
     })
   }
@@ -70,7 +66,10 @@ export default function VideoPlayer({ video, bookmarks, categories, stars, playe
     if (player !== null) {
       const time = Math.round(player.currentTime)
       if (time) {
-        mutateAddBookmark({ categoryID: category.id, time })
+        mutateAddBookmark({
+          categoryID: category.id,
+          time
+        })
       }
     }
   }
@@ -79,17 +78,16 @@ export default function VideoPlayer({ video, bookmarks, categories, stars, playe
     <>
       <ContextMenuTrigger id='video'>
         <Player
+          videoId={videoId}
           title={video.name}
           playerRef={playerRef}
-          video={video}
-          bookmarks={bookmarks}
-          poster={`${serverConfig.newApi}/video/${video.id}/poster`}
-          thumbnails={`${serverConfig.newApi}/video/${video.id}/vtt`}
+          poster={`${serverConfig.newApi}/video/${videoId}/poster`}
+          thumbnails={`${serverConfig.newApi}/video/${videoId}/vtt`}
           src={{
-            video: `${serverConfig.newApi}/video/${video.id}/file`,
-            hls: `${serverConfig.newApi}/video/${video.id}/hls`
+            video: `${serverConfig.newApi}/video/${videoId}/file`,
+            hls: `${serverConfig.newApi}/video/${videoId}/hls`
           }}
-          modal={modal}
+          onReady={onReady}
         />
       </ContextMenuTrigger>
 
@@ -102,7 +100,7 @@ export default function VideoPlayer({ video, bookmarks, categories, stars, playe
           onClick={() => {
             setModal(
               'Add Bookmark',
-              categories.map(category => (
+              categories?.map(category => (
                 <Button
                   variant='outlined'
                   color='primary'
@@ -124,7 +122,7 @@ export default function VideoPlayer({ video, bookmarks, categories, stars, playe
           component={ContextMenuItem}
           icon={video.censored ? 'check-circle' : 'warn-cirlce'}
           text={video.censored ? 'UnCensor' : 'Censor'}
-          onClick={censorToggle}
+          onClick={() => mutateToggleCensor({ cen: !video.censored })}
         />
 
         <IconWithText
@@ -141,6 +139,7 @@ export default function VideoPlayer({ video, bookmarks, categories, stars, playe
                   if (e.key === 'Enter') {
                     setModal()
 
+                    // TODO use form
                     renameVideo((e.target as HTMLInputElement).value)
                   }
                 }}
@@ -167,7 +166,16 @@ export default function VideoPlayer({ video, bookmarks, categories, stars, playe
           }}
         />
 
-        <IconWithText component={ContextMenuItem} icon='edit' text='Update Video' onClick={updateVideo} />
+        <IconWithText
+          component={ContextMenuItem}
+          icon='edit'
+          text='Update Video'
+          onClick={() => {
+            videoService.updateVideo(videoId).then(() => {
+              location.reload()
+            })
+          }}
+        />
 
         <hr />
 
@@ -175,7 +183,7 @@ export default function VideoPlayer({ video, bookmarks, categories, stars, playe
           component={ContextMenuItem}
           icon='delete'
           text='Delete Video'
-          disabled={stars.length !== 0}
+          disabled={stars === undefined || stars.length !== 0}
           onClick={deleteVideo}
         />
       </ContextMenu>

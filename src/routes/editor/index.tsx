@@ -73,10 +73,6 @@ function Table({ name, obj }: WrapperProps) {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: [name] })
   })
 
-  const updateItem = (ref: UpdateRef, value: string) => {
-    mutateCheckbox({ ref, name: value })
-  }
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
 
@@ -114,7 +110,14 @@ function Table({ name, obj }: WrapperProps) {
           </TableHead>
 
           <TableBody>
-            {data?.map(item => <TableRow key={item.id} obj={obj} data={item} update={updateItem} />)}
+            {data?.map(item => (
+              <TableRow
+                key={item.id}
+                obj={obj}
+                data={item}
+                update={(ref, value) => mutateCheckbox({ ref, name: value })}
+              />
+            ))}
           </TableBody>
         </MuiTable>
       </TableContainer>

@@ -57,24 +57,30 @@ export default {
     return { mutate }
   },
   useAddImage: (id: number) => {
+    // const queryClient = useQueryClient()
+
     const { mutate } = useMutation<unknown, Error, { url: string }>({
       mutationKey: ['star', id, 'addImage'],
       mutationFn: payload => api.post(`/${id}/image`, payload),
       onSuccess: () => {
         // reload required for context-menu to update
         location.reload()
+        // queryClient.invalidateQueries({ ...keys.star.byId(id) })
       }
     })
 
     return { mutate }
   },
   useRemoveImage: (id: number) => {
+    // const queryClient = useQueryClient()
+
     const { mutate } = useMutation({
       mutationKey: ['star', id, 'removeImage'],
       mutationFn: () => api.delete(`/${id}/image`),
       onSuccess: () => {
         // reload required for context-menu to update
         location.reload()
+        // queryClient.invalidateQueries({ ...keys.star.byId(id) })
       }
     })
 

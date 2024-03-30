@@ -4,43 +4,51 @@ import { useNavigate } from '@tanstack/react-router'
 import { ContextMenu, ContextMenuTrigger, ContextMenuItem } from 'rctx-contextmenu'
 
 import Icon, { IconWithText } from '../icon'
+import Spinner from '../spinner'
 
 import { useModalContext } from '@/context/modalContext'
-import { Video } from '@/interface'
 import { videoService } from '@/service'
 import { escapeRegExp } from '@/utils'
 
 import styles from './header.module.scss'
 
 type HeaderProps = {
-  video: Video
+  videoId: number
 }
-export default function Header({ video }: HeaderProps) {
+export default function Header({ videoId }: HeaderProps) {
+  const { data: video } = videoService.useVideo(videoId)
+
+  if (video === undefined) return <Spinner />
+
   return (
     <Grid container item alignItems='center' component='header' id={styles.header}>
-      <HeaderTitle video={video} isValid={video.isValid.title} />
+      <HeaderTitle videoId={videoId} isValid={video.isValid.title} />
 
       {video.slug === null ? (
-        <HeaderSlug video={video} />
+        <HeaderSlug videoId={videoId} />
       ) : (
         <>
-          <InvalidFname video={video} isValid={video.isValid.fname} />
-          <HeaderDate video={video} />
-          <HeaderNetwork video={video} />
+          <InvalidFname videoId={videoId} isValid={video.isValid.fname} />
+          <HeaderDate videoId={videoId} />
+          <HeaderNetwork videoId={videoId} />
         </>
       )}
 
-      <HeaderQuality video={video} />
+      <HeaderQuality videoId={videoId} />
     </Grid>
   )
 }
 
 type HeaderTitleProps = {
-  video: Video
+  videoId: number
   isValid: boolean
 }
-function HeaderTitle({ video, isValid }: HeaderTitleProps) {
+function HeaderTitle({ videoId, isValid }: HeaderTitleProps) {
+  const { data: video } = videoService.useVideo(videoId)
+
   const { setModal } = useModalContext()
+
+  if (video === undefined) return <Spinner />
 
   const copyFranchise = () => {
     navigator.clipboard.writeText(video.franchise)
@@ -51,26 +59,26 @@ function HeaderTitle({ video, isValid }: HeaderTitleProps) {
       const newTitle = video.name.replace(new RegExp(`^${escapeRegExp(video.franchise)}`), newFranchise)
 
       Promise.allSettled([
-        videoService.renameFranchise(video.id, newFranchise),
-        videoService.renameTitle(video.id, newTitle)
+        videoService.renameFranchise(videoId, newFranchise),
+        videoService.renameTitle(videoId, newTitle)
       ]).then(() => {
         location.reload()
       })
     } else {
-      videoService.renameFranchise(video.id, newFranchise).then(() => {
+      videoService.renameFranchise(videoId, newFranchise).then(() => {
         location.reload()
       })
     }
   }
 
   const renameTitle = (newTitle: string) => {
-    videoService.renameTitle(video.id, newTitle).then(() => {
+    videoService.renameTitle(videoId, newTitle).then(() => {
       location.reload()
     })
   }
 
   const setSlug = (slug: string) => {
-    videoService.setSlug(video.id, slug).then(() => {
+    videoService.setSlug(videoId, slug).then(() => {
       location.reload()
     })
   }
@@ -99,6 +107,7 @@ function HeaderTitle({ video, isValid }: HeaderTitleProps) {
                   if (e.key === 'Enter') {
                     setModal()
 
+                    // TODO use form
                     renameTitle((e.target as HTMLInputElement).value)
                   }
                 }}
@@ -122,6 +131,7 @@ function HeaderTitle({ video, isValid }: HeaderTitleProps) {
                   if (e.key === 'Enter') {
                     setModal()
 
+                    // TODO use form
                     renameFranchise((e.target as HTMLInputElement).value)
                   }
                 }}
@@ -146,6 +156,7 @@ function HeaderTitle({ video, isValid }: HeaderTitleProps) {
                 autoFocus
                 onKeyDown={e => {
                   if (e.key === 'Enter') {
+                    // TODO use form
                     const value: string = (e.target as HTMLInputElement).value
 
                     // Only submit data if all lowercase
@@ -174,13 +185,13 @@ function HeaderTitle({ video, isValid }: HeaderTitleProps) {
 }
 
 type HeaderSlugProps = {
-  video: Video
+  videoId: number
 }
-function HeaderSlug({ video }: HeaderSlugProps) {
+function HeaderSlug({ videoId }: HeaderSlugProps) {
   const { setModal } = useModalContext()
 
   const setSlug = (value: string) => {
-    videoService.setSlug(video.id, value).then(() => {
+    videoService.setSlug(videoId, value).then(() => {
       location.reload()
     })
   }
@@ -197,6 +208,8 @@ function HeaderSlug({ video }: HeaderSlugProps) {
             onKeyDown={e => {
               if (e.key === 'Enter') {
                 const value: string = (e.target as HTMLInputElement).value
+
+                // TODO use form
 
                 // Only submit data if all lowercase
                 if (value === value.toLowerCase()) {
@@ -215,11 +228,15 @@ function HeaderSlug({ video }: HeaderSlugProps) {
 }
 
 type HeaderDateProps = {
-  video: Video
+  videoId: number
 }
-function HeaderDate({ video }: HeaderDateProps) {
+function HeaderDate({ videoId }: HeaderDateProps) {
+  const { data: video } = videoService.useVideo(videoId)
+
+  if (video === undefined) return <Spinner />
+
   const handleDate = () => {
-    videoService.setDate(video.id).then(() => {
+    videoService.setDate(videoId).then(() => {
       location.reload()
     })
   }
@@ -233,19 +250,23 @@ function HeaderDate({ video }: HeaderDateProps) {
 }
 
 type InvalidFnameProps = {
-  video: Video
+  videoId: number
   isValid: boolean
 }
-function InvalidFname({ video, isValid }: InvalidFnameProps) {
-  if (isValid) return null
+function InvalidFname({ videoId, isValid }: InvalidFnameProps) {
+  const { data: video } = videoService.useVideo(videoId)
+
+  if (video === undefined) return <Spinner />
 
   const handleRename = () => {
     if (video.slug !== null) {
-      videoService.renameVideo(video.id, `${video.slug}.mp4`).then(() => {
+      videoService.renameVideo(videoId, `${video.slug}.mp4`).then(() => {
         location.reload()
       })
     }
   }
+
+  if (isValid) return null
 
   return (
     <Button size='small' variant='outlined' onClick={handleRename} disabled={video.slug === null}>
@@ -256,14 +277,18 @@ function InvalidFname({ video, isValid }: InvalidFnameProps) {
 }
 
 type HeaderNetworkProps = {
-  video: Video
+  videoId: number
 }
-function HeaderNetwork({ video }: HeaderNetworkProps) {
+function HeaderNetwork({ videoId }: HeaderNetworkProps) {
+  const { data: video } = videoService.useVideo(videoId)
+
   const navigate = useNavigate()
+
+  if (video === undefined) return <Spinner />
 
   const handleClick = () => {
     if (video.brand === null) {
-      videoService.setBrand(video.id).then(() => {
+      videoService.setBrand(videoId).then(() => {
         location.reload()
       })
     } else {
@@ -283,9 +308,12 @@ function HeaderNetwork({ video }: HeaderNetworkProps) {
 }
 
 type HeaderQualityProps = {
-  video: Video
+  videoId: number
 }
-function HeaderQuality({ video }: HeaderQualityProps) {
+function HeaderQuality({ videoId }: HeaderQualityProps) {
+  const { data: video } = videoService.useVideo(videoId)
+
+  if (video === undefined) return <Spinner />
   if (video.quality >= 1080) return null
 
   return (

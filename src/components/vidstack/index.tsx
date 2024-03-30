@@ -16,23 +16,27 @@ import { DefaultVideoLayout, defaultLayoutIcons } from '@vidstack/react/player/l
 import Hls, { ErrorData } from 'hls.js'
 import { useSessionStorage } from 'usehooks-ts'
 
-import { Modal } from '@/context/modalContext'
-import { Bookmark, Video } from '@/interface'
+import { useModalContext } from '@/context/modalContext'
+import { videoService } from '@/service'
 
 import './vidstack.css'
 
 type PlayerProps = {
+  videoId: number
   title: string
   src: { video: string; hls: string }
   poster?: string
   thumbnails?: string
-  video: Video
-  bookmarks: Bookmark[]
   playerRef: React.RefObject<MediaPlayerInstance>
-  modal: Modal
+  onReady: () => void
 }
 
-export default function Player({ title, src, poster, thumbnails, video, playerRef, modal, bookmarks }: PlayerProps) {
+export default function Player({ videoId, title, src, poster, thumbnails, playerRef, onReady }: PlayerProps) {
+  const { data: video } = videoService.useVideo(videoId)
+  const { data: bookmarks } = videoService.useBookmarks(videoId)
+
+  const { modal } = useModalContext()
+
   const remote = useMediaRemote(playerRef)
   const hlsRef = useRef<Hls>()
 
@@ -40,13 +44,17 @@ export default function Player({ title, src, poster, thumbnails, video, playerRe
   const [localBookmark, setLocalBookmark] = useSessionStorage('bookmark', 0)
 
   useEffect(() => {
+    if (video === undefined) return
+
     if (localVideo !== video.id) {
       setLocalVideo(video.id)
       setLocalBookmark(0)
     }
-  }, [localVideo, setLocalBookmark, setLocalVideo, video.id])
+  }, [localVideo, setLocalBookmark, setLocalVideo, video])
 
   const chapters = useMemo<VTTContent>(() => {
+    if (bookmarks === undefined || video === undefined) return { cues: [] }
+
     return {
       cues: bookmarks.map((bookmark, idx, arr) => ({
         startTime: bookmark.start,
@@ -54,7 +62,7 @@ export default function Player({ title, src, poster, thumbnails, video, playerRe
         text: bookmark.name
       }))
     }
-  }, [bookmarks, video.duration])
+  }, [bookmarks, video])
 
   const onProviderChange = (provider: MediaProviderAdapter | null) => {
     if (provider === null) return
@@ -63,6 +71,8 @@ export default function Player({ title, src, poster, thumbnails, video, playerRe
       provider.library = () => import('hls.js')
       provider.config = { maxBufferLength: Infinity, autoStartLoad: false }
     }
+
+    onReady()
   }
 
   const onTimeUpdate = (detail: MediaTimeUpdateEventDetail) => {
@@ -92,6 +102,7 @@ export default function Player({ title, src, poster, thumbnails, video, playerRe
 
   return (
     <MediaPlayer
+      onCanPlay={onReady}
       ref={playerRef}
       src={[
         { src: src.video, type: 'video/mp4' },

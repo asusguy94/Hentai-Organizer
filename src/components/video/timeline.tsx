@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { Button } from '@mui/material'
 
@@ -10,49 +10,38 @@ import { MediaPlayerInstance } from '@/components/vidstack'
 
 import { IconWithText } from '../icon'
 import MissingImage from '../image/missing'
+import Spinner from '../spinner'
 
 import { serverConfig } from '@/config'
 import { useActiveContext } from '@/context/activeContext'
 import { useModalContext } from '@/context/modalContext'
 import { useStarEventContext } from '@/context/starEventContext'
 import useCollision from '@/hooks/useCollision'
-import { Attribute, Bookmark, Category, VideoStar, Video, Outfit } from '@/interface'
-import { bookmarkService, outfitService } from '@/service'
+import { Bookmark as BookmarkType } from '@/interface'
+import { attributeService, bookmarkService, categoryService, outfitService, videoService } from '@/service'
 
 import styles from './timeline.module.scss'
 
 const spacing = { top: 3, bookmark: 36 }
 
 type TimelineProps = {
-  video: Video
-  bookmarks: Bookmark[]
-  stars: VideoStar[]
-  attributes: Attribute[]
-  categories: Category[]
+  videoId: number
   playerRef: React.RefObject<MediaPlayerInstance>
+  playerReady: boolean
 }
-export default function Timeline({ video, bookmarks, stars, attributes, categories, playerRef }: TimelineProps) {
+export default function Timeline({ videoId, playerRef, playerReady }: TimelineProps) {
   const windowSize = useWindowSize()
   const bookmarksRef = useRef<HTMLButtonElement[]>([])
   const [maxLevel, setMaxLevel] = useState(0)
   const [bookmarkLevels, setBookmarkLevels] = useState<number[]>([])
   const { collisionCheck } = useCollision()
 
-  const { data: outfits } = outfitService.useAll()
-
-  const { mutate: mutateSetTime } = bookmarkService.useSetTime(video.id)
-  const { mutate: mutateSetCategory } = bookmarkService.useSetCategory(video.id)
-  const { mutate: mutateAddAttribute } = bookmarkService.useAddAttribute(video.id)
-  const { mutate: mutateRemoveAttribute } = bookmarkService.useRemoveAttribute(video.id)
-  const { mutate: mutateSetOutfit } = bookmarkService.useSetOutfit(video.id)
-  const { mutate: mutateRemoveBookmark } = bookmarkService.useRemoveBookmark(video.id)
-  const { mutate: mutateRemoveStar } = bookmarkService.useRemoveStar(video.id)
-
-  const { active } = useActiveContext()
-  const { setEvent: setStarEvent } = useStarEventContext()
-  const { setModal } = useModalContext()
+  const { data: video } = videoService.useVideo(videoId)
+  const { data: bookmarks } = videoService.useBookmarks(videoId)
 
   useEffect(() => {
+    if (bookmarks === undefined) return
+
     const bookmarksArr = bookmarks.length > 0 ? bookmarksRef.current : []
     const levels = Array<number>(bookmarks.length).fill(0)
     let maxLevel = 0
@@ -72,7 +61,7 @@ export default function Timeline({ video, bookmarks, stars, attributes, categori
 
     setMaxLevel(maxLevel)
     setBookmarkLevels(levels)
-  }, [bookmarks, collisionCheck, playerRef, windowSize.width])
+  }, [bookmarks, collisionCheck, playerRef, windowSize.width, playerReady])
 
   useEffect(() => {
     const setHeight = () => {
@@ -91,62 +80,62 @@ export default function Timeline({ video, bookmarks, stars, attributes, categori
     return () => {
       window.removeEventListener('scroll', setHeight)
     }
-  }, [maxLevel, playerRef])
+  }, [maxLevel, playerRef, playerReady])
 
-  const setTime = (bookmarkID: number) => {
-    const player = playerRef.current
+  if (video === undefined || bookmarks === undefined) return <Spinner />
 
-    if (player !== null) {
-      const time = Math.round(player.currentTime)
+  return (
+    <div id={styles.timeline} style={bookmarks.length > 0 ? { marginTop: spacing.top } : {}}>
+      {bookmarks.map((bookmark, idx) => (
+        <Bookmark
+          key={bookmark.id}
+          bookmark={bookmark}
+          duration={video.duration}
+          top={`${(bookmarkLevels[idx] - 1) * spacing.bookmark}px`}
+          videoId={videoId}
+          playerRef={playerRef}
+          bookmarkRef={ref => (bookmarksRef.current[idx] = ref)}
+        />
+      ))}
+    </div>
+  )
+}
 
-      mutateSetTime({ time, id: bookmarkID })
-    }
-  }
+type BookmarkProps = {
+  bookmark: BookmarkType
+  duration: number
+  top: string
+  videoId: number
+  playerRef: React.RefObject<MediaPlayerInstance>
+  bookmarkRef: (btn: HTMLButtonElement) => void
+}
 
-  const hasStar = (bookmark: Bookmark) => bookmark.starID > 0
-  const attributesFromStar = (starID: number) => stars.find(star => star.id === starID)?.attributes ?? []
-  const isStarAttribute = (starID: number, attributeID: number) => {
-    return attributesFromStar(starID).some(attr => attr.id === attributeID)
-  }
+function Bookmark({ bookmark, duration, top, videoId, playerRef, bookmarkRef }: BookmarkProps) {
+  const { data: outfits } = outfitService.useAll()
+  const { data: attributes } = attributeService.useAll()
+  const { data: categories } = categoryService.useAll()
+  const { data: stars } = videoService.useStars(videoId)
 
-  const removeBookmark = (id: number) => {
-    mutateRemoveBookmark({ id })
-  }
+  const { mutate: mutateSetTime } = bookmarkService.useSetTime(videoId, bookmark.id)
+  const { mutate: mutateSetCategory } = bookmarkService.useSetCategory(videoId, bookmark.id)
+  const { mutate: mutateAddAttribute } = bookmarkService.useAddAttribute(videoId, bookmark.id)
+  const { mutate: mutateRemoveAttribute } = bookmarkService.useRemoveAttribute(videoId, bookmark.id)
+  const { mutate: mutateSetOutfit } = bookmarkService.useSetOutfit(videoId, bookmark.id)
+  const { mutate: mutateRemoveBookmark } = bookmarkService.useRemoveBookmark(videoId, bookmark.id)
+  const { mutate: mutateRemoveStar } = bookmarkService.useRemoveStar(videoId, bookmark.id)
+  const { mutate: mutateRemoveOutfit } = bookmarkService.useRemoveOutfit(videoId, bookmark.id)
+  const { mutate: mutateClearAttributes } = bookmarkService.useClearAttributes(videoId, bookmark.id)
 
-  const setCategory = (category: Category, bookmark: Bookmark) => {
-    mutateSetCategory({ categoryID: category.id, id: bookmark.id })
-  }
+  const { active } = useActiveContext()
+  const { setEvent: setStarEvent } = useStarEventContext()
+  const { setModal } = useModalContext()
 
-  const setOutfit = (outfit: Outfit, bookmark: Bookmark) => {
-    mutateSetOutfit({ outfitID: outfit.id, id: bookmark.id })
-  }
+  const isActive =
+    (active.star !== null && bookmark.starID === active.star.id) ||
+    (active.attribute !== null && bookmark.attributes.some(a => a.id === active.attribute?.id)) ||
+    (active.outfit !== null && bookmark.outfit === active.outfit)
 
-  const removeOutfit = (bookmark: Bookmark) => {
-    bookmarkService.removeOutfit(bookmark.id).then(() => {
-      location.reload()
-    })
-  }
-
-  const addAttribute = (attribute: Attribute, bookmark: Bookmark) => {
-    mutateAddAttribute({ attributeID: attribute.id, id: bookmark.id })
-  }
-
-  const removeAttribute = (bookmark: Bookmark, attribute: Attribute) => {
-    mutateRemoveAttribute({
-      attributeID: attribute.id,
-      id: bookmark.id
-    })
-  }
-
-  const clearAttributes = (bookmark: Bookmark) => {
-    bookmarkService.clearAttributes(bookmark.id).then(() => {
-      location.reload()
-    })
-  }
-
-  const removeStar = (bookmark: Bookmark) => {
-    mutateRemoveStar({ id: bookmark.id })
-  }
+  const tooltip = bookmark.starID > 0 || bookmark.attributes.length > 0 || bookmark.outfit !== null
 
   const playVideo = (time: number) => {
     const player = playerRef.current
@@ -156,254 +145,247 @@ export default function Timeline({ video, bookmarks, stars, attributes, categori
     }
   }
 
+  const setTime = () => {
+    const player = playerRef.current
+
+    if (player !== null) {
+      const time = Math.round(player.currentTime)
+
+      mutateSetTime({ time })
+    }
+  }
+
+  const attributesFromStar = (starID: number) => stars?.find(star => star.id === starID)?.attributes ?? []
+  const isStarAttribute = (starID: number, attributeID: number) => {
+    return attributesFromStar(starID).some(attr => attr.id === attributeID)
+  }
+
   return (
-    <div id={styles.timeline} style={bookmarks.length > 0 ? { marginTop: spacing.top } : {}}>
-      {bookmarks.map((bookmark, idx) => {
-        const tooltip = bookmark.starID > 0 || bookmark.attributes.length > 0 || bookmark.outfit !== null
+    <>
+      <ContextMenuTrigger id={`bookmark-${bookmark.id}`}>
+        <Button
+          size='small'
+          variant={isActive ? 'contained' : 'outlined'}
+          color={bookmark.starID !== 0 ? 'primary' : 'secondary'}
+          className={styles.bookmark}
+          style={{
+            left: `${(bookmark.start / duration) * 100}%`,
+            top
+          }}
+          onMouseDown={e => e.button === 0 && playVideo(bookmark.start)}
+          ref={bookmarkRef}
+        >
+          <div data-tooltip-id={bookmark.id.toString()}>{bookmark.name}</div>
 
-        const isActive =
-          (active.star !== null && bookmark.starID === active.star.id) ||
-          (active.attribute !== null && bookmark.attributes.some(a => a.id === active.attribute?.id)) ||
-          (active.outfit !== null && bookmark.outfit === active.outfit)
+          {tooltip && (
+            <Tooltip id={bookmark.id.toString()} className={styles.tooltip} opacity={1}>
+              {bookmark.starID !== 0 &&
+                (stars?.find(s => s.id === bookmark.starID)?.image === null ? (
+                  <MissingImage />
+                ) : (
+                  <img
+                    src={`${serverConfig.newApi}/star/${bookmark.starID}/image`}
+                    data-star-id={bookmark.starID}
+                    // missing={stars.find(s => s.id === bookmark.starID)?.image === null}
+                    alt='star'
+                  />
+                ))}
 
-        return (
-          <Fragment key={bookmark.id}>
-            <ContextMenuTrigger id={`bookmark-${bookmark.id}`}>
-              <Button
-                size='small'
-                variant={isActive ? 'contained' : 'outlined'}
-                color={hasStar(bookmark) ? 'primary' : 'secondary'}
-                className={styles.bookmark}
-                style={{
-                  left: `${(bookmark.start / video.duration) * 100}%`,
-                  top: `${(bookmarkLevels[idx] - 1) * spacing.bookmark}px`
-                }}
-                onMouseDown={e => e.button === 0 && playVideo(bookmark.start)}
-                ref={bookmark => bookmark !== null && (bookmarksRef.current[idx] = bookmark)}
-              >
-                <div data-tooltip-id={bookmark.id.toString()}>{bookmark.name}</div>
+              {bookmark.attributes
+                .sort((a, b) => {
+                  if (isStarAttribute(bookmark.starID, a.id)) return -1
+                  else if (isStarAttribute(bookmark.starID, b.id)) return 1
 
-                {tooltip && (
-                  <Tooltip id={bookmark.id.toString()} className={styles.tooltip} opacity={1}>
-                    {bookmark.starID !== 0 &&
-                      (stars.find(s => s.id === bookmark.starID)?.image === null ? (
-                        <MissingImage />
-                      ) : (
-                        <img
-                          src={`${serverConfig.newApi}/star/${bookmark.starID}/image`}
-                          data-star-id={bookmark.starID}
-                          // missing={stars.find(s => s.id === bookmark.starID)?.image === null}
-                          alt='star'
-                        />
-                      ))}
+                  return a.name.localeCompare(b.name)
+                })
+                .map(attribute => (
+                  <Button
+                    key={attribute.id}
+                    color='info'
+                    size='small'
+                    variant='contained'
+                    component='div'
+                    className={`attribute ${styles.btn}`}
+                  >
+                    {attribute.name}
+                  </Button>
+                ))}
 
-                    {bookmark.attributes
-                      .sort((a, b) => {
-                        if (isStarAttribute(bookmark.starID, a.id)) return -1
-                        else if (isStarAttribute(bookmark.starID, b.id)) return 1
+              {bookmark.outfit !== null && (
+                <>
+                  <hr />
+                  <Button
+                    key={`outfit__${bookmark.outfit}`}
+                    color='info'
+                    size='small'
+                    variant='contained'
+                    component='div'
+                    className={styles.btn}
+                  >
+                    {bookmark.outfit}
+                  </Button>
+                </>
+              )}
+            </Tooltip>
+          )}
+        </Button>
+      </ContextMenuTrigger>
 
-                        return a.name.localeCompare(b.name)
-                      })
-                      .map(attribute => (
-                        <Button
-                          key={attribute.id}
-                          color='info'
-                          size='small'
-                          variant='contained'
-                          component='div'
-                          className={`attribute ${styles.btn}`}
-                        >
-                          {attribute.name}
-                        </Button>
-                      ))}
-                    {bookmark.outfit !== null && (
-                      <>
-                        <hr />
-                        <Button
-                          key={`outfit__${bookmark.outfit}`}
-                          color='info'
-                          size='small'
-                          variant='contained'
-                          component='div'
-                          className={styles.btn}
-                        >
-                          {bookmark.outfit}
-                        </Button>
-                      </>
-                    )}
-                  </Tooltip>
-                )}
-              </Button>
-            </ContextMenuTrigger>
+      <ContextMenu id={`bookmark-${bookmark.id}`}>
+        <IconWithText
+          component={ContextMenuItem}
+          icon='add'
+          text='Add Star'
+          disabled={bookmark.starID !== 0 || stars === undefined || stars.length === 0}
+          onClick={() => setStarEvent(true, bookmark)}
+        />
 
-            <ContextMenu id={`bookmark-${bookmark.id}`}>
-              <IconWithText
-                component={ContextMenuItem}
-                icon='add'
-                text='Add Star'
-                disabled={bookmark.starID !== 0 || stars.length === 0}
-                onClick={() => setStarEvent(true, bookmark)}
-              />
+        <IconWithText
+          component={ContextMenuItem}
+          icon='delete'
+          text='Remove Star'
+          disabled={bookmark.starID === 0}
+          onClick={mutateRemoveStar}
+        />
 
-              <IconWithText
-                component={ContextMenuItem}
-                icon='delete'
-                text='Remove Star'
-                disabled={bookmark.starID === 0}
-                onClick={() => removeStar(bookmark)}
-              />
+        <hr />
 
-              <hr />
+        <IconWithText
+          component={ContextMenuItem}
+          icon='add'
+          text='Add Attribute'
+          onClick={() => {
+            setModal(
+              'Add Attribute',
+              attributes
+                ?.filter(attribute => bookmark.attributes.every(attr => attribute.name !== attr.name))
+                .map(attribute => (
+                  <Button
+                    key={attribute.id}
+                    variant='outlined'
+                    color='primary'
+                    onClick={() => {
+                      setModal()
+                      mutateAddAttribute({ attributeID: attribute.id })
+                    }}
+                  >
+                    {attribute.name}
+                  </Button>
+                )),
+              true
+            )
+          }}
+        />
 
-              <IconWithText
-                component={ContextMenuItem}
-                icon='add'
-                text='Add Attribute'
-                onClick={() => {
-                  setModal(
-                    'Add Attribute',
-                    attributes
-                      .filter(attribute => bookmark.attributes.every(attr => attribute.name !== attr.name))
-                      .map(attribute => (
-                        <Button
-                          key={attribute.id}
-                          variant='outlined'
-                          color='primary'
-                          onClick={() => {
-                            setModal()
-                            addAttribute(attribute, bookmark)
-                          }}
-                        >
-                          {attribute.name}
-                        </Button>
-                      )),
-                    true
-                  )
-                }}
-              />
+        <IconWithText
+          component={ContextMenuItem}
+          icon='delete'
+          text='Remove Attribute'
+          disabled={attributesFromStar(bookmark.starID).length >= bookmark.attributes.length}
+          onClick={() => {
+            setModal(
+              'Remove Attribute',
+              bookmark.attributes
+                // only show attribute, if not from star
+                .filter(attribute => !isStarAttribute(bookmark.starID, attribute.id))
+                .map(attribute => (
+                  <Button
+                    key={attribute.id}
+                    variant='outlined'
+                    color='primary'
+                    onClick={() => {
+                      setModal()
+                      mutateRemoveAttribute({ attributeID: attribute.id })
+                    }}
+                  >
+                    {attribute.name}
+                  </Button>
+                )),
+              true
+            )
+          }}
+        />
 
-              <IconWithText
-                component={ContextMenuItem}
-                icon='delete'
-                text='Remove Attribute'
-                disabled={attributesFromStar(bookmark.starID).length >= bookmark.attributes.length}
-                onClick={() => {
-                  setModal(
-                    'Remove Attribute',
-                    bookmark.attributes
-                      // only show attribute, if not from star
-                      .filter(attribute => !isStarAttribute(bookmark.starID, attribute.id))
-                      .map(attribute => (
-                        <Button
-                          key={attribute.id}
-                          variant='outlined'
-                          color='primary'
-                          onClick={() => {
-                            setModal()
-                            removeAttribute(bookmark, attribute)
-                          }}
-                        >
-                          {attribute.name}
-                        </Button>
-                      )),
-                    true
-                  )
-                }}
-              />
+        <IconWithText
+          component={ContextMenuItem}
+          icon='delete'
+          text='Clear Attributes'
+          disabled={attributesFromStar(bookmark.starID).length >= bookmark.attributes.length}
+          onClick={mutateClearAttributes}
+        />
 
-              <IconWithText
-                component={ContextMenuItem}
-                icon='delete'
-                text='Clear Attributes'
-                disabled={attributesFromStar(bookmark.starID).length >= bookmark.attributes.length}
-                onClick={() => clearAttributes(bookmark)}
-              />
+        <hr />
 
-              <hr />
+        <IconWithText
+          component={ContextMenuItem}
+          icon='add'
+          text='Set Outfit'
+          onClick={() => {
+            setModal(
+              'Set Outfit',
+              outfits
+                ?.filter(outfit => outfit.name !== bookmark.outfit)
+                .map(outfit => (
+                  <Button
+                    key={outfit.id}
+                    variant='outlined'
+                    color='primary'
+                    onClick={() => {
+                      setModal()
+                      mutateSetOutfit({ outfitID: outfit.id })
+                    }}
+                  >
+                    {outfit.name}
+                  </Button>
+                )),
+              true
+            )
+          }}
+        />
 
-              <IconWithText
-                component={ContextMenuItem}
-                icon='add'
-                text='Set Outfit'
-                onClick={() => {
-                  setModal(
-                    'Set Outfit',
-                    outfits
-                      ?.filter(outfit => outfit.name !== bookmark.outfit)
-                      .map(outfit => (
-                        <Button
-                          key={outfit.id}
-                          variant='outlined'
-                          color='primary'
-                          onClick={() => {
-                            setModal()
-                            setOutfit(outfit, bookmark)
-                          }}
-                        >
-                          {outfit.name}
-                        </Button>
-                      )),
-                    true
-                  )
-                }}
-              />
+        <IconWithText
+          component={ContextMenuItem}
+          icon='delete'
+          text='Remove Outfit'
+          disabled={bookmark.outfit === null}
+          onClick={mutateRemoveOutfit}
+        />
 
-              <IconWithText
-                component={ContextMenuItem}
-                icon='delete'
-                text='Remove Outfit'
-                disabled={bookmark.outfit === null}
-                onClick={() => removeOutfit(bookmark)}
-              />
+        <hr />
 
-              <hr />
+        <IconWithText
+          component={ContextMenuItem}
+          icon='edit'
+          text='Change Category'
+          onClick={() => {
+            setModal(
+              'Change Category',
+              categories
+                ?.filter(category => category.name !== bookmark.name)
+                .map(category => (
+                  <Button
+                    key={category.id}
+                    variant='outlined'
+                    color='primary'
+                    onClick={() => {
+                      setModal()
+                      mutateSetCategory({ categoryID: category.id })
+                    }}
+                  >
+                    {category.name}
+                  </Button>
+                )),
+              true
+            )
+          }}
+        />
 
-              <IconWithText
-                component={ContextMenuItem}
-                icon='edit'
-                text='Change Category'
-                onClick={() => {
-                  setModal(
-                    'Change Category',
-                    categories
-                      .filter(category => category.name !== bookmark.name)
-                      .map(category => (
-                        <Button
-                          key={category.id}
-                          variant='outlined'
-                          color='primary'
-                          onClick={() => {
-                            setModal()
-                            setCategory(category, bookmark)
-                          }}
-                        >
-                          {category.name}
-                        </Button>
-                      )),
-                    true
-                  )
-                }}
-              />
+        <IconWithText component={ContextMenuItem} icon='time' text='Change Time' onClick={setTime} />
 
-              <IconWithText
-                component={ContextMenuItem}
-                icon='time'
-                text='Change Time'
-                onClick={() => setTime(bookmark.id)}
-              />
+        <hr />
 
-              <hr />
-
-              <IconWithText
-                component={ContextMenuItem}
-                icon='delete'
-                text='Delete'
-                onClick={() => removeBookmark(bookmark.id)}
-              />
-            </ContextMenu>
-          </Fragment>
-        )
-      })}
-    </div>
+        <IconWithText component={ContextMenuItem} icon='delete' text='Delete' onClick={mutateRemoveBookmark} />
+      </ContextMenu>
+    </>
   )
 }

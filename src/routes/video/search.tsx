@@ -242,7 +242,7 @@ function Filter() {
 }
 
 function Videos() {
-  const { sort, query, category, outfit, attribute, network, nullCategory } = useAllSearchParams(defaultObj)
+  const { sort, query, category, outfit, attribute, network, nullCategory, shuffle } = useAllSearchParams(defaultObj)
 
   const { data: videos, isLoading } = searchService.useVideos()
 
@@ -257,11 +257,16 @@ function Videos() {
     return videos.filter((_, idx) => idx < videoCount)
   }, [localSettings?.video_count, videos])
 
+  const sortedVideos = useMemo(() => {
+    if (sort === 'shuffle' && shuffle === defaultObj.shuffle) return filtered
+
+    return filtered.toSorted(getSort(sort))
+  }, [filtered, sort, shuffle])
+
   if (isLoading || videos === undefined) return <Spinner />
 
-  const visible = filtered
+  const visible = sortedVideos
     .filter(v => !v.noStar)
-    .sort(getSort(sort))
     .filter(v => v.name.toLowerCase().includes(query.toLowerCase()) || isDefault(query, defaultObj.query))
     .filter(
       v => category.split(',').every(cat => v.categories.includes(cat)) || isDefault(category, defaultObj.category)

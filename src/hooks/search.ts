@@ -6,6 +6,14 @@ import { AllowString } from '@/interface'
 
 type ParamValue<T, K extends keyof T> = T[K] extends string ? AllowString<T[K]> : never
 
+function generateSearch(searchParams: URLSearchParams) {
+  if (searchParams.size === 0) {
+    return ''
+  } else {
+    return '?' + searchParams.toString()
+  }
+}
+
 export function useDynamicSearchParam<T extends DefaultObj>(defaultValue: T) {
   const navigate = useNavigate()
 
@@ -21,7 +29,7 @@ export function useDynamicSearchParam<T extends DefaultObj>(defaultValue: T) {
 
   const update = () => {
     navigate({
-      to: location.pathname + '?' + currentSearchParams.toString(),
+      to: location.pathname + generateSearch(currentSearchParams),
       replace: true,
       resetScroll: false
     })

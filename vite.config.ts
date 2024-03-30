@@ -19,10 +19,6 @@ export default defineConfig(({ mode }) => ({
     rollupOptions: {
       output: {
         manualChunks: {
-          react: ['react'],
-          'react-dom': ['react-dom', 'react-dom/server'],
-          '@tanstack': ['@tanstack/react-router', '@tanstack/react-query'],
-          'react-toastify': ['react-toastify'],
           '@mui': ['@mui/material'],
           '@vidstack': ['@vidstack/react']
         }

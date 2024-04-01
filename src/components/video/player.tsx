@@ -24,7 +24,6 @@ export default function VideoPlayer({ videoId, playerRef, onReady }: VideoPlayer
   const { data: video } = videoService.useVideo(videoId)
   const { data: categories } = categoryService.useAll()
   const { data: stars } = videoService.useStars(videoId)
-
   const { mutate: mutateAddBookmark } = videoService.useAddBookmark(videoId)
   const { mutate: mutateToggleCensor } = videoService.useToggleCensor(videoId)
 
@@ -34,6 +33,12 @@ export default function VideoPlayer({ videoId, playerRef, onReady }: VideoPlayer
 
   const copy = () => {
     navigator.clipboard.writeText(video.path.file.slice(0, -4))
+  }
+
+  const resetPlays = () => {
+    videoService.resetPlays(video.id).then(() => {
+      location.reload()
+    })
   }
 
   const deleteVideo = () => {
@@ -124,6 +129,8 @@ export default function VideoPlayer({ videoId, playerRef, onReady }: VideoPlayer
           text={video.censored ? 'UnCensor' : 'Censor'}
           onClick={() => mutateToggleCensor({ cen: !video.censored })}
         />
+
+        <IconWithText component={ContextMenuItem} icon='delete' text='Remove Plays' onClick={resetPlays} />
 
         <IconWithText
           component={ContextMenuItem}

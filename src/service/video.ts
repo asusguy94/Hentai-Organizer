@@ -14,6 +14,8 @@ type HomeVideo = {
 }
 
 export default {
+  addPlay: (id: number) => api.put(`/${id}`, { plays: 1 }),
+  resetPlays: (id: number) => api.put(`/${id}`, { plays: 0 }),
   renameVideo: (id: number, path: string) => api.put(`/${id}`, { path }),
   useToggleCensor: (id: number) => {
     const queryClient = useQueryClient()

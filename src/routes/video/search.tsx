@@ -114,6 +114,16 @@ function Sort() {
     update()
   }
 
+  const sortPlays = (reverse = false) => {
+    setParam('shuffle', defaultObj.shuffle)
+    if (reverse) {
+      setParam('sort', '-plays')
+    } else {
+      setParam('sort', 'plays')
+    }
+    update()
+  }
+
   const shuffle = () => {
     setParam('sort', 'shuffle')
     setParam('shuffle', Date.now().toString())
@@ -135,6 +145,7 @@ function Sort() {
             <SortObj id='added' labels={['Recent Upload', 'Old Upload']} callback={sortAdded} reversed />
             <SortObj id='published' labels={['Newest', 'Oldest']} callback={sortDate} reversed />
             <SortObj id='quality' labels={['Highest Quality', 'Lowest Quality']} callback={sortQuality} reversed />
+            <SortObj id='quality' labels={['Most Popular', 'Least Popular']} callback={sortPlays} reversed />
           </RadioGroup>
         </FormControl>
       </div>

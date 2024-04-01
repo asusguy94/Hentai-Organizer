@@ -66,7 +66,7 @@ type DefaultVideoObj = {
   outfit: string
   network: string
   query: string
-  sort: WithReverse<'alphabetical' | 'added' | 'published' | 'quality' | 'shuffle'>
+  sort: WithReverse<'alphabetical' | 'added' | 'plays' | 'published' | 'quality' | 'shuffle'>
   shuffle: string
 }
 
@@ -119,6 +119,9 @@ export function getVideoSort(type: DefaultVideoObj['sort']): SortMethodVideo {
       break
     case 'quality':
       sortMethod = (a, b) => a.quality - b.quality
+      break
+    case 'plays':
+      sortMethod = (a, b) => a.plays - b.plays
       break
     case 'shuffle':
       sortMethod = () => Math.random() - 0.5

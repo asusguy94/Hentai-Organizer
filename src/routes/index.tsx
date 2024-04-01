@@ -12,8 +12,9 @@ import { videoService } from '@/service'
 export const Route = createFileRoute('/')({
   component: () => (
     <Grid container>
-      <Column label='recent' cols={16} rows={2} />
-      <Column label='newest' cols={16} rows={2} />
+      <Column label='recent' cols={16} rows={1} />
+      <Column label='newest' cols={16} rows={1} />
+      <Column label='popular' cols={16} rows={2} />
     </Grid>
   )
 })

@@ -115,7 +115,28 @@ export default {
   removeAttribute: (id: number, attributeID: number) => api.delete(`/${id}/attribute/${attributeID}`),
   addVideos: (videos: unknown[]) => api.post('/add', { videos }),
   setSlug: (id: number, slug: string) => api.put(`/${id}/api`, { slug }),
-  setBrand: (id: number) => api.put(`/${id}/api`, { brand: true }),
+  useSetBrand: (id: number) => {
+    const queryClient = useQueryClient()
+
+    const { mutate } = useMutation({
+      mutationKey: ['video', id, 'setBrand'],
+      mutationFn: () => api.put(`/${id}/api`, { brand: true }),
+      onSuccess: () => queryClient.invalidateQueries({ ...keys.video.byId(id) })
+    })
+
+    return { mutate }
+  },
+  useSetDate: (id: number) => {
+    const queryClient = useQueryClient()
+
+    const { mutate } = useMutation({
+      mutationKey: ['video', id, 'setDate'],
+      mutationFn: () => api.put(`/${id}/api`, { date: true }),
+      onSuccess: () => queryClient.invalidateQueries({ ...keys.video.byId(id) })
+    })
+
+    return { mutate }
+  },
   setDate: (id: number) => api.put(`/${id}/api`, { date: true }),
   setCover: (id: number) => api.put(`/${id}/api`, { cover: true }),
   setPoster: (id: number) => api.put(`/${id}/api`, { poster: true }),

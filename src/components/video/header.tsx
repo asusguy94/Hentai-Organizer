@@ -232,17 +232,12 @@ type HeaderDateProps = {
 }
 function HeaderDate({ videoId }: HeaderDateProps) {
   const { data: video } = videoService.useVideo(videoId)
+  const { mutate } = videoService.useSetDate(videoId)
 
   if (video === undefined) return <Spinner />
 
-  const handleDate = () => {
-    videoService.setDate(videoId).then(() => {
-      location.reload()
-    })
-  }
-
   return (
-    <Button size='small' variant='outlined' onClick={handleDate}>
+    <Button size='small' variant='outlined' onClick={() => mutate()}>
       <Icon code='calendar' />
       <span>{video.date.published ?? 'Get Date'}</span>
     </Button>
@@ -281,6 +276,7 @@ type HeaderNetworkProps = {
 }
 function HeaderNetwork({ videoId }: HeaderNetworkProps) {
   const { data: video } = videoService.useVideo(videoId)
+  const { mutate } = videoService.useSetBrand(videoId)
 
   const navigate = useNavigate()
 
@@ -288,9 +284,7 @@ function HeaderNetwork({ videoId }: HeaderNetworkProps) {
 
   const handleClick = () => {
     if (video.brand === null) {
-      videoService.setBrand(videoId).then(() => {
-        location.reload()
-      })
+      mutate()
     } else {
       navigate({
         to: '/video/search',

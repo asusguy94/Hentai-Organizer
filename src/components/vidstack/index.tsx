@@ -94,10 +94,11 @@ export default function Player({ videoId, title, src, poster, thumbnails, player
     }
   }
 
-  const onWheel = (e: React.WheelEvent) => {
-    if (playerRef.current === null) return
-
-    playerRef.current.currentTime += 10 * Math.sign(e.deltaY) * -1
+  const seekStep = 1
+  const seekToTime = (offset: number, player = remote.getPlayer()) => {
+    if (player !== null) {
+      remote.seek(player.currentTime + offset)
+    }
   }
 
   return (
@@ -113,9 +114,7 @@ export default function Player({ videoId, title, src, poster, thumbnails, player
       viewType='video'
       storage='vidstack'
       onProviderChange={onProviderChange}
-      onTimeUpdate={onTimeUpdate}
-      onWheel={onWheel}
-      onHlsManifestParsed={onManifestParsed}
+      onWheel={e => seekToTime(10 * Math.sign(e.deltaY) * -1)}
       onHlsInstance={hls => (hlsRef.current = hls)}
       onHlsError={onHlsError}
       keyTarget='document'
@@ -124,14 +123,17 @@ export default function Player({ videoId, title, src, poster, thumbnails, player
         toggleMuted: 'm',
         volumeUp: 'ArrowUp',
         volumeDown: 'ArrowDown',
-        seekBackward: 'ArrowLeft',
-        seekForward: 'ArrowRight',
-        togglePaused: {
-          keys: 'Space',
-          callback(e) {
-            if (e.type === 'keyup') {
-              remote.togglePaused()
-            }
+        togglePaused: 'Space',
+        seekBackward: {
+          keys: 'ArrowLeft',
+          onKeyDown({ player }) {
+            seekToTime(-seekStep, player)
+          }
+        },
+        seekForward: {
+          keys: 'ArrowRight',
+          onKeyDown({ player }) {
+            seekToTime(seekStep, player)
           }
         }
       }}
@@ -140,10 +142,11 @@ export default function Player({ videoId, title, src, poster, thumbnails, player
         {poster !== undefined && localBookmark === 0 && <Poster className='vds-poster' src={poster} alt={title} />}
         <Track kind='chapters' content={chapters} default type='json' />
       </MediaProvider>
+
       <DefaultVideoLayout
         thumbnails={thumbnails}
         icons={defaultLayoutIcons}
-        seekStep={1}
+        seekStep={seekStep}
         slots={{ googleCastButton: null, pipButton: null, fullscreenButton: null }}
         noScrubGesture={false}
       />

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 
 import { Button } from '@mui/material'
 
+import { useMediaRemote } from '@vidstack/react'
 import { ContextMenu, ContextMenuTrigger, ContextMenuItem } from 'rctx-contextmenu'
 import { Tooltip } from 'react-tooltip'
 import { useWindowSize } from 'react-use'
@@ -126,6 +127,8 @@ function Bookmark({ bookmark, duration, top, videoId, playerRef, bookmarkRef }: 
   const { mutate: mutateRemoveOutfit } = bookmarkService.useRemoveOutfit(videoId, bookmark.id)
   const { mutate: mutateClearAttributes } = bookmarkService.useClearAttributes(videoId, bookmark.id)
 
+  const remote = useMediaRemote(playerRef)
+
   const { active } = useActiveContext()
   const { setEvent: setStarEvent } = useStarEventContext()
   const { setModal } = useModalContext()
@@ -137,14 +140,6 @@ function Bookmark({ bookmark, duration, top, videoId, playerRef, bookmarkRef }: 
 
   const tooltip = bookmark.starID > 0 || bookmark.attributes.length > 0 || bookmark.outfit !== null
 
-  const playVideo = (time: number) => {
-    const player = playerRef.current
-    if (player !== null) {
-      player.currentTime = time
-      player.play()
-    }
-  }
-
   const setTime = () => {
     const player = playerRef.current
 
@@ -153,6 +148,15 @@ function Bookmark({ bookmark, duration, top, videoId, playerRef, bookmarkRef }: 
 
       mutateSetTime({ time })
     }
+  }
+
+  const playVideo = (time: number) => {
+    remote.seek(time)
+    remote.play()
+  }
+
+  const togglePause = () => {
+    remote.togglePaused()
   }
 
   const attributesFromStar = (starID: number) => stars?.find(star => star.id === starID)?.attributes ?? []
@@ -173,6 +177,7 @@ function Bookmark({ bookmark, duration, top, videoId, playerRef, bookmarkRef }: 
             top
           }}
           onMouseDown={e => e.button === 0 && playVideo(bookmark.start)}
+          onKeyDown={e => e.code === 'Space' && togglePause()}
           ref={bookmarkRef}
         >
           <div data-tooltip-id={bookmark.id.toString()}>{bookmark.name}</div>

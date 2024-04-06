@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Button,
   Card,
+  CardContent,
   CardMedia,
   Checkbox,
   Divider,
@@ -474,8 +475,12 @@ function Franchise() {
   return (
     <div id={styles.franchise}>
       {video.related.map(v => (
-        <a href={`/video/${v.id}`} key={v.id}>
+        <Link to='/video/$videoId' params={{ videoId: v.id }} key={v.id}>
           <Grid container component={Card} className={styles.episode}>
+            <Grid component={CardContent}>
+              <Typography>{v.plays} plays</Typography>
+            </Grid>
+
             <Grid item xs={2} className={styles.thumbnail} justifyContent='center'>
               {v.image === null ? (
                 <MissingImage />
@@ -492,7 +497,7 @@ function Franchise() {
               {v.name.replace(new RegExp(`^${escapeRegExp(video.franchise)}\\s`), '')}
             </Grid>
           </Grid>
-        </a>
+        </Link>
       ))}
     </div>
   )

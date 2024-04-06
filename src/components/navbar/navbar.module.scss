@@ -17,10 +17,22 @@
 
       &:hover {
         background-color: forestgreen;
+      }
 
-        .sub {
-          display: block;
+      .sub {
+        display: none;
+        position: absolute;
+        background-color: green;
+        box-shadow: 0 8px 16px 0 rgb(0 0 0 / 20%);
+        z-index: 1;
+
+        li {
+          padding: 0 8px;
         }
+      }
+
+      &:hover .sub {
+        display: block;
       }
 
       a {
@@ -28,18 +40,6 @@
         color: white;
         text-decoration: none;
         padding: 12px;
-      }
-
-      .sub {
-        display: none;
-        position: absolute;
-        background-color: green;
-        box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
-        z-index: 1;
-
-        li {
-          padding: 0 8px;
-        }
       }
     }
   }

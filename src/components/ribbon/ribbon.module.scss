@@ -14,14 +14,13 @@
     translate: 30%;
     rotate: 45deg;
     transform-origin: top left;
-
     font-weight: bold;
     font-size: 0.9em;
     min-width: 20px;
     text-align: center;
 
-    &:before,
-    &:after {
+    &::before,
+    &::after {
       content: '';
       position: absolute;
       top: 0;
@@ -31,11 +30,11 @@
       background: red;
     }
 
-    &:before {
+    &::before {
       right: 100%;
     }
 
-    &:after {
+    &::after {
       left: 100%;
     }
   }

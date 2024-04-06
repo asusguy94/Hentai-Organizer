@@ -13,14 +13,14 @@
 
   .star {
     margin: 5px;
+    width: var(--star-width);
 
-    width: var(--starWidth);
     img {
-      height: var(--starHeight);
+      height: var(--star-height);
     }
 
     .title {
-      padding: 0px 2px;
+      padding: 0 2px;
       align-items: center;
       height: 24px * 2;
     }

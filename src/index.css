@@ -1,7 +1,7 @@
 :root {
   /* Star Image */
-  --starWidth: 200px;
-  --starHeight: 275px;
+  --star-width: 200px;
+  --star-height: 275px;
 }
 
 h1,
@@ -56,10 +56,10 @@ button {
 
 /* MUI Link Color */
 a {
-  color: rgb(25, 118, 212);
-  text-decoration: underline rgba(25, 118, 212, 0.4);
+  color: rgb(25 118 212);
+  text-decoration: underline rgb(25 118 212 / 40%);
 }
 
 a:hover {
-  text-decoration-color: rgba(25, 118, 212, 1);
+  text-decoration-color: rgb(25 118 212);
 }

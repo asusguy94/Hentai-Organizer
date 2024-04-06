@@ -2,12 +2,12 @@
 
 #star {
   #profile {
-    max-height: var(--starHeight);
-    max-width: var(--starWidth);
+    max-height: var(--star-height);
+    max-width: var(--star-width);
   }
 
   .no-error {
-    color: rgba(black, 0.6);
+    color: rgb(black / 60%);
   }
 
   .error label {
@@ -26,5 +26,5 @@
 
 .video {
   margin: 0 10px 10px 5px !important;
-  width: 240px;
+  width: 290px;
 }

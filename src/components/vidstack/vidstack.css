@@ -3,14 +3,13 @@
 
 .vds-slider {
   --media-slider-track-height: 6px;
-
-  --media-slider-track-fill-bg: rgb(0, 200, 0);
-  --media-slider-track-progress-bg: rgb(168, 0, 255);
-  --media-slider-track-bg: rgba(255, 255, 255, 0.25);
+  --media-slider-track-fill-bg: rgb(0 200 0);
+  --media-slider-track-progress-bg: rgb(168 0 255);
+  --media-slider-track-bg: rgba(255 255 255 / 25%);
 }
 
 .vds-time-group {
-  --media-time-color: rgba(255, 255, 255, 1);
+  --media-time-color: rgb(255 255 255);
 }
 
 /* Always display Timeline-DOT */

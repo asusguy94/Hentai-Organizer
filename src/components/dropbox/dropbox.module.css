@@ -1,10 +1,10 @@
 #dropbox {
   width: 200px;
   height: 275px;
-  border: 2px dashed rgba(255, 0, 0, 0.3);
+  border: 2px dashed rgb(255 0 0 / 30%);
 
   &.hover {
-    border-color: rgba(255, 0, 0, 1);
+    border-color: rgb(255 0 0);
   }
 
   .label {

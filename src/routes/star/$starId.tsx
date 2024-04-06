@@ -224,6 +224,7 @@ function Video({ video }: { video: StarVideo }) {
             muted
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
+            style={{ objectFit: 'fill' }}
           />
 
           <CardContent>

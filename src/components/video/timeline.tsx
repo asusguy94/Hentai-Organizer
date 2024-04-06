@@ -37,6 +37,8 @@ export default function Timeline({ videoId, playerRef, playerReady }: TimelinePr
   const [bookmarkLevels, setBookmarkLevels] = useState<number[]>([])
   const { collisionCheck } = useCollision()
 
+  const remote = useMediaRemote(playerRef)
+
   const { data: video } = videoService.useVideo(videoId)
   const { data: bookmarks } = videoService.useBookmarks(videoId)
 
@@ -62,11 +64,11 @@ export default function Timeline({ videoId, playerRef, playerReady }: TimelinePr
 
     setMaxLevel(maxLevel)
     setBookmarkLevels(levels)
-  }, [bookmarks, collisionCheck, playerRef, windowSize.width, playerReady])
+  }, [bookmarks, collisionCheck, windowSize.width, playerReady])
 
   useEffect(() => {
     const setHeight = () => {
-      const videoElement = playerRef.current?.el ?? null
+      const videoElement = remote.getPlayer()?.el ?? null
       if (videoElement !== null) {
         const videoTop = videoElement.getBoundingClientRect().top
         videoElement.style.height = `calc(100vh - (${spacing.bookmark}px * ${maxLevel}) - ${videoTop}px - ${spacing.top}px)`
@@ -81,7 +83,7 @@ export default function Timeline({ videoId, playerRef, playerReady }: TimelinePr
     return () => {
       window.removeEventListener('scroll', setHeight)
     }
-  }, [maxLevel, playerRef, playerReady])
+  }, [maxLevel, playerReady, remote])
 
   if (video === undefined || bookmarks === undefined) return <Spinner />
 
@@ -91,8 +93,10 @@ export default function Timeline({ videoId, playerRef, playerReady }: TimelinePr
         <Bookmark
           key={bookmark.id}
           bookmark={bookmark}
-          duration={video.duration}
-          top={`${(bookmarkLevels[idx] - 1) * spacing.bookmark}px`}
+          style={{
+            top: `${(bookmarkLevels[idx] - 1) * spacing.bookmark}px`,
+            left: `${(bookmark.start / video.duration) * 100}%`
+          }}
           videoId={videoId}
           playerRef={playerRef}
           bookmarkRef={ref => (bookmarksRef.current[idx] = ref)}
@@ -104,16 +108,15 @@ export default function Timeline({ videoId, playerRef, playerReady }: TimelinePr
 
 type BookmarkProps = {
   bookmark: BookmarkType
-  duration: number
-  top: string
+  style: React.CSSProperties
   videoId: number
   playerRef: React.RefObject<MediaPlayerInstance>
   bookmarkRef: (btn: HTMLButtonElement) => void
 }
 
-function Bookmark({ bookmark, duration, top, videoId, playerRef, bookmarkRef }: BookmarkProps) {
+function Bookmark({ bookmark, style, videoId, playerRef, bookmarkRef }: BookmarkProps) {
   const { data: outfits } = outfitService.useAll()
-  const { data: attributes } = attributeService.useAll()
+  const { data: attributes } = attributeService.useVideos()
   const { data: categories } = categoryService.useAll()
   const { data: stars } = videoService.useStars(videoId)
 
@@ -141,7 +144,7 @@ function Bookmark({ bookmark, duration, top, videoId, playerRef, bookmarkRef }: 
   const tooltip = bookmark.starID > 0 || bookmark.attributes.length > 0 || bookmark.outfit !== null
 
   const setTime = () => {
-    const player = playerRef.current
+    const player = remote.getPlayer()
 
     if (player !== null) {
       const time = Math.round(player.currentTime)
@@ -172,10 +175,7 @@ function Bookmark({ bookmark, duration, top, videoId, playerRef, bookmarkRef }: 
           variant={isActive ? 'contained' : 'outlined'}
           color={bookmark.starID !== 0 ? 'primary' : 'secondary'}
           className={styles.bookmark}
-          style={{
-            left: `${(bookmark.start / duration) * 100}%`,
-            top
-          }}
+          style={style}
           onMouseDown={e => e.button === 0 && playVideo(bookmark.start)}
           onKeyDown={e => e.code === 'Space' && togglePause()}
           ref={bookmarkRef}

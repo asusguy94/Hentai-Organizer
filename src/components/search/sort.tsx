@@ -9,7 +9,7 @@ function createReverse<T extends string>(sort: T) {
 
 type SortObjProps<T extends DefaultObj> = {
   labels: [string, string]
-  id: T['sort']
+  id: WithoutReverse<T['sort']>
   callback: (reversed: boolean) => void
   reversed?: boolean
 }

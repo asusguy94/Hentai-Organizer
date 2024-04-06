@@ -5,16 +5,18 @@ import {
   MediaPlayerInstance,
   MediaProvider,
   MediaProviderAdapter,
-  MediaTimeUpdateEventDetail,
   Poster,
   Track,
   VTTContent,
   isHLSProvider,
-  useMediaRemote
+  useMediaRemote,
+  useMediaState
 } from '@vidstack/react'
 import { DefaultVideoLayout, defaultLayoutIcons } from '@vidstack/react/player/layouts/default'
 import Hls, { ErrorData } from 'hls.js'
-import { useSessionStorage } from 'usehooks-ts'
+import { toast } from 'react-toastify'
+
+import { CustomStorage } from './storage'
 
 import { useModalContext } from '@/context/modalContext'
 import { videoService } from '@/service'
@@ -40,17 +42,9 @@ export default function Player({ videoId, title, src, poster, thumbnails, player
   const remote = useMediaRemote(playerRef)
   const hlsRef = useRef<Hls>()
 
-  const [localVideo, setLocalVideo] = useSessionStorage('video', 0)
-  const [localBookmark, setLocalBookmark] = useSessionStorage('bookmark', 0)
+  const currentTime = useMediaState('currentTime', playerRef)
 
-  useEffect(() => {
-    if (video === undefined) return
-
-    if (localVideo !== video.id) {
-      setLocalVideo(video.id)
-      setLocalBookmark(0)
-    }
-  }, [localVideo, setLocalBookmark, setLocalVideo, video])
+  const lastPlayAddedRef = useRef<number | null>(null)
 
   const chapters = useMemo<VTTContent>(() => {
     if (bookmarks === undefined || video === undefined) return { cues: [] }
@@ -69,28 +63,33 @@ export default function Player({ videoId, title, src, poster, thumbnails, player
 
     if (isHLSProvider(provider)) {
       provider.library = () => import('hls.js')
-      provider.config = { maxBufferLength: Infinity, autoStartLoad: false }
+      provider.config = { maxBufferLength: Infinity }
     }
 
     onReady()
   }
 
-  const onTimeUpdate = (detail: MediaTimeUpdateEventDetail) => {
-    //TODO omitting this resets the video to the beginning every time
-    if (detail.currentTime > 0) {
-      setLocalBookmark(Math.round(detail.currentTime))
-    }
-  }
-
-  const onManifestParsed = () => {
-    if (hlsRef.current !== undefined) {
-      hlsRef.current.startLoad(localBookmark)
-    }
-  }
-
   const onHlsError = (detail: ErrorData) => {
     if (detail.fatal) {
       hlsRef.current?.destroy()
+    }
+  }
+
+  const customStorage = useMemo(() => new CustomStorage(), [])
+
+  useEffect(() => {
+    customStorage.updateVideoId(videoId)
+  }, [customStorage, videoId])
+
+  const onPlay = () => {
+    // TODO lastPlayAddedRef.current breaks if the user refreshes the page
+    if (customStorage.canAddPlay() && lastPlayAddedRef.current !== videoId) {
+      videoService.addPlay(videoId).then(() => {
+        toast.success('Play added', { autoClose: 500 })
+
+        lastPlayAddedRef.current = videoId
+        customStorage.resetCanAddPlay()
+      })
     }
   }
 
@@ -112,7 +111,8 @@ export default function Player({ videoId, title, src, poster, thumbnails, player
       streamType='on-demand'
       load='eager'
       viewType='video'
-      storage='vidstack'
+      storage={customStorage}
+      onPlay={onPlay}
       onProviderChange={onProviderChange}
       onWheel={e => seekToTime(10 * Math.sign(e.deltaY) * -1)}
       onHlsInstance={hls => (hlsRef.current = hls)}
@@ -139,7 +139,7 @@ export default function Player({ videoId, title, src, poster, thumbnails, player
       }}
     >
       <MediaProvider>
-        {poster !== undefined && localBookmark === 0 && <Poster className='vds-poster' src={poster} alt={title} />}
+        {poster !== undefined && currentTime < 1 && <Poster className='vds-poster' src={poster} alt={title} />}
         <Track kind='chapters' content={chapters} default type='json' />
       </MediaProvider>
 

@@ -28,11 +28,7 @@ import styles from './star.module.scss'
 
 export const Route = createFileRoute('/star/$starId')({
   parseParams: ({ starId }) => ({ starId: parseInt(starId) }),
-  component: StarPage
-})
-
-export default function StarPage() {
-  return (
+  component: () => (
     <Grid container>
       <Grid item xs={6}>
         <div id={styles.star}>
@@ -44,7 +40,7 @@ export default function StarPage() {
       </Grid>
     </Grid>
   )
-}
+})
 
 function Videos() {
   const { starId } = Route.useParams()

@@ -257,16 +257,16 @@ function Videos() {
 
   const { data: videos, isLoading } = searchService.useVideos()
 
-  const localSettings = useSettings()
+  const { localSettings } = useSettings()
 
   const filtered = useMemo<VideoSearch[]>(() => {
-    const videoCount = localSettings?.video_count
+    const videoCount = localSettings.video_count
 
     if (videos === undefined) return []
-    if (videoCount === undefined || videoCount === defaultSettings.video_count) return videos
+    if (videoCount === defaultSettings.video_count) return videos
 
     return videos.filter((_, idx) => idx < videoCount)
-  }, [localSettings?.video_count, videos])
+  }, [localSettings.video_count, videos])
 
   const sortedVideos = useMemo(() => {
     if (sort === 'shuffle' && shuffle === defaultObj.shuffle) return filtered

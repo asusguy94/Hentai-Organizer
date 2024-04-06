@@ -1,12 +1,33 @@
-import { useReadLocalStorage } from 'usehooks-ts'
+import { useLocalStorage } from 'react-use'
 
-export const keys = ['video_count', 'bookmark_spacing'] as const
-export const settingsKey = 'settings'
+export const defaultSettings = {
+  video_count: 0,
+  bookmark_spacing: 0,
+  foo: 'bar'
+}
 
-export type SettingKey = (typeof keys)[number]
-export type SettingValue = number
-export type Settings = Partial<Record<SettingKey, SettingValue>>
+export type Settings = typeof defaultSettings
 
-export const defaultSettings: Required<Settings> = { video_count: 0, bookmark_spacing: 0 }
+export function useSettings() {
+  const [storedSettings, setStoredSettings] = useLocalStorage<Partial<Settings>>('settings', defaultSettings)
 
-export const useSettings = () => useReadLocalStorage<Settings>(settingsKey)
+  const localSettings = { ...defaultSettings, ...storedSettings }
+
+  const setLocalSettings = (newSettings: Partial<Settings>) => {
+    setStoredSettings(prev => {
+      const updatedSettings = { ...prev, ...newSettings }
+
+      Object.keys(updatedSettings).forEach(key => {
+        const settingsKey = key as keyof Settings
+
+        if (updatedSettings[settingsKey] === defaultSettings[settingsKey]) {
+          delete updatedSettings[settingsKey]
+        }
+      })
+
+      return updatedSettings
+    })
+  }
+
+  return { localSettings, setLocalSettings }
+}

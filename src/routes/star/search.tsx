@@ -111,7 +111,7 @@ function Sort() {
 
       <FormControl>
         <RadioGroup name='sort' defaultValue={getSortString(sort)}>
-          <SortObj id={defaultObj.sort} labels={['A-Z', 'Z-A']} callback={sortAlphabetical} />
+          <SortObj id='alphabetical' labels={['A-Z', 'Z-A']} callback={sortAlphabetical} />
           <SortObj id='added' labels={['Newest', 'Oldest']} callback={sortAdded} reversed />
           <SortObj id='videos' labels={['Most Active', 'Least Active']} callback={sortActivity} reversed />
           <SortObj id='activity' labels={['Newest Activity', 'Oldest Activity']} callback={sortLastActivity} reversed />

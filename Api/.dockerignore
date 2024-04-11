@@ -1,0 +1,7 @@
+.env
+Dockerfile
+.dockerignore
+node_modules
+README.md
+.git
+media

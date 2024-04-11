@@ -1,0 +1,45 @@
+{
+  "name": "hentaits-fastify",
+  "version": "1.0.0",
+  "main": "src/index.ts",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "build": "prisma generate && tsc",
+    "format": "prettier --write .",
+    "docker:build": "docker build -t asusguy94/hentaits:fastify .",
+    "docker:push": "docker push asusguy94/hentaits:fastify",
+    "docker:remove": "docker image prune -f",
+    "docker": "yarn docker:build && yarn docker:push && yarn docker:remove",
+    "docker:watch": "nodemon --exec \"yarn docker\""
+  },
+  "dependencies": {
+    "@fastify/cors": "^9.0.1",
+    "@fastify/swagger": "^8.14.0",
+    "@fastify/swagger-ui": "^3.0.0",
+    "@prisma/client": "^5.10.2",
+    "axios": "^1.6.7",
+    "capitalize": "^2.0.4",
+    "dayjs": "^1.11.10",
+    "fake-useragent": "^1.0.1",
+    "fastify": "^4.26.2",
+    "ffmpeg-generate-video-preview": "^1.0.3",
+    "fluent-ffmpeg": "^2.1.2",
+    "get-video-dimensions": "^1.0.0",
+    "node-fetch": "^3.3.2",
+    "prisma": "^5.10.2",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@trivago/prettier-plugin-sort-imports": "^4.3.0",
+    "@types/capitalize": "^2.0.2",
+    "@types/fluent-ffmpeg": "^2.1.24",
+    "@types/node": "^20.11.25",
+    "fastify-tsconfig": "^2.0.0",
+    "nodemon": "^3.1.0",
+    "prettier": "^3.2.5",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.4.2"
+  }
+}

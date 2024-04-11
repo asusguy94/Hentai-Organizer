@@ -1,0 +1,13 @@
+{
+  "singleQuote": true,
+  "jsxSingleQuote": true,
+  "tabWidth": 2,
+  "trailingComma": "none",
+  "printWidth": 120,
+  "useTabs": false,
+  "semi": false,
+  "arrowParens": "avoid",
+  "importOrder": ["^(fastify|@?fastify[/-](.*))$", "<THIRD_PARTY_MODULES>", "path|fs", "^[./]"],
+  "importOrderSeparation": true,
+  "plugins": ["@trivago/prettier-plugin-sort-imports"]
+}

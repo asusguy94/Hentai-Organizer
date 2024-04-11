@@ -1,19 +1,15 @@
 {
   "name": "hentaits",
   "version": "1.0.0",
-  "main": "index.js",
-  "repository": "private:asusguy94/Hentai-Organizer.git",
   "author": "asusGuy94 <asusguy94.1@gmail.com>",
   "license": "MIT",
+  "private": true,
   "scripts": {
     "install:client": "yarn install --cwd Client",
     "install:api": "yarn install --cwd Api",
     "install:all": "yarn install:client && yarn install:api",
     "outdated:client": "yarn outdated --cwd Client",
     "outdated:api": "yarn outdated --cwd Api",
-    "outdated:all": "yarn outdated:client && yarn outdated:api",
-    "upgrade:client": "yarn upgrade-interactive --cwd Client",
-    "upgrade:api": "yarn upgrade-interactive --cwd Api",
-    "client:dev": "yarn dev --cwd Client"
+    "outdated:all": "yarn outdated:client && yarn outdated:api"
   }
 }
